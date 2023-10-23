@@ -42,7 +42,9 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
-  setScheduleStatus
+  setScheduleStatus,
+  clearErrorMSg
+
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -1143,6 +1145,13 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         {rowdata.profileName}
       </span>;
 };
+const showToast = (severity, detail) => {
+  toast.current.show({
+    severity: severity,
+    summary: severity === 'success' ? 'Success' : 'Error',
+    detail: detail,
+  });
+};
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -1356,21 +1365,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      setVisible_setup(false);
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail:"Configuration created successfully.",
         life: 5000
       });
-      setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo?.current && errorinfo?.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: getConfigData?.setupExists?.error?.CONTENT,
-        life: 5000
-      });
+      showToast('error', getConfigData?.setupExists?.error?.CONTENT);
     };
+    dispatch(clearErrorMSg());
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
