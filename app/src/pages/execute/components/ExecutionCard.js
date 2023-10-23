@@ -2,7 +2,7 @@ import { Card } from "primereact/card";
 import "../styles/ExecutionCard.scss";
 import { getBrowser } from "../../utility/utilityFunctions";
 
-const ExecutionCard = ({ cardData, configData,selectedTool }) => {
+const ExecutionCard = ({ cardData, configData }) => {
   console.log(getBrowser(cardData?.executionRequest?.browserType));
 
   const determineIntegration = (integrationData) => {
@@ -12,8 +12,11 @@ const ExecutionCard = ({ cardData, configData,selectedTool }) => {
       return 'qTest';
     } else if (integrationData.zephyr.url) {
       return 'Zephyr';
-    } else {
-      return 'None';
+    } else if (integrationData?.azure?.url) {
+      return 'Azure';
+    }
+    else {
+      return 'NA';
     }
   };
   
@@ -38,7 +41,9 @@ const ExecutionCard = ({ cardData, configData,selectedTool }) => {
           </div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Selected Browser  : {getBrowser(cardData?.executionRequest?.browserType).join(", ")}</div>
+        <div>
+            Selected Browser: {cardData?.executionRequest?.browserType ? getBrowser(cardData.executionRequest.browserType).join(", ") : "NA"}
+        </div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
         <div>Integration Type: {integrationType}</div>

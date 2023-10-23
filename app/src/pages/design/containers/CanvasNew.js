@@ -2274,7 +2274,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             </div>
             </Dialog>
             <Dialog
-        className='compare__object__modal'
+        className='compare__object__modal_canvas'
         header={` Analyze Scenario -${fetchingDetails && fetchingDetails["name"]}` }      
         style={{ height: "21.06rem", width: "24.06rem" }}
         visible={visibleScenarioAnalyze}

@@ -205,6 +205,10 @@ const configureSetupSlice = createSlice({
     setScheduleStatus: (state) => {
       state.scheduledStatus = false;
     },
+    clearErrorMSg: (state) => {
+      state.error = "";
+      state.setupExists = "";
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getProjects.pending, (state) => {
@@ -361,3 +365,4 @@ const configureSetupSlice = createSlice({
 export default configureSetupSlice.reducer;
 export const { checkRequired } = configureSetupSlice.actions;
 export const { setScheduleStatus } = configureSetupSlice.actions;
+export const { clearErrorMSg } = configureSetupSlice.actions;

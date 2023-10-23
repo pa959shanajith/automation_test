@@ -82,8 +82,7 @@ const VerticalSteps = (props) => {
       navigate("/design");
       var reqForOldModule={
         tab:"createTab",
-        projectid:project.projectId
-        ,
+        projectid:project.projectId,
         version:0,
         cycId: null,
         modName:"",
@@ -92,14 +91,14 @@ const VerticalSteps = (props) => {
       
       
     var firstModld=await getModules(reqForOldModule)
+    if(firstModld.length>0){
     var reqForFirstModule={
       tab:"createTab",
-      projectid:project.projectId
-      ,
+      projectid:project.projectId,
       version:0,
       cycId: null,
       modName:"",
-      moduleid:firstModld[0]._id
+      moduleid:firstModld[0]?._id
     }
     var firstModDetails=await getModules(reqForFirstModule)
 
@@ -107,7 +106,7 @@ const VerticalSteps = (props) => {
     if(!firstModDetails.currentlyInUse.length>0)
     await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
       dispatch(selectedProj(project.projectId))
-    }
+    }}
     else if(value==="Execute"){
           dispatch(updateSteps(2))
           navigate("/execute");

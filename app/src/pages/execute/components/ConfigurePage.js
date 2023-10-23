@@ -42,7 +42,9 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
-  setScheduleStatus
+  setScheduleStatus,
+  clearErrorMSg
+
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -216,6 +218,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
@@ -1142,6 +1146,13 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         {rowdata.profileName}
       </span>;
 };
+const showToast = (severity, detail) => {
+  toast.current.show({
+    severity: severity,
+    summary: severity === 'success' ? 'Success' : 'Error',
+    detail: detail,
+  });
+};
 
   const configModal = (getType, getData = null) => {
     if (getType === "CancelUpdate") {
@@ -1355,21 +1366,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      setVisible_setup(false);
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail:"Configuration created successfully.",
         life: 5000
       });
-      setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo?.current && errorinfo?.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: getConfigData?.setupExists?.error?.CONTENT,
-        life: 5000
-      });
+      showToast('error', getConfigData?.setupExists?.error?.CONTENT);
     };
+    dispatch(clearErrorMSg());
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
@@ -2103,7 +2110,7 @@ Learn More '/>
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            // isDisabled={!selectedICE}
+            isDisabled={(radioButton_grid === "Execute with Avo Assure Client" && !selectedICE)}
           />
           <AvoModal
             visible={visible_CICD}
@@ -2254,6 +2261,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
+            disabled={userInfo.rolename.trim()==="Quality Engineer"}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2288,7 +2296,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo.rolename.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
