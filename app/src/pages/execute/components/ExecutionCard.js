@@ -16,7 +16,7 @@ const ExecutionCard = ({ cardData, configData }) => {
       return 'Azure';
     }
     else {
-      return 'None';
+      return 'NA';
     }
   };
   
@@ -41,7 +41,9 @@ const ExecutionCard = ({ cardData, configData }) => {
           </div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
-          <div>Selected Browser  : {getBrowser(cardData?.executionRequest?.browserType).join(", ")}</div>
+        <div>
+            Selected Browser: {cardData?.executionRequest?.browserType ? getBrowser(cardData.executionRequest.browserType).join(", ") : "NA"}
+        </div>
         </div>
         <div className="col-12 lg:col-6 xl:col-6 md:col-12 sm:col-12">
         <div>Integration Type: {integrationType}</div>
