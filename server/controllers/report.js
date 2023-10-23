@@ -89,12 +89,10 @@ const openScreenShot = async (username, path,host) => {
         mySocket = myserver.allSocketsMap[clientName][icename];
         logger.info("Sending socket request for render_screenshot to cachedb");
         mySocket.emit("render_screenshot", path);
-        console.log(path);
 
         return (new Promise((rsv, rej) => {
             let scrShotData = [];
             mySocket.on("render_screenshot_finished", (message) =>{
-                console.log(message);
                 const data = message;
                 if (data === "fail") {
                     logger.error("Screenshots processing failed!");
