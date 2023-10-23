@@ -89,10 +89,12 @@ const openScreenShot = async (username, path,host) => {
         mySocket = myserver.allSocketsMap[clientName][icename];
         logger.info("Sending socket request for render_screenshot to cachedb");
         mySocket.emit("render_screenshot", path);
+        console.log(path);
 
         return (new Promise((rsv, rej) => {
             let scrShotData = [];
             mySocket.on("render_screenshot_finished", (message) =>{
+                console.log(message);
                 const data = message;
                 if (data === "fail") {
                     logger.error("Screenshots processing failed!");
@@ -119,7 +121,7 @@ const openScreenShot = async (username, path,host) => {
 exports.openScreenShot_API = async (req, res) => {
     try {
         const username = req.body.username; //req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.body.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -130,7 +132,7 @@ exports.openScreenShot_API = async (req, res) => {
 exports.openScreenShot = async (req, res) => {
     try {
         const username = req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.body.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
