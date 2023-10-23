@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {saveMindmap,getModules,getScreens} from '../api';
+import {saveMindmap,getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import * as d3 from 'd3';
 import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule } from '../designSlice';
 import '../styles/SaveMapButton.scss'
@@ -23,12 +23,16 @@ const SaveMapButton = (props) => {
     const moduledata = useSelector(state=>state.design.moduleList)
     const verticalLayout= props.verticalLayout
     const savedList = useSelector(state=>state.design.savedList)
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
     useEffect(()=>{
         if(props.createnew==='save'||props.createnew==='autosave')clickSave()      
           // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList,props.toast)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList,props.toast,userInfo)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -42,7 +46,7 @@ const SaveMapButton = (props) => {
 
      
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast,userInfo)=>{
     var tab = "endToend"
     var selectedProject;
     var error = !1
@@ -159,6 +163,8 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     else
         modId = result
     var moduleselected = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":modId})
+    await updateTestSuiteInUseBy("Web",modId,modId,userInfo?.username,true,false)
+
     if(moduleselected.error){displayError(moduleselected.error);return}
     var screendata = await getScreens(projId)
     if(screendata.error){displayError(screendata.error);return}
