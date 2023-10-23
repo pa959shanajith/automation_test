@@ -2435,9 +2435,9 @@ exports.manageJiraDetails = async (req, res) => {
 			}
 			result = await utils.fetchData(inputs, "admin/manageJiraDetails", actionName);
 		}else{
-			const jiraURL = data.user.jiraURL;
-			const jiraUsername = data.user.jiraUsername;
-			const jiraAPI = data.user.jiraAPI;
+			const jiraURL = data.user.url;
+			const jiraUsername = data.user.username;
+			const jiraAPI = data.user.password;
 			let inputs = {
 				"userId": userId,
 				"jiraUrl": jiraURL,
@@ -2552,11 +2552,11 @@ exports.manageZephyrDetails = async (req, res) => {
 				"action":action
 			}
 		}else{
-			const zephyrUrl = data.user.zephyrUrl;
-			const zephyrUsername = data.user.zephyrUsername;
-			const zephyrPassword = data.user.zephyrPassword;
-			const zephyrToken = data.user.zephyrToken;
-			const zephyrAuthType = data.user.zephyrAuthType;
+			const zephyrUrl = data.user.url;
+			const zephyrUsername = data.user.username;
+			const zephyrPassword = data.user.password;
+			const zephyrToken = data.user.token !== ''?data.user.token:"token";
+			const zephyrAuthType = data.user.authType;
 			inputs = {
 				"userId": userId,
 				"zephyrUrl": zephyrUrl,
@@ -2591,9 +2591,9 @@ exports.manageAzureDetails = async (req, res) => {
 			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
 
 		}else{
-			const AzureUrl = data.user.AzureURL;
-			const AzureUsername = data.user.AzureUsername;
-			const AzurePAT = data.user.AzurePAT;
+			const AzureUrl = data.user.url;
+			const AzureUsername = data.user.username;
+			const AzurePAT = data.user.password;
 			
 			inputs = {
 				"AzureUrl": AzureUrl,

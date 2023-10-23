@@ -129,6 +129,9 @@ export const settingSlice=createSlice({
         },
         enableSaveButton :(state, action) => {
             state.enableSaveButton =  action.payload
+        },
+        resetAzureLogin : (state, action) =>{
+            state.AzureLogin = initialState.AzureLogin;
         }
     }
 })
@@ -159,7 +162,8 @@ export const {
     checkedParentIds,
     checkedProjectIds,
     checkedReleaseIds,
-    enableSaveButton
+    enableSaveButton,
+    resetAzureLogin
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

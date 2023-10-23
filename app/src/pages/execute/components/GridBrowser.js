@@ -44,13 +44,28 @@ const GridBrowser = ({
   });
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const [showIntegrationModal, setShowIntegrationModal] = useState(false)
-  const [selectedTool, setSelectedTool] = useState(false);
+  const [showIntegrationModal, setShowIntegrationModal] = useState(false);
+  
+  const determineIntegration = (integrationData) => {
+    if (integrationData?.alm?.url) {
+      return 'ALM';
+    } else if (integrationData?.qtest?.url) {
+      return 'qTest';
+    } else if (integrationData?.zephyr?.url) {
+      return 'Zephyr';
+    } else if (integrationData?.azure?.url) {
+      return 'Azure';
+    }
+     else {
+      return 'None';
+    }
+  };
+  const [selectedTool, setSelectedTool] = useState({name: determineIntegration(integration)});
   const [checkedNotify, setCheckedNotify] = useState(false);
   // const[isNotifyOnExecutionCompletion,setIsNotifyOnExecutionCompletion]=useState('');
   const toast = useRef(null);
 
-  const tools = [
+  const integrationList = [
     { name: 'ALM' },
     { name: 'qTest' },
     { name: 'Zephyr' },
@@ -159,7 +174,7 @@ const GridBrowser = ({
                 setSelectedTool(selectedIntegration.value)
                 syncScenarioChange(selectedIntegration.value.name)
               }}
-              options={tools}
+              options={integrationList}
               optionLabel="name"
               placeholder="Select Integration"
               valueTemplate={selectedToolTemplate}

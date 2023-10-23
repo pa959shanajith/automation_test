@@ -15,6 +15,8 @@ import { updateSteps } from './VerticalComponentsSlice';
 import { getProjectIDs } from "../api"
 import { selectedProj } from '../../design/designSlice';
 import { showGenuis } from '../../global/globalSlice';
+import { getModules,updateTestSuiteInUseBy } from '../../design/api'
+
 
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
@@ -23,6 +25,10 @@ const VerticalSteps = (props) => {
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let project = reduxDefaultselectedProject;
     const activeStep = reduxDefaultselectedProject.progressStep;
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -70,12 +76,37 @@ const VerticalSteps = (props) => {
     },
     ];
 
-  const handleNext = (value) => {
+  const handleNext = async(value) => {
     if(value=== "Design Studio"){
       dispatch(updateSteps(1))
       navigate("/design");
-      dispatch(selectedProj(project.projectId))
+      var reqForOldModule={
+        tab:"createTab",
+        projectid:project.projectId,
+        version:0,
+        cycId: null,
+        modName:"",
+        moduleid:null
+      }
+      
+      
+    var firstModld=await getModules(reqForOldModule)
+    if(firstModld.length>0){
+    var reqForFirstModule={
+      tab:"createTab",
+      projectid:project.projectId,
+      version:0,
+      cycId: null,
+      modName:"",
+      moduleid:firstModld[0]?._id
     }
+    var firstModDetails=await getModules(reqForFirstModule)
+
+
+    if(!firstModDetails.currentlyInUse.length>0)
+    await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
+      dispatch(selectedProj(project.projectId))
+    }}
     else if(value==="Execute"){
           dispatch(updateSteps(2))
           navigate("/execute");

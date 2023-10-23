@@ -333,7 +333,7 @@ const TableRow = (props) => {
               FontSize: 100,
               fontSize: 14,
               background: "white",
-              height:200,
+              height:Object.keys(optionKeyword).length>4?200:110,
             }),
             menuPortal: (base) => ({ 
                 ...base, 
