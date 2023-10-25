@@ -40,13 +40,12 @@ export const getFunctionalReports = async(projId, relName, cycId) => {
                 'Content-type': 'application/json',
             },
             data: {
-                "param":"getReportsData_ICE",
-                "reportsInputData":{
-                    "projectId": projId,
-                    "releaseName": relName,
-                    "cycleId": cycId,
-                    "configurekey": projId,
-                    "type":"allmodules",
+                reportsInputData:{
+                    projectId: projId,
+                    releaseName: relName,
+                    cycleId: cycId,
+                    configurekey: projId,
+                    type:"allmodules",
                 }
             },
             credentials: 'include'
