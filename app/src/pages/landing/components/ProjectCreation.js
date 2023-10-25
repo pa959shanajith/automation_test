@@ -4,7 +4,7 @@ import { Button } from 'primereact/button';
 import '../styles/ProjectCreation.scss';
 import { useNavigate, Link } from 'react-router-dom';
 import CreateProject from './CreateProject';
-import VerticalSteps from './VerticalStpes';
+import VerticalSteps from './VerticalSteps';
 import { useSelector } from 'react-redux';
 
 

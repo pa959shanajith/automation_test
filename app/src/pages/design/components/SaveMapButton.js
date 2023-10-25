@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import * as d3 from 'd3';
-import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule } from '../designSlice';
+import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId } from '../designSlice';
 import '../styles/SaveMapButton.scss'
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
@@ -82,32 +82,65 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
         return;
     }
     setBlockui({show:true,content:'Saving flow! Please wait...'})
-    // dNodes.forEach((e, i)=>{
-    //     if (i === 0) return;
-    //     temp_data[i] = {
-    //         idx: i,
-    //         x: e.x,
-    //         y: e.y,
-    //         type: e.type
-    //     };
-    // });
-    // if (verticalLayout) {
-    //     temp_data.sort((a, b)=>a.x - b.x);
-    // } else {
-    //     temp_data.sort((a, b)=>a.y - b.y);
-    // }
-    // temp_data.forEach((e)=>{
-    //     // var key_1=undefined;
-    //     if(dNodes[e.idx].parent === null) return;
-    //     var key_1= dNodes[e.idx].parent.id;
-    //     var key=e.type+'_'+key_1;
-    //     if(counter[key] === undefined)  counter[key]=1;
-    //     if (dNodes[e.idx].childIndex !== counter[key]) {
-    //         dNodes[e.idx].childIndex = counter[key];
-    //         dNodes[e.idx].cidxch = 'true'; // child index updated
-    //     }
-    //     counter[key] = counter[key] + 1;
-    // })
+    dNodes.forEach((e, i)=>{
+        if (i === 0) return;
+        temp_data[i] = {
+            idx: i,
+            x: e.x,
+            y: e.y,
+            type: e.type
+        };
+    });
+    if (verticalLayout) {
+        temp_data.sort((a, b)=>a.x - b.x);
+    } else {
+        temp_data.sort((a, b)=>a.y - b.y);
+    }
+    temp_data.forEach((e)=>{
+        // var key_1=undefined;
+        if(dNodes[e.idx].parent === null) return;
+        var key_1= dNodes[e.idx].parent.id;
+        var key=e.type+'_'+key_1;
+        if(counter[key] === undefined)  counter[key]=1;
+        if (dNodes[e.idx].childIndex !== counter[key]) {
+            dNodes[e.idx].childIndex = counter[key];
+            dNodes[e.idx].cidxch = 'true'; // child index updated
+        }
+        if(dNodes[e.idx].type === 'scenarios' && dNodes[e.idx].state !== "created"){
+            for(let s = 0;s<dNodes[0].children.length;s++){
+                if(dNodes[0].children[s].id === dNodes[e.idx].id){
+                    dNodes[0].children[s].childIndex = counter[key];
+                    dNodes[0].children[s].cidxch = 'true';
+                }
+            }
+        }
+        else if(dNodes[e.idx].type === 'screens'){
+            for(let i = 0;i<dNodes[0].children.length;i++){
+                if(dNodes[0].children[i].id === dNodes[e.idx].parent.id){
+                    for(let j = 0; j<dNodes[0].children[i].children.length;j++){
+                        if(dNodes[0].children[i].children[j].id === dNodes[e.idx].id){
+                            dNodes[0].children[i].children[j].childIndex = counter[key];
+                            dNodes[0].children[i].children[j].cidxch = 'true';
+                        }
+                    }
+                }
+            }
+        }else if (dNodes[e.idx].type === 'testcases'){
+            for(let k = 0;k<dNodes[0].children.length;k++){
+                for(let m = 0; m<dNodes[0].children[k].children.length;m++){
+                    if(dNodes[0].children[k].children[m].id === dNodes[e.idx].parent.id){
+                        for(let n = 0; n<dNodes[0].children[k].children[m].children.length;n++){
+                            if(dNodes[0].children[k].children[m].children[n].id === dNodes[e.idx].id){
+                                dNodes[0].children[k].children[m].children[n].childIndex = counter[key];
+                                dNodes[0].children[k].children[m].children[n].cidxch = 'true';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        counter[key] = counter[key] + 1;
+    })
     treeIterator(mapData, dNodes[0], error);
     var data = {
         write: flag,
@@ -163,6 +196,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     else
         modId = result
     var moduleselected = await getModules({modName:null,cycId:cycId?cycId:null,"tab":tab,"projectid":projId,"moduleid":modId})
+    dispatch(SetCurrentId(modId))
     await updateTestSuiteInUseBy("Web",modId,modId,userInfo?.username,true,false)
 
     if(moduleselected.error){displayError(moduleselected.error);return}

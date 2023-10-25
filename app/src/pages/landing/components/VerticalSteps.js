@@ -101,9 +101,7 @@ const VerticalSteps = (props) => {
       moduleid:firstModld[0]?._id
     }
     var firstModDetails=await getModules(reqForFirstModule)
-
-
-    if(!firstModDetails.currentlyInUse.length>0)
+    if(!firstModDetails.currentlyInUse?.length>0)
     await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
       dispatch(selectedProj(project.projectId))
     }}

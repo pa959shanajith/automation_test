@@ -204,19 +204,16 @@ const UserDemo = (props) => {
         setShowAgentDialog(true);
     }
 
-    const confirmLogout = () => {
+    const confirmLogout = async() => {
         if(localStorage.getItem('OldModuleForReset')!==null){
         var reqForOldModule={
             tab:"createTab",
-            projectid:selectedProj
-            ,
+            projectid:selectedProj,
             version:0,
             cycId: null,
             modName:"",
             moduleid:localStorage.getItem('OldModuleForReset')
           }
-          
-          
         var moduledataold=await getModules(reqForOldModule)
         if(userInfo?.username===moduledataold.currentlyInUse)
         await updateTestSuiteInUseBy("Web",localStorage.getItem('OldModuleForReset'),localStorage.getItem('OldModuleForReset'),userInfo?.username,false,true)
