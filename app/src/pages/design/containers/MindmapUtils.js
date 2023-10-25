@@ -238,8 +238,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                   id: child.id ? child.id : generateId(parentId, childIdx + 1),
                   parent: {
                     ...child.parent.data,
-                    id: child.parent.data.id ? child.parent.data.id : parentId,
-                    // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+                    id: child.parent.id ? child.parent.id : parentId,
+                    parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
                   }
                 };
           
@@ -258,8 +258,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                 id: idx,
                 parent: d.parent ? {
                   ...d.parent.data,
-                  id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
-                  parent: d.parent.parent ? { ...d.parent.parent.data } : null
+                  id: d.parent.id ? d.parent.id : generateId(idx - 1, 0),
+                  parent: d.parent ? { ...d.parent.data } : null
                 } : null
               };
           
@@ -353,8 +353,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
               id: child.id ? child.id : generateId(parentId, childIdx + 1),
               parent: {
                 ...child.parent.data,
-                id: child.parent.data.id ? child.parent.data.id : parentId,
-                // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+                id: child.parent.id ? child.parent.id : parentId,
+                parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
               }
             };
       
@@ -373,8 +373,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
             id: idx,
             parent: d.parent ? {
               ...d.parent.data,
-              id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
-              parent: d.parent.parent ? { ...d.parent.parent.data } : null
+              id: d.parent.id ? d.parent.id : generateId(idx - 1, 0),
+              parent: d.parent ? { ...d.parent.data } : null
             } : null
           };
       
@@ -755,47 +755,6 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
                         }
                 //}
         });
-        if (dNodes[pi].type === "scenarios") {
-            for (let i = 0; dNodes[0].children.length > i; i++) {
-                if (dNodes[0].children[i].id === dNodes[pi].id) {
-                    const newData = {
-                        ...dNodes[0].children[i],
-                        x: parseFloat(l[0]), // Update x value
-                        y: parseFloat(l[1]), // Update y value
-                    };
-                    dNodes[0].children[i] = newData;
-                    break;
-                }
-            }
-        }
-        else if (dNodes[pi].type === "screens") {
-            for (let j = 0; j < dNodes[0].children.length; j++) {
-                for (let r = 0; r < dNodes[0].children[j].children.length; r++) {
-                    if (dNodes[0].children[j].children[r].id === dNodes[pi].id) {
-                        const newObject = {
-                            ...dNodes[0].children[j].children[r],
-                            x: parseFloat(l[0]), // Update x value for the parent object
-                            y: parseFloat(l[1]), // Update y value for the parent object
-                        };
-                        dNodes[0].children[j].children[r] = newObject;
-                    }
-                }
-            }
-        }
-        else if (dNodes[pi].type === 'testcases') {
-            for (var k = 0; k < dNodes[0].children.length; k++) {
-                for (var j = 0; j < dNodes[0].children[k].children.length; j++) {
-                    if (dNodes[0].children[k].children[j].id === dNodes[pi].parent.id) {
-                        const newObject = {
-                            ...dNodes[0].children[k].children[j],
-                            x: parseFloat(l[0]), // Update x value
-                            y: parseFloat(l[1]), // Update y value
-                        };
-                        dNodes[0].children[k].children[j] = newObject;
-                    }
-                }
-            }
-        }
         p.classed('ct-movable', !1);
         return {linkDisplay}
 };

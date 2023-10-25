@@ -39,7 +39,7 @@ const ModuleListDrop = (props) =>{
     const moduleSelectlist = useSelector(state=>state.design.selectedModulelist)
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
-    const currentModuleId = useSelector(state=>state.design.currentModuleId)
+    const currentId = useSelector(state=>state.design.currentid)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -134,7 +134,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch(savedList(true))}
         setWarning(false); 
-        
+        if(dontShowFirstModules === true)loadModule(currentId)
      // eslint-disable-next-line react-hooks/exhaustive-deps
      }, [moduleLists, initProj])
      useEffect(()=> {
