@@ -260,7 +260,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             setSelectedDevices('')
             setDevices([])
             setSelectApk([])
-            let findapk = Object.entries(mobileDetailsBrowserStack.stored_files[option.key]).map(([key, value], index) => ({
+            let findapk = Object.entries(mobileDetailsBrowserStack.stored_files[option.key]).map((key, index) => ({
                 key: key,
                 text: key,
                 title: key,
@@ -440,7 +440,8 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                             "platformName": selectedMobilePlatforms,
                             "deviceName": selectedDevices,
                             "platformVersion": selectedMobileVersion,
-                            "uploadedApk": selectedApk
+                            "uploadedApk": selectedApk,
+                            "browserName": "Chrome"
                             
                         }
                     }        

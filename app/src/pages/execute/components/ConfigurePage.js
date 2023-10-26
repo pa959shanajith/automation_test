@@ -686,7 +686,7 @@ const handleBrowserstackSubmit = async (BrowserstackPayload) => {
       //   setOs(arrayOS);
         setBrowserstackBrowserDetails(resultData);
   }
-  else if (resultData && resultData.devices){
+  else if (resultData && resultData.devices && resultData.stored_files){
     const arrayPlatforms = Object.keys(resultData.devices).map((element, index) => { 
         return {
             key: element,
