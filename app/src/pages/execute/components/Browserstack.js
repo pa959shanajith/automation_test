@@ -67,7 +67,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
                     </div>
                 </form>
                 
-                <Button id='Browserstack_submit' label="Submit"
+                <Button id='Saucelabs_submit' label="Submit"
                     onClick={() => handleBrowserstackSubmit(defaultValues)}
                 />
                 </>}headerTxt='Browserstack login' modalSytle={{
@@ -192,11 +192,11 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
     
     return (
         <>
-            <AvoModal  header='Browserstack Integration' visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
+            <AvoModal customClass='browserstack_modal'  header='Browserstack Integration' visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
                 
             content={
             <>
-                <div><h6>Operating Systems</h6></div>
+                <div className='os_name'><h3>Operating Systems</h3></div>
                 <Dropdown
                     // noItemsText={[]}
                     onChange={(e)=>onOsChange(e.value)}
@@ -207,9 +207,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     // width='15rem'
                     optionLabel='key'
                     placeholder='select OS'
+                    className='browserstack_dropdown'
                     // calloutMaxHeight='12rem'
                 />
-                <div><h6>Operating Systems Versions</h6></div>
+                <div className='os_name'><h3>Operating Systems Versions</h3></div>
                 <Dropdown
                     // noItemsText={[]}
                     disabled={selectedOS == ''}
@@ -221,9 +222,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     // width='15rem'
                     optionLabel='key'
                     placeholder='select OS Versions'
+                    className='browserstack_dropdown'
                     // calloutMaxHeight='12rem'
                 />
-                <div><h6>Browsers</h6></div>
+                <div className='os_name'><h3>Browsers</h3></div>
                 <Dropdown
                     // noItemsText={[]}
                     disabled={selectedOsVersions == ''}
@@ -235,9 +237,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     // width='15rem'
                     optionLabel='key'
                     placeholder='select Browsers'
+                    className='browserstack_dropdown'
                     // calloutMaxHeight='12rem'
                 />
-                <div><h6>Browser Versions</h6></div>
+                <div className='os_name'><h3>Browser Versions</h3></div>
                 <Dropdown
                     // noItemsText={[]}
                     disabled={selectedBrowserVersions == ''}
@@ -249,31 +252,32 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     // width='15rem'
                     optionLabel='key'
                     placeholder='select Browser Versions'
+                    className='browserstack_dropdown'
                     // calloutMaxHeight='10rem'
                 />
                 <div>
-                    <div>
-                <div className="legends-container">
-                      <div className="legend">
-                        <span id="status" className="status-available1"></span>
-                        <span className="legend-texta">Available</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-unavailable"></span>
-                        <span className="legend-text2">Unavailable</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-dnd"></span>
-                        <span className="legend-text1">Do Not Disturb</span>
-                      </div>
+                <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
                     </div>
-                    </div>
-                    <div className='adminControl-ice-sauce'>
-                        <div className='sauce_ICEsearch'>
-                            <span className="leftControl_sauce" title="Token Name"></span>
-                            <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Select Avo Assure Client'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  />
-                        </div>
-                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                      className="saucelabs_ICE"
+                    />
+                  </div>
                 </div>
                 <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
                     dataExecution.type = (ExeScreen === true ? ((smartMode === "normal") ? "" : smartMode) : "")
@@ -296,11 +300,11 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     }
                     }
                     autoFocus />
-                    <Button id='Saucelabs_cancel' className='Saucelabs_cancel' label="Cancel" onClick={() => onHidedia('displayBasic7')} />
+                    <Button id='Saucelabs_cancel' text className='Saucelabs_cancel' size='small' label="Cancel" onClick={() => onHidedia('displayBasic7')} />
                 </>}
                 headerTxt='Browserstack Integration' modalSytle={{
-                    width: "45vw",
-                    height: "67vh",
+                    width: "40vw",
+                    height: "87vh",
                     background: "#FFFFFF",
                     }}/>
         </>
