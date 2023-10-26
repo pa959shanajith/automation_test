@@ -70,7 +70,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
                 <Button id='Saucelabs_submit' label="Submit"
                     onClick={() => handleBrowserstackSubmit(defaultValues)}
                 />
-                </>}headerTxt='Browserstack login' modalSytle={{
+                </>}headerTxt='BrowserStack login' modalSytle={{
                 width: "39vw",
                 height: "44vh",
                 background: "#FFFFFF",
@@ -302,7 +302,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, displayBas
                     autoFocus />
                     <Button id='Saucelabs_cancel' text className='Saucelabs_cancel' size='small' label="Cancel" onClick={() => onHidedia('displayBasic7')} />
                 </>}
-                headerTxt='Browserstack Integration' modalSytle={{
+                headerTxt='BrowserStack Integration' modalSytle={{
                     width: "40vw",
                     height: "87vh",
                     background: "#FFFFFF",

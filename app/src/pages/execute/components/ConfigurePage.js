@@ -556,7 +556,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
             setDisplayBasic4(false);
             await handleSubmit1();
             break;
-        case 'browserstack':
+        case 'BrowserStack':
           setDisplayBasic6('displayBasic6');
           setExecutingOn("ICE")
           setConfigItem(idx);
@@ -998,14 +998,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'sauceLabs', code: 1 },
-    { name: 'browserstack', code: 2 },
+    { name: 'BrowserStack', code: 2 },
   ];
   
-  const selectedCountryTemplate = (option, props) => {
+  const selectedCountryTemplate = (option, props) => {    
     if (option) {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '1rem' }} />
+                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1017,7 +1017,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       const countryOptionTemplate = (option) => {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '18px' }} />
+                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1122,9 +1122,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
             </Button>
 
             <div className="cloud-test-provider" >
-  <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
-  </div> 
+              <Dropdown
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+            </div> 
           
           </div>
         ),
