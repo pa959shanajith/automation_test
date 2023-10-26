@@ -209,11 +209,19 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                 break;
             case 'Zephyr':
                 try{
+                    let zephyrObj = {
+                        url: zephyrLoginDetails.url,
+                        authType: zephyrLoginDetails.authType
+                    }
+                    if(zephyrLoginDetails.username && zephyrLoginDetails.password){
+                        zephyrObj['username'] = zephyrLoginDetails.username;
+                        zephyrObj['password'] = zephyrLoginDetails.password;
+                    } 
+                    if(zephyrLoginDetails.token) {
+                        zephyrObj['token'] = zephyrLoginDetails.token;
+                    }
                     setLoading('Updating...');
-                    var data = await manageZephyrDetails(isEmpty?"create":"update", {
-                        ...zephyrLoginDetails,
-                        authType : zephyrLoginDetails.password ? "basic" : "token"
-                    });
+                    var data = await manageZephyrDetails(isEmpty?"create":"update", zephyrObj);
                     setLoading(false);
                     if(data.error){
                         toastError(data.error);
@@ -444,7 +452,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                      <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
                                    </div>
                                     <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"22rem":"11rem", bottom:!isEmpty?"2.5rem":""}}>
+                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"22rem":"21rem", bottom:!isEmpty?"2.5rem":"2rem"}}>
                                     </Button>
                                 </div>
                             </>)}

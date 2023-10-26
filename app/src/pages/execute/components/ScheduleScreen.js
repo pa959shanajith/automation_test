@@ -15,11 +15,12 @@ import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import { cancelScheduledJob_ICE, getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
-import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks, statusDetails } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
 import { Toast } from "primereact/toast";
 import { Tooltip } from 'primereact/tooltip';
+import { Dropdown } from "primereact/dropdown";
 
 const ScheduleScreen = ({
   cardData,
@@ -51,7 +52,7 @@ const ScheduleScreen = ({
 }) => {
   const [tableFilter, setTableFilter] = useState("");
   const [exestatus, setExestatus] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState({ name: "", code: "" },);
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
   const duplicateinfo = useRef(null);
@@ -299,9 +300,13 @@ const ScheduleScreen = ({
               className="make_recurring"
             />
             <OverlayPanel ref={statusfilter} className="recurrence_container">
-              <InputText
+              <Dropdown
                 value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
+                onChange={(e) => setFilterStatus(e.value)}
+                options={statusDetails}
+                optionLabel="name"
+                placeholder="Select status"
+                className="w-full md:w-14rem"
               />
             </OverlayPanel>
             <OverlayPanel ref={recurrance} className="recurrence_container">
@@ -395,7 +400,7 @@ const ScheduleScreen = ({
                 [...getScheduledList?.scheduledList]
                   ?.reverse()
                   .filter((el) => el?.recurringpattern === "One Time")
-                  .filter((el) => el.status.includes(filterStatus))
+                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -460,9 +465,9 @@ const ScheduleScreen = ({
               value={
                 Array.isArray(getScheduledList?.scheduledList) &&
                 [...getScheduledList?.scheduledList]
-                  .reverse()
+                  ?.reverse()
                   .filter((el) => el?.recurringpattern !== "One Time")
-                  .filter((el) => el.status.includes(filterStatus))
+                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(

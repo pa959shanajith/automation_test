@@ -39,7 +39,7 @@ const ModuleListDrop = (props) =>{
     const moduleSelectlist = useSelector(state=>state.design.selectedModulelist)
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
-    const currentModuleId = useSelector(state=>state.design.currentModuleId)
+    const currentId = useSelector(state=>state.design.currentid)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -134,7 +134,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch(savedList(true))}
         setWarning(false); 
-        
+        if(dontShowFirstModules === true)loadModule(currentId)
      // eslint-disable-next-line react-hooks/exhaustive-deps
      }, [moduleLists, initProj])
      useEffect(()=> {
@@ -831,19 +831,11 @@ setPreventDefaultModule(true);
           </div>
         )
        }
-       const handleReaOnlyTestSuite=async (props)=>{
-        const data = getModules({tab:"createTab", version:0, cycId:null, projectid:props.proj})
-        if(data.length>0){
-        let resetInUse=false
-        let assignToUser=false
-        var reqForCurrentModule={
-          tab:"createTab",
-          projectid:props.proj,
-          version:0,
-          cycId: null,
-          modName:"",
-          moduleid:props.modID
-      }
+      const handleReaOnlyTestSuite=async (props)=>{
+       const data = getModules({tab:"createTab", version:0, cycId:null, projectid:props.proj})
+       
+       let resetInUse=false
+        
       var reqForOldModule={
         tab:"createTab",
         projectid:props.proj,
@@ -853,36 +845,25 @@ setPreventDefaultModule(true);
         moduleid:props.oldModuleForReset
       }
       
-      var moduledata = await getModules(reqForCurrentModule)
-      var moduledataold=await getModules(reqForOldModule)
-      if(moduledata.error){props.displayError(moduledata.error);return}
-        
-        if(!moduledata.currentlyInUse.length>0)
-        // if testuite isnt assigned to any user
-        {
-          // check for older testsuite assignment to get reset 
-          //here we will check whether the older module was assigned to current logged in user or not 
-          
-         (moduledataold.currentlyInUse!==props.userInfo?.username) ? resetInUse=false: resetInUse=true
       
-              // call the api to assign current testsuite and reset older one(based on above condition) 
-         await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,true,resetInUse)
-         loadModule(props.modID)
-        }
-         else if(moduledataold.currentlyInUse===props.userInfo?.username ){
+      var moduledataold=await getModules(reqForOldModule)
+      if(moduledataold.error){props.displayError(moduledataold.error);return}
+        
+  
+      if(moduledataold.currentlyInUse===props.userInfo?.username ){
       
           // only reset no assignment 
           resetInUse=true
           
-          await scrapeApi.updateTestSuiteInUseBy(props.appType,props.modID,props.oldModuleForReset,props.userInfo?.username,false,resetInUse)
-          loadModule(props.modID)
+          await scrapeApi.updateTestSuiteInUseBy(props.appType,"123",props.oldModuleForReset,props.userInfo?.username,false,resetInUse)
+          if(data.length>0)loadModule(props.modID)
         }
         else{
-          loadModule(props.modID)
+          if(data.length>0)loadModule(props.modID)
         }
+      localStorage.removeItem('OldModuleForReset')
       
-      }   
-    }
+      }  
       
     return(
         <Fragment>

@@ -8,6 +8,7 @@ import { loadUserInfoActions } from '../LandingSlice';
 import { useNavigate, Link } from "react-router-dom";
 import EditProfile from '../components/EditProfile'
 import Agent from '../components/Agent';
+import { getModules,updateTestSuiteInUseBy } from "../../design/api";
 // import 'primereact/resources/themes/saga-blue/theme.css';
 // import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
@@ -30,6 +31,8 @@ const UserDemo = (props) => {
     const [showUD, setShowUD] = useState(false);
     const [showOverlay, setShowOverlay] = useState("");
     const[OS,setOS]=useState("Windows")
+    const selectedProj = useSelector(state=>state.design.selectedProj)
+
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -201,7 +204,21 @@ const UserDemo = (props) => {
         setShowAgentDialog(true);
     }
 
-    const confirmLogout = () => {
+    const confirmLogout = async() => {
+        if(localStorage.getItem('OldModuleForReset')!==null){
+        var reqForOldModule={
+            tab:"createTab",
+            projectid:selectedProj,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:localStorage.getItem('OldModuleForReset')
+          }
+        var moduledataold=await getModules(reqForOldModule)
+        if(userInfo?.username===moduledataold.currentlyInUse)
+        await updateTestSuiteInUseBy("Web",localStorage.getItem('OldModuleForReset'),localStorage.getItem('OldModuleForReset'),userInfo?.username,false,true)
+        
+    }
         RedirectPage(navigate, { reason: "logout" });
     };
 
