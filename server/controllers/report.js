@@ -21,7 +21,7 @@ wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf
 var templatepdf = '';
 
 fs.readFile(path.join(__dirname,"..","..","templates","pdfReport","content.handlebars"), 'utf8', function(err, data) {
-    templatepdf = Handlebars.compile(data);
+templatepdf = Handlebars.compile(data);
 });
 
 let headers
