@@ -15,10 +15,12 @@ import "../styles/ScheduleScreen.scss";
 import ExecutionCard from "./ExecutionCard";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import { cancelScheduledJob_ICE, getScheduledDetailsOnDate_ICE, getScheduledDetails_ICE } from "../configureSetupSlice";
-import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks } from "../../utility/mockData";
+import { endMonths, scheduleMonths, schedulePeriod, scheduleWeek, scheduleWeeks, statusDetails } from "../../utility/mockData";
 import AvoInput from "../../../globalComponents/AvoInput";
 import AvoModal from "../../../globalComponents/AvoModal";
 import { Toast } from "primereact/toast";
+import { Tooltip } from 'primereact/tooltip';
+import { Dropdown } from "primereact/dropdown";
 
 const ScheduleScreen = ({
   cardData,
@@ -26,6 +28,8 @@ const ScheduleScreen = ({
   setStartDate,
   endDate,
   setEndDate,
+  recurEvery,
+  setRecurEvery,
   startTime,
   setStartTime,
   selectedPattren,
@@ -48,11 +52,13 @@ const ScheduleScreen = ({
 }) => {
   const [tableFilter, setTableFilter] = useState("");
   const [exestatus, setExestatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState({ name: "", code: "" },);
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
   const duplicateinfo = useRef(null);
 
   const recurrance = useRef(null);
+  const statusfilter = useRef(null);
 
   const scheduleDaily = [
     {
@@ -166,7 +172,7 @@ const ScheduleScreen = ({
       WY: (
         <div className="col-12 lg:col-9 xl:col-9 md:col-8 sm:col-6 flex flex-wrap flex-column">
           <div>
-            Recur every <InputText title="Enter after every how many week(s) you wish it to recur"   keyfilter={/^[0-9]+$/} /> week(s) on:
+            Recur every <InputText title="Enter after every how many week(s) you wish it to recur" value={recurEvery} onChange={(e) => setRecurEvery(e.target.value)} keyfilter={/^[0-9]+$/} /> week(s) on:
           </div>
           <div className="flex flex-wrap">
             {scheduleWeeks.map((el) => (
@@ -293,6 +299,16 @@ const ScheduleScreen = ({
               severity="info"
               className="make_recurring"
             />
+            <OverlayPanel ref={statusfilter} className="recurrence_container">
+              <Dropdown
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.value)}
+                options={statusDetails}
+                optionLabel="name"
+                placeholder="Select status"
+                className="w-full md:w-14rem"
+              />
+            </OverlayPanel>
             <OverlayPanel ref={recurrance} className="recurrence_container">
               <div className="grid">
                 <div className="col-12">Recurrence Pattern</div>
@@ -381,7 +397,77 @@ const ScheduleScreen = ({
             <DataTable
               value={
                 Array.isArray(getScheduledList?.scheduledList) &&
-                [...getScheduledList?.scheduledList]?.reverse().filter((el) => el?.recurringpattern === "One Time")
+                [...getScheduledList?.scheduledList]
+                  ?.reverse()
+                  .filter((el) => el?.recurringpattern === "One Time")
+                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
+                  .map((el) => ({
+                    ...el,
+                    scheduledon: `${new Date(
+                      el.scheduledon
+                    ).toLocaleDateString()}, ${el.time}`,
+                    endafter: el.endafter ? el.endafter : "-",
+                    status: (
+                      <div className="flex align-items-center justify-content-evenly">
+                        <Link onClick={() => onScheduleStatus(el)}>
+                          {el.status}
+                        </Link>
+                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                        <Tooltip target=".pi-trash"  position="bottom" content="Click here to delete this scheduled execution." />
+                      </div>
+                    ),
+                    target:
+                      el.schedulethrough === "client"
+                        ? el.target
+                        : el.schedulethrough,
+                  }))
+              }
+              tableStyle={{ minWidth: "50rem" }}
+              globalFilter={tableFilter}
+            >
+              <Column
+                align="center"
+                field="scheduledon"
+                header="Start Date & Time"
+              ></Column>
+              <Column
+                align="center"
+                field="target"
+                header="Environment"
+              ></Column>
+              <Column
+                align="center"
+                field="scheduletype"
+                header="Recurrance Type"
+              ></Column>
+              <Column
+                align="center"
+                field="endafter"
+                header="End After"
+              ></Column>
+              <Column
+                align="center"
+                field="status"
+                header={
+                  <span>
+                    Status
+                    <span
+                      className="pi pi-filter"
+                      onClick={(e) => statusfilter.current.toggle(e)}
+                    ></span>
+                  </span>
+                }
+              ></Column>
+            </DataTable>
+          </TabPanel>
+          <TabPanel header="Recurring Tasks">
+            <DataTable
+              value={
+                Array.isArray(getScheduledList?.scheduledList) &&
+                [...getScheduledList?.scheduledList]
+                  ?.reverse()
+                  .filter((el) => el?.recurringpattern !== "One Time")
+                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -425,58 +511,19 @@ const ScheduleScreen = ({
                 field="endafter"
                 header="End After"
               ></Column>
-              <Column align="center" field="status" header="Status"></Column>
-            </DataTable>
-          </TabPanel>
-          <TabPanel header="Recurring Tasks">
-            <DataTable
-              value={
-                Array.isArray(getScheduledList?.scheduledList) &&
-                [...getScheduledList?.scheduledList].reverse().filter((el) => el?.recurringpattern !== "One Time")
-                  .map((el) => ({
-                    ...el,
-                    scheduledon: `${new Date(
-                      el.scheduledon
-                    ).toLocaleDateString()}, ${el.time}`,
-                    endafter: el.endafter ? el.endafter : "-",
-                    status: (
-                      <div className="flex align-items-center justify-content-evenly">
-                        <Link onClick={() => onScheduleStatus(el)}>
-                          {el.status}
-                        </Link>
-                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
-                      </div>
-                    ),
-                    target:
-                      el.schedulethrough === "client"
-                        ? el.target
-                        : el.schedulethrough,
-                  }))
-              }
-              tableStyle={{ minWidth: "50rem" }}
-              globalFilter={tableFilter}
-            >
               <Column
                 align="center"
-                field="scheduledon"
-                header="Start Date & Time"
+                field="status"
+                header={
+                  <span>
+                    Status
+                    <span
+                      className="pi pi-filter"
+                      onClick={(e) => statusfilter.current.toggle(e)}
+                    ></span>
+                  </span>
+                }
               ></Column>
-              <Column
-                align="center"
-                field="target"
-                header="Envrionment"
-              ></Column>
-              <Column
-                align="center"
-                field="scheduletype"
-                header="Recurrance Type"
-              ></Column>
-              <Column
-                align="center"
-                field="endafter"
-                header="End After"
-              ></Column>
-              <Column align="center" field="status" header="Status"></Column>
             </DataTable>
           </TabPanel>
         </TabView>

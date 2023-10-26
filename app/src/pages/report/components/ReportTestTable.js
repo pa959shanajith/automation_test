@@ -15,6 +15,7 @@ import {
   viewReport,
   openScreenshot,
   getAccessibilityData,
+  getDetails_AZURE,
 } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -43,7 +44,6 @@ export default function BasicDemo() {
   const [searchTest, setSearchTest] = useState("");
   const [inputSummary, setInputSummary] = useState("");
   const [inputDesc, setInputDesc] = useState("");
-  const [userData, setUserData] = useState({});
   const [visibleBug, setVisibleBug] = useState(false);
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
@@ -120,12 +120,27 @@ export default function BasicDemo() {
   }, [accessibilityId]);
 
   useEffect(() => {
-    setInputSummary(selectedRow[0]?.Comments);
+    setInputSummary(selectedRow[0]?.StepDescription);
     setConfigValues({
       ...configValues,
-      Summary: selectedRow[0]?.Comments,
+      Summary: selectedRow[0]?.StepDescription,
     });
-    setInputDesc(selectedRow[0]?.StepDescription);
+    // Description should include all steps till the selected step.
+    let description = "";
+    if(selectedRow.length > 0) {
+      let newDesc = [];
+      let slNo = parseInt(selectedRow[0]?.id);
+      let foundStep = reportData?.rows.find((item)=> item.id === slNo)
+      if (foundStep){
+          for (let i=0; i<reportData?.rows.length; i++) {
+              newDesc.push(reportData?.rows[i]?.StepDescription);
+              if (reportData?.rows[i]?.id === foundStep.id) break;
+          }
+      }
+      description = newDesc.join("\n\n");
+      console.log(description);
+    }
+    setInputDesc(description);
   }, [selectedRow]);
 
   useEffect(() => {
@@ -304,6 +319,7 @@ export default function BasicDemo() {
                 executionId: reportData?.overallstatus?.executionId,
                 ...(!!Object.keys(configValues).length && valueObj),
                 executionReportNo: `Execution No: ${executed}`,
+                ...(getItemType()?.itemId && { mappedItem: getItemType()?.itemId }),
               },
               action: "createIssueInJira",
             })
@@ -392,9 +408,16 @@ export default function BasicDemo() {
   const handleBug = (getBugtype) => {
     setVisibleBug(true);
     setBugTitle(getBugtype);
+    let resp = ""; 
     (async () => {
-      const resp = await getDetails_JIRA();
-      setUserData(resp);
+      if(getBugtype === "Jira"){
+        resp = await getDetails_JIRA();
+      } else {
+        resp = await getDetails_AZURE();
+      }
+      setLoginName(getBugtype === "Jira" ? resp?.jiraUsername : resp?.AzureUsername );
+      setLoginKey(getBugtype === "Jira" ? resp?.jirakey : resp?.AzurePAT);
+      setLoginUrl(getBugtype === "Jira" ? resp?.jiraURL : resp?.AzureURL);
     })();
   };
 
@@ -602,21 +625,26 @@ export default function BasicDemo() {
 
   const treeData = convertDataToTree(reportViewData);
 
-  const onUserName = () => {
-    setLoginName(userData?.jiraUsername);
-    setLoginKey(userData?.jirakey);
-    setLoginUrl(userData?.jiraURL);
-  }
+  useEffect(() => {
+    const getState = { ...configValues };
+    const isAttachedArr = configureFeilds.filter((val) => val.name === "Attachment")
+    if(!!isAttachedArr.length) {
+      getState.Attachment = selectedRow[0]?.screenshot_path;
+    }else if(getState?.Attachment){
+      delete getState?.Attachment;
+    }
+    setConfigValues(getState);
+  }, [configureFeilds]);
 
   useEffect(() => {
     if(jiraDropDown && issueDropDown){
       setConfigureFeilds([]);
-      setInputSummary(selectedRow[0]?.Comments);
+      setInputSummary(selectedRow[0]?.StepDescription);
       if (bugTitle === "Jira") {
         setConfigValues({
           ...configValues,
-          Summary: selectedRow[0]?.Comments,
-          Attachment: selectedRow[0]?.screenshot_path
+          Summary: selectedRow[0]?.StepDescription,
+          // ...(selectedRow[0]?.screenshot_path && { Attachment: selectedRow[0]?.screenshot_path }),
         });
       } else {
         setConfigValues({});
@@ -706,13 +734,16 @@ export default function BasicDemo() {
     if(mappedProjects?.itemCode){
       itemObj.itemId = mappedProjects?.itemCode;
       itemObj.itemDesc = mappedProjects?.itemSummary;
-    } else if(mappedProjects?.TestSuiteId){
+    } else if(mappedProjects?.TestCaseId){
+      itemObj.itemId = mappedProjects?.TestCaseId;
+      itemObj.itemDesc = mappedProjects?.testCaseSummary;
+    }else if(mappedProjects?.TestSuiteId){
       itemObj.itemId = mappedProjects?.TestSuiteId;
       itemObj.itemDesc = mappedProjects?.testSuiteSummary;
     } else if(mappedProjects?.userStoryId){
       itemObj.itemId = mappedProjects?.userStoryId;
       itemObj.itemDesc = mappedProjects?.userStorySummary;
-    }
+    } 
     return itemObj;
   };
 
@@ -997,27 +1028,13 @@ export default function BasicDemo() {
           <span>Azure DevOps</span>
         </div>
       </OverlayPanel>
-      {userData?.jiraUsername && (
-        <OverlayPanel ref={userRef} className="jira_user">
-          <Menu
-            model={[
-              {
-                label: (
-                  <span onClick={() => onUserName()}>
-                    {userData?.jiraUsername}
-                  </span>
-                ),
-              },
-            ]}
-          />
-        </OverlayPanel>
-      )}
       <AvoModal
         visible={logBug}
         setVisible={setLogBug}
         onModalBtnClick={onLogBugBtnClick}
         content={
           <div className="grid">
+            <div className="flex  flex-row">
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
                 dropdownValue={jiraDropDown}
@@ -1056,6 +1073,7 @@ export default function BasicDemo() {
                 required={true}
               />
             </div>
+          </div>
             <Divider />
             {bugTitle !== "Jira" && (
               <div className="col-12">
@@ -1157,7 +1175,7 @@ export default function BasicDemo() {
                         className="text_desc"
                         rows={1}
                         name={el.name}
-                        value={configValues[el.name]}
+                        value={(el.name === "Attachment" && selectedRow[0]?.screenshot_path) ? selectedRow[0]?.screenshot_path : configValues[el.name]}
                         onChange={(e) => handleConfigValues(e)}
                         disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
                       />

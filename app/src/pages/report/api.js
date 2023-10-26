@@ -35,18 +35,17 @@ export const fetchConfigureList = async(props) => {
 export const getFunctionalReports = async(projId, relName, cycId) => {
     try{
         const res = await axios(url+'/getReportsData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
-                "param":"getReportsData_ICE",
-                "reportsInputData":{
-                    "projectId": projId,
-                    "releaseName": relName,
-                    "cycleId": cycId,
-                    "configurekey": projId,
-                    "type":"allmodules",
+            data: {
+                reportsInputData:{
+                    projectId: projId,
+                    releaseName: relName,
+                    cycleId: cycId,
+                    configurekey: projId,
+                    type:"allmodules",
                 }
             },
             credentials: 'include'
@@ -147,11 +146,11 @@ export const getReportListSuites = async(getTestSuiteId) => {
 export const getScreenData = async(screenName) =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 screendata: screenName,
                 type: "reportdata_names_only"
             },
@@ -174,11 +173,11 @@ export const getScreenData = async(screenName) =>{
 export const getAccessibilityData = async(id, type = "reportdata") =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 executionid: id,
                 type: type
             },
@@ -317,11 +316,11 @@ export const downloadReports = async(getDownload, type) => {
 export const getAccessibilityScreens = async(projId, relName, cycId) =>{
     try{
         const res = await axios(url+'/getAccessibilityData_ICE', {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            params: {
+            data: {
                 'cycleId': cycId,
                 'projectId': projId,
                 'releaseName': relName,
@@ -392,6 +391,28 @@ export const getDetails_JIRA = async() => {
     }
 }
 
+export const getDetails_AZURE = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_AZURE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.JIRA.WARN_FETCH_SAVED_CREDS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.JIRA.WARN_FETCH_SAVED_CREDS}
+    }
+}
 
 export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
     try{

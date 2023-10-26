@@ -2,6 +2,7 @@ import axios from 'axios';
 import {RedirectPage, Messages as MSG, VARIANT} from '../global';
 import {navigate} from './Components/ManageIntegrations';
 import {url} from '../../App';
+import {history} from './index'
 
 export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
     try{
@@ -31,6 +32,31 @@ export const connectJira_ICE = async(jiraurl,jirausername,jirapwd) => {
     }catch(err){
         console.error(err)
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+export const manageJiraDetails = async(action, userObj) => { 
+    try{
+        const res = await axios(url+'/manageJiraDetails', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,user: userObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error: {content: "Failed to "+action+" Jira Configuration.", variant: VARIANT.ERROR}}
+    }catch(err){
+        console.error(err)
+        return {error:{content: "Failed to "+action+" Jira Configuration.", variant: VARIANT.ERROR}}
     }
 }
 
@@ -69,6 +95,30 @@ export const getJiraTestcases_ICE = async(input_payload) => {
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
+
+export const getDetails_JIRA = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_JIRA', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_JIRA_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_JIRA_FETCH}
+    }
+}
+
 export const getDetails_Azure = async() => { 
     try{
         const res = await axios(url+'/getDetails_Azure', {
@@ -103,6 +153,29 @@ export const getDetails_SAUCELABS = async() => {
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
+    }
+}
+
+export const getDetails_ZEPHYR = async() => { 
+    try{
+        const res = await axios(url+'/getDetails_Zephyr', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }else if(res.status===200 && res.data !== "fail"){
             return res.data;

@@ -10,7 +10,7 @@
      font: $f4_semibold;
      color: #212121;
      top: 1rem;
-     right: 5rem;
+     right: 4rem;
 }
 .util_header_Encryption{
     font: $f5_regular;
@@ -41,15 +41,11 @@
 }
 
 #selected{
-    // background: $primaryColorDarkest;
     border-radius: 5px;
 }
 
 .util__execution_ic{
     padding: 10px;
-}
-.util__execution_ic:hover{
-    // background: $hovorIcon !important;
 }
 .util__devOps {
     width: 4.5rem;
@@ -63,7 +59,7 @@
     border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
     top: 2rem;
-    right: 4rem;
+    right: 3rem;
 }
 
 .not_active_tab_encryption {
@@ -73,7 +69,7 @@
     align-items: center;
     position: relative;
     top: 2rem;
-    right: 4rem;
+    right: 3rem;
 }
 
 .active_tab_data {
@@ -84,7 +80,7 @@
     border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
     top: 3rem;
-    right: 4rem;
+    right: 3rem;
 }
 
 .not_active_tab_data {
@@ -94,9 +90,18 @@
     align-items: center;
     position: relative;
     top: 3rem;
-    right: 4rem;
+    right: 3rem;
 }
 .left_side_panel{
     position: relative;
     right: 18rem;
+}
+.notelabel{
+    margin-left: 1rem;
+    font: $f6_semibold;
+}
+.notecontent{
+    margin-left: 4rem;
+    margin-top: -1.5rem;
+   font:$f6_regular
 }

@@ -119,7 +119,7 @@ const openScreenShot = async (username, path,host) => {
 exports.openScreenShot_API = async (req, res) => {
     try {
         const username = req.body.username; //req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.body.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -130,7 +130,7 @@ exports.openScreenShot_API = async (req, res) => {
 exports.openScreenShot = async (req, res) => {
     try {
         const username = req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.body.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -403,6 +403,8 @@ exports.connectJira_ICE = function(req, res) {
                                             if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
                                                 logger.info('Jira: Login successfully.');
                                             } else {
+                                                if(resultData == "Fail") data = "Fail to Login"
+                                                resultData = {'error':data}
                                                 logger.error('Jira: Login Failed.');
                                             }
                                             res.send(resultData);
@@ -1362,7 +1364,7 @@ exports.fetchExecutionDetail = async (req, res) => {
 exports.getReportsData_ICE = async (req, res) => {
     const fnName = "getReportsData_ICE";
     try {
-        let reportInputData = req.query.reportsInputData;
+        let reportInputData = req.body.reportsInputData;
         if (reportInputData.type == 'allmodules') {
             logger.info("Inside UI service: " + fnName + " - allmodules");
             let inputs = {
@@ -1469,7 +1471,7 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 		const fnName = "getAccessibilityTestingData_ICE"
 		var inputs = {};
 		var result = {};
-		var query = req.query;
+		var query = req.body;
 		switch(query.type){
 			case "screendata":
 				inputs ={query: "screendata", "cycleid": query.cycleId}; 

@@ -15,10 +15,11 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import ConfigureSetup from "./ConfigureSetup";
 import {FooterTwo as Footer} from '../../global';
 import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
-import {readTestSuite_ICE} from '../api'
+// import {readTestSuite_ICE} from '../api'
 import { Dropdown } from 'primereact/dropdown'; 
-import {saveSauceLabData} from '../api';
+// import {saveSauceLabData} from '../api';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
+import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -41,7 +42,9 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
-  setScheduleStatus
+  setScheduleStatus,
+  clearErrorMSg
+
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -138,6 +141,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [scheduling, setScheduling] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [recurEvery, setRecurEvery] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [selectedPattren, setSelectedPattren] = useState({});
   const [selectedDaily, setSelectedDaily] = useState(null);
@@ -167,6 +171,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [osNames, setOsNames] = useState([]);
   const [browserstackUser,setBrowserstackUser] = useState({});
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
+  const [isEmpty, setIsEmpty] = useState(false);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -198,6 +203,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
    selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
+  const [defaultValues2, setDefaultValues2] = useState({});
   const [emailNotificationReciever, setEmailNotificationReciever] = useState(null);
   const [isNotifyOnExecutionCompletion, setIsNotifyOnExecutionCompletion] = useState(false);
   const [isEmailNotificationEnabled, setIsEmailNotificationEnabled] = useState(false);
@@ -212,6 +218,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
@@ -381,7 +389,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
-    setLoading('Fetching ICE ...')
+    // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
       displayError(data.error);
@@ -398,12 +406,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
     setIceStatus(data1);
     populateICElist(arr, true, data1);
-    setLoading(false);
+    // setLoading(false);
   };
 
   useEffect(() => {
     if(configProjectId !== ""){
+      setLoading('Fetching ICE ...')
       fetchData();
+      setLoading(false);
     }
     // eslint-disable-next-line
   }, [configProjectId]);
@@ -514,6 +524,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   }
 
   const dialogFuncMap = {
+    'displayModal' : setDisplayModal,
     'displayBasic4' : setDisplayBasic4,
     'displayBasic5' : setDisplayBasic5,
     'displayBasic6' : setDisplayBasic6,
@@ -521,7 +532,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     'showSauceLabLogin':setShowSauceLabLogin,
     'showBrowserstackLogin':setShowBrowserstackLogin 
 }
-  const handleOptionChange = (selected,type,fetechConfig,index,idx) => {
+  const handleOptionChange = async (selected,type,fetechConfig,index,idx) => {
     // setDropdownSelected(selected);
     setDropdownSelected(prevValues => {
         const newValues = [...prevValues];
@@ -529,16 +540,18 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         return newValues;
       });
     switch (selected) {
-        case 'sauceLabs':
+        case 'SauceLabs':
           setDisplayBasic4('displayBasic4');
           setExecutingOn("ICE")
           setConfigItem(idx);
-            triggerSauceLab(fetechConfig,type);
+            await triggerSauceLab(fetechConfig,type);
             // setDropdownSelected(prevValues => {
             //     const newValues = [...prevValues];
             //     newValues[index] = '';
             //     return newValues;
             //   });
+            setDisplayBasic4(false);
+            await handleSubmit1();
             break;
         case 'browserstack':
           setDisplayBasic6('displayBasic6');
@@ -683,64 +696,72 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
-  setDisplayBasic4(false);
   // open the new dialog
-  setLoading("Fetching details..")
-  SauceLabPayload['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-  let data = await saveSauceLabData({
-      SauceLabPayload
-  });
-  if (data && data.os_names && data.browser) {
-      // Data exists and has the expected properties
-      
-      setLoading(false)
-      setDisplayBasic5(true);
-
-      const arrayOS = data.os_names.map((element, index) => {
-        return {
-          key: element,
-          text: element,
-          title: element,
-          index: index
-        };
-      });
-      setOsNames(arrayOS);
-      setBrowserDetails(data);
-  }
-  else if (data && data.emulator && data.real_devices && data.stored_files){
-      // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-      //     return {
-      //         key: element,
-      //         text: element,
-      //         title: element,
-      //         index: index
-      //     }
-      // })
-      // setPlatforms(arrayPlatforms);
-
-      setMobileDetails(data);
-      setLoading(false);
-      setDisplayBasic5(true);
-    }
-     else {
-      setLoading(false);
-      // Data is empty or doesn't have expected properties
-      if (data == "unavailableLocalServer"){
-          toast.current.show({
-            severity: 'error',
-            summary: 'Error',
-            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-            life: 5000
-          });
-      }else{
-        toast.current.show({
-          severity: 'error',
-          summary: 'error',
-          detail: "Error while fetching the data from Saucelabs",
-          life: 5000
+  setLoading("Fetching details..");
+  const data1 = await getDetails_SAUCELABS()
+  if (data1.error) { setMsg(data1.error); return; }
+      if (data1 !== "empty") {
+        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
+        let data = await saveSauceLabData({
+          "SauceLabPayload" : {
+            ...data1,
+            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
+          }
         });
-      }  
-    }
+        if (data && data.os_names && data.browser) {
+          // Data exists and has the expected properties
+          
+          const arrayOS = data.os_names.map((element, index) => {
+            return {
+              key: element,
+              text: element,
+              title: element,
+              index: index
+            };
+          });
+          setOsNames(arrayOS);
+          setBrowserDetails(data);
+          setLoading(false)
+          setDisplayBasic4('displayBasic4');
+      }
+      else if (data && data.emulator && data.real_devices && data.stored_files){
+          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
+          //     return {
+          //         key: element,
+          //         text: element,
+          //         title: element,
+          //         index: index
+          //     }
+          // })
+          // setPlatforms(arrayPlatforms);
+    
+          setMobileDetails(data);
+          setDisplayBasic4(true);
+          setLoading(false);
+        }
+         else {
+          
+          // Data is empty or doesn't have expected properties
+          if (data == "unavailableLocalServer"){
+              toast.current.show({
+                severity: 'error',
+                summary: 'Error',
+                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+                life: 5000
+              });
+          }else{
+            toast.current.show({
+              severity: 'error',
+              summary: 'error',
+              detail: "Error while fetching the data from Saucelabs",
+              life: 5000
+            });
+          } 
+          setLoading(false); 
+        }
+      } else {
+        setMsg("No data stored in settings"); return;
+      }
   }
 
 
@@ -820,13 +841,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
   const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
-  displayBasic5={displayBasic5} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
+  displayBasic4={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-      onModalBtnClick={onHidedia}
+      onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
       availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
 />,
-  [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+  [mobileDetails, browserDetails, displayBasic4, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, handleSubmit1]);
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
@@ -953,7 +974,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     // { name: 'browserstack', code: 2 },
   ];
   
@@ -1079,7 +1100,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
   <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}/>
+  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
   </div> 
           
           </div>
@@ -1124,6 +1145,13 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       >
         {rowdata.profileName}
       </span>;
+};
+const showToast = (severity, detail) => {
+  toast.current.show({
+    severity: severity,
+    summary: severity === 'success' ? 'Success' : 'Error',
+    detail: detail,
+  });
 };
 
   const configModal = (getType, getData = null) => {
@@ -1205,10 +1233,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         {}
       );
       const getSelected = Object.keys(selectedNodeKeys);
-      const parent = getSelected.filter((el) => el.length === 1);
+      const parent = getSelected.filter((el) => !(el.includes('-')));
       const child = getSelected
-        .filter((el) => el.length > 1)
-        .map((e) => ({ [e.charAt(0)]: e.charAt(2) }));
+        .filter((el) => el.includes('-'))
+        .map((e) => ({ [e.split("-")[0]]: e.split("-")[1] }));
       const selectedKeys = {};
       const selectedArr = parent.map((element) =>
         child
@@ -1338,21 +1366,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      setVisible_setup(false);
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail:"Configuration created successfully.",
         life: 5000
       });
-      setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo?.current && errorinfo?.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: getConfigData?.setupExists?.error?.CONTENT,
-        life: 5000
-      });
+      showToast('error', getConfigData?.setupExists?.error?.CONTENT);
     };
+    dispatch(clearErrorMSg());
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
@@ -1518,6 +1542,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setStartDate(null);
       setScheduling(false);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1587,7 +1612,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
             source: "schedule",
             exectionMode: "serial",
             executionEnv: "default",
-            browserType: selectedSchedule?.executionRequest?.browserType,
+            browserType: selectedSchedule?.executionRequest?.browserType ? selectedSchedule?.executionRequest?.browserType : ['1'],
             integration: selectedSchedule?.executionRequest?.integration,
             batchInfo: selectedSchedule?.executionRequest?.batchInfo.map((el) => ({
               ...el,
@@ -1626,6 +1651,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1679,6 +1705,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
         setScheduling(false);
         setStartDate(null);
         setEndDate(null);
+        setRecurEvery(null);
         setStartTime(null);
         setScheduleOption({});
         setSelectedDaily(null);
@@ -1692,6 +1719,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       setScheduling(false);
       setStartDate(null);
       setEndDate(null);
+      setRecurEvery(null);
       setStartTime(null);
       setScheduleOption({});
       setSelectedDaily(null);
@@ -1981,6 +2009,8 @@ Learn More '/>
                 setStartDate={setStartDate}
                 endDate={endDate}
                 setEndDate={setEndDate}
+                recurEvery={recurEvery}
+                setRecurEvery={setRecurEvery}
                 startTime={startTime}
                 setStartTime={setStartTime}
                 selectedPattren={selectedPattren}
@@ -2080,7 +2110,7 @@ Learn More '/>
               minWidth: "38rem",
             }}
             customClass="schedule_modal"
-            // isDisabled={!selectedICE}
+            isDisabled={(radioButton_grid === "Execute with Avo Assure Client" && !selectedICE)}
           />
           <AvoModal
             visible={visible_CICD}
@@ -2231,6 +2261,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
+            disabled={userInfo.rolename.trim()==="Quality Engineer"}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2265,7 +2296,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small" >
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo.rolename.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

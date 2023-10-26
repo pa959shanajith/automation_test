@@ -720,9 +720,9 @@ if (cluster.isMaster) {
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
 		// Added Report API's
-		app.get('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
+		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
-		app.get('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

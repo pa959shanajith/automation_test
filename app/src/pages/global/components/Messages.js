@@ -418,6 +418,7 @@ const Messages={
         WARN_ADD_PROPERTY: {"CONTENT":"Please enter at least one property", "VARIANT": VARIANT.WARNING},
         WARN_IRIS_SAVE: {"CONTENT":"Submitted successfully but failed to save IRIS image, ICE not available.", "VARIANT": VARIANT.WARNING},
         WARN_IRIS_SAVE_FAIL: {"CONTENT":"Submitted successfully but failed to save IRIS image.", "VARIANT": VARIANT.WARNING},
+        SUCC_OBJ_CHANGE: { "CONTENT": 'Changes saved successfully.', "VARIANT": VARIANT.SUCCESS },
     },
     SCHEDULE:{
         ERR_FETCH_TESTSUITE: {"CONTENT":"Failed to fetch Testsuite.", "VARIANT": VARIANT.ERROR},

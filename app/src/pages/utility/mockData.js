@@ -228,3 +228,16 @@ export const viewByOptions = [
     value: 'Test Suites'
   }
 ];
+
+export const statusDetails = [
+  { name: 'Completed', code: 'CPT' },
+  { name: 'In Progress', code: 'IP' },
+  { name: 'Scheduled', code: 'SD' },
+  { name: 'Recurring', code: 'RG' },
+  { name: 'Terminated', code: 'TD' },
+  { name: 'Cancelled', code: 'CD' },
+  { name: 'Missed', code: 'MD' },
+  { name: 'Failed', code: 'FD' },
+  { name: 'Skipped', code: 'SK' },
+  { name: 'Show All', code: 'SA' },
+];
