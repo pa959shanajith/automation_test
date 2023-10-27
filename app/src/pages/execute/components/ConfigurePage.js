@@ -2389,7 +2389,8 @@ Learn More '/>
           isDisabled={
             !configTxt ||
             (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
-            !Object.keys(selectedNodeKeys)?.length
+            !Object.keys(selectedNodeKeys)?.length ||
+            (!!Object.keys(selectedNodeKeys)?.length && !Object.keys(selectedNodeKeys).some(el => el.includes('-')))
           }
         />
       </div>

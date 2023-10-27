@@ -428,21 +428,28 @@ export default function BasicDemo() {
   const getTableHeader = (
     <div className="grid">
       <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
-        {(reportData?.browserType === "NA" || "chrome") && (
+        {(reportData?.overallstatus?.browserType === "Chrome") && (
           <img
             src="static/imgs/chrome_icon.svg"
             alt="chrome icon"
             style={{ width: "25px", height: "25px", margin: "0.5rem" }}
           />
         )}
-        {reportData?.browserType === "edge" && (
+        {reportData?.overallstatus?.browserType === "Edge Chromium" && (
           <img
             src="static/imgs/edge_icon.svg"
             alt="edge icon"
             style={{ width: "25px", height: "25px", margin: "0.5rem" }}
           />
         )}
-        {reportData?.browserType === "edge" && (
+        {reportData?.overallstatus?.browserType === "Firefox" && (
+          <img
+            src="static/imgs/fire-fox.png"
+            alt="safari icon"
+            style={{ width: "25px", height: "25px", margin: "0.5rem" }}
+          />
+        )}
+        {reportData?.overallstatus?.browserType === "safari" && (
           <img
             src="static/imgs/safari_icon.svg"
             alt="safari icon"
