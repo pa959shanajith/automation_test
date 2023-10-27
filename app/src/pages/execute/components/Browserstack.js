@@ -67,10 +67,10 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
                     </div>
                 </form>
                 
-                <Button id='Browserstack_submit' label="Submit"
+                <Button id='Saucelabs_submit' label="Submit"
                     onClick={() => handleBrowserstackSubmit(defaultValues)}
                 />
-                </>}headerTxt='Browserstack login' modalSytle={{
+                </>}headerTxt='BrowserStack login' modalSytle={{
                 width: "39vw",
                 height: "44vh",
                 background: "#FFFFFF",
@@ -270,7 +270,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     
     return (
         <>
-            <AvoModal  header='Browserstack Integration' visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
+            <AvoModal customClass='browserstack_modal'  header='Browserstack Integration' visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
                 
             content={
                 <>
@@ -395,28 +395,28 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     </>}
 
                 <div>
-                    <div>
-                <div className="legends-container">
-                      <div className="legend">
-                        <span id="status" className="status-available1"></span>
-                        <span className="legend-texta">Available</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-unavailable"></span>
-                        <span className="legend-text2">Unavailable</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-dnd"></span>
-                        <span className="legend-text1">Do Not Disturb</span>
-                      </div>
+                <div className="ice_container">
+                    <div className="ice_status">
+                      <span className="available"></span>
+                      <span>Available</span>
+                      <span className="unavailable"></span>
+                      <span>Unavailable</span>
+                      <span className="dnd"></span>
+                      <span>Do Not Disturb</span>
                     </div>
-                    </div>
-                    <div className='adminControl-ice-sauce'>
-                        <div className='sauce_ICEsearch'>
-                            <span className="leftControl_sauce" title="Token Name"></span>
-                            <DropDownList poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder} placeholder={'Select Avo Assure Client'} data={availableICE} smartMode={(ExeScreen === true ? smartMode : '')} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  />
-                        </div>
-                    </div>
+                    <DropDownList
+                      poolType={poolType}
+                      ExeScreen={ExeScreen}
+                      inputErrorBorder={inputErrorBorder}
+                      setInputErrorBorder={setInputErrorBorder}
+                      placeholder={"Search"}
+                      data={availableICE}
+                      smartMode={ExeScreen === true ? smartMode : ""}
+                      selectedICE={selectedICE}
+                      setSelectedICE={setSelectedICE}
+                      className="saucelabs_ICE"
+                    />
+                  </div>
                 </div>
                 <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
                     dataExecution.type = (ExeScreen === true ? ((smartMode === "normal") ? "" : smartMode) : "")
@@ -449,11 +449,11 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     }
                     }
                     autoFocus />
-                    <Button id='Saucelabs_cancel' className='Saucelabs_cancel' label="Cancel" onClick={() => onHidedia('displayBasic7')} />
+                    <Button id='Saucelabs_cancel' text className='Saucelabs_cancel' size='small' label="Cancel" onClick={() => onHidedia('displayBasic7')} />
                 </>}
-                headerTxt='Browserstack Integration' modalSytle={{
-                    width: "45vw",
-                    height: "67vh",
+                headerTxt='BrowserStack Integration' modalSytle={{
+                    width: "40vw",
+                    height: "87vh",
                     background: "#FFFFFF",
                     }}/>
         </>

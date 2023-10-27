@@ -54,7 +54,8 @@ const initialState = {
     exportProjname:"",
     enableExportMindmapButton:true,
     oldModuleForReset:"",
-    currentModuleId:""
+    currentModuleId:"",
+    currentid:""
 }
 
 export const designSlice = createSlice({
@@ -212,6 +213,9 @@ export const designSlice = createSlice({
     },
     SetCurrentModuleId:(state,action)=>{
       state.currentModuleId=action.payload
+    },
+    SetCurrentId:(state, action)=>{
+      state.currentid= action.payload
     }
 
 }  })
@@ -220,6 +224,7 @@ export const designSlice = createSlice({
 export const { projectList, moduleList,screenData,
 selectedProj,
 SetCurrentModuleId,
+SetCurrentId,
 searchModule,
 initEnEProj,
 isEnELoad,

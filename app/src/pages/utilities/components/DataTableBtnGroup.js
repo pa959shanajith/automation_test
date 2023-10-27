@@ -6,7 +6,7 @@ import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData,
 import { ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global';
 import ExportDataTable from './ExportDataTable';
 // import * as actionTypes from '../state/action';
-import ImportPopUp from './ImportPopup';
+import ImportPopUp from './ImportPopUp';
 import * as utilApi from '../api';
 import DtPasteStepDialog from './DtPasteStepDialog';
 import { Button } from 'primereact/button';

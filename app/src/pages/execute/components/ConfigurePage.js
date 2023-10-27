@@ -43,7 +43,9 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
-  setScheduleStatus
+  setScheduleStatus,
+  clearErrorMSg
+
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -393,7 +395,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
-    setLoading('Fetching ICE ...')
+    // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
       displayError(data.error);
@@ -410,12 +412,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
     setIceStatus(data1);
     populateICElist(arr, true, data1);
-    setLoading(false);
+    // setLoading(false);
   };
 
   useEffect(() => {
     if(configProjectId !== ""){
+      setLoading('Fetching ICE ...')
       fetchData();
+      setLoading(false);
     }
     // eslint-disable-next-line
   }, [configProjectId]);
@@ -534,7 +538,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     'showSauceLabLogin':setShowSauceLabLogin,
     'showBrowserstackLogin':setShowBrowserstackLogin 
 }
-  const handleOptionChange = (selected,type,fetechConfig,index,idx) => {
+  const handleOptionChange = async (selected,type,fetechConfig,index,idx) => {
     // setDropdownSelected(selected);
     setDropdownSelected(prevValues => {
         const newValues = [...prevValues];
@@ -546,16 +550,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           setDisplayBasic4('displayBasic4');
           setExecutingOn("ICE")
           setConfigItem(idx);
-            triggerSauceLab(fetechConfig,type);
+            await triggerSauceLab(fetechConfig,type);
             // setDropdownSelected(prevValues => {
             //     const newValues = [...prevValues];
             //     newValues[index] = '';
             //     return newValues;
             //   });
-            // setDisplayBasic4(false);
-            handleSubmit1();
+            setDisplayBasic4(false);
+            await handleSubmit1();
             break;
-        case 'browserstack':
+        case 'BrowserStack':
           setDisplayBasic6('displayBasic6');
           setExecutingOn("ICE")
           setConfigItem(idx);
@@ -712,10 +716,8 @@ else{
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
-  // setDisplayBasic4(false);
   // open the new dialog
-  setLoading("Fetching details..")
-  setDisplayBasic4('displayBasic4');
+  setLoading("Fetching details..");
   const data1 = await getDetails_SAUCELABS()
   if (data1.error) { setMsg(data1.error); return; }
       if (data1 !== "empty") {
@@ -729,9 +731,6 @@ const handleSubmit1 = async (SauceLabPayload) => {
         if (data && data.os_names && data.browser) {
           // Data exists and has the expected properties
           
-          setLoading(false)
-          // setDisplayBasic5(true);
-          // setDisplayBasic4('displayBasic4');
           const arrayOS = data.os_names.map((element, index) => {
             return {
               key: element,
@@ -742,6 +741,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
           });
           setOsNames(arrayOS);
           setBrowserDetails(data);
+          setLoading(false)
+          setDisplayBasic4('displayBasic4');
       }
       else if (data && data.emulator && data.real_devices && data.stored_files){
           // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
@@ -755,11 +756,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
           // setPlatforms(arrayPlatforms);
     
           setMobileDetails(data);
-          setLoading(false);
           setDisplayBasic4(true);
+          setLoading(false);
         }
          else {
-          setLoading(false);
+          
           // Data is empty or doesn't have expected properties
           if (data == "unavailableLocalServer"){
               toast.current.show({
@@ -775,7 +776,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
               detail: "Error while fetching the data from Saucelabs",
               life: 5000
             });
-          }  
+          } 
+          setLoading(false); 
         }
       } else {
         setMsg("No data stored in settings"); return;
@@ -1013,14 +1015,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'SauceLabs', code: 1 },
-    { name: 'browserstack', code: 2 },
+    { name: 'BrowserStack', code: 2 },
   ];
   
-  const selectedCountryTemplate = (option, props) => {
+  const selectedCountryTemplate = (option, props) => {    
     if (option) {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '1rem' }} />
+                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1032,7 +1034,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       const countryOptionTemplate = (option) => {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '18px' }} />
+                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1137,9 +1139,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
             </Button>
 
             <div className="cloud-test-provider" >
-  <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
-  </div> 
+              <Dropdown
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+            </div> 
           
           </div>
         ),
@@ -1183,6 +1185,13 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       >
         {rowdata.profileName}
       </span>;
+};
+const showToast = (severity, detail) => {
+  toast.current.show({
+    severity: severity,
+    summary: severity === 'success' ? 'Success' : 'Error',
+    detail: detail,
+  });
 };
 
   const configModal = (getType, getData = null) => {
@@ -1397,21 +1406,17 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      setVisible_setup(false);
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail:"Configuration created successfully.",
         life: 5000
       });
-      setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo?.current && errorinfo?.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: getConfigData?.setupExists?.error?.CONTENT,
-        life: 5000
-      });
+      showToast('error', getConfigData?.setupExists?.error?.CONTENT);
     };
+    dispatch(clearErrorMSg());
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
@@ -2401,7 +2406,8 @@ Learn More '/>
           isDisabled={
             !configTxt ||
             (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
-            !Object.keys(selectedNodeKeys)?.length
+            !Object.keys(selectedNodeKeys)?.length ||
+            (!!Object.keys(selectedNodeKeys)?.length && !Object.keys(selectedNodeKeys).some(el => el.includes('-')))
           }
         />
       </div>

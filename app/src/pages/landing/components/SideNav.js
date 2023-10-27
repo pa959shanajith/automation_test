@@ -63,7 +63,7 @@ const SideNav = () => {
         },
         {
             // path: "/dashboard",
-            name: "dashboard",
+            name: "Dashboard",
             icon: <img src={tabForDashboard === "dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
             disabled: false
         },
@@ -73,7 +73,7 @@ const SideNav = () => {
         else {
             setDisableIconDialogVisible(true);
         };
-        if (name === "dashboard") {
+        if (name === "Dashboard") {
             window.open("/dashboard/#", '_blank');
             const dataHandledForDashBoard = {
                 login: JSON.stringify({
