@@ -275,7 +275,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             content={
                 <>
                 {!showBrowserstack && <> 
-                    <div><h6>Operating Systems</h6></div>
+                    <div className='os_name'><h3>Operating Systems</h3></div>
                     <Dropdown
                         // noItemsText={[]}
                         onChange={(e)=>onOsChange(e.value)}
@@ -286,12 +286,13 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         // width='15rem'
                         optionLabel='key'
                         placeholder='select OS'
+                        className='browserstack_dropdown'
                         // calloutMaxHeight='12rem'
                     />
                     </>}
     
                     {!showBrowserstack && <>
-                    <div><h6>Operating Systems Versions</h6></div>
+                    <div className='os_name'><h3>Operating Systems Versions</h3></div>
                     <Dropdown
                         // noItemsText={[]}
                         disabled={selectedOS == ''}
@@ -303,12 +304,13 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         // width='15rem'
                         optionLabel='key'
                         placeholder='select OS Versions'
+                        className='browserstack_dropdown'
                         // calloutMaxHeight='12rem'
                     />
                     </>}
     
                     {!showBrowserstack && <>   
-                    <div><h6>Browsers</h6></div>
+                    <div className='os_name'><h3>Browsers</h3></div>
                     <Dropdown
                         // noItemsText={[]}
                         disabled={selectedOsVersions == ''}
@@ -320,12 +322,13 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         // width='15rem'
                         optionLabel='key'
                         placeholder='select Browsers'
+                        className='browserstack_dropdown'
                         // calloutMaxHeight='12rem'
                     />
                     </>}
     
                     {!showBrowserstack && <>
-                    <div><h6>Browser Versions</h6></div>
+                    <div className='os_name'><h3>Browser Versions</h3></div>
                     <Dropdown
                         // noItemsText={[]}
                         disabled={selectedBrowserVersions == ''}
@@ -337,12 +340,13 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         // width='15rem'
                         optionLabel='key'
                         placeholder='select Browser Versions'
+                        className='browserstack_dropdown'
                         // calloutMaxHeight='10rem'
                     />
                     </>}
 
-                    {showBrowserstack && <>   
-                    <div><h6>Platform</h6></div>
+                    {showBrowserstack && <>  
+                    <div className='os_name'><h3>Platform</h3></div> 
                     <Dropdown 
                         onChange={(e)=>onMobilePlatformChange(e.value)}
                         options={selectPlatforms}
@@ -351,12 +355,14 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         valueTemplate={selectedMobilePlatforms}                    
                         optionLabel='key'
                         placeholder='select platform'
+                        className='browserstack_dropdown'
                     />
                     </>}
 
                     {showBrowserstack && <>   
-                    <div><h6>versions</h6></div>
+                    <div className='os_name'><h3>Versions</h3></div>
                     <Dropdown
+                        disabled={selectedMobilePlatforms == ''}
                         onChange={(e)=>onMobileVersionChange(e.value)}
                         options={mobileVersion}
                         value={selectedMobileVersion}
@@ -364,12 +370,14 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         valueTemplate={selectedMobileVersion}
                         optionLabel='key'
                         placeholder='select version'
+                        className='browserstack_dropdown'
                     />
                     </>}
 
-                    {showBrowserstack && <>   
-                    <div><h6>devices</h6></div>
+                    {showBrowserstack && <> 
+                    <div className='os_name'><h3>devices</h3></div>  
                     <Dropdown
+                        disabled={selectedMobileVersion == ''}
                         onChange={(e)=>onDeviceChange(e.value)}
                         options={selectDevices}
                         value={selectedDevices}
@@ -377,12 +385,14 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         valueTemplate={selectedDevices}
                         optionLabel='key'
                         placeholder='select device'
+                        className='browserstack_dropdown'
                     />
                     </>}
 
-                    {selectProjects === 'MobileApp' && <>   
-                    <div><h6>uploaded apk</h6></div>
+                    {selectProjects === 'MobileApp' && <> 
+                    <div className='os_name'><h3>uploaded apk</h3></div>  
                     <Dropdown
+                        disabled={selectedDevices == ''}
                         onChange={(e)=>onApkChange(e.value)}
                         options={selectedApk}
                         value={selectApk}
@@ -390,7 +400,8 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                         valueTemplate={selectApk}
                         optionLabel='key'
                         placeholder='select apk'
-                        className="w-full md:w-10rem"
+                        className='browserstack_dropdown'
+                        // className="w-full md:w-10rem"
                     />
                     </>}
 
