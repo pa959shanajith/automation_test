@@ -181,6 +181,11 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		batchExecutionData.remote_url = batchExecutionData.saucelabDetails.SaucelabsURL;
 		delete batchExecutionData.saucelabDetails;
 	}
+	if(batchExecutionData.executionEnv == 'browserstack') {
+		batchExecutionData.browserstack_username = batchExecutionData.browserstackDetails.BrowserstackUsername;
+		batchExecutionData.browserstack_access_key = batchExecutionData.browserstackDetails.Browserstackkey;
+		delete batchExecutionData.browserstackDetails;
+	}
 	if(batchExecutionData['configurekey'] && req.query == 'fetchingTestSuiteIds') {
 		let index = -1;
 		for (let testSuiteData of batchExecutionData.batchInfo){

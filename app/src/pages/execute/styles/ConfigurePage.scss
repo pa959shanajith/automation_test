@@ -77,6 +77,23 @@
   .saucelab_dropDown {
     width: 90%;
   }
+}
+
+.browserstack_modal{
+  .browserstack_dropdown{
+    width: 90%;
+  }
+  .p-dialog-content {
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 23rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+  }
+
   .ice_container {
     display: flex;
     flex-direction: column;
