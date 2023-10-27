@@ -1012,7 +1012,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     { name: 'browserstack', code: 2 },
   ];
   

@@ -146,6 +146,15 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             versions: value,
             name:value,
           }));
+          let findapk = Object.keys(mobileDetailsBrowserStack.stored_files).map((element, index) => ({
+            key: element,
+            text: element,
+            title: element,
+            index: element,
+            versions: element,
+            name:element,
+        }))
+        setApk(findapk);
           setPlatforms(platformArray);
         }
       }, [browserstackBrowserDetails, mobileDetailsBrowserStack]);
@@ -256,19 +265,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
         }
 
         const onApkChange = async (option) => {
-            setSelectedMobileVersion(option.key);
-            setSelectedDevices('')
-            setDevices([])
-            setSelectApk([])
-            let findapk = Object.entries(mobileDetailsBrowserStack.stored_files[option.key]).map((key, index) => ({
-                key: key,
-                text: key,
-                title: key,
-                index: index,
-                versions: value,
-                name:value,
-            }))
-            setApk(findapk);
+            setSelectApk(option.key)
         }    
     
     return (
