@@ -85,7 +85,7 @@ const Settings =() =>{
                 <span style={{ marginBottom: '0.5rem' }}>
                   <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}>  jira, Zephyr,Azure DevOps, ALM, Qtest integration can be done</p>
                 </span>
-                <Button className="manageProj_btn" size="small" label='Manage Integrations' disabled={!isQualityEngineer} onClick={handleOpenDialog} ></Button>
+                <Button className="manageProj_btn" size="small" label='Manage Integrations' disabled={isQualityEngineer} onClick={handleOpenDialog} ></Button>
                 {Integrations}
               </div>
               <div className='image-settings'>
