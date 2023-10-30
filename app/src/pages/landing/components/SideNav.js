@@ -23,8 +23,6 @@ const SideNav = () => {
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
-    // const realImage = tabSelected === "/landing" ? <img src="static/imgs/folder_icon_selected.svg" className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" /> : <img src="static/imgs/folder_icon.svg" className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />
-
 
     useEffect(() => {
         updateNavListItems();
@@ -95,26 +93,8 @@ const SideNav = () => {
         }
         else {
             event.preventDefault();
-            // setTabSelected(route);
             setDisableIconDialogVisible(true);
         };
-        // if (name === "Dashboard") {
-        //     window.open("/dashboard/#", '_blank');
-        //     const dataHandledForDashBoard = {
-        //         login: JSON.stringify({
-        //             SR: userInfo.rolename,
-        //             userinfo: userInfo,
-        //         })
-        //     };
-
-        //     const finalDataForDashboard = JSON.stringify(dataHandledForDashBoard);  
-        //     localStorage.setItem("Reduxbackup", finalDataForDashboard);
-        //     // window.localStorage['Reduxbackup'] = finalDataForDashboard;
-        //     window.localStorage['persist:login'] = window.localStorage['Reduxbackup']
-        //     window.localStorage['integrationScreenType'] = null
-        //     // window.localStorage['navigateScreen'] = 'dashboard';
-        //     // window.location.href = "/dashboard";
-        // }
     }
 
     const itdmDialogHide = () => {
