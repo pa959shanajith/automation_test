@@ -74,7 +74,7 @@ const DisplayProject = (props) => {
     const currentDate = new Date();
 
     // Calculate the time difference in milliseconds
-    const timeDifference = currentDate - providedDate;
+    // const timeDifference = currentDate - providedDate;
 
     // Calculate years, months, days, hours, and seconds
     const millisecondsInASecond = 1000;
@@ -90,7 +90,7 @@ const DisplayProject = (props) => {
     // const minutes = Math.floor((timeDifference % millisecondsInAnHour) / millisecondsInAMinute);
     // const seconds = Math.floor((timeDifference % millisecondsInAMinute) / millisecondsInASecond);
 
-    const date1 = moment(inputDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
+    const date1 = moment(providedDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
     const date2 = moment(new Date(), 'ddd MMM DD YYYY HH:mm:ss ZZ');
 
     //convert the difference to other units, such as seconds, minutes, hours, etc.
