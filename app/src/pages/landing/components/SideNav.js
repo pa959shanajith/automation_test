@@ -54,7 +54,7 @@ const SideNav = () => {
             disabled: false
         },
         {
-            path: "/",
+            path: "/itdm",
             name: "ITDM",
             icon: <img src= { tabSelected==="/" ?  "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
             disabled: true
