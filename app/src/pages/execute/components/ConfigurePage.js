@@ -174,6 +174,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackUser,setBrowserstackUser] = useState({});
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -219,18 +221,19 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject.projectId)
   }, [selectProjects]);
 
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
+    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
+    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
   }, [selectProjects.projectId]);
@@ -687,6 +690,20 @@ const handleBrowserstackSubmit = async (BrowserstackPayload) => {
       //   setOs(arrayOS);
         setBrowserstackBrowserDetails(resultData);
   }
+  else if (resultData && resultData.devices && resultData.stored_files){
+    const arrayPlatforms = Object.keys(resultData.devices).map((element, index) => { 
+        return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+        }
+    })
+    setPlatforms(arrayPlatforms);
+    setMobileDetailsBrowserStack(resultData);
+    setLoading(false);
+    setDisplayBasic7(true);
+  }
 else{
   setLoading(false);
   if (resultData == "unavailableLocalServer"){
@@ -863,12 +880,12 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  browserstackBrowserDetails={browserstackBrowserDetails}
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
         />,
-            [browserstackBrowserDetails, displayBasic7, onHidedia,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+            [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
             availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
 
 
@@ -997,7 +1014,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     { name: 'BrowserStack', code: 2 },
   ];
   
@@ -1005,7 +1022,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     if (option) {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1017,7 +1034,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       const countryOptionTemplate = (option) => {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1123,7 +1140,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
               <Dropdown
-                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
             </div> 
           
           </div>
@@ -1405,7 +1422,7 @@ const showToast = (severity, detail) => {
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+        ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
         appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
@@ -1828,6 +1845,7 @@ const showToast = (severity, detail) => {
          <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
          {loading ? <ScreenOverlay content={loading} /> : null}
 
           <DataTable

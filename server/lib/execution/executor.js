@@ -136,6 +136,8 @@ class TestSuiteExecutor {
                 execReq['osVersion'] = batchData.osVersion
                 execReq['browserName'] = batchData.browserName
                 execReq['os'] = batchData.os
+            } else {
+                execReq["mobile"] = batchData.mobile
             } 
         }
         const gitInfo = batchData.gitInfo;

@@ -474,7 +474,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
             </>
             } headerTxt='SauceLabs Integration' modalSytle={{
                 width: "38vw",
-                height: "67vh",
+                height: "75vh",
                 background: "#FFFFFF",
                 }}/>
             
