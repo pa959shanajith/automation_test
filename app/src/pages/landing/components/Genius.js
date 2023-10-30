@@ -1243,7 +1243,7 @@ const toastSuccess = (successMessage) => {
           </div>:null}
             <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
-            <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>&nbsp;Mandatory Fields</div>
+            <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>All the fields are Mandatory.</div>
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
               {props.selectedProject?null:<button className="reset-action__exit" style={{ border: "none", color: "#605BFF", borderRadius: "4px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>}
               <button className="reset-action__next"
