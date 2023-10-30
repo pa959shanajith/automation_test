@@ -71,8 +71,6 @@ const CreateLanding = (props) => {
     }
 
     const selectServerHandler = (event) => {
-        console.log(event.target.value.name);
-        console.log(event.value.name);
         setServerName(event.target.value.name);
         dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
         dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
