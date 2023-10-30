@@ -316,7 +316,7 @@ const CloudSettings = () => {
                         <span><img src="static/imgs/Saucelabs-1.png" className="img__azure"></img></span>
                         <span className="text__jira">sauceLabs</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'brwoserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
+                    <div className={`icon-wrapper ${selectedscreen?.name === 'browserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
                         <span><img src="static/imgs/browserstack_icon 48x48.svg" className="img__alm"></img></span>
                         <span className="text__jira">BrowserStack</span>
                     </div>
