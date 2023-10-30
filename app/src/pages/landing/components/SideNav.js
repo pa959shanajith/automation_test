@@ -44,7 +44,7 @@ const SideNav = () => {
         {
             path: "/utility",
             name: "Utilities",
-            icon: <img src={tabSelected === "/utility" ? "static/imgs/Reports tab.svg" : "static/imgs/Reports tab.svg"} className="icon" data-pr-tooltip=" Manage utilities" data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/utility" ? "static/imgs/utility_icon.svg" : "static/imgs/utility_icon.svg"} className="icon" data-pr-tooltip=" Manage utilities" data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
@@ -56,13 +56,13 @@ const SideNav = () => {
         {
             path: "/itdm",
             name: "ITDM",
-            icon: <img src= { tabSelected==="/" ?  "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
+            icon: <img src= { tabSelected==="/itdm" ?  "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
             disabled: true
         },
         {
             path: "/dashboard",
             name: "Dashboard",
-            icon: <img src={tabSelected === "dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
             disabled: false
         },
     ]
@@ -70,22 +70,22 @@ const SideNav = () => {
     const onTabClickHandler = (event, route, disabled, name) => {
         if (!disabled) { 
             if(route === "/dashboard"){
-                 event.preventDefault();
-                    window.open("/dashboard/#", '_blank');
-                    const dataHandledForDashBoard = {
-                        login: JSON.stringify({
-                            SR: userInfo.rolename,
-                            userinfo: userInfo,
-                        })
-                    };
-        
-                    const finalDataForDashboard = JSON.stringify(dataHandledForDashBoard);  
-                    localStorage.setItem("Reduxbackup", finalDataForDashboard);
-                    // window.localStorage['Reduxbackup'] = finalDataForDashboard;
-                    window.localStorage['persist:login'] = window.localStorage['Reduxbackup']
-                    window.localStorage['integrationScreenType'] = null
-                    // window.localStorage['navigateScreen'] = 'dashboard';
-                    // window.location.href = "/dashboard";
+                event.preventDefault();
+                window.open("/dashboard/#", '_blank');
+                const dataHandledForDashBoard = {
+                    login: JSON.stringify({
+                        SR: userInfo.rolename,
+                        userinfo: userInfo,
+                    })
+                };
+    
+                const finalDataForDashboard = JSON.stringify(dataHandledForDashBoard);  
+                localStorage.setItem("Reduxbackup", finalDataForDashboard);
+                // window.localStorage['Reduxbackup'] = finalDataForDashboard;
+                window.localStorage['persist:login'] = window.localStorage['Reduxbackup']
+                window.localStorage['integrationScreenType'] = null
+                // window.localStorage['navigateScreen'] = 'dashboard';
+                // window.location.href = "/dashboard";
             }
             else {
                 setTabSelected(route);
