@@ -997,7 +997,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const cloudTestOptions = [
-    { name: 'sauceLabs', code: 1 },
+    { name: 'SauceLabs', code: 1 },
     { name: 'BrowserStack', code: 2 },
   ];
   
@@ -1005,7 +1005,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     if (option) {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1017,7 +1017,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       const countryOptionTemplate = (option) => {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src={option.name === "sauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1123,7 +1123,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
             <div className="cloud-test-provider" >
               <Dropdown
-                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} tooltip="Cloud Platform Execution" options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
             </div> 
           
           </div>
@@ -1828,6 +1828,7 @@ const showToast = (severity, detail) => {
          <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
          {loading ? <ScreenOverlay content={loading} /> : null}
 
           <DataTable
