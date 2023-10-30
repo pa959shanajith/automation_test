@@ -1014,15 +1014,19 @@ const CanvasNew = (props) => {
   };
 
   const accept = () => {
-    dispatch(showGenuis({
-      showGenuisWindow:true,
-      geniusWindowProps:{
-        selectedProject:{key: proj,text: projectList[proj]["name"]},        
-        selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
-        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
-        geniusFromMindmap:true
-      }
-    })) 
+    if (toastData !== true){
+      dispatch(showGenuis({
+        showGenuisWindow:true,
+        geniusWindowProps:{
+          selectedProject:{key: proj,text: projectList[proj]["name"]},        
+          selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
+          selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
+          geniusFromMindmap:true
+        }
+      })) 
+    }else{
+      toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
+    }
   }
 
   const reject = () => {}
