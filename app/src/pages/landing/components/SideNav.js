@@ -32,7 +32,7 @@ const SideNav = () => {
         {
             path: "/landing",
             name: "Projects",
-            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon_selected.svg" : "static/imgs/folder_icon.svg"} className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon.svg" : "static/imgs/folder_icon_selected.svg"} className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
