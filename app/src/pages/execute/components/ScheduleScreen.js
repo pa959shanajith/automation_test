@@ -273,6 +273,8 @@ const ScheduleScreen = ({
         schedUserid: JSON.stringify(getValue?.scheduledby),
       })
     ).then(() =>
+    {
+      duplicateinfo?.current?.show({ severity: 'success', summary: 'Success', detail: "Scheduled item has been deleted successfully", life: 5000 });
       dispatch(
         getScheduledDetails_ICE({
           param: "getScheduledDetails_ICE",
@@ -280,6 +282,7 @@ const ScheduleScreen = ({
           configName: cardData?.configurename,
         })
       )
+    }
     );
   };
 
@@ -528,7 +531,7 @@ const ScheduleScreen = ({
           </TabPanel>
         </TabView>
       </div>
-      <Toast ref={duplicateinfo} />
+      <Toast ref={duplicateinfo} position="bottom-center"/>
       <AvoModal
         visible={exestatus}
         setVisible={setExestatus}
