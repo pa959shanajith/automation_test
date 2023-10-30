@@ -45,6 +45,8 @@ export default function BasicDemo() {
   const [inputSummary, setInputSummary] = useState("");
   const [inputDesc, setInputDesc] = useState("");
   const [visibleBug, setVisibleBug] = useState(false);
+  const [visibleScreen, setVisibleScreen] = useState(false);
+  const [visibleScreenShot, setVisibleScreenShot] = useState("");
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
   const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -402,7 +404,6 @@ export default function BasicDemo() {
       );
     }
     setSelectedFilter(_selectedFilters);
-    setSearchTest(_selectedFilters[0]?.name ? _selectedFilters[0].name : "");
   };
 
   const handleBug = (getBugtype) => {
@@ -428,21 +429,28 @@ export default function BasicDemo() {
   const getTableHeader = (
     <div className="grid">
       <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
-        {(reportData?.browserType === "NA" || "chrome") && (
+        {(reportData?.overallstatus?.browserType === "Chrome") && (
           <img
             src="static/imgs/chrome_icon.svg"
             alt="chrome icon"
             style={{ width: "25px", height: "25px", margin: "0.5rem" }}
           />
         )}
-        {reportData?.browserType === "edge" && (
+        {reportData?.overallstatus?.browserType === "Edge Chromium" && (
           <img
             src="static/imgs/edge_icon.svg"
             alt="edge icon"
             style={{ width: "25px", height: "25px", margin: "0.5rem" }}
           />
         )}
-        {reportData?.browserType === "edge" && (
+        {reportData?.overallstatus?.browserType === "Firefox" && (
+          <img
+            src="static/imgs/fire-fox.png"
+            alt="safari icon"
+            style={{ width: "25px", height: "25px", margin: "0.5rem" }}
+          />
+        )}
+        {reportData?.overallstatus?.browserType === "safari" && (
           <img
             src="static/imgs/safari_icon.svg"
             alt="safari icon"
@@ -564,7 +572,7 @@ export default function BasicDemo() {
         },
         children: [],
       };
-      data[i].children?.forEach((child) => {
+      data[i].children?.filter(el => !!selectedFilter.length ? selectedFilter.map((el) => el.name).includes(el.status): el).forEach((child) => {
         const modifiedChild = { ...child }; // Create a new object with the same properties as child
         if (modifiedChild?.EllapsedTime) {
           modifiedChild.EllapsedTime = modifiedChild.EllapsedTime.split(":")
@@ -752,14 +760,10 @@ export default function BasicDemo() {
       <div
         className="screenshot_view"
         onClick={async () => {
+          setVisibleScreen(true);
           let data = await openScreenshot(getLink?.data?.screenshot_path);
           let image = "data:image/PNG;base64," + data;
-          let WindowObject = window.open();
-          let strHtml =
-            "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" +
-            image +
-            "'/>\n</body>\n</html>";
-          WindowObject.document.writeln(strHtml);
+          setVisibleScreenShot(image);
         }}
       >
         View Screenshot
@@ -1014,6 +1018,18 @@ export default function BasicDemo() {
           background: "#FFFFFF",
         }}
         footerType="Connect"
+      />
+      <AvoModal
+        visible={visibleScreen}
+        setVisible={setVisibleScreen}
+        onModalBtnClick={() => setVisibleScreen(false)}
+        content={<div><img src={visibleScreenShot} className="img_screenShot" alt="screenshot" /></div>}
+        customClass="screenshot_modal"
+        modalSytle={{
+          width: "95vw",
+          height: "95vh",
+          background: "#FFFFFF",
+        }}
       />
       <OverlayPanel ref={bugRef} className="report_bug">
         <div className="flex downloadItem" onClick={() => handleBug("Jira")}>

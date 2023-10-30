@@ -40,30 +40,32 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     const [checked, setChecked] = useState(false);
     const [loading, setLoading] = useState(false)
     const [isEmpty, setIsEmpty] = useState(true);
-    const [showModal,setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [disableLoginBtn, setDisableLoginBtn] = useState(false);
 
 
-    
-  const toastError = (erroMessage) => {
-    if (erroMessage.CONTENT) {
-      toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
-    }
+
+
+    const toastError = (erroMessage) => {
+        if (erroMessage.CONTENT) {
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
     else toast.current.show({ severity: 'error', summary: 'Error', detail:JSON.stringify(erroMessage), life: 5000 });
-  }
-
-  const toastSuccess = (successMessage) => {
-    if (successMessage.CONTENT) {
-      toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
-  }
 
-  const toastWarn = (warnMessage) => {
-    if (warnMessage.CONTENT) {
-        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    const toastSuccess = (successMessage) => {
+        if (successMessage.CONTENT) {
+            toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
     }
+
+    const toastWarn = (warnMessage) => {
+        if (warnMessage.CONTENT) {
+            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+        }
     else toast.current.show({ severity: 'warn', summary: 'Warning', detail:  JSON.stringify(warnMessage), life: 5000 });
-}
+    }
 
 
     const handleLogin = (name, value) => {
@@ -133,7 +135,32 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         }
     }
 
-    const getAzureDetails = async () =>{
+    useEffect(() => {
+        let disbalebtn = false;
+        switch (selectedscreen.name) {
+            case 'Jira':
+                disbalebtn = loginDetails.url && loginDetails.username && loginDetails.password;
+                setDisableLoginBtn(!disbalebtn);
+                break;
+            case 'Zephyr':
+                disbalebtn = zephyrLoginDetails.url && zephyrLoginDetails.username && zephyrLoginDetails.password;
+                setDisableLoginBtn(!disbalebtn);
+                break;
+            case 'Azure DevOps':
+                disbalebtn = AzureLoginDetails.url && AzureLoginDetails.username && AzureLoginDetails.password;
+                setDisableLoginBtn(!disbalebtn);
+                break;
+            case 'ALM':
+                break;
+            case 'qTest':
+                break;
+            default:
+                break;
+        }
+        // return disbalebtn;
+    },[selectedscreen.name, loginDetails,zephyrLoginDetails,AzureLoginDetails])
+
+    const getAzureDetails = async () => {
         try {
             setLoading("Loading...")
             const data = await getDetails_Azure();
@@ -190,108 +217,120 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
     const loginHandler = async() => {
      if(checked){
-        switch (selectedscreen.name) {
-            case 'Jira':
+            switch (selectedscreen.name) {
+                case 'Jira':
                 try{
-                    setLoading('Updating...');
+                        setLoading('Updating...');
                     var data = await manageJiraDetails(isEmpty?"create":"update", loginDetails);
-                    setLoading(false);
+                        setLoading(false);
                     if(data.error){
-                        toastError(data.error);
-                        return;
-                    }
-                    // setCreateJira(false);
+                            toastError(data.error);
+                            return;
+                        }
+                        // setCreateJira(false);
                         toastSuccess(MSG.CUSTOM(`The JIRA configuration was successfully created`, VARIANT.SUCCESS));
-                //    getJiraDetails();
+                        //    getJiraDetails();
                 }catch(e){
-                    toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
-                }
-                break;
-            case 'Zephyr':
-                try{
-                    setLoading('Updating...');
-                    var data = await manageZephyrDetails(isEmpty?"create":"update", {
-                        ...zephyrLoginDetails,
-                        authType : zephyrLoginDetails.password ? "basic" : "token"
-                    });
-                    setLoading(false);
-                    if(data.error){
-                        toastError(data.error);
-                        return;
+                        toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
                     }
-                    // setCreateZephyr(false);
+                    break;
+                case 'Zephyr':
+                try{
+                        let zephyrObj = {
+                            url: zephyrLoginDetails.url,
+                            authType: zephyrLoginDetails.authType
+                        }
+                    if(zephyrLoginDetails.username && zephyrLoginDetails.password){
+                            zephyrObj['username'] = zephyrLoginDetails.username;
+                            zephyrObj['password'] = zephyrLoginDetails.password;
+                        }
+                    if(zephyrLoginDetails.token) {
+                            zephyrObj['token'] = zephyrLoginDetails.token;
+                        }
+                        setLoading('Updating...');
+                    var data = await manageZephyrDetails(isEmpty?"create":"update", zephyrObj);
+                        setLoading(false);
+                    if(data.error){
+                            toastError(data.error);
+                            return;
+                        }
+                        // setCreateZephyr(false);
                         toastSuccess(MSG.CUSTOM(`The Zephyr configuration is successfully created`, VARIANT.SUCCESS));
-                //    getZephyrDetails();
+                        //    getZephyrDetails();
                 }catch(e){
-                    toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
-                }
-                break;
-            case 'Azure DevOps':
-                try{
-                    setLoading('Updating...');
-                    var data = await manageAzureDetails(isEmpty?"create":"update", AzureLoginDetails);
-                    setLoading(false);
-                    if(data.error){
-                        toastError(data.error);
-                        return;
+                        toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
                     }
-                    // setCreateAzure(false);
+                    break;
+                case 'Azure DevOps':
+                try{
+                        setLoading('Updating...');
+                    var data = await manageAzureDetails(isEmpty?"create":"update", AzureLoginDetails);
+                        setLoading(false);
+                    if(data.error){
+                            toastError(data.error);
+                            return;
+                        }
+                        // setCreateAzure(false);
                         toastSuccess(MSG.CUSTOM(`The Azure DevOps configuration was successfully created`, VARIANT.SUCCESS));
-                //    getAzureDetails();
+                        //    getAzureDetails();
                 }catch(e){
-                    toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
-                }
-                break;
-            case 'ALM':
-                break;
-            case 'qTest':
-                break;
-            default:
-                break;
+                        toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
+                    }
+                    break;
+                case 'ALM':
+                    break;
+                case 'qTest':
+                    break;
+                default:
+                    break;
+            }
         }
-     }
 
         showCard2();
-         setDisableFields(false);
+        setDisableFields(false);
     }
 
     const confirmPopupMsg = (
         <div> <p>Are you sure you want to delete the saved credentials</p></div>
-      )
+    )
 
 
-      const deleteHandler = async() => {
+    const deleteHandler = async() => {
         if(!isEmpty){
-           switch (selectedscreen.name) {
-            case 'Jira':
-                var data = await manageJiraDetails("delete", {});
-                if(data.error){
-                    toastError(data.error);
-                    return;
-                }
-                dispatchAction(resetIntergrationLogin());
-                setIsEmpty(true);
-                toastSuccess("Successfully deleted the credentials")
-           case 'Zephyr':
-                var data = await manageZephyrDetails("delete", {});
-                if(data.error){
-                    toastError(data.error);
-                    return;
-                }
-                dispatchAction(resetZephyrLogin())
-                setIsEmpty(true);
-                toastSuccess("Successfully deleted the credentials")
-            case 'Azure DevOps':
+            switch (selectedscreen.name) {
+                case 'Jira':
+                    var data = await manageJiraDetails("delete", {});
+                    if(data.error){
+                            toastError(data.error);
+                            return;
+                        }
+                            dispatchAction(resetIntergrationLogin());
+                            setIsEmpty(true);
+                            toastSuccess("Successfully deleted the credentials")
+                        break;
+                case 'Zephyr':
+                    var data = await manageZephyrDetails("delete", {});
+                    if(data.error){
+                            toastError(data.error);
+                            return;
+                        }
+                            dispatchAction(resetZephyrLogin())
+                            setIsEmpty(true);
+                            toastSuccess("Successfully deleted the credentials")
+                            break;
+                case 'Azure DevOps':
                     var data = await manageAzureDetails("delete", {});
                     if(data.error){
                         toastError(data.error);
                         return;
                     }
-                    dispatchAction(resetAzureLogin())
-                    setIsEmpty(true);
-                    toastSuccess("Successfully deleted the credentials")
-           }
-        }}
+                        dispatchAction(resetAzureLogin())
+                        setIsEmpty(true);
+                        toastSuccess("Successfully deleted the credentials")
+                    break;
+            }
+        }
+    }
 
     return (
         <>
@@ -299,7 +338,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
             <Toast ref={toast} position="bottom-center" baseZIndex={1300} />
             <div className="login_container_integrations">
                 <div className="side-panel_login">
-                  
+
                     <div className={`icon-wrapper ${selectedscreen?.name === 'Jira' ? 'selected' : ''}`} onClick={() => {handleScreenType({ name: 'Jira', code: 'JA' }); getJiraDetails()}}>
                         <span><img src="static/imgs/jira_icon.svg" className="img__jira"></img></span>
                         <span className="text__jira">Jira</span>
@@ -365,44 +404,44 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                 </div>
                 }  */}
                 {selectedscreen?.code === 'GIT' ? <GitConfig toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/> : <>
-                {selectedscreen && authType === "basic"}
-                    <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
-                    {selectedscreen?.name === 'Zephyr' && (
-                        <div className="apptype__token">
-                            <span>Application Type:</span>
-                            <div className="p-field-radiobutton">
-                                <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={authType === 'basic'} />
-                                <label htmlFor="basic" className="basic_login">Basic</label>
-                            </div>
-                            <div className="p-field-radiobutton">
-                                <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={authType === 'token'} />
-                                <label htmlFor="token" className="token_login">Token</label>
-                            </div>
-                        </div>)}
-                    {authType === "basic" && selectedscreen && (
-                        <>
-                            <div className="input-cls">
-                                <span>Username <span style={{ color: 'red' }}>*</span></span>
-                                <span style={{ marginLeft: '1.5rem' }}>
-                                    <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
-                                    {/* <label htmlFor="username">Username</label> */}
-                                </span>
-                            </div>
-                            <div className="passwrd-cls">
+                        {selectedscreen && authType === "basic"}
+                        <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
+                        {selectedscreen?.name === 'Zephyr' && (
+                            <div className="apptype__token">
+                                <span>Application Type:</span>
+                                <div className="p-field-radiobutton">
+                                    <RadioButton inputId="basic" name="loginType" value="basic" onChange={handleRadioChange} checked={authType === 'basic'} />
+                                    <label htmlFor="basic" className="basic_login">Basic</label>
+                                </div>
+                                <div className="p-field-radiobutton">
+                                    <RadioButton inputId="token" name="loginType" value="token" onChange={handleRadioChange} checked={authType === 'token'} />
+                                    <label htmlFor="token" className="token_login">Token</label>
+                                </div>
+                            </div>)}
+                        {authType === "basic" && selectedscreen && (
+                            <>
+                                <div className="input-cls">
+                                    <span>Username <span style={{ color: 'red' }}>*</span></span>
+                                    <span style={{ marginLeft: '1.5rem' }}>
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
+                                        {/* <label htmlFor="username">Username</label> */}
+                                    </span>
+                                </div>
+                                <div className="passwrd-cls">
                                 {selectedscreen?.name === 'Zephyr' ?(
-                                 <span> Password <span style={{ color: 'red' }}>*</span></span>)
+                                        <span> Password <span style={{ color: 'red' }}>*</span></span>)
                                  :(
-                                    <span> API Token <span style={{ color: 'red' }}>*</span></span>
-                                 )
-                                }
-                                
-                                <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                                {/* <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} feedback={false} /> */}
+                                            <span> API Token <span style={{ color: 'red' }}>*</span></span>
+                                        )
+                                    }
+
+                                    <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                    {/* <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} feedback={false} /> */}
                                 <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem', paddingRight:'2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"}/>
-                                {(loginDetails.password || zephyrLoginDetails.password || AzureLoginDetails.password) && <div className='p-input-icon-right cursor-pointer'>
-                                    <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`}
-                                    onClick={() => { setShowPassword(!showPassword) }} />
-                                </div>}
+                                    {(loginDetails.password || zephyrLoginDetails.password || AzureLoginDetails.password) && <div className='p-input-icon-right cursor-pointer'>
+                                        <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`}
+                                            onClick={() => { setShowPassword(!showPassword) }} />
+                                    </div>}
 
                                 </div>
                                 <div className="url-cls">
@@ -416,7 +455,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                       {!isEmpty ? <Button label="Delete" onClick={()=>setShowModal(true)} severity="danger" /> :""}
                                       <Checkbox className="checkbox_cred" style={{left:!isEmpty?"1.5rem":"7.5rem"}} onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
                                       <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
-                                    <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
+                                    <Button disabled={disableLoginBtn} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
                                         onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"4rem":"11rem"}}>
                                     </Button>
                                 </div>
@@ -438,13 +477,13 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                     </span>
                                 </div>
                                 <div className="login__div">
-                                   <div>
+                                    <div>
                                     {!isEmpty ? <Button label="Delete" onClick={()=>setShowModal(true)} severity="danger" /> :""}
                                      <Checkbox className="checkbox_cred" style={{left:!isEmpty?"1.5rem":"7.5rem"}} onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
                                      <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
-                                   </div>
+                                    </div>
                                     <Button disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'login'}
-                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"22rem":"11rem", bottom:!isEmpty?"2.5rem":""}}>
+                                        onClick={loginHandler} className="login__btn" style={{left:!isEmpty?"22rem":"21rem", bottom:!isEmpty?"2.5rem":"2rem"}}>
                                     </Button>
                                 </div>
                             </>)}
@@ -456,11 +495,11 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
             </Card>
             {/* <ZephyrContent visible={zephyrVisible} onHide={zephyrhideDialog} selectedscreen={selectedscreen} /> */}
             <AvoConfirmDialog
-             visible={showModal}
-             onHide={() => setShowModal(false)}
-             showHeader={false}
-             message={confirmPopupMsg}
-             icon="pi pi-exclamation-triangle"
+                visible={showModal}
+                onHide={() => setShowModal(false)}
+                showHeader={false}
+                message={confirmPopupMsg}
+                icon="pi pi-exclamation-triangle"
              accept={()=>deleteHandler()}/>
         </>
     )

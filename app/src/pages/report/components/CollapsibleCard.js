@@ -144,9 +144,9 @@ const SummaryBar = ({ summaryValues , type }) => {
         if (typeof summaryValues.pass === 'string') {
             if (summaryValues.pass !== undefined && summaryValues.fail !== undefined && summaryValues.terminate !== undefined){
                 setProgress({ 
-                    pass: stripDecimal(summaryValues.pass), 
-                    fail: stripDecimal(summaryValues.fail),
-                    terminate: stripDecimal(summaryValues.terminate)
+                    pass: stripDecimal(Math.round(summaryValues.pass).toString()), 
+                    fail: stripDecimal(Math.round(summaryValues.fail).toString()),
+                    terminate: stripDecimal(Math.round(summaryValues.terminate).toString())
                 });
             }
             else {

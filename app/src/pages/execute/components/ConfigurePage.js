@@ -19,6 +19,7 @@ import ExecutionProfileStatistics from "./ExecutionProfileStatistics";
 import { Dropdown } from 'primereact/dropdown'; 
 // import {saveSauceLabData} from '../api';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
+import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
@@ -42,7 +43,9 @@ import {
   testSuitesScheduler_ICE,
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
-  setScheduleStatus
+  setScheduleStatus,
+  clearErrorMSg
+
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -158,6 +161,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [loading, setLoading] = useState(false);
   const [showBrowserstackLogin,setShowBrowserstackLogin] = useState(false);
   const [displayBasic4, setDisplayBasic4] = useState(false);
+  const [showBrowserstack, setShowBrowserstack] = useState(false);
   const [displayBasic6, setDisplayBasic6] = useState(false);
   const [displayBasic7, setDisplayBasic7] = useState(false);
   const [currentExecutionRequest,setCurrentExecutionRequest] = useState(null);
@@ -170,6 +174,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackUser,setBrowserstackUser] = useState({});
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -215,17 +221,19 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject.projectId)
   }, [selectProjects]);
 
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
+    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
   }, [selectProjects.projectId]);
@@ -387,7 +395,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     // var projId = current_task.testSuiteDetails ? current_task.testSuiteDetails[0].projectidts : currentTask.testSuiteDetails[0].projectidts;
     var projId = configProjectId;
     var dataforApi = { poolid: "", projectids: [projId] };
-    setLoading('Fetching ICE ...')
+    // setLoading('Fetching ICE ...')
     const data = await getPools(dataforApi);
     if (data.error) {
       displayError(data.error);
@@ -404,12 +412,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
     setIceStatus(data1);
     populateICElist(arr, true, data1);
-    setLoading(false);
+    // setLoading(false);
   };
 
   useEffect(() => {
     if(configProjectId !== ""){
+      setLoading('Fetching ICE ...')
       fetchData();
+      setLoading(false);
     }
     // eslint-disable-next-line
   }, [configProjectId]);
@@ -528,7 +538,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     'showSauceLabLogin':setShowSauceLabLogin,
     'showBrowserstackLogin':setShowBrowserstackLogin 
 }
-  const handleOptionChange = (selected,type,fetechConfig,index,idx) => {
+  const handleOptionChange = async (selected,type,fetechConfig,index,idx) => {
     // setDropdownSelected(selected);
     setDropdownSelected(prevValues => {
         const newValues = [...prevValues];
@@ -540,25 +550,25 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
           setDisplayBasic4('displayBasic4');
           setExecutingOn("ICE")
           setConfigItem(idx);
-            triggerSauceLab(fetechConfig,type);
+            await triggerSauceLab(fetechConfig,type);
             // setDropdownSelected(prevValues => {
             //     const newValues = [...prevValues];
             //     newValues[index] = '';
             //     return newValues;
             //   });
-            // setDisplayBasic4(false);
-            handleSubmit1();
+            setDisplayBasic4(false);
+            await handleSubmit1();
             break;
-        case 'browserstack':
+        case 'BrowserStack':
           setDisplayBasic6('displayBasic6');
           setExecutingOn("ICE")
           setConfigItem(idx);
             triggerBrowserstack(fetechConfig,type);
-            // setDropdownSelected(prevValues => {
-            //     const newValues = [...prevValues];
-            //     newValues[index] = '';
-            //     return newValues;
-            //   });
+            setDropdownSelected(prevValues => {
+                const newValues = [...prevValues];
+                newValues[index] = '';
+                return newValues;
+              });
             break;
       case 'lambdaTest':
             // add changes for lambdaTest
@@ -655,47 +665,59 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     
 }
 
-// const handleBrowserstackSubmit = async (BrowserstackPayload) => {
-//   // close the existing dialog
-//   setDisplayBasic6(false);
-//   // open the new dialog
-//   setLoading('Fetching details...') 
-//   BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
-//   let resultData = await saveBrowserstackData({
-//       BrowserstackPayload
+const handleBrowserstackSubmit = async (BrowserstackPayload) => {
+  // close the existing dialog
+  setDisplayBasic6(false);
+  // open the new dialog
+  setLoading('Fetching details...') 
+  BrowserstackPayload['action'] = (showBrowserstack?"mobileWebDetails":"webDetails")
+  let resultData = await saveBrowserstackData({
+      BrowserstackPayload
           
-//   })
-//   if(resultData && resultData.os_names && resultData.browser){
-//       setLoading(false);
-//       setDisplayBasic7(true);
+  })
+  if(resultData && resultData.os_names && resultData.browser){
+      setLoading(false);
+      setDisplayBasic7(true);
 
-//       // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
-//       //     return {
-//       //       key: key,
-//       //       text: key,
-//       //       title: key,
-//       //       index: index
-//       //     };
-//       //   });
-//       //   setOs(arrayOS);
-//         setBrowserstackBrowserDetails(resultData);
-//   }
-// else{
-//   setLoading(false);
-//   if (resultData == "unavailableLocalServer"){
-//       setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
-//   }else{
-//       setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
-//   }
-// }
-// };
+      // const arrayOS = Object.entries(resultData.os).map(([key, value], index) => {
+      //     return {
+      //       key: key,
+      //       text: key,
+      //       title: key,
+      //       index: index
+      //     };
+      //   });
+      //   setOs(arrayOS);
+        setBrowserstackBrowserDetails(resultData);
+  }
+  else if (resultData && resultData.devices && resultData.stored_files){
+    const arrayPlatforms = Object.keys(resultData.devices).map((element, index) => { 
+        return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+        }
+    })
+    setPlatforms(arrayPlatforms);
+    setMobileDetailsBrowserStack(resultData);
+    setLoading(false);
+    setDisplayBasic7(true);
+  }
+else{
+  setLoading(false);
+  if (resultData == "unavailableLocalServer"){
+      setMsg(MSG.INTEGRATION.ERR_UNAVAILABLE_ICE);
+  }else{
+      setMsg({"CONTENT":"Error while fetching the data from Browserstack", "VARIANT": VARIANT.ERROR})
+  }
+}
+};
 
 const handleSubmit1 = async (SauceLabPayload) => {
   // close the existing dialog
-  // setDisplayBasic4(false);
   // open the new dialog
-  setLoading("Fetching details..")
-  setDisplayBasic4('displayBasic4');
+  setLoading("Fetching details..");
   const data1 = await getDetails_SAUCELABS()
   if (data1.error) { setMsg(data1.error); return; }
       if (data1 !== "empty") {
@@ -709,9 +731,6 @@ const handleSubmit1 = async (SauceLabPayload) => {
         if (data && data.os_names && data.browser) {
           // Data exists and has the expected properties
           
-          setLoading(false)
-          // setDisplayBasic5(true);
-          // setDisplayBasic4('displayBasic4');
           const arrayOS = data.os_names.map((element, index) => {
             return {
               key: element,
@@ -722,6 +741,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
           });
           setOsNames(arrayOS);
           setBrowserDetails(data);
+          setLoading(false)
+          setDisplayBasic4('displayBasic4');
       }
       else if (data && data.emulator && data.real_devices && data.stored_files){
           // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
@@ -735,11 +756,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
           // setPlatforms(arrayPlatforms);
     
           setMobileDetails(data);
-          setLoading(false);
           setDisplayBasic4(true);
+          setLoading(false);
         }
          else {
-          setLoading(false);
+          
           // Data is empty or doesn't have expected properties
           if (data == "unavailableLocalServer"){
               toast.current.show({
@@ -755,7 +776,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
               detail: "Error while fetching the data from Saucelabs",
               life: 5000
             });
-          }  
+          } 
+          setLoading(false); 
         }
       } else {
         setMsg("No data stored in settings"); return;
@@ -844,8 +866,28 @@ const handleSubmit1 = async (SauceLabPayload) => {
       onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
       availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE} sauceLab={sauceLab} dataExecution={dataExecution} sauceLabUser={sauceLabUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute}  iceNameIdMap={iceNameIdMap}
 />,
-  [mobileDetails, browserDetails, displayBasic4, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-      availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap, handleSubmit1]);
+  [mobileDetails, browserDetails, displayBasic5, onHidedia, showSauceLabs, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+    availableICE, smartMode, selectedICE, setSelectedICE, sauceLab,currentSelectedItem, dataExecution, sauceLabUser, browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
+    const browserstackLogin = useMemo(() =>
+    <BrowserstackLogin
+        setLoading={setLoading}
+        displayBasic6={displayBasic6}
+        onHidedia={onHidedia}
+        handleBrowserstackSubmit={handleBrowserstackSubmit}
+        setBrowserstackUser={setBrowserstackUser}
+        onModalBtnClick={onHidedia}
+    />,
+    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
+
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+        />,
+            [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
+
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
@@ -973,14 +1015,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
   const cloudTestOptions = [
     { name: 'SauceLabs', code: 1 },
-    // { name: 'browserstack', code: 2 },
+    { name: 'BrowserStack', code: 2 },
   ];
   
-  const selectedCountryTemplate = (option, props) => {
+  const selectedCountryTemplate = (option, props) => {    
     if (option) {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '1rem' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" : "   static/imgs/browserstack_icon.svg" }  style={{ width: '1rem' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -992,7 +1034,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       const countryOptionTemplate = (option) => {
         return (
             <div className="flex align-items-center">
-                <img alt={option.name} src="static/imgs/Saucelabs-1.png"  style={{ width: '18px' }} />
+                <img alt={option.name} src={option.name === "SauceLabs" ? "static/imgs/Saucelabs-1.png" :  "static/imgs/browserstack_icon.svg" }  style={{ width: '18px' }} />
                 <div>{option.name}</div>
             </div>
         );
@@ -1097,9 +1139,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
             </Button>
 
             <div className="cloud-test-provider" >
-  <Dropdown 
-  placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name,'web',item,idx,setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs');setBrowserstackExecutionEnv('browserstack')}}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate}   disabled={selectProjects.appType==="Desktop"||selectProjects.appType==="Mainframe"||selectProjects.appType==="OEBS"||selectProjects.appType==="SAP"}/>
-  </div> 
+              <Dropdown
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+            </div> 
           
           </div>
         ),
@@ -1143,6 +1185,13 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
       >
         {rowdata.profileName}
       </span>;
+};
+const showToast = (severity, detail) => {
+  toast.current.show({
+    severity: severity,
+    summary: severity === 'success' ? 'Success' : 'Error',
+    detail: detail,
+  });
 };
 
   const configModal = (getType, getData = null) => {
@@ -1357,27 +1406,23 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
       tableUpdate();
+      setVisible_setup(false);
       toast.current.show({
         severity: 'success',
         summary: 'Success',
         detail:"Configuration created successfully.",
         life: 5000
       });
-      setVisible_setup(false);
     } else if(getConfigData?.setupExists?.error?.CONTENT){
-      errorinfo?.current && errorinfo?.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: getConfigData?.setupExists?.error?.CONTENT,
-        life: 5000
-      });
+      showToast('error', getConfigData?.setupExists?.error?.CONTENT);
     };
+    dispatch(clearErrorMSg());
   }, [getConfigData?.setupExists]);
 
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+        ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
         appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
@@ -1800,6 +1845,7 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
          <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
          <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
          {loading ? <ScreenOverlay content={loading} /> : null}
 
           <DataTable
@@ -2270,6 +2316,8 @@ Learn More '/>
       <div>
       {sauceLabLogin}
       {sauceLabExecute}
+      {browserstackExecute}
+      {browserstackLogin}
         <Breadcrumbs />
         <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>
           <div className="col-12 lg:col-8 xl:col-8 md:col-6 sm:col-12" style={{ marginBottom: '-0.6rem' }}>
@@ -2359,7 +2407,8 @@ Learn More '/>
           isDisabled={
             !configTxt ||
             (typesOfAppType !=="Web"? null:!avodropdown?.browser?.length) ||
-            !Object.keys(selectedNodeKeys)?.length
+            !Object.keys(selectedNodeKeys)?.length ||
+            (!!Object.keys(selectedNodeKeys)?.length && !Object.keys(selectedNodeKeys).some(el => el.includes('-')))
           }
         />
       </div>

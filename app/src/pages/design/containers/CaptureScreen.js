@@ -26,7 +26,8 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import { RadioButton } from 'primereact/radiobutton';
 // import LaunchApplication from '../components/LaunchApplication';
 import "../styles/LaunchApplication.scss";
-import {getDeviceSerialNumber_ICE} from "../api";
+import {getDeviceSerialNumber_ICE,checkingMobileClient_ICE} from "../api";
+// import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
@@ -470,22 +471,16 @@ const elementTypeProp =(elementProperty) =>{
     case "form" || "fieldset" :
       return "Forms";
       
-    case "input" || "textarea" :
-      return "Textbox/Textarea";
-      
     case "table" || "tbody" || "tfoot" || "thead" || "tr":
       return "Table";
 
-      case "form" || "fieldset":
+    case "form" || "fieldset":
         return "Forms";
 
-      case "input" || "textarea":
+    case "input" || "textarea" || "textbox":
         return "Textbox";
 
-      case "table" || "tbody" || "tfoot" || "thead" || "tr":
-        return "Table";
-
-      default:
+    default:
         return "Element";
     }
   }
@@ -581,7 +576,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: elementTypeProp(item.tag),
+                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
@@ -2090,7 +2085,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
       {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
       {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
-        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} />
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects}/>
         :
         <>
         {typesOfAppType ==="Web"?
@@ -2480,6 +2475,7 @@ const LaunchApplication = props => {
     const deviceNameHandler = event => setDeviceName(event.target.value);
 
     const [uuid, setUUID] = useState("");
+    const [CheckingMobileClient_ICEResponse, setcheckingMobileClient_ICEResponse] = useState(false);
     const uuidHandler = event => setUUID(event.target.value);
 
     const onMobileAppLaunch = () => {
@@ -2512,6 +2508,15 @@ const LaunchApplication = props => {
           props.toastError(error)
       })
     }
+    const handleCheckingMobileClient_ICE = (value)=>{
+      if(value === "A"){
+        checkingMobileClient_ICE().then(data=>{
+          console.log("dataOfcheckingMobileClient_ICE",data)
+          if(data === false){
+            setcheckingMobileClient_ICEResponse(true)
+          }})
+      }
+    }
 
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
@@ -2523,8 +2528,8 @@ const LaunchApplication = props => {
       type="radio"
       name="method"
       value="A"
-      onChange={
-        handleSerialNumber
+      onChange={(e)=>{
+        handleSerialNumber(); handleCheckingMobileClient_ICE(e.target.value); setCheckedForMobApp(true);}
       }
       checked={os === 'android'} 
       // defaultChecked={true} // Set this to true for default selection
@@ -2554,16 +2559,24 @@ const LaunchApplication = props => {
   </div>
 </div>
 
-          {os === "android" &&
-            <div className='AndroidContent'>
-                <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
-              <select data-test="andriodSerialNumber" className='versionSelect' placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
-                <option value="" disabled>Select Mobile Serial Number</option>
-                {serialNumbers.map((serialNumber) => (
-                  <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
-                ))}
-              </select>
-              </div>}
+        {os === "android" &&
+                  <>
+                    <div className='wholeAndroidContainer'>
+                      <div className='AndroidContent'>
+                        <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
+                        <select data-test="andriodSerialNumber" className='versionSelect' placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
+                          <option value="" disabled>Select Mobile Serial Number</option>
+                          {serialNumbers.map((serialNumber) => (
+                            <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {CheckingMobileClient_ICEResponse &&
+                        <span>Required packages for mobile testing in Avo Assure client folder are missing.<a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                      }
+                    </div>
+                  </>
+                }
             {os === "ios" &&
           <div className='iOSContent'>
               <InputText data-test="iosApppath"  placeholder="Enter Application path" value={appPath2} onChange={appPath2Handler} name="appPath2_i"  />

@@ -2555,7 +2555,7 @@ exports.manageZephyrDetails = async (req, res) => {
 			const zephyrUrl = data.user.url;
 			const zephyrUsername = data.user.username;
 			const zephyrPassword = data.user.password;
-			const zephyrToken = data.user.token !== ''?data.user.token:"token";
+			const zephyrToken = data.user.token;
 			const zephyrAuthType = data.user.authType;
 			inputs = {
 				"userId": userId,
@@ -2838,5 +2838,63 @@ exports.fetchAvoDiscoverMap = async (req, res) => {
 	} catch (exception) {
 		logger.error("Error occurred in admin/fetchAvoDiscoverMap:", exception);
 		res.send("fail");
+	}
+};
+
+exports.manageBrowserstackDetails = async (req, res) => {
+	const actionName = "manageBrowserstackDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageBrowserstackDetails", actionName);
+		}else{
+			const BrowserstackUsername = data.user.BrowserstackUsername;
+			const BrowserstackAPI = data.user.BrowserstackAPI;
+			let inputs = {
+				"userId": userId,
+				"BrowserstackUsername": BrowserstackUsername,
+				"BrowserstackAPI": BrowserstackAPI,
+				"action": action
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageBrowserstackDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.getDetails_BROWSERSTACK= async (req, res) => {
+	const actionName = "getDetails_BROWSERSTACK";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_BROWSERSTACK", actionName);
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				BrowserstackURL: result['url'],
+				BrowserstackUsername: result['username'],
+				Browserstackkey: result['api']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_BROWSERSTACK: %s", exception);
+		return res.status(500).send("fail");
 	}
 };

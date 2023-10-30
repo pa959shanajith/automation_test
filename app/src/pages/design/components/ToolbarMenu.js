@@ -1,6 +1,6 @@
 import React, { useState, useRef, Fragment, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getModules,getScreens} from '../api';
+import {getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import {readTestSuite_ICE,exportMindmap,exportToExcel,exportToGit} from '../api';
 import '../styles/ToolbarMenu.scss';
 import * as d3 from 'd3';
@@ -44,6 +44,10 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const isEnELoad = useSelector(state=>state.design.isEnELoad);
     const [checked, setChecked] = useState(false);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux; 
+  else userInfo = userInfo ;
     // let selectProject = reduxDefaultselectedProject;
   
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -164,6 +168,54 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         paste({...copyNode})
     }
     var projectList = Object.entries(prjList)
+    const handleProjectSelecte=async(proj)=>{
+            // Code to check whether to reset the old test suite while changing project or not .
+            var reqForOldModule={
+                tab:"createTab",
+                projectid:initProj
+                ,
+                version:0,
+                cycId: null,
+                modName:"",
+                moduleid:localStorage.getItem('OldModuleForReset')
+              }
+              
+              
+            var moduledataold=await getModules(reqForOldModule)
+            if(userInfo?.username===moduledataold.currentlyInUse)
+            {await updateTestSuiteInUseBy("Web",localStorage.getItem('OldModuleForReset'),localStorage.getItem('OldModuleForReset'),userInfo?.username,false,true)
+            }
+            var reqForNewModule={
+                tab:"createTab",
+                projectid:proj,
+                version:0,
+                cycId: null,
+                modName:"",
+                moduleid:null
+              }
+              
+              
+            var firstModld=await getModules(reqForNewModule)
+            if(firstModld.length>0){
+            var reqForFirstModule={
+              tab:"createTab",
+              projectid:proj,
+              version:0,
+              cycId: null,
+              modName:"",
+              moduleid:firstModld[0]?._id
+            }
+            var firstModDetails=await getModules(reqForFirstModule)
+        
+        
+            if(!firstModDetails.currentlyInUse.length>0)
+            await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
+             
+        
+
+    }
+    selectProj(proj)
+}
     return(
         <Fragment>
             {exportBox?<ModalContainer
@@ -175,7 +227,7 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         <div style={{display:'flex'}}>
             <div style={{background:"white", width: '17rem'}}>
                 <label data-test="projectLabel" className='projectLabel'>Project:</label>
-                <select data-test="projectSelect" className='projectSelect' value={initProj} onChange={(e)=>{selectProj(e.target.value)}}>
+                <select data-test="projectSelect" className='projectSelect' value={initProj} onChange={(e)=>{handleProjectSelecte(e.target.value)}}>
                     {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
                 </select> 
             </div>     

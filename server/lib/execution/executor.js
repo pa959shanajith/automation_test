@@ -128,6 +128,18 @@ class TestSuiteExecutor {
                 execReq["mobile"] = batchData.mobile
             }
         }
+        if(batchData.executionEnv == 'browserstack' && batchData.batchInfo.length) {
+            execReq['browserstack_username'] = batchData.browserstack_username
+            execReq['browserstack_access_key'] = batchData.browserstack_access_key
+            if(batchData.batchInfo[0].appType == 'Web') {
+                execReq['browserVersion'] = batchData.browserVersion
+                execReq['osVersion'] = batchData.osVersion
+                execReq['browserName'] = batchData.browserName
+                execReq['os'] = batchData.os
+            } else {
+                execReq["mobile"] = batchData.mobile
+            } 
+        }
         const gitInfo = batchData.gitInfo;
         if(gitflag){
             var folderPath = gitInfo['folderPath'];

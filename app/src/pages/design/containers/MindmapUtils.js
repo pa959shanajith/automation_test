@@ -1,7 +1,7 @@
 /*eslint eqeqeq: "off"*/
 import * as d3 from 'd3';
 import {v4 as uuid} from 'uuid'
-// import { readCtScale } from './Canvas';
+import { readCtScale } from './CanvasNew';
 
 function unfoldtree(d){
     // d3.select('#node_' + d.id).classed('no-disp', !1).select('.ct-cRight').classed('ct-nodeBubble', !0); 
@@ -238,8 +238,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                   id: child.id ? child.id : generateId(parentId, childIdx + 1),
                   parent: {
                     ...child.parent.data,
-                    id: child.parent.data.id ? child.parent.data.id : parentId,
-                    // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+                    id: child.parent.id ? child.parent.id : parentId,
+                    parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
                   }
                 };
           
@@ -258,7 +258,7 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                 id: idx,
                 parent: d.parent ? {
                   ...d.parent.data,
-                  id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
+                  id: d.parent ? d.parent.id : generateId(idx - 1, 0),
                   parent: d.parent.parent ? { ...d.parent.parent.data } : null
                 } : null
               };
@@ -353,8 +353,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
               id: child.id ? child.id : generateId(parentId, childIdx + 1),
               parent: {
                 ...child.parent.data,
-                id: child.parent.data.id ? child.parent.data.id : parentId,
-                // parent: child.parent.parent.data? child.parent.parent.data:null // Use the parent's ID as the unique identifier
+                id: child.parent.id ? child.parent.id : parentId,
+                parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
               }
             };
       
@@ -373,7 +373,7 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
             id: idx,
             parent: d.parent ? {
               ...d.parent.data,
-              id: d.parent.data.id ? d.parent.data.id : generateId(idx - 1, 0),
+              id: d.parent.parent ? d.parent.parent.id : generateId(idx - 1, 0),
               parent: d.parent.parent ? { ...d.parent.parent.data } : null
             } : null
           };
@@ -703,7 +703,7 @@ export const moveNodeBegin = (idx,linkDisplay,dLinks,temp,pos,verticalLayout,Can
         svg.on('mousemove.nodemove', (event)=>{
                 event.stopImmediatePropagation();
                 var t = {} ;
-                // if(CanvasFlag==='createnew')pos=readCtScale();
+                if(CanvasFlag==='createnew')pos=readCtScale();
                 // else if(CanvasFlag==='assign')pos=readCtScaleAssign();
                 // else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
                 const cSpan = [pos.x, pos.y];
@@ -729,12 +729,25 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
         var l = p.attr('transform').slice(10, -1).split(',');
         dNodes[pi].x = parseFloat(l[0]);
         dNodes[pi].y = parseFloat(l[1]);
-        var link = addLink(dLinks[temp.t].source, dLinks[temp.t].target,verticalLayout);
-        var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
-        linkDisplay[lid] = link
+        let f;
+        if (dNodes[pi].type === 'testcases'){
+            for(let d = 0; d<dNodes.length; d++){
+                if(dNodes[d].name === dNodes[pi].parent.name){
+                    f = d
+                    break
+                }
+            }
+            var link = addLink(dNodes[f], dNodes[pi],verticalLayout);
+            var lid = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
+            linkDisplay[lid] = link
+        }else {
+            var links = addLink(dLinks[temp.t].source, dNodes[pi],verticalLayout);
+            var lids= 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
+            linkDisplay[lids] = links
+        }
         temp.s.forEach(function(d) {
                 // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
-                        var link = addLink(dLinks[d].source, dLinks[d].target,verticalLayout);
+                        var link = addLink(dNodes[pi], dLinks[d].target,verticalLayout);
                         var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
                         linkDisplay[lid] = link
                         if(temp.hidden.indexOf(d) !== -1){

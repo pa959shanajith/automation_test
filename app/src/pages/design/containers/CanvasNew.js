@@ -1014,15 +1014,19 @@ const CanvasNew = (props) => {
   };
 
   const accept = () => {
-    dispatch(showGenuis({
-      showGenuisWindow:true,
-      geniusWindowProps:{
-        selectedProject:{key: proj,text: projectList[proj]["name"]},        
-        selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
-        selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
-        geniusFromMindmap:true
-      }
-    })) 
+    if (toastData !== true){
+      dispatch(showGenuis({
+        showGenuisWindow:true,
+        geniusWindowProps:{
+          selectedProject:{key: proj,text: projectList[proj]["name"]},        
+          selectedModule:{key:fetchingDetails["parent"]["_id"],text:fetchingDetails["parent"]["name"]},
+          selectedScenario:{key:fetchingDetails["_id"],text:fetchingDetails["name"]},
+          geniusFromMindmap:true
+        }
+      })) 
+    }else{
+      toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
+    }
   }
 
   const reject = () => {}
@@ -2369,8 +2373,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                     :null}
                     {(node[1].type!=='modules')?
                     <circle 
-                    onMouseUp={(e)=>moveNode(e,'KeyUp')}
-                    onMouseDown={(e)=>moveNode(e,'KeyDown')}
+                    onMouseUpCapture={(e)=>moveNode(e,'KeyUp')}
+                    onMouseDownCapture={(e)=>moveNode(e,'KeyDown')}
                     cx={verticalLayout ? 20 : -3} cy={verticalLayout ? -4 : 20}
                     className={"ct-"+node[1].type+" ct-nodeBubble"} r="4"></circle>
                     :null}
