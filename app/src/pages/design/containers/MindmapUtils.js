@@ -258,8 +258,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                 id: idx,
                 parent: d.parent ? {
                   ...d.parent.data,
-                  id: d.parent.id ? d.parent.id : generateId(idx - 1, 0),
-                  parent: d.parent ? { ...d.parent.data } : null
+                  id: d.parent ? d.parent.id : generateId(idx - 1, 0),
+                  parent: d.parent.parent ? { ...d.parent.parent.data } : null
                 } : null
               };
           
@@ -373,8 +373,8 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
             id: idx,
             parent: d.parent ? {
               ...d.parent.data,
-              id: d.parent.id ? d.parent.id : generateId(idx - 1, 0),
-              parent: d.parent ? { ...d.parent.data } : null
+              id: d.parent.parent ? d.parent.parent.id : generateId(idx - 1, 0),
+              parent: d.parent.parent ? { ...d.parent.parent.data } : null
             } : null
           };
       
