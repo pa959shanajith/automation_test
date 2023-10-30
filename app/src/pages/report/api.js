@@ -393,7 +393,7 @@ export const getDetails_JIRA = async() => {
 
 export const getDetails_AZURE = async() => { 
     try{
-        const res = await axios(url+'/getDetails_AZURE', {
+        const res = await axios(url+'/getDetails_Azure', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',

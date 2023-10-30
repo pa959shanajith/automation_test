@@ -402,7 +402,6 @@ export default function BasicDemo() {
       );
     }
     setSelectedFilter(_selectedFilters);
-    setSearchTest(_selectedFilters[0]?.name ? _selectedFilters[0].name : "");
   };
 
   const handleBug = (getBugtype) => {
@@ -571,7 +570,7 @@ export default function BasicDemo() {
         },
         children: [],
       };
-      data[i].children?.forEach((child) => {
+      data[i].children?.filter(el => !!selectedFilter.length ? selectedFilter.map((el) => el.name).includes(el.status): el).forEach((child) => {
         const modifiedChild = { ...child }; // Create a new object with the same properties as child
         if (modifiedChild?.EllapsedTime) {
           modifiedChild.EllapsedTime = modifiedChild.EllapsedTime.split(":")
