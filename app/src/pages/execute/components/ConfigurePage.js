@@ -174,6 +174,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackUser,setBrowserstackUser] = useState({});
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
+  const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
+  const [platforms, setPlatforms] = useState([]);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -230,7 +232,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
+    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
+    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
   }, [selectProjects.projectId]);
@@ -687,6 +690,20 @@ const handleBrowserstackSubmit = async (BrowserstackPayload) => {
       //   setOs(arrayOS);
         setBrowserstackBrowserDetails(resultData);
   }
+  else if (resultData && resultData.devices && resultData.stored_files){
+    const arrayPlatforms = Object.keys(resultData.devices).map((element, index) => { 
+        return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+        }
+    })
+    setPlatforms(arrayPlatforms);
+    setMobileDetailsBrowserStack(resultData);
+    setLoading(false);
+    setDisplayBasic7(true);
+  }
 else{
   setLoading(false);
   if (resultData == "unavailableLocalServer"){
@@ -863,12 +880,12 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  browserstackBrowserDetails={browserstackBrowserDetails}
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
         />,
-            [browserstackBrowserDetails, displayBasic7, onHidedia,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+            [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
             availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
 
 

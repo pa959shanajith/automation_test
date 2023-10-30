@@ -38,6 +38,7 @@ export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
   const [reportViewData, setReportViewData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState(null);
+  const [bugLoader, setBugLoader] = useState(false);
   const [loginName, setLoginName] = useState("");
   const [loginKey, setLoginKey] = useState("");
   const [loginUrl, setLoginUrl] = useState("");
@@ -45,6 +46,8 @@ export default function BasicDemo() {
   const [inputSummary, setInputSummary] = useState("");
   const [inputDesc, setInputDesc] = useState("");
   const [visibleBug, setVisibleBug] = useState(false);
+  const [visibleScreen, setVisibleScreen] = useState(false);
+  const [visibleScreenShot, setVisibleScreenShot] = useState("");
   const [logBug, setLogBug] = useState(false);
   const [bugTitle, setBugTitle] = useState("");
   const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -656,6 +659,7 @@ export default function BasicDemo() {
         setConfigValues({});
       }
       (async () => {
+        setBugLoader(true);
         const getFields =
           bugTitle === "Jira"
             ? await connectJira_ICE_Fields(
@@ -692,6 +696,7 @@ export default function BasicDemo() {
           disabled: bugTitle === "Jira" ? getFields[el].required : getFields[el].alwaysRequired,
           data: bugTitle === "Jira" ? getFields[el].value : getFields[el]?.allowedValues && !!getFields[el]?.allowedValues.length ? getFields[el]?.allowedValues.map((e) => ({ key: e, name: e })) : ""
         }));
+        setBugLoader(false);
         setSelectedFiels(fieldValues);
       })();
     }
@@ -758,14 +763,10 @@ export default function BasicDemo() {
       <div
         className="screenshot_view"
         onClick={async () => {
+          setVisibleScreen(true);
           let data = await openScreenshot(getLink?.data?.screenshot_path);
           let image = "data:image/PNG;base64," + data;
-          let WindowObject = window.open();
-          let strHtml =
-            "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" +
-            image +
-            "'/>\n</body>\n</html>";
-          WindowObject.document.writeln(strHtml);
+          setVisibleScreenShot(image);
         }}
       >
         View Screenshot
@@ -1021,6 +1022,18 @@ export default function BasicDemo() {
         }}
         footerType="Connect"
       />
+      <AvoModal
+        visible={visibleScreen}
+        setVisible={setVisibleScreen}
+        onModalBtnClick={() => setVisibleScreen(false)}
+        content={<div><img src={visibleScreenShot} className="img_screenShot" alt="screenshot" /></div>}
+        customClass="screenshot_modal"
+        modalSytle={{
+          width: "95vw",
+          height: "95vh",
+          background: "#FFFFFF",
+        }}
+      />
       <OverlayPanel ref={bugRef} className="report_bug">
         <div className="flex downloadItem" onClick={() => handleBug("Jira")}>
           <img src="static/imgs/jira_icon.svg" className="img_jira" />
@@ -1194,6 +1207,7 @@ export default function BasicDemo() {
         }
         customClass="jira_modal"
         headerTxt="Create Issue"
+        addLoader={bugLoader}
         modalSytle={{
           width: "60vw",
           background: "#FFFFFF",
