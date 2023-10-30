@@ -38,6 +38,7 @@ export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
   const [reportViewData, setReportViewData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState(null);
+  const [bugLoader, setBugLoader] = useState(false);
   const [loginName, setLoginName] = useState("");
   const [loginKey, setLoginKey] = useState("");
   const [loginUrl, setLoginUrl] = useState("");
@@ -658,6 +659,7 @@ export default function BasicDemo() {
         setConfigValues({});
       }
       (async () => {
+        setBugLoader(true);
         const getFields =
           bugTitle === "Jira"
             ? await connectJira_ICE_Fields(
@@ -694,6 +696,7 @@ export default function BasicDemo() {
           disabled: bugTitle === "Jira" ? getFields[el].required : getFields[el].alwaysRequired,
           data: bugTitle === "Jira" ? getFields[el].value : getFields[el]?.allowedValues && !!getFields[el]?.allowedValues.length ? getFields[el]?.allowedValues.map((e) => ({ key: e, name: e })) : ""
         }));
+        setBugLoader(false);
         setSelectedFiels(fieldValues);
       })();
     }
@@ -1204,6 +1207,7 @@ export default function BasicDemo() {
         }
         customClass="jira_modal"
         headerTxt="Create Issue"
+        addLoader={bugLoader}
         modalSytle={{
           width: "60vw",
           background: "#FFFFFF",
