@@ -204,7 +204,7 @@ const SauceLabsExecute = React.memo(({ mobileDetails, selectProjects, browserDet
                 )
             });
             setBrowserVersions(findBrowserVersion.sort((a, b) => {
-                return Number(a.key) - Number(b.key);
+                return Number(b.key) - Number(a.key);
             }));
         }
     }
