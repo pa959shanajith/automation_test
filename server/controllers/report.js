@@ -119,7 +119,7 @@ const openScreenShot = async (username, path,host) => {
 exports.openScreenShot_API = async (req, res) => {
     try {
         const username = req.body.username; //req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.session.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client !== undefined? req.session.client:req.body.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
@@ -130,7 +130,7 @@ exports.openScreenShot_API = async (req, res) => {
 exports.openScreenShot = async (req, res) => {
     try {
         const username = req.session.username;
-        const result = await openScreenShot(username, req.body.absPath,req.session.client);
+        const result = await openScreenShot(username, req.body.absPath,req.session.client !== undefined? req.session.client:req.body.client);
         res.send(result);
     } catch (exception) {
         logger.error("Exception in openScreenShot when trying to load screenshot: %s", exception);
