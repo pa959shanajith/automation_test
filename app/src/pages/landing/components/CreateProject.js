@@ -276,15 +276,14 @@ const CreateProject = (props) => {
     setDisplayUser((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
-      
-
     ]);
     setUnFiltereAssaignedData((prevAssignedUsers) => [
       ...prevAssignedUsers,
       ...assignedUsers
-      
-
     ]);
+    setUnFilteredData(unFilteredData.filter(
+      (item) => !selectedCheckboxes.some((checkbox) => checkbox.id === item.id)
+    ));
     setSelectedCheckboxes([]);
     setSelectAll(false);
   };
@@ -332,9 +331,12 @@ const CreateProject = (props) => {
     const unassignedUsers = displayUser.filter(
       (item) => selectedAssignedCheckboxes.some((checkbox) => checkbox.id === item.id)
     );
-    setItems((prevItems) => [...prevItems, ...unassignedUsers]);
+    setItems((prevItems) => [...prevItems, ...unassignedUsers]);    
+    setUnFilteredData([...unFilteredData, ...unassignedUsers]);
     setDisplayUser(filteredAssignedItems);
-    setUnFiltereAssaignedData(filteredAssignedItems);
+    setUnFiltereAssaignedData((prevAssignedUsers) => prevAssignedUsers.filter(
+      (item) => !selectedAssignedCheckboxes.some((checkbox) => checkbox.id === item.id)
+    ));
     setSelectedAssignedCheckboxes([]);
     setSelectallAssaigned(false);
 
