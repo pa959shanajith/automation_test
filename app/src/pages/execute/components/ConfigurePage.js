@@ -219,12 +219,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId: selectProjects)
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject.projectId)
   }, [selectProjects]);
 
   useEffect(() => {
@@ -1405,7 +1405,7 @@ const showToast = (severity, detail) => {
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+        ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
         appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]

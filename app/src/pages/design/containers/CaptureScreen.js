@@ -471,22 +471,16 @@ const elementTypeProp =(elementProperty) =>{
     case "form" || "fieldset" :
       return "Forms";
       
-    case "input" || "textarea" :
-      return "Textbox/Textarea";
-      
     case "table" || "tbody" || "tfoot" || "thead" || "tr":
       return "Table";
 
-      case "form" || "fieldset":
+    case "form" || "fieldset":
         return "Forms";
 
-      case "input" || "textarea":
+    case "input" || "textarea" || "textbox":
         return "Textbox";
 
-      case "table" || "tbody" || "tfoot" || "thead" || "tr":
-        return "Table";
-
-      default:
+    default:
         return "Element";
     }
   }
@@ -581,7 +575,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: elementTypeProp(item.tag),
+                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
@@ -2090,7 +2084,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
       {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
       {/* //Element properties  */}
       {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
-        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} />
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects}/>
         :
         <>
         {typesOfAppType ==="Web"?

@@ -174,8 +174,14 @@ const reports = () => {
         const sortType = e.value;
 
         let sortedData = [...filteredExecutionData];
-        if (sortType === '2') {
-            sortedData.sort((a, b) => a.configurename.localeCompare(b.configurename));
+        if (sortType.code === "2") {
+          sortedData.sort((a, b) =>
+            a.configurename.localeCompare(b.configurename)
+          );
+        } else if(sortType.code === "1") {
+          sortedData.sort((a, b) => Date.parse(b.execDate) - Date.parse(a.execDate));
+        } else if(sortType.code === "0") {
+          sortedData.sort((a, b) => b.noOfExecution - a.noOfExecution);
         }
         setReportData(sortedData);
         setSelectedItem(sortType);

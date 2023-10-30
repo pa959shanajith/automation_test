@@ -100,6 +100,7 @@ const EditIrisObject = props => {
             });
         }
         props.setElementProperties(false)
+        props.saveScrapedObjects();
     }
     const footerContent = (
         <div>
