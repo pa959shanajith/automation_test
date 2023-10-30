@@ -39,6 +39,21 @@
     }
 }
 
+.loaderClass {
+  .p-dialog-content {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .spinnerClass {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+}
+
 .schedule_modal {
   .p-dialog-content {
     display: flex;
