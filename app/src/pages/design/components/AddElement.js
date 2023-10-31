@@ -162,7 +162,7 @@ const AddElement = (props) => {
                                     style={{ width: "15rem", marginLeft: "1.25rem" }} />
                             </div>
                             <div style={{ marginLeft: "13.5rem" }}>
-                                <Button icon="pi pi-plus" size="small" onClick={handleAddElementAdd} ></Button>
+                                <Button icon="pi pi-plus" size="small" disabled={!addElementInputValue} onClick={handleAddElementAdd} ></Button>
                             </div>
                         </div>
                     </Card>

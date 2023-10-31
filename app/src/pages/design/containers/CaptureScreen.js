@@ -462,10 +462,10 @@ const elementTypeProp =(elementProperty) =>{
     case "col" || "colgroup" || "nav" :
       return "Navigation Menus";
 
-    case "datalist" || "select" :
+    case "select" || "datalist" :
       return "Dropdown";
 
-    case "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
+    case "list" || "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
       return "List";
 
     case "form" || "fieldset" :
