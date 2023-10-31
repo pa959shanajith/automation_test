@@ -543,7 +543,7 @@ export default function BasicDemo() {
       return icon;
     };
 
-    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : (
+    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : rowData?.data?.Step === 'Terminated' ? null : (
       <img
         src={getIcon(bugTitle)}
         alt="bug defect"
@@ -568,6 +568,7 @@ export default function BasicDemo() {
         key: data[i].id,
         data: {
           StepDescription: data[i].StepDescription,
+          Step: data[i].Step,
           slno: data[i].slno,
           key: data[i].id,
         },
