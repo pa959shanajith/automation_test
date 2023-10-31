@@ -541,7 +541,7 @@ const CreateUser = (props) => {
 
     const userCreateHandler = () => {
         props.toast.current.clear();
-        editUser ? props.toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : props.toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
+        // editUser ? props.toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : props.toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
         createUserDialogHide();
     }
 
