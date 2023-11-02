@@ -244,10 +244,17 @@ exports.saveData = async (req, res) => {
 				if (e.type == "modules") rIndex = uidx;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
-				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex,scrapedurl:e.scrapedurl || null ,scrapeinfo:e.scrapeinfo||null });
+				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
+				if(e.scrapedurl) {
+					nObj[nObj.length - 1]['scrapedurl'] = e.scrapedurl
+				}
+				if(e.scrapeinfo) {
+					nObj[nObj.length - 1]['scrapeinfo'] = e.scrapeinfo
+				}
 				if (e.type == "testcases") {
 					nObj[nObj.length - 1]['pid_c'] = e._id||null;
-					nObj[nObj.length - 1]['steps'] = e.steps||null;
+					if(e.steps)
+						nObj[nObj.length - 1]['steps'] = e.steps;
 				};
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 				idDict[e.id] = uidx++;
@@ -257,10 +264,18 @@ exports.saveData = async (req, res) => {
 				ts.children.forEach(function (s, i) {
 					var tcList = [];
 					s.children.forEach(function (tc, i) {
-						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex),"steps":tc.steps||null});
+						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
+						if(tc.steps) 
+							tcList[tcList.length - 1]['steps'] = tc.steps;
 					});
 					tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex),scrapedurl:s.scrapedurl || null ,scrapeinfo:s.scrapeinfo||null });
+					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
+					if(s.scrapedurl) {
+						sList[sList.length - 1]['scrapedurl'] = s.scrapedurl
+					}
+					if(s.scrapeinfo) {
+						sList[sList.length - 1]['scrapeinfo'] = s.scrapeinfo
+					}
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);

@@ -1,6 +1,6 @@
 import React, { useRef, Fragment, useState, useEffect } from 'react';
 import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gitToMindmap, pdProcess, importGitMindmap, writeFileServer, writeZipFileServer, jsonToMindmap,singleExcelToMindmap ,checkExportVer, importDefinition, saveMindmap} from '../api';
-import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
+import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar,ScreenOverlay} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import {setImportData} from '../designSlice';
@@ -14,11 +14,13 @@ import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from "primereact/inputtext";
 import { Toast } from 'primereact/toast';
-import { screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
+import { selectedModuleReducer,screenData, moduleList, selectedModule, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
 import { RedirectPage, Header } from '../../global';
 
 const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop}) => {
     const [projList,setProjList] = useState({})
+    const dispatch = useDispatch()
+    const [loading,setLoading] = useState(false)
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(true)
@@ -63,6 +65,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
     const handleImport = async ()=>{
         // console.log(valueOfImport);
         // console.log(selectedProj)
+        setLoading('Loading');
         let userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const localStorageDefaultProject = localStorage.getItem('DefaultProject');
         let selectProj = JSON.parse(localStorageDefaultProject);
@@ -75,11 +78,15 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
           setModuleName(data['CollectionName'])
           console.log("response of handleImport")
           console.log(data)
+          // setLoading(false);
+          setLoading('Creating Mindmap')
           const moduleData = await handleModuleCreate(data)
           await handleScenarioCreate(data,moduleData)
         } else {
           console.error("Fail to launch WSDL_GO. ERROR::::", 'error');
         }
+        setImportPop(false)
+        setLoading(false);
     }
 
     const changeImportType = (e) => {
@@ -92,8 +99,8 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         return(
           <Fragment>
                 <div className='mnode__buttons'>
-                    <label className='err-message'>{error}</label>                
-                    <Button disabled={disableSubmit} onClick={()=>{setSubmit(true);handleImport()}} label='Import API'/>                
+                    <label className='err-message'>{error}</label>
+                    <Button disabled={disableSubmit} onClick={()=>{handleImport()}} label='Import API'/>                
                 </div>
           </Fragment>
         )
@@ -139,6 +146,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
           let modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.projectId : "", "moduleid": null });
           // if (modulesdata === "Invalid Session") return RedirectPage(history);
           if (modulesdata.error) { displayError(modulesdata.error); return; }
+          // dispatchselectedModuleReducer(modulesdata)
           
           
         //   setProjModules(modulesdata);
@@ -175,14 +183,14 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         "cidxch": null
       }
       if(type == 'screens' && data != '') {
-        res["scrapedurl"] = "http://www.dneonline.com/calculator.asmx?op=Add";
+        res["scrapedurl"] = data['endPointURL'];
         res["scrapeinfo"] = {
             "body" : data['requestBody'],
-            "operations" : "",
+            "operations" : data['operations'],
             "responseHeader" : "",
             "responseBody" : "",
             "method" : data['method'],
-            "endPointURL" : "http://www.dneonline.com/calculator.asmx?op=Add",
+            "endPointURL" : data['endPointURL'],
             "header" : data['requestHeader'],
             "param" : ""
         }
@@ -193,7 +201,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "custname" : "WebService List",
             "keywordVal" : "setEndPointURL",
             "inputVal" : [ 
-                "http://www.dneonline.com/calculator.asmx?op=Add"
+                data['endPointURL']
             ],
             "outputVal" : "",
             "appType" : "Webservice",
@@ -292,6 +300,8 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             let apiData = {
               'requestBody':scenario[Object.keys(scenario)[0]]['requestBody'],
               'requestHeader':scenario[Object.keys(scenario)[0]]['requestHeader'],
+              'endPointURL':scenario[Object.keys(scenario)[0]]['endPointURL'],
+              'operations':scenario[Object.keys(scenario)[0]]['operation']
             }
             if (methods && methods.length > 0) {
               methods.forEach((screen, idx_scr) => {
@@ -360,10 +370,10 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
           // if (response === "Invalid Session") return RedirectPage(history);
           if (response.error) { displayError(response.error); return }
           setMsg(MSG.CUSTOM("Scenario Created Successfully", "success"));
-          var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.projectId : "", "moduleid": [selectedModule.key], cycId: null })
+          var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.projectId : "", "moduleid": [moduleData.key], cycId: null })
           // if (moduledata === "Invalid Session") return RedirectPage(history);
           if (moduledata.error) { displayError(moduledata.error); return; }
-          setModScenarios(moduledata.children);
+          dispatch(selectedModuleReducer(moduledata))
          
           const newSce={
             key: moduledata.children[moduledata.children.length-1]._id,
@@ -378,6 +388,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
     
     return(
     <>
+        {loading ? <ScreenOverlay content={loading} /> :
         <Dialog className='ImportDialog' header='Import API Definition' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
         {/* <AvoInput
                   htmlFor="import definition"
@@ -418,7 +429,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
                         }
                     />
                 </div>
-        </Dialog>
+        </Dialog>}
     </>
     )
 }
