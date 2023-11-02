@@ -27,6 +27,7 @@
   .Project_Display_Nav {
     display: flex;
     flex-direction: column;
+    width: 100%;
   }
 
   #Last_modifie {
@@ -57,16 +58,22 @@
     font: $f6_regular;
     color: rgba(3, 2, 41, .6);
     overflow: hidden;
-    max-width: 17.8rem;
     text-overflow: ellipsis;
-    display: inherit;
     white-space: nowrap;
     margin-left: 0.2rem;
   }
 
   .ProjectApp_Name {
-    display: inherit;
+    display: flex;
     white-space: nowrap;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    text-overflow: ellipsis;
+    text-align: left;
+      .Project_name{
+        width: 91%;
+      }
   }
 
   .projectInsideLast {
