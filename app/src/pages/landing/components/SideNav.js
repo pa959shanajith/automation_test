@@ -32,37 +32,37 @@ const SideNav = () => {
         {
             path: "/landing",
             name: "Projects",
-            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon.svg" : "static/imgs/folder_icon_selected.svg"} className="icon" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/landing" ? "static/imgs/folder_icon.svg" : "static/imgs/folder_icon_selected.svg"} className="icon_Projects" data-pr-tooltip="Create/View all your projects." data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
             path: "/reports",
             name: "Reports",
-            icon: <img src={tabSelected === "/reports" ? "static/imgs/report_icon_selected.svg" : "static/imgs/report_icon.svg"} className="icon" data-pr-tooltip=" View and analyze executed test automations." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/reports" ? "static/imgs/report_icon_selected.svg" : "static/imgs/report_icon.svg"} className="icon_Reports" data-pr-tooltip=" View and analyze executed test automations." data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
             path: "/utility",
             name: "Utilities",
-            icon: <img src={tabSelected === "/utility" ? "static/imgs/utility_icon.svg" : "static/imgs/utility_icon.svg"} className="icon" data-pr-tooltip=" Manage utilities" data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/utility" ? "static/imgs/utility_icon.svg" : "static/imgs/utility_icon.svg"} className="icon_Utilities" data-pr-tooltip=" Manage utilities" data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
             path: "/admin",
             name: "Admin",
-            icon: <img src={tabSelected === "/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_disabled_icon.svg"} className="icon" data-pr-tooltip="Manage/Create users, agents and other advanced configurations." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/admin" ? "static/imgs/admin_icon_selected.svg" : "static/imgs/admin_disabled_icon.svg"} className="icon_Admin" data-pr-tooltip="Manage/Create users, agents and other advanced configurations." data-pr-position="right" height="25px" />,
             disabled: false
         },
         {
             path: "/itdm",
             name: "ITDM",
-            icon: <img src= { tabSelected==="/itdm" ?  "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
+            icon: <img src= { tabSelected==="/itdm" ?  "static/imgs/ITDM_icon_selected.svg" : "static/imgs/ITDM_icon.svg"} className="icon_ITDM" data-pr-tooltip="Test Data Management Tool to create, modify and provision data"  data-pr-position="right" height="25px"/>,
             disabled: true
         },
         {
             path: "/dashboard",
             name: "Dashboard",
-            icon: <img src={tabSelected === "/dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
+            icon: <img src={tabSelected === "/dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon_Dashboard" data-pr-tooltip="Access to Dash board." data-pr-position="right" height="25px" />,
             disabled: false
         },
     ]
@@ -110,7 +110,6 @@ const SideNav = () => {
     return (
         <>
             <div className="sidebar_container">
-                <Tooltip target=".icon" mouseTrack mouseTrackLeft={20} />
                 <Dialog className="itdm_header" visible={disableIconDialogVisible} header="AVO iTDM" onHide={() => itdmDialogHide()} style={{ width: '30vw' }} >
                     {/* <Carousel value={ITDM_images} itemTemplate={ITDM_Template} /> */}
                     <div className="border-1 surface-border border-round m-2 text-center py-5 px-3">
@@ -129,6 +128,8 @@ const SideNav = () => {
                 <div className="sidebar">
                     {
                         filteredMenuItems.map((item, index) => (
+                        <>
+                            <Tooltip target={`.icon_${item.name}`} mouseTrack mouseTrackLeft={20} />
                             <NavLink to={item.path}  key={index}
                                 onClick={(e) => onTabClickHandler(e, item.path, item.disabled, item.name)}
                                 // className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')}
@@ -142,6 +143,7 @@ const SideNav = () => {
                                     <Ripple />
                                 </div>
                             </NavLink>
+                        </>
                         ))
                     }
                 </div>
