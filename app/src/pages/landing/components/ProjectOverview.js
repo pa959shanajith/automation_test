@@ -5,6 +5,7 @@ import Analysis from './Analysis';
 import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'primereact/tooltip';
 
 const ProjectOverview = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -35,6 +36,7 @@ const ProjectOverview = (props) => {
                     {defaultselectedProject && defaultselectedProject.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="35" width='30' />)}
                     {defaultselectedProject && defaultselectedProject.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20" />)}
                     <p className='DefaultProjectName'>{defaultselectedProject && defaultselectedProject.projectName}</p>
+                    <Tooltip target=".DefaultProjectName" content={defaultselectedProject.projectName} position='bottom'/>
                 </div>
                 <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
             </div>
