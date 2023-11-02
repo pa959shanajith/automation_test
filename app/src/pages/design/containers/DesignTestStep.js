@@ -1165,9 +1165,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [ ...findData.testCases ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:1000});
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', details:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
+        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:1000});
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){

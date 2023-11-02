@@ -102,7 +102,7 @@ const DisplayProject = (props) => {
     const years = date2.diff(date1, 'years');
 
     let output="";
-      if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0 && seconds >= 0) {
+      if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0) {
         output = "Created now";
       }
       else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {

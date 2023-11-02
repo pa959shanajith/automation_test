@@ -462,10 +462,10 @@ const elementTypeProp =(elementProperty) =>{
     case "col" || "colgroup" || "nav" :
       return "Navigation Menus";
 
-    case "datalist" || "select" :
+    case "select" || "datalist" :
       return "Dropdown";
 
-    case "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
+    case "list" || "dir" || "dl" || "li" || "ol" || "optgroup" || "option" || "ul" :
       return "List";
 
     case "form" || "fieldset" :
@@ -1125,7 +1125,7 @@ else{
 
   const emptyMessage = (
     <div className='empty_msg1'>
-      <div className='empty_msg'>
+      <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
         {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}

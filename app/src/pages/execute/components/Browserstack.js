@@ -224,7 +224,9 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     });
                 }
             }
-            setselectedBrowserVerionDetails(arrayBrowserVersion)
+            setselectedBrowserVerionDetails(arrayBrowserVersion.sort((a,b) => {
+                return Number(b.key) - Number(a.key);
+            }));
         }
         
         const onBrowserVersionChange = (option) =>{

@@ -1,6 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import "./AvoModal.scss";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const AvoModal = ({
   visible,
@@ -11,6 +12,7 @@ const AvoModal = ({
   modalSytle,
   onModalBtnClick = () => {},
   isDisabled = false,
+  addLoader = false,
   customClass = ""
 }) => {
 
@@ -62,13 +64,14 @@ const AvoModal = ({
     <Dialog
       header={headerTxt}
       visible={visible}
-      className={`modalClass ${customClass}`}
+      className={`modalClass ${customClass} ${addLoader ? "loaderClass": ""}`}
       style={modalSytle}
       onHide={() => onModalBtnClick('Cancel')}
       {...(headerClass ? { headerClassName: headerClass } : {})}
       {...(footerContent ? { footer: footerContent } : {})}
     >
       {content}
+      {addLoader && <ProgressSpinner className="spinnerClass" />}
     </Dialog>
   );
 };
