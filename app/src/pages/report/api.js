@@ -614,7 +614,7 @@ export const viewJiraMappedList_ICE = async(userID, scenarioName) => {
     }
 }
 
-export const viewAzureMappedList_ICE = async(userID, scenarioName) => {
+export const viewAzureMappedList_ICE = async(userID, scenario) => {
     try{
         const res = await axios(url+'/viewAzureMappedList_ICE', {
             method: 'POST',
@@ -625,7 +625,7 @@ export const viewAzureMappedList_ICE = async(userID, scenarioName) => {
             credentials: 'include',
             data: {
                 "userID": userID,
-                "scenarioName": scenarioName,
+                "scenario": scenario,
                 "action": "viewAzureMappedList_ICE"
             },
         });
