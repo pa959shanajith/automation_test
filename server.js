@@ -269,7 +269,7 @@ if (cluster.isMaster) {
 		app.get('/viewReport', report.viewReport);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
-		app.get('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
 		cookie: true
 		}));
@@ -306,7 +306,7 @@ if (cluster.isMaster) {
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
-			var roles = ["Admin"]; //Allowed roles
+			var roles = ["Admin", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 

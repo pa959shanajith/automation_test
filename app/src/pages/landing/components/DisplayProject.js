@@ -102,7 +102,7 @@ const DisplayProject = (props) => {
     const years = date2.diff(date1, 'years');
 
     let output="";
-      if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0 && seconds >= 0) {
+      if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0) {
         output = "Created now";
       }
       else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {
@@ -328,7 +328,9 @@ const DisplayProject = (props) => {
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (
-            <div title={project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName} key={project.projectId} >
+            <>
+            <Tooltip target={`.project_uniqueid${project.projectId}`} content={`${project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName}`} position='right'></Tooltip>
+            <div key={project.projectId} className={`project_uniqueid${project.projectId}`}>
               <button
                 className={project.projectId === defaultProjectId ? 'default-project project-card' : 'project-card'}
                 onClick={() => {
@@ -337,26 +339,28 @@ const DisplayProject = (props) => {
                   }
                 }}>
                 <div className="Project_Display_Nav">
-                <div className="ProjectApp_Name">
-                {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
-                {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
-                <div className="Project_name">
-                <p id="projectInside">{project.projectName}</p>
-                </div>
-                </div>
-                <div className="projectInsideLast">
-                <p id="Last_modifie">{project.modifiedDate} by {project.modifiedName}</p>
-                </div>
+                  <div className="ProjectApp_Name">
+                    {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
+                    {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
+                    {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                    {project.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                    {project.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
+                    <span className="Project_name">
+                      <p id="projectInside">{project.projectName}</p>
+                    </span>
+                  </div>
+                  <div className="projectInsideLast">
+                    <p id="Last_modifie">{project.modifiedDate} by {project.modifiedName}</p>
+                  </div>
                 </div>
               </button>
-            </div>))}
+            </div>
+            </>))
+            }
         </div>
       </Panel>
     </>

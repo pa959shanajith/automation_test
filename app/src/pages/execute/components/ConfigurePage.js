@@ -232,11 +232,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
     setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    // selectProjects?.appType === "MobileWeb" ? setShowBrowserstack(true) : setShowBrowserstack(false)
     setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
-  }, [selectProjects.projectId]);
+  }, [selectProjects.projectId, selectProjects.appType]);
 
  const displayError = (error) => {
     setLoading(false)

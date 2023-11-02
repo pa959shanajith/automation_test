@@ -52,6 +52,7 @@ const ScheduleScreen = ({
 }) => {
   const [tableFilter, setTableFilter] = useState("");
   const [exestatus, setExestatus] = useState("");
+  const [selectedType, setSelectedType] = useState("");
   const [filterStatus, setFilterStatus] = useState({ name: "", code: "" },);
   const getScheduledList = useSelector((store) => store.configsetup);
   const dispatch = useDispatch();
@@ -232,6 +233,7 @@ const ScheduleScreen = ({
   }, [getScheduledList?.scheduledStatus]);
 
   const onScheduleStatus = (getStatus) => {
+    setSelectedType(getStatus?.status);
     dispatch(
       getScheduledDetailsOnDate_ICE({
         param: "getScheduledDetails_ICE",
@@ -291,7 +293,7 @@ const ScheduleScreen = ({
       <ExecutionCard cardData={cardData} configData={getScheduledList} />
       <div className="schedule_container">
         <div className="grid schedule_options">
-        <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+          <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
             <Button
               icon="pi pi-sync"
               label={
@@ -403,7 +405,12 @@ const ScheduleScreen = ({
                 [...getScheduledList?.scheduledList]
                   ?.reverse()
                   .filter((el) => el?.recurringpattern === "One Time")
-                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
+                  .filter((el) =>
+                    filterStatus?.name && filterStatus?.name !== "Show All"
+                      ? el.status.toLowerCase() ===
+                        filterStatus?.name.toLowerCase()
+                      : el
+                  )
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -415,8 +422,18 @@ const ScheduleScreen = ({
                         <Link onClick={() => onScheduleStatus(el)}>
                           {el.status}
                         </Link>
-                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
-                        <Tooltip target=".pi-trash"  position="bottom" content="Click here to delete this scheduled execution." />
+                        {el.status === "recurring" ||
+                        el.status === "scheduled" ? (
+                          <span
+                            className="pi pi-trash"
+                            onClick={(e) => handleCancel(e, el)}
+                          ></span>
+                        ) : null}
+                        <Tooltip
+                          target=".pi-trash"
+                          position="bottom"
+                          content="Click here to delete this scheduled execution."
+                        />
                       </div>
                     ),
                     target:
@@ -456,6 +473,7 @@ const ScheduleScreen = ({
                     Status
                     <span
                       className="pi pi-filter"
+                      title="Filter Status"
                       onClick={(e) => statusfilter.current.toggle(e)}
                     ></span>
                   </span>
@@ -470,7 +488,12 @@ const ScheduleScreen = ({
                 [...getScheduledList?.scheduledList]
                   ?.reverse()
                   .filter((el) => el?.recurringpattern !== "One Time")
-                  .filter((el) => (filterStatus?.name && filterStatus?.name !== "Show All") ? el.status.toLowerCase() === filterStatus?.name.toLowerCase() : el)
+                  .filter((el) =>
+                    filterStatus?.name && filterStatus?.name !== "Show All"
+                      ? el.status.toLowerCase() ===
+                        filterStatus?.name.toLowerCase()
+                      : el
+                  )
                   .map((el) => ({
                     ...el,
                     scheduledon: `${new Date(
@@ -482,7 +505,13 @@ const ScheduleScreen = ({
                         <Link onClick={() => onScheduleStatus(el)}>
                           {el.status}
                         </Link>
-                        {(el.status === "recurring" || el.status === "scheduled") ? <span className="pi pi-trash" onClick={(e) => handleCancel(e, el)}></span> : null }
+                        {el.status === "recurring" ||
+                        el.status === "scheduled" ? (
+                          <span
+                            className="pi pi-trash"
+                            onClick={(e) => handleCancel(e, el)}
+                          ></span>
+                        ) : null}
                       </div>
                     ),
                     target:
@@ -522,6 +551,7 @@ const ScheduleScreen = ({
                     Status
                     <span
                       className="pi pi-filter"
+                      title="Filter Status"
                       onClick={(e) => statusfilter.current.toggle(e)}
                     ></span>
                   </span>
@@ -531,7 +561,7 @@ const ScheduleScreen = ({
           </TabPanel>
         </TabView>
       </div>
-      <Toast ref={duplicateinfo} position="bottom-center"/>
+      <Toast ref={duplicateinfo} position="bottom-center" />
       <AvoModal
         visible={exestatus}
         setVisible={setExestatus}
@@ -539,22 +569,27 @@ const ScheduleScreen = ({
         onModalBtnClick={onStatusBtnClick}
         content={
           <DataTable
-            value={getScheduledList?.scheduledStatusList.map((el) => ({
-              ...el,
-              scenariodetails: "Test_Scenario12",
-              testsuitenames: "",
-            }))}
+            value={getScheduledList?.scheduledStatusList.map((list) =>
+              list?.scenariodetails.map((details, ind) =>
+                details.map((scenarios) => ({
+                  testsuitename: list?.testsuitenames[ind],
+                  scenariodetail: scenarios?.scenarioName,
+                  status: list?.status,
+                })
+                )
+              )
+            ).flat(2).filter((val) => val.status === selectedType )}
             tableStyle={{ minWidth: "50rem" }}
             globalFilter={tableFilter}
           >
             <Column
               align="center"
-              field="testsuitenames"
+              field="testsuitename"
               header="Test Suite"
             ></Column>
             <Column
               align="center"
-              field="scenariodetails"
+              field="scenariodetail"
               header="Testcase Name"
             ></Column>
             <Column align="center" field="status" header="Status"></Column>
