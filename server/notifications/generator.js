@@ -719,7 +719,7 @@ generateEmailPayload.reportOnCICDExecution = async data => {
 
 	data.reportExecutionData.reportData.forEach(reportDataItem => {
 		reportDataItem.suiteDetails.forEach(reportItem => {
-			if (reportItem.reportId.length > 0) reportItem.url = data.url + "/reports/?" + "executionid="+reportItem.reportId
+			if (reportItem.reportId.length > 0) reportItem.url = data.url + '/viewReports?reportID=' + reportItem.reportId;
 
 			if (reportItem.status.toLowerCase() == "pass") reportItem.pass = true;
 			else if (reportItem.status.toLowerCase() == "fail") reportItem.fail = true;

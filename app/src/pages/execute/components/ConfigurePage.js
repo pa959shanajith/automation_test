@@ -221,7 +221,16 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const [selectedLanguage, setSelectedLanguage] = useState("curl");
+  const [selectBuildType, setSelectBuildType] = useState("HTTP");
+  const languages = [
+    { label:"cURL", value: "curl" },
+    { label:"HTTP", value: "http" },
+    { label:"Javascript", value: "javascript" },
+    { label:"Python", value: "python" },
+    { label:"PowerShell - RestMethod", value: "powershell" },
+  ]
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -382,11 +391,82 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
  const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
+      setSelectedLanguage("curl");
+      setSelectBuildType("HTTP");
+      setExecutionTypeInRequest("asynchronous");
     }
   };
 
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
+
+  const codeSnippets = {
+    curl: `curl --location "${url}" \n
+--header "Content-Type: application/json" \n
+--data "{\n
+    "key": "${currentKey}",\n
+    "executionType": "${executionTypeInRequest}"\n
+}"\n`,
+
+    http: `POST /execAutomation HTTP/1.1\n
+Host: ${url.slice(8, -15)}\n
+Content-Type: application/json\n
+Content-Length: 93\n
+
+{
+    "key": "${currentKey}",\n
+    "executionType": "${executionTypeInRequest}"\n
+}\n`,
+
+    javascript: `var myHeaders = new Headers();\n
+myHeaders.append("Content-Type", "application/json");\n
+
+var raw = JSON.stringify({\n
+    "key": "${currentKey}",\n
+    "executionType": "${executionTypeInRequest}"\n
+});
+
+var requestOptions = {\n
+    method: 'POST',\n
+    headers: myHeaders,\n
+    body: raw,\n
+    redirect: 'follow'\n
+};\n
+
+fetch("${url}", requestOptions)\n
+    .then(response => response.text())\n
+    .then(result => console.log(result))\n
+    .catch(error => console.log('error', error));\n`,
+
+    python: `import requests\n
+import json\n
+
+url = "${url}"\n
+
+payload = json.dumps({\n
+    "key": "${currentKey}",\n
+    "executionType": "${executionTypeInRequest}"\n
+})\n
+headers = {\n
+    'Content-Type': 'application/json'\n
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)\n
+
+print(response.text)\n`,
+
+    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"\n
+$headers.Add("Content-Type", "application/json")\n
+
+$body = @"
+{
+    "key": "${currentKey}",\n
+    "executionType": "${executionTypeInRequest}"\n
+}
+"@\n
+$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body\n
+$response | ConvertTo-Json`,
+};
 
   const fetchData = async () => {
     setSmartMode("normal");
@@ -2159,95 +2239,141 @@ Learn More '/>
               <>
                 <ExecutionCard cardData={fetechConfig[configItem]} configData={getConfigData} />
 
-                <div className="input_CICD ">
-                 
-                  <div class="container_url">
-                    <label for="inputField" class="devopsUrl_label">
-                    DevOps Integration URL
-                    </label>
-                    <div className="url">
-                    <pre className="grid_download_dialog__content cicdpre">
-                      <code id="api-url" title={url}>
-                        {url}
-                      </code>
-                    </pre>
-
-                    <Button
-                      icon="pi pi-copy"
-                      className="copy_CICD"
-                      
-                      onClick={() => {
-                        copyConfigKey(url);
-                      }}
-                     
-                      
-                      // title={copyToolTip}
-                    />
-                    
-                    <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
-                   </div>
-                   </div>
-                  <div className="executiontype">
-                    <div className="lable_sync">
-                      <label
-                        className="Async_lable"
-                        id="async"
-                        htmlFor="synch"
-                        value="asynchronous"
-                      >
-                        Asynchronous
-                      </label>
-                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
-                      <InputSwitch
-                        className="inputSwitch_CICD"
-                        label=""
-                        inlineLabel={true}
-                        onChange={() =>
-                          executionTypeInRequest == "asynchronous"
-                            ? setExecutionTypeInRequest("synchronous")
-                            : setExecutionTypeInRequest("asynchronous")
-                        }
-                        checked={executionTypeInRequest === "synchronous"}
-                      />
-                      <label
-                        className="sync_label"
-                        id="sync"
-                        htmlFor="synch"
-                        value="synchronous"
-                      >
-                        Synchronous
-                      </label>
-                      <img className='info_btn_sync'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                <div className="buildtype_container">
+                  <div className="flex flex-wrap gap-3">
+                    <label className="buildtype_label">Select Build Type:</label>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="HTTPrequest" className="ss__build_type_rad" type="radio" name="HTTP" value="HTTP" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === "HTTP"} />
+                      <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">HTTP request</label>
+                    </div>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="Code" className="ss__build_type_rad" type="radio" name="CODE" value="CODE" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === 'CODE'} />
+                      <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Code snippet</label>
                     </div>
                   </div>
-                  <div className="container_devopsLabel" title={str}>
-                    <span className="devops_label">DevOps Request Body : </span>
+                </div>
+
+                <div className="input_CICD ">
+                 
+                  { selectBuildType == "HTTP" ?
+                  <div>
+                    <div class="container_url">
+                      <label for="inputField" class="devopsUrl_label">
+                        DevOps Integration URL
+                      </label>
+                      <div className="url">
+                        <pre className="grid_download_dialog__content cicdpre">
+                          <code id="api-url" title={url}>
+                            {url}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_CICD"
+                        
+                          onClick={() => {
+                            copyConfigKey(url);
+                          }}
+                    
+                      
+                          // title={copyToolTip}
+                        />
+                    
+                        <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
+                      </div>
+                    </div>
+                    <div className="executiontype">
+                      <div className="lable_sync">
+                        <label
+                          className="Async_lable"
+                          id="async"
+                          htmlFor="synch"
+                          value="asynchronous"
+                        >
+                          Asynchronous
+                        </label>
+                        <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
+                        <InputSwitch
+                          className="inputSwitch_CICD"
+                          label=""
+                          inlineLabel={true}
+                          onChange={() =>
+                            executionTypeInRequest == "asynchronous"
+                              ? setExecutionTypeInRequest("synchronous")
+                              : setExecutionTypeInRequest("asynchronous")
+                          }
+                          checked={executionTypeInRequest === "synchronous"}
+                        />
+                        <label
+                          className="sync_label"
+                          id="sync"
+                          htmlFor="synch"
+                          value="synchronous"
+                        >
+                          Synchronous
+                        </label>
+                        <img className='info_btn_sync'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                      </div>
+                    </div>
+                    <div className="container_devopsLabel" title={str}>
+                      <span className="devops_label">DevOps Request Body</span>
+                      <div>
+                        <div className="key">
+                        <pre className="grid_download_dialog__content executiontypenamepre">
+                          <code
+                            className="executiontypecode"
+                            id="devops-key"
+                            title={str}
+                          >
+                            {str}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_devops"
+                          onClick={() => {
+                            copyConfigKey(str);
+                          }}
+                          // title={copyToolTip}
+                        />
+                        <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  :
+                  <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
+                    <label className="code_label">Select language:</label>
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
                     <div>
                       <div className="key">
-                      <pre className="grid_download_dialog__content executiontypenamepre">
+                      <pre className="code_snippet__content code_snippet__pre">
                         <code
-                          className="executiontypecode"
-                          id="devops-key"
-                          title={str}
+                          className="code_snippet__code"
+                          id="code_snippet-key"
+                          title={codeSnippets[selectedLanguage]}
                         >
-                          {str}
+                          {codeSnippets[selectedLanguage]}
                         </code>
                       </pre>
 
                       <Button
                         icon="pi pi-copy"
-                        className="copy_devops"
+                        className="copy_code__snippet"
                         onClick={() => {
-                          copyConfigKey(str);
+                          copyConfigKey(codeSnippets[selectedLanguage]);
                         }}
                         // title={copyToolTip}
                       />
-                      <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                      <Tooltip target=".copy_code__snippet" position="right" content={copyToolTip}/>
                       </div>
                     </div>
-                  </div>
+                  </div> }
+
                 </div>
               </>
             }
