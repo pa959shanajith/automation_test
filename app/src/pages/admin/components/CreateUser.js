@@ -101,7 +101,6 @@ const CreateUser = (props) => {
                 if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
                 return 1;
             });
-            // setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
     }, [allRoles.length > 0]);
