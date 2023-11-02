@@ -38,7 +38,9 @@ const UserList = (props) => {
                             firstName: user[4],
                             lastName: user[5],
                             email: user[6],
-                            role: user[3]
+                            role: user[3],
+                            roleId: user[2]
+
                         };
                         filteredUserList.push(dataObject);
                     }
@@ -62,7 +64,8 @@ const UserList = (props) => {
                     firstName: user[4],
                     lastName: user[5],
                     email: user[6],
-                    role: user[3]
+                    role: user[3],
+                    roleId: user[2]
                 };
                 filteredUserList.push(dataObject);
             }
@@ -85,14 +88,36 @@ const UserList = (props) => {
     );
 
 
-    const editRowData = (rowData) => {
+    const editRowData = async(rowData) => {
+        // try {
+        //     const UserList = await getUserDetails("user");
+        //     let filteredUserList = [];
+        //     UserList.map((user) => {
+        //         if (user[3] !== "Admin") {
+        //             const dataObject = {
+        //                 userName: user[0],
+        //                 userId: user[1],
+        //                 firstName: user[4],
+        //                 lastName: user[5],
+        //                 email: user[6],
+        //                 role: user[3],
+        //                 roleId: user[2]
+        //             };
+        //             filteredUserList.push(dataObject);
+        //         }
+        //     });
+        //     setData(filteredUserList);
+        //     setLoading(false);
+        // } catch (error) {
+        //     console.error('Error fetching User list:', error);
+        // }
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
         dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(rowData.firstName));
         dispatch(AdminActions.UPDATE_USERID(rowData.userId));
         dispatch(AdminActions.UPDATE_USERIDNAME(rowData.userId + ";" + rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(rowData.email));
-        dispatch(AdminActions.UPDATE_USERROLE(rowData.role));
+        dispatch(AdminActions.UPDATE_USERROLE(rowData.roleId));
         setEditUserData(rowData);
     }
 

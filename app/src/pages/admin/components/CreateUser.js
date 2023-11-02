@@ -101,10 +101,10 @@ const CreateUser = (props) => {
                 if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
                 return 1;
             });
-            setRoleDropdownValue(editUserRole);
+            // setRoleDropdownValue(editUserRole);
             setAllRolesUpdate(allRolesList);
         }
-    }, [allRoles.length > 0, role]);
+    }, [allRoles.length > 0]);
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details' },
@@ -419,13 +419,13 @@ const CreateUser = (props) => {
         })()
     }
 
-    const ldapSwitchFetch = async ({ userConf_ldap_fetch }) => {
+    const ldapSwitchFetch = async ({ userConf_ldap_fetch, serverName }) => {
         dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(""))
         dispatch(AdminActions.UPDATE_LDAP_USER(""))
         clearForm(true);
         setLdapDirectoryAddClass(false);
         if (userConf_ldap_fetch !== "import") return false;
-        const ldapServer = server;
+        const ldapServer = serverName;
         dispatch(AdminActions.UPDATE_NO_CREATE(true))
         dispatch(AdminActions.UPDATE_LDAP_ALLUSER_LIST([]))
         setLoading("Fetching LDAP users...");
@@ -456,10 +456,10 @@ const CreateUser = (props) => {
     };
 
     //Fetch LDAP User detail
-    const ldapGetUser = async (props) => {
+    const ldapGetUser = async (input) => {
         let ldapUser = ldap.user;
-        if (props !== undefined) {
-            ldapUser = props.luser;
+        if (input !== undefined) {
+            ldapUser = input.luser;
         }
         const ldapServer = server;
         dispatch(AdminActions.UPDATE_NO_CREATE(true))
@@ -541,7 +541,6 @@ const CreateUser = (props) => {
 
     const userCreateHandler = () => {
         props.toast.current.clear();
-        // editUser ? props.toastSuccess(MSG.CUSTOM("User updated successfully!", VARIANT.SUCCESS)) : props.toastSuccess(MSG.CUSTOM("User created successfully!", VARIANT.SUCCESS));
         createUserDialogHide();
     }
 
@@ -553,6 +552,7 @@ const CreateUser = (props) => {
             onClick={() => {
                 editUser ? createUserDialogHide() :  userCreateHandler();
             }}
+            size="small"
         >
         </Button>
         {(selectedTab === "userDetails") && <Button
@@ -562,6 +562,7 @@ const CreateUser = (props) => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
             disabled={nocreate}
+            size="small"
             >
             {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
         </Button>}
