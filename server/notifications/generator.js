@@ -446,6 +446,40 @@ generateEmailPayload.verifyUser = async data => {
 	};
 };
 
+generateEmailPayload.welcomenewuser = async data => {
+	const user = data.user;
+	const recv = user.email.toString();
+	if (!validator.isEmail(recv)) return { error: { msg: "User does not have a valid email address", code: "INVALID_RECIPIENT"} }
+	const msg = {
+		'subject': 'Welcome to AvoAssure',
+		'template': 'welcome-new-user',
+		'context': {
+			'companyLogo': data.url + companyLogo,
+			'productLogo': data.url + productLogo,
+			'username': user.email,
+			'firstname': user.firstname,
+			'lastname': user.lastname,
+			'uid':user.uid,
+			'domain':user.url,
+			'Token': user.token,
+			'datetime': new Date().toLocaleString(),
+      'mainTemplateNotRequired':true,
+			'customFooter': "Please contact your Avo Assure administrator for any trouble logging in."
+		},
+    // attachments:[{
+    //   filename: 'AvoAutomation.png',
+    //   path: path.resolve(__dirname,"../../public" + companyLogo1),
+    //   cid: 'companyLogo'
+    // }]
+	};
+
+	return {
+		error: null,
+		msg,
+		receivers: [recv]
+	};
+};
+
 function userUpdate(data) {
 	return when.promise((resolve, reject) => {
 		storageModule.getUser(data.userId).then((user) => {

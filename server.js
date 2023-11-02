@@ -306,7 +306,7 @@ if (cluster.isMaster) {
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
-			var roles = ["Admin"]; //Allowed roles
+			var roles = ["Admin", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
