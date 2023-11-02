@@ -221,7 +221,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
