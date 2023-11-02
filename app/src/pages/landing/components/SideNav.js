@@ -93,7 +93,7 @@ const SideNav = () => {
         }
         else {
             event.preventDefault();
-            setDisableIconDialogVisible(true);
+            if(route === "/itdm") setDisableIconDialogVisible(true);
         };
     }
 
@@ -132,7 +132,7 @@ const SideNav = () => {
                             <NavLink to={item.path}  key={index}
                                 onClick={(e) => onTabClickHandler(e, item.path, item.disabled, item.name)}
                                 // className={"p-ripple nav_item" + (item.disabled ? '_disabled' : '')}
-                                className={"p-ripple nav_item"}
+                                className={"p-ripple nav_item icon" + (item.disabled ? '_disabled' : '')}
                                 activeclassname={"active"}
                                 end
                             >
