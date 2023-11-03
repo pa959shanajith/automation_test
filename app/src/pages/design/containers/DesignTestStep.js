@@ -954,8 +954,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' className='select' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
-                    <Tooltip target='.select' position='bottom' content='  Select Test Step(s)'/> */}
+                    <i className='pi pi-check-square' style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black'}} onClick={()=>selectMultiple()}/>
+                    <Tooltip target='.pi-check-square' position='bottom' content='  Select Test Step(s)'/>
                     <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
                     <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
@@ -1388,7 +1388,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         stepList.push(...stepSelect.check)
         let newChecks = Array.from(new Set(stepList))
         setStepSelect({edit: false, check: newChecks, highlight: []});
-        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== findData.testCases.length;
         setShowSM(false);
     }
 
@@ -1501,6 +1502,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                             </div>
                         </div>
                     </Dialog>} */}
+                    { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} show={showSM} selectSteps={selectSteps} upperLimit={data.testCases.length} /> }
                     { showPS && <PasteStepDialog setShow={setShowPS} show={showPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
                     { showConfPaste && <ConfPasteStep />}
                     { showConfirmPop && ConfirmPopups() }
