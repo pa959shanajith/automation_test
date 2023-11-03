@@ -88,7 +88,7 @@ const UserList = (props) => {
     );
 
 
-    const editRowData = async(rowData) => {
+    const editRowData = (rowData) => {
         dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
         dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(rowData.firstName));
