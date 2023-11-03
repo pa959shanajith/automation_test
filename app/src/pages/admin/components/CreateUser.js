@@ -84,7 +84,6 @@ const CreateUser = (props) => {
 
     useEffect(() => {
         let allRolesList = [];
-        let editUserRole = "";
         if (allRoles.length) {
             allRoles.forEach(userRole => {
                 let roleObject = {};
@@ -92,7 +91,6 @@ const CreateUser = (props) => {
                     roleObject.name = userRole[0];
                     roleObject.value = userRole[1];
                     allRolesList.push(roleObject);
-                    if (role === roleObject.name) editUserRole = roleObject.value;
                 }
             });
 
@@ -101,6 +99,7 @@ const CreateUser = (props) => {
                 if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
                 return 1;
             });
+            if(role) setRoleDropdownValue(role);
             setAllRolesUpdate(allRolesList);
         }
     }, [allRoles.length > 0]);
