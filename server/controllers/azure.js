@@ -492,15 +492,22 @@ exports.viewAzureMappedList_ICE = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		var userid = req.session.userid;
-        if (!req.body.scenarioName) {
+        if (!req.body.scenarioName && !req.body.scenario) {
             var inputs = {
                 "userid": userid,
                 "query": "azuredetails"
             };
-        } else {
+        } else if(req.body.scenarioName) {
             var inputs = {
                 "userid": userid,
                 'scenarioName':req.body.scenarioName,
+                "query": "azuredetails"
+            };
+        }
+        else if(req.body.scenario){
+            var inputs = {
+                "userid": userid,
+                'scenario':req.body.scenario,
                 "query": "azuredetails"
             };
         }
