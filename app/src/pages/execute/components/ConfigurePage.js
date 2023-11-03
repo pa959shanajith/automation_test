@@ -225,11 +225,12 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
-    { label:"cURL", value: "curl" },
-    { label:"HTTP", value: "http" },
-    { label:"Javascript", value: "javascript" },
-    { label:"Python", value: "python" },
-    { label:"PowerShell - RestMethod", value: "powershell" },
+    { label: "cURL", value: "curl" },
+    { label: "HTTP", value: "http" },
+    { label: "Javascript", value: "javascript" },
+    { label: "Python", value: "python" },
+    { label: "PowerShell - RestMethod", value: "powershell" },
+    {label: "Shell - wget", value: "shell"}
   ]
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -403,69 +404,80 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const codeSnippets = {
     curl: `curl --location "${url}" \n
 --header "Content-Type: application/json" \n
---data "{\n
-    "key": "${currentKey}",\n
-    "executionType": "${executionTypeInRequest}"\n
-}"\n`,
+--data "{
+    \"key\": \"${currentKey}\",
+    \"executionType\": \"${executionTypeInRequest}\"
+}"`,
 
-    http: `POST /execAutomation HTTP/1.1\n
-Host: ${url.slice(8, -15)}\n
-Content-Type: application/json\n
-Content-Length: 93\n
+    http: `POST /execAutomation HTTP/1.1
+Host: ${url.slice(8, -15)}
+Content-Type: application/json
+Content-Length: 93
 
 {
-    "key": "${currentKey}",\n
-    "executionType": "${executionTypeInRequest}"\n
-}\n`,
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}`,
 
-    javascript: `var myHeaders = new Headers();\n
-myHeaders.append("Content-Type", "application/json");\n
+    javascript: `var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
 
-var raw = JSON.stringify({\n
-    "key": "${currentKey}",\n
-    "executionType": "${executionTypeInRequest}"\n
+var raw = JSON.stringify({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
 });
 
-var requestOptions = {\n
-    method: 'POST',\n
-    headers: myHeaders,\n
-    body: raw,\n
-    redirect: 'follow'\n
-};\n
+var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+};
 
-fetch("${url}", requestOptions)\n
-    .then(response => response.text())\n
-    .then(result => console.log(result))\n
-    .catch(error => console.log('error', error));\n`,
+fetch("${url}", requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));`,
 
-    python: `import requests\n
-import json\n
+    python: `import requests
+import json
 
-url = "${url}"\n
+url = "${url}"
 
-payload = json.dumps({\n
-    "key": "${currentKey}",\n
-    "executionType": "${executionTypeInRequest}"\n
-})\n
-headers = {\n
-    'Content-Type': 'application/json'\n
+payload = json.dumps({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+})
+headers = {
+    'Content-Type': 'application/json'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)\n
+response = requests.request("POST", url, headers=headers, data=payload)
 
-print(response.text)\n`,
+print(response.text)`,
 
-    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"\n
-$headers.Add("Content-Type", "application/json")\n
+    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Content-Type", "application/json")
 
 $body = @"
 {
-    "key": "${currentKey}",\n
-    "executionType": "${executionTypeInRequest}"\n
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
 }
-"@\n
-$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body\n
+"@
+
+$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
 $response | ConvertTo-Json`,
+
+    shell: `wget --no-check-certificate --quiet
+  --method POST
+  --timeout=0
+  --header 'Content-Type: application/json'
+  --body-data '{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}'
+    '${url}'`,
 };
 
   const fetchData = async () => {
@@ -2241,7 +2253,7 @@ Learn More '/>
 
                 <div className="buildtype_container">
                   <div className="flex flex-wrap gap-3">
-                    <label className="buildtype_label">Select Build Type:</label>
+                    <label className="buildtype_label">Execution Trigger Type:</label>
                     <div className="flex align-items-center">
                       <RadioButton data-test="HTTPrequest" className="ss__build_type_rad" type="radio" name="HTTP" value="HTTP" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === "HTTP"} />
                       <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">HTTP request</label>
@@ -2347,7 +2359,7 @@ Learn More '/>
                   </div>
                   :
                   <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
-                    <label className="code_label">Select language:</label>
+                    <label className="code_label">Select Language:</label>
                     <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
                     <div>
                       <div className="key">
