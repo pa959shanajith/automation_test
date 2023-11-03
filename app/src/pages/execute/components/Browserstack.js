@@ -99,6 +99,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     const [mobileVersion, setMobileVersion] = useState([]);
     const [selectApk, setSelectApk] = useState('');
     const [selectedApk, setApk] = useState([]);
+    const [selectApkId, setSelectApkId] = useState('');
      
     useEffect(() => {
         setNewOsNames([]);
@@ -153,6 +154,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             index: element,
             versions: element,
             name:element,
+            id: mobileDetailsBrowserStack.stored_files[element],
         }))
         setApk(findapk);
           setPlatforms(platformArray);
@@ -268,6 +270,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
 
         const onApkChange = async (option) => {
             setSelectApk(option.key)
+            setSelectApkId(option.id)
         }    
     
     return (
@@ -450,7 +453,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                             "platformName": selectedMobilePlatforms,
                             "deviceName": selectedDevices,
                             "platformVersion": selectedMobileVersion,
-                            "uploadedApk": selectedApk,
+                            "uploadedApk": selectApkId,
                             "browserName": "Chrome"
                             
                         }
