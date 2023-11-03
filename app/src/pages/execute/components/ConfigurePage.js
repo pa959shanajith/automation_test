@@ -175,6 +175,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
+  const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [browserlist, setBrowserlist] = useState([
     {
@@ -873,19 +874,21 @@ const handleSubmit1 = async (SauceLabPayload) => {
         setLoading={setLoading}
         displayBasic6={displayBasic6}
         onHidedia={onHidedia}
+        setBrowserstackValues={setBrowserstackValues}
         handleBrowserstackSubmit={handleBrowserstackSubmit}
         setBrowserstackUser={setBrowserstackUser}
         onModalBtnClick={onHidedia}
+        browserstackValues={browserstackValues}
     />,
-    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
+    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
     const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
         />,
             [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
+            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
 
 
 
