@@ -459,6 +459,8 @@
     right: 49rem!important;
     top: 4rem!important
 }
-  
-    
-    
+.disabled_icon_tootlip{
+    display: flex;
+    cursor: not-allowed !important;
+    pointer-events: initial !important;
+}    

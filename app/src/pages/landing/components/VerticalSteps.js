@@ -56,13 +56,17 @@ const VerticalSteps = (props) => {
       color:"white" ,padding:"0.3rem 0.8rem",marginRight: "13.7rem"
     };
     
+    const notALicenseAGS = {
+      value: userInfo?.licensedetails.AGS === false,
+      msg: "You do not have access for Avo Genius."
+    }
+
     const navigate = useNavigate();
     const steps = [
     {
         label: activeStep  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
         description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
-        title:<div><Button  disabled={project.appType!=="Web"} type = "AVOgenius" size="small" style={project.appType=="Web"?buttonStyle_genius:buttonStyle_genius_disabled} onClick={(e)=>handleNext("AVO Genius")}><img style={{color:"white", fill:"white",marginRight:"10px"}} src="static/imgs/avo_genius_18x18_icon.svg"/>  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold",fontFamily: "Open Sans" ,padding: "0.1rem 0.2rem"}}> OR </span><Button type = "designStudio" size="small" style={buttonStyle_design} onClick={(e)=>handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg"  style={{ marginRight: '10px' }} />Design Studio</Button> </div>
-       
+        title:(<div><Button className={notALicenseAGS.value ? 'geniusDisable_tooltip' : 'genius_tooltip'} disabled={project.appType !== "Web" || notALicenseAGS.value} type="AVOgenius" size="small" style={project.appType !== "Web" || notALicenseAGS.value ? buttonStyle_genius_disabled : buttonStyle_genius} onClick={(e) => handleNext("AVO Genius")} title={notALicenseAGS.value ? notALicenseAGS.msg : "AVO Genius(Smart Recorder)"}><img style={{ color: "white", fill: "white", marginRight: "10px" }} src="static/imgs/avo_genius_18x18_icon.svg" />  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold", fontFamily: "Open Sans", padding: "0.1rem 0.2rem" }}> OR </span><Button type="designStudio" size="small" style={buttonStyle_design} onClick={(e) => handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg" style={{ marginRight: '10px' }} />Design Studio</Button></div>) 
     },
     {
         label: ' Configure and test execution profiles',

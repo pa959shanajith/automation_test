@@ -70,24 +70,7 @@
     color:white;
     padding:"0.3rem 0.8rem"
   }
-// .MuiStepLabel-root .MuiStepLabel-vertical .css-14sza3e-MuiStepLabel-root{
-//     margin-left: 1%;
-//     height: 30%;
-// }
-// .css-8t49rw-MuiStepConnector-line {
-// height: 0px !important;
-
-// }
-// .css-ahj2mt-MuiTypography-root{
-//     line-height: 0px !important;
-//     letter-spacing:0px !important;
-// }
-// .MuiBox-root .css-1bxarir{
-//     margin-bottom: 10% !important;
-//     height: 1% !important;
-   
-// }
-
-// .MuiStepper-root .MuiStepper-vertical  .css-9tmuzo-MuiStepper-root{
-//     border-width: 1px solid black;
-// }
+  .geniusDisable_tooltip{
+    pointer-events: initial !important;
+    cursor: not-allowed !important;
+}
