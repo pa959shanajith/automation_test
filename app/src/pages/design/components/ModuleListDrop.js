@@ -6,6 +6,7 @@ import {ScreenOverlay} from '../../global';
 import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
+import WSImportMindmap from'../components/WSImportMindmap.js';
 import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
@@ -54,6 +55,7 @@ const ModuleListDrop = (props) =>{
     const [modE2Elist, setModE2EList] = useState(moduleLists)
     const [searchForNormal, setSearchForNormal] = useState(false)
     const [importPop,setImportPop] = useState(false)
+    const [WSimportPop,setWSImportPop] = useState(false)
     const [blockui,setBlockui] = useState({show:false})
     const [scenarioList,setScenarioList] = useState([])
     const [initScList,setInitScList] = useState([]) 
@@ -1051,7 +1053,7 @@ setPreventDefaultModule(true);
             />:null}
              <>
       <div className="CollapseWholeCont">
-       <div className="collapseBut" style={{height:"9%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'16rem',zIndex:'2',}}>
+       <div className="collapseBut" style={{height:"9%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'17rem',zIndex:'1',}}>
              <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); }}/> 
           </div>
             <div className="Whole_container" style={{ width: collapseWhole ? "17rem" : "0.9rem", transitionDuration: '0.7s ', overflow: !collapseWhole ? "hidden" : "",backgroundColor: !collapseWhole? "#c1c1ef" : ""  }}>
@@ -1083,6 +1085,11 @@ setPreventDefaultModule(true);
                      </div> */}
                       {userInfo && userInfo.rolename !== "Quality Engineer" ? (
                         <>
+                      <img className="pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
+                     <img  className="custom-target-iconws" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>setWSImportPop(true)}  />
+                     <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
+                     {WSimportPop? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true}  importPop={WSimportPop}/>:null}
+                    
                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" onClick={()=>setImportPop(true)}></img>
                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}
