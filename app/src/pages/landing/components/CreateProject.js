@@ -22,6 +22,7 @@ const CreateProject = (props) => {
   const [selectAll, setSelectAll] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [query, setQuery] = useState('');
+  let userInfo = useSelector((state)=> state.landing.userInfo);
   const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
   const [selectallAssaigned, setSelectallAssaigned] = useState(false);
   const [queryDisplayUser, setQueryDisplayUser] = useState('');
