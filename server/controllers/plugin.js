@@ -97,7 +97,6 @@ exports.validateProject = async (req, res) =>{
   logger.info("Inside UI service: validateProject ");
 
   var status = "fail";
-  const regEx= /[;~*+=?^%<>()|\\|\/]/;
   const createProjectObj=req.body;
   const inputs = {
     query : "validateproject"

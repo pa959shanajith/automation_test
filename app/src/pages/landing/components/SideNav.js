@@ -28,7 +28,7 @@ const SideNav = () => {
         updateNavListItems();
     }, []);
 
-    const notALicenseDashboard ={
+    const dashboardLicense ={
         value: userInfo?.licensedetails.MD === 'false',
         msg: "You do not have access for Dashboard"
     }
@@ -67,8 +67,8 @@ const SideNav = () => {
         {
             path: "/dashboard",
             name: "Dashboard",
-            icon: <img src={tabSelected === "/dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon_Dashboard" data-pr-tooltip={notALicenseDashboard.value ? notALicenseDashboard.msg : "Access to Dash board."} data-pr-position="right" height="25px" />,
-            disabled: notALicenseDashboard.value
+            icon: <img src={tabSelected === "/dashboard" ? "static/imgs/dashboardIcon.png" : "static/imgs/dashboard_disabled_icon.png"} className="icon_Dashboard" data-pr-tooltip={dashboardLicense.value ? dashboardLicense.msg : "Access to Dash board."} data-pr-position="right" height="25px" />,
+            disabled: dashboardLicense.value
         },
     ]
 

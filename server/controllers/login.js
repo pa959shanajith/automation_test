@@ -74,12 +74,6 @@ exports.loadUserInfo = async (req, res) => {
 		}
 		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
         userProfile['licenseID']='4_'
-		// for(let x of userProfile.pluginsInfo )
-		// {
-		// 	if(x.pluginName == "LicenseTypes") {
-		// 		userProfile['licenseID']=license_dict[x.pluginValue.toLowerCase()]
-		// 	}
-		// }
 		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
