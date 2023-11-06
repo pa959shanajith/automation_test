@@ -265,7 +265,7 @@ const DisplayProject = (props) => {
       <div className="Project_header">
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
-
+        {props.validateProjectLicense.status === 'fail'  && <Tooltip target="#CreateDisable_Title" content={props.validateProjectLicense.message} position='bottom'/>}
         <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError}/>
         {sortVisible && (<div ref={menuRef}><Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color"/>
         </div>)}
@@ -274,8 +274,8 @@ const DisplayProject = (props) => {
           <div className="add_sort_btn">
             <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} ref={sortButtonRef}/>
             {userInfo && userInfo.rolename === "Quality Manager" ? (
-              <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
-            ) : null}
+              <span id='CreateDisable_Title' ><button className="pi pi-plus add_btn" onClick={handleOpenDialog} disabled ={props.validateProjectLicense.status === 'fail'}/></span>
+              ) : null}
 
           </div>
         </div>

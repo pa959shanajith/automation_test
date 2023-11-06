@@ -6,6 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import CreateProject from './CreateProject';
 import VerticalSteps from './VerticalSteps';
 import { useSelector } from 'react-redux';
+import { Tooltip } from 'primereact/tooltip';
 
 
 
@@ -35,15 +36,14 @@ const ProjectCreation = (props) => {
 
   return (
     <>
-      {/* {visible && <CreateProject setVisible={setVisible} />} */}
+      {props.validateProjectLicense.status === 'fail' && <Tooltip target="#CreateDisable_Title" content={props.validateProjectLicense.message} position='bottom'/>}
       <div className='p-2 surface-100 flex flex-column' style={{overflow:"auto", height:'100vh'}}>
         <div className='VerticalStepBox'>
           <VerticalSteps />
         </div>
-        {/* <div className=" CreateProj-card"> */}
         {userInfo && userInfo.rolename === "Quality Manager" ? (
           <Card className="CreateProj-card" id='Createproj-title' title="Do you want to create a new project?" >
-            <Button className="CreateProj_btn" size="small" onClick={handleOpenDialog} >Create Project</Button>
+            <span id='CreateDisable_Title'><Button className="CreateProj_btn" size="small" onClick={handleOpenDialog} label='Create Project' disabled ={props.validateProjectLicense.status === 'fail'} /></span>
             <CreateProject 
             visible={visible} 
             onHide={handleCloseDialog} 
@@ -52,10 +52,6 @@ const ProjectCreation = (props) => {
             toastSuccess={props.toastSuccess}
             toastError={props.toastError}/>
           </Card>) : null}
-        {/* </div> */}
-
-        {/* <div  className="gotoadmin-card">  */}
-
         {userInfo && userInfo.isadminuser === true ? (
         <Card className="gotoadmin-card" title="Wish to do some housekeeping today?">
           <div className="list_btns">
@@ -65,7 +61,6 @@ const ProjectCreation = (props) => {
           </div>
           <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
         </Card>) : null}
-        {/* </div> */}
       </div>
     </>
 

@@ -40,7 +40,7 @@ const ProjectOverview = (props) => {
                 </div>
                 <TabMenu className='tab-menu' model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} />
             </div>
-            {activeIndex === 0 && <ProjectCreation toastError={props.toastError} toastSuccess={props.toastSuccess} />}
+            {activeIndex === 0 && <ProjectCreation validateProjectLicense={props.validateProjectLicense} toastError={props.toastError} toastSuccess={props.toastSuccess} />}
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}
         </div>

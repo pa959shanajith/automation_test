@@ -633,6 +633,7 @@ var browserstack = require('./server/controllers/browserstack');
 
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+		app.post('/validateProject', auth.protect, plugin.validateProject);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
         app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);

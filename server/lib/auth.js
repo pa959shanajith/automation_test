@@ -578,47 +578,37 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						const vstatus = await utils.fetchData({},"/hooks/validateStatus");
-                        if(vstatus.status === 'pass'){
-							var vuser = { 'status' : 'pass'}
-							if(req.user.username != 'admin'){
-							   vuser = await utils.fetchData({},"/hooks/validateUser");
-							}
-							if(vuser.status === 'pass'){
-								res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-								req.session.userid = userid;
-								req.session.ip = ip;
-								req.session.loggedin = (new Date()).toISOString();
-								req.session.username = username;
-								req.session.uniqueId = req.session.id;;
-								req.session.usertype = user.type;
-								req.session.client = clientName;
-								logger.rewriters[0] = function(level, msg, meta) {
-									meta.username = username;
-									meta.userid = userid;
-									meta.userip = ip;
-									return meta;
-								};
-							}else{
-								return res.send(vuser)
-							}
-						}else{
-							return res.send(vstatus)
-						}
-						
-						// res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-						// req.session.userid = userid;
-						// req.session.ip = ip;
-						// req.session.loggedin = (new Date()).toISOString();
-						// req.session.username = username;
-						// req.session.uniqueId = req.session.id;;
-						// req.session.usertype = user.type;
-						// logger.rewriters[0] = function(level, msg, meta) {
-						// 	meta.username = username;
-						// 	meta.userid = userid;
-						// 	meta.userip = ip;
-						// 	return meta;
-						// };
+						const result = await utils.fetchData({}, "admin/getAvailablePlugins", "getAvailablePlugins");
+                        currentDate = new Date();
+                        currentDate.setHours(0,0,0,0);
+                        expiryDate = new Date(result.ExpiresOn)
+                        if(result.Status == "Active" && expiryDate >= currentDate){
+                            if(!result.USER.includes("Unlimited") && username != 'admin') {
+                                const sesscount = await utils.allSessCount(clientName);
+                                if(sesscount >= parseInt(result.USER))
+                                {
+                                    emsg = {'status':"fail",'message':"Max Users Already loggedin"}
+                                    return res.send(emsg);
+                                }
+                            }
+                            res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+                            req.session.userid = userid;
+                            req.session.ip = ip;
+                            req.session.loggedin = (new Date()).toISOString();
+                            req.session.username = username;
+                            req.session.uniqueId = req.session.id;;
+                            req.session.usertype = user.type;
+                            req.session.client = clientName;
+                            logger.rewriters[0] = function(level, msg, meta) {
+                                meta.username = username;
+                                meta.userid = userid;
+                                meta.userip = ip;
+                                return meta;
+                            };
+                        }else{
+                            emsg = {'status':"fail",'message':"License is not active"}
+                            return res.send(emsg);
+                        }
 					}
 				}
 			} catch (err) {
