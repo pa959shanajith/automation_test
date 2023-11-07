@@ -222,7 +222,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     setHeaderCheck(false);
                     // setIsUnderReview(props.current_task.status === "underReview")
                 })
-                .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+                .catch(error => console.error("Error: Fetch Test Steps Failed ::::", error));
             }
             setOverlay("Loading...")
             if (screenLevelTestCases.length !== 0) {
@@ -453,7 +453,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
-                setShowConfirmPop({ 'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
+                setShowConfirmPop({ 'title': 'Save Test Steps', 'content': 'Test Steps has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
                 return;
             }
             let testCaseId = '';
@@ -563,7 +563,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                                         .catch(error => {
                                                             // setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                                             toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                                            console.error("Error: Fetch TestCase Failed ::::", error)
+                                                            console.error("Error: Fetch Test Steps Failed ::::", error)
                                                         });
                                                     }        
                                                 } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
@@ -593,7 +593,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     .catch(error=>{
                                         // setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                         toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                        console.error("Error: Fetch TestCase Failed ::::", error)
+                                        console.error("Error: Fetch Test Steps Failed ::::", error)
                                     });
                                 }
                             }
@@ -751,7 +751,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         const isTestIDPresent = addedTestCase.some(item => item.testCaseID === testCase.testCaseID);
     
         if (isTestIDPresent) {
-            toastError("Duplicate Dependent Testcase found");
+            toastError("Duplicate Dependent Test Steps found");
         } else {
             const addTestcaseData = {
                 testCaseID: testCase.testCaseID,
@@ -1203,7 +1203,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:1000});
         else if (stepSelect.check.length <= 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP.CONTENT,life:1000});
-        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
+        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Test Steps has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
         else setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
     const onDeleteTestStep = () => {
