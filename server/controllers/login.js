@@ -57,14 +57,10 @@ exports.loadUserInfo = async (req, res) => {
 			logger.error("User role not found");
 			return res.send("fail");
 		}
-		if (permData.pluginresult.length === 0) {
-			logger.info("User plugins not found");
-			return res.send("fail");
-		}
 		if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 		req.session.activeRole = rolename;
 		userProfile.rolename = req.session.defaultRole;
-		userProfile.pluginsInfo = permData.pluginresult;
+		userProfile.licensedetails = permData.licenseDetails;
 		userProfile.page = (userProfile.rolename == "Admin")? "admin":"landing";
 		userProfile.tandc = false;
 		userProfile.isTrial = permData.isTrial;
@@ -78,12 +74,6 @@ exports.loadUserInfo = async (req, res) => {
 		}
 		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
         userProfile['licenseID']='4_'
-		for(let x of userProfile.pluginsInfo )
-		{
-			if(x.pluginName == "LicenseTypes") {
-				userProfile['licenseID']=license_dict[x.pluginValue.toLowerCase()]
-			}
-		}
 		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
