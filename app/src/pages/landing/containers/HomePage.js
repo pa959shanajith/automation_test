@@ -14,7 +14,10 @@ const HomePage = () => {
     const toast = useRef();
     navigate= useNavigate();
     const savedCreateProject = useSelector((state) => state.landing.savedNewProject);
-
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo ;
 
     useEffect(() => {
         if (window.localStorage['navigateScreen'] !== "landing") {
@@ -22,15 +25,18 @@ const HomePage = () => {
         }
     }, []);
 
-    useEffect(() => {(async () => {
-        try{
-          const validateCreateProject = await validateProject();
-          setValidateProjectLicense(validateCreateProject);
-        }catch (error){
-        console.error("API request failed:", error);
+    useEffect(() => {
+        if ( userInfo?.rolename === "Quality Manager") {
+          (async () => {
+            try {
+              const validateCreateProject = await validateProject();
+              setValidateProjectLicense(validateCreateProject);
+            } catch (error) {
+              console.error("API request failed:", error);
+            }
+          })();
         }
-        })();
-    }, [savedCreateProject]);
+      }, [userInfo?.rolename === "Quality Manager", savedCreateProject]);
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {

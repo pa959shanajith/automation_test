@@ -57,7 +57,7 @@ const VerticalSteps = (props) => {
     };
     
     const agsLicense = {
-      value: userInfo?.licensedetails.AGS === false,
+      value: userInfo?.licensedetails?.AGS === false,
       msg: "You do not have access for Avo Genius."
     }
 

@@ -1043,7 +1043,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
         };
 
   const cicdLicense = {
-    value: userInfo?.licensedetails.CICD === false,
+    value: userInfo?.licensedetails?.CICD === false,
     msg: "You do not have access for CICD."
   }
 
