@@ -306,7 +306,7 @@ if (cluster.isMaster) {
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
-			var roles = ["Admin"]; //Allowed roles
+			var roles = ["Admin", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
@@ -510,6 +510,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
+		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
@@ -632,6 +633,7 @@ var browserstack = require('./server/controllers/browserstack');
 
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+		app.post('/validateProject', auth.protect, plugin.validateProject);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
         app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);

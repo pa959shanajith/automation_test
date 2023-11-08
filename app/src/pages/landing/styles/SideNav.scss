@@ -1,8 +1,9 @@
 @import "../../global/styles/ColorVariables.scss";
 .sidebar_container{
     display: flex;
-    width: 3%;
+    width: 5%;
     height: 100%;
+    min-width: 3.6rem;
     .sidebar {
         width: 100%;
         position: sticky;

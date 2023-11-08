@@ -1,4 +1,47 @@
 @import "../../global/styles/ColorVariables.scss";
+
+.ws-main-container{
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    height: 100%;
+}
+.request-side{
+    width: 49%;
+    height: 100%;
+    padding: 1%;
+    border-right: 0.1rem solid grey;
+}
+.request-second-line{
+    display: flex;
+    justify-content: space-between;
+    margin: 3% 0%;
+}
+.method-styling .p-dropdown .p-dropdown-label{
+    // background: blue;
+    background: blue;
+    color: white;
+    width: 30%;
+}
+.request-select-method{
+    display: flex;
+}
+.request-tabs{
+    margin: 3% 0%;
+}
+.response-side{
+    width: 49%;
+    height: 100%;
+    padding: 1%;
+}
+.response-second-line{
+    display: flex;
+    justify-content: space-between;
+}
+.response-third-line {
+    display: flex;
+    justify-content: space-around;
+}
 .ws__row{
     display: flex;
     width: 97%;

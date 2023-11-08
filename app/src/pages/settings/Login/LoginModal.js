@@ -44,7 +44,10 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     const [disableLoginBtn, setDisableLoginBtn] = useState(false);
 
 
-
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if (!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo;
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
@@ -332,6 +335,11 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         }
     }
 
+    const notALicenseALM = {
+        value: userInfo?.licensedetails?.ALMDMT === 'false',
+        msg: "You do not have access for ALM"
+    }
+
     return (
         <>
             {loading ? <ScreenOverlay content={loading} /> : null}
@@ -355,10 +363,16 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                         <span><img src="static/imgs/qTest_icon.svg" className="img__qtest"></img></span>
                         <span className="text__qtest">qTest</span>
                     </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'ALM', code: 'ALM' })}>
+                    {notALicenseALM.value ? <div className={'icon-wrapper'} onClick={() => handleScreenType({ name: 'ALM', code: 'ALM' })}>
+                        <span title={notALicenseALM.msg}><img src="static/imgs/ALM_icon.svg" className="img__alm_disabled"></img></span>
+                        <span className="text__alm_disabled">ALM</span>
+                    </div>
+                     : 
+                     <div className={`icon-wrapper ${selectedscreen?.name === 'ALM' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'ALM', code: 'ALM' })}>
                         <span><img src="static/imgs/ALM_icon.svg" className="img__alm"></img></span>
                         <span className="text__alm">ALM</span>
-                    </div>
+                    </div> 
+                    }
                     <div>
                         <div className={`icon-wrapper ${selectedscreen?.name === 'Git' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Git', code: 'GIT' })}>
                             <span><img src="static/imgs/git_configuration_icon.svg" className="img__alm" alt="Git Icon" /></span>

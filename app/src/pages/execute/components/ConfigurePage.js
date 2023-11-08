@@ -175,6 +175,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackBrowserDetails,setBrowserstackBrowserDetails] = useState([]);
   const [isEmpty, setIsEmpty] = useState(false);
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
+  const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [browserlist, setBrowserlist] = useState([
     {
@@ -224,6 +225,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject.projectId)
@@ -873,19 +877,21 @@ const handleSubmit1 = async (SauceLabPayload) => {
         setLoading={setLoading}
         displayBasic6={displayBasic6}
         onHidedia={onHidedia}
+        setBrowserstackValues={setBrowserstackValues}
         handleBrowserstackSubmit={handleBrowserstackSubmit}
         setBrowserstackUser={setBrowserstackUser}
         onModalBtnClick={onHidedia}
+        browserstackValues={browserstackValues}
     />,
-    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser]);
+    [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
     const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
         />,
             [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist, CheckStatusAndExecute, iceNameIdMap]);
+            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
 
 
 
@@ -1039,6 +1045,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
         );
         };
 
+  const cicdLicense = {
+    value: userInfo?.licensedetails?.CICD === false,
+    msg: "You do not have access for CICD."
+  }
+
   const tableUpdate = async () => {
     const getState = [];
     setLoader(true);
@@ -1124,6 +1135,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >
               Schedule
             </Button>
+            <span id={cicdLicense.value || selectProjects.appType!=="Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
             <Button
               className="CICD"
               size="small"
@@ -1132,11 +1144,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-              disabled={selectProjects.appType!=="Web"}
+              disabled={selectProjects.appType!=="Web" || cicdLicense.value}
             >  
               CI/CD
             </Button>
-
+            </span>
             <div className="cloud-test-provider" >
               <Dropdown
                 placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
@@ -1843,8 +1855,9 @@ const showToast = (severity, detail) => {
         <>
          <Tooltip target=".execute_now " position="bottom" content="  Execute Configuration using Avo Assure Agent/Grid/Client."/>
          <Tooltip target=".schedule " position="bottom" content="  Schedule your execution on a date and time you wish. You can set recurrence pattern as well."/>
-         <Tooltip target=".CICD " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
+         <Tooltip target="#CICD_tooltip " position="bottom" content=" Get a URL and payload which can be integrated with tools like jenkins for CI/CD execution."/>
          <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
+         <Tooltip target="#CICD_Disable_tooltip" position="bottom" content={cicdLicense.msg}/> 
          {loading ? <ScreenOverlay content={loading} /> : null}
 
           <DataTable

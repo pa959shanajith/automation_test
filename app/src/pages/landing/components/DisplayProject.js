@@ -265,7 +265,7 @@ const DisplayProject = (props) => {
       <div className="Project_header">
         <Tooltip target=".add_btn" position="bottom" content="Create Project" />
         <Tooltip target=".sort_btn" position="bottom" content="Sort Projects" />
-
+        {props.validateProjectLicense.status === 'fail'  && <Tooltip target="#CreateDisable_Title" content={props.validateProjectLicense.message} position='bottom'/>}
         <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError}/>
         {sortVisible && (<div ref={menuRef}><Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color"/>
         </div>)}
@@ -274,8 +274,8 @@ const DisplayProject = (props) => {
           <div className="add_sort_btn">
             <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} ref={sortButtonRef}/>
             {userInfo && userInfo.rolename === "Quality Manager" ? (
-              <button className="pi pi-plus add_btn" onClick={handleOpenDialog} />
-            ) : null}
+              <span id='CreateDisable_Title' ><button className="pi pi-plus add_btn" onClick={handleOpenDialog} disabled ={props.validateProjectLicense.status === 'fail'}/></span>
+              ) : null}
 
           </div>
         </div>
@@ -328,7 +328,9 @@ const DisplayProject = (props) => {
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (
-            <div title={project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName} key={project.projectId} >
+            <>
+            <Tooltip target={`.project_uniqueid${project.projectId}`} content={`${project.projectName + "\n" + project.modifiedDate + " by " + project.modifiedName}`} position='right'></Tooltip>
+            <div key={project.projectId} className={`project_uniqueid${project.projectId}`}>
               <button
                 className={project.projectId === defaultProjectId ? 'default-project project-card' : 'project-card'}
                 onClick={() => {
@@ -337,26 +339,28 @@ const DisplayProject = (props) => {
                   }
                 }}>
                 <div className="Project_Display_Nav">
-                <div className="ProjectApp_Name">
-                {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
-                {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
-                {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
-                {project.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
-                {project.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
-                <div className="Project_name">
-                <p id="projectInside">{project.projectName}</p>
-                </div>
-                </div>
-                <div className="projectInsideLast">
-                <p id="Last_modifie">{project.modifiedDate} by {project.modifiedName}</p>
-                </div>
+                  <div className="ProjectApp_Name">
+                    {project.appType === "Web" && (<img src="static/imgs/Web.svg" alt="Web App Icon" height="20" />)}
+                    {project.appType === "MobileWeb" && (<img src="static/imgs/MobileWeb.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "Desktop" && (<img src="static/imgs/Desktop.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "Webservice" && (<img src="static/imgs/WebService.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "SAP" && (<img src="static/imgs/SAP.svg" alt="Mobile App Icon" height="20" width='18' />)}
+                    {project.appType === "OEBS" && (<img src="static/imgs/OEBS.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                    {project.appType === "Mainframe" && (<img src="static/imgs/Mainframes.svg" alt="Mobile App Icon" height="18" width='20' />)}
+                    {project.appType === "MobileApp" && (<img src="static/imgs/MobileApps.svg" alt="Mobile App Icon" height="20" />)}
+                    {project.appType === "System" && (<img src="static/imgs/System_application.svg" alt="Mobile App Icon" height="20"/>)}
+                    <span className="Project_name">
+                      <p id="projectInside">{project.projectName}</p>
+                    </span>
+                  </div>
+                  <div className="projectInsideLast">
+                    <p id="Last_modifie">{project.modifiedDate} by {project.modifiedName}</p>
+                  </div>
                 </div>
               </button>
-            </div>))}
+            </div>
+            </>))
+            }
         </div>
       </Panel>
     </>

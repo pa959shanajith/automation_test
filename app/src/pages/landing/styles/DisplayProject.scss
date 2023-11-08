@@ -27,6 +27,7 @@
   .Project_Display_Nav {
     display: flex;
     flex-direction: column;
+    width: 100%;
   }
 
   #Last_modifie {
@@ -57,16 +58,22 @@
     font: $f6_regular;
     color: rgba(3, 2, 41, .6);
     overflow: hidden;
-    max-width: 17.8rem;
     text-overflow: ellipsis;
-    display: inherit;
     white-space: nowrap;
     margin-left: 0.2rem;
   }
 
   .ProjectApp_Name {
-    display: inherit;
+    display: flex;
     white-space: nowrap;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    text-overflow: ellipsis;
+    text-align: left;
+      .Project_name{
+        width: 91%;
+      }
   }
 
   .projectInsideLast {
@@ -137,7 +144,7 @@
       background: transparent;
       cursor: pointer;
       color: #6c757d;
-      margin-left: 2.3rem;
+      margin-right: 2rem;
     }
 
     .add_btn {
@@ -147,13 +154,17 @@
       color: #6c757d;
     }
 
+    .CreateDisable_Title{
+      cursor: not-allowed !important;
+    }
+
     .All_Project {
       padding: 0.5rem 1.5rem;
     }
 
     .add_sort_btn {
       display: flex;
-      flex-direction: row-reverse;
+      flex-direction: row;
     }
     .card__add {
       height: 11%;

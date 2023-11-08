@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ModalContainer } from '../../global';
 import "../styles/SelectMultipleDialog.scss";
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
 
 /*
     Component: Select Steps Dialog
@@ -73,26 +74,27 @@ const SelectMultipleDialog = props => {
         else showSelectError('empty');
     }
 
-    return (<ModalContainer 
-        title="Select Test Step(s)"
-        modalClass="modal-sm"
-        content={
+    return (<Dialog 
+        header="Select Test Step(s)"
+        visible={props.show}
+        className="modal-sm"
+        onHide={()=>{
+            setStepNum("");
+            showSelectError("");
+            props.setShow(false)
+        }}
+        footer={
+            <Button onClick={selectSteps} data-test="d__smactionbtn" label='Submit'/>
+        }
+    >
         <div className="sm_dialog"> 
             <div className="sm_lbl" data-test="d__smlbl">Select step(s) no:</div>
             <div className="sm_hint" data-test="d__smlbl">For multiple select. Eg: 5;10-15;20;22</div>
             <input className="sm_input" data-test="d__sminp" placeholder="Enter a value" onChange={SMHandler} value={stepNum}/>
             { selectError && 
                 <div className="sm_error" data-test="d__smerror">{selectErrors[selectError]}</div>            }
-        </div>}
-        close={()=>{
-            setStepNum("");
-            showSelectError("");
-            props.setShow(false)
-        }}
-        footer={
-            <button onClick={selectSteps} data-test="d__smactionbtn">Submit</button>
-        }
-    />
+        </div>
+    </Dialog>
 )
 }
 

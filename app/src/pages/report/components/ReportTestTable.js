@@ -204,7 +204,8 @@ export default function BasicDemo() {
           iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
         };
         const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
-        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        const scn = reportData?.rows.length ? reportData?.rows[0].scenario_id : reportData?.overallstatus?.scenarioName
+        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id,  scn);
         setMappedProjects(getMappedAdoProjects);
         setJiraDetails({
           ...getAzureDetails,
@@ -543,7 +544,7 @@ export default function BasicDemo() {
       return icon;
     };
 
-    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : rowData?.data?.Step === 'Terminated' ? null : (
+    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : rowData?.data?.Step === 'Terminated' || rowData?.data?.flag === "Terminate" ? null : (
       <img
         src={getIcon(bugTitle)}
         alt="bug defect"
@@ -602,6 +603,7 @@ export default function BasicDemo() {
             );
           }
         }
+        modifiedChild.flag = modifiedChild.status;
         const statusIcon =
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"

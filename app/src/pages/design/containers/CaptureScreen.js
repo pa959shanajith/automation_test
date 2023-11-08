@@ -528,23 +528,24 @@ const elementTypeProp =(elementProperty) =>{
 
           }
           else if (typeof data === "object" && typesOfAppType === "Webservice") {
-            haveItems = data.view[0].endPointURL && data.view[0].method;
+            haveItems = data.endPointURL && data.method;
+            console.log(haveItems)
             if (haveItems) {
 
               let localReqBody = "";
-              if (data.view[0].body) localReqBody = getProcessedBody(data.view[0].body, 'fetch');
+              if (data.body) localReqBody = getProcessedBody(data.body, 'fetch');
 
               let localRespBody = "";
-              if (data.view[0].responseBody) localRespBody = getProcessedBody(data.view[0].responseBody, 'fetch');
+              if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
 
               dispatch(WsData({
-                endPointURL: data.view[0].endPointURL,
-                method: data.view[0].method,
-                opInput: data.view[0].operations || "",
-                reqHeader: data.view[0].header ? data.view[0].header.split("##").join("\n") : "",
+                endPointURL: data.endPointURL,
+                method: data.method,
+                opInput: data.operations || "",
+                reqHeader: data.header ? data.header.split("##").join("\n") : "",
                 reqBody: localReqBody,
-                paramHeader: data.view[0].param ? data.view[0].param.split("##").join("\n") : "",
-                respHeader: data.view[0].responseHeader ? data.view[0].responseHeader.split("##").join("\n") : "",
+                paramHeader: data.param ? data.param.split("##").join("\n") : "",
+                respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
                 respBody: localRespBody
               }));
               setSaved({ flag: true });
@@ -1125,7 +1126,7 @@ else{
 
   const emptyMessage = (
     <div className='empty_msg1'>
-      <div className='empty_msg'>
+      <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
         {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
@@ -1741,7 +1742,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-      {!props.testSuiteInUse?<div className="card_modal">
+      {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
               {!showPanel && <div className='insprint__block1'>
