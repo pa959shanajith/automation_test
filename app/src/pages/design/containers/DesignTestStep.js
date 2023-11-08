@@ -222,7 +222,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     setHeaderCheck(false);
                     // setIsUnderReview(props.current_task.status === "underReview")
                 })
-                .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+                .catch(error => console.error("Error: Fetch Test Steps Failed ::::", error));
             }
             setOverlay("Loading...")
             if (screenLevelTestCases.length !== 0) {
@@ -453,7 +453,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
-                setShowConfirmPop({ 'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
+                setShowConfirmPop({ 'title': 'Save Test Steps', 'content': 'Test Steps has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
                 return;
             }
             let testCaseId = '';
@@ -563,7 +563,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                                         .catch(error => {
                                                             // setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                                             toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                                            console.error("Error: Fetch TestCase Failed ::::", error)
+                                                            console.error("Error: Fetch Test Steps Failed ::::", error)
                                                         });
                                                     }        
                                                 } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
@@ -593,7 +593,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     .catch(error=>{
                                         // setMsg(MSG.DESIGN.ERR_FETCH_TC);
                                         toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                        console.error("Error: Fetch TestCase Failed ::::", error)
+                                        console.error("Error: Fetch Test Steps Failed ::::", error)
                                     });
                                 }
                             }
@@ -751,7 +751,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         const isTestIDPresent = addedTestCase.some(item => item.testCaseID === testCase.testCaseID);
     
         if (isTestIDPresent) {
-            toastError("Duplicate Dependent Testcase found");
+            toastError("Duplicate Dependent Test Steps found");
         } else {
             const addTestcaseData = {
                 testCaseID: testCase.testCaseID,
@@ -954,8 +954,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' className='select' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
-                    <Tooltip target='.select' position='bottom' content='  Select Test Step(s)'/> */}
+                    <i className='pi pi-check-square' style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black'}} onClick={()=>selectMultiple()}/>
+                    <Tooltip target='.pi-check-square' position='bottom' content='  Select Test Step(s)'/>
                     <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
                     <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
@@ -1203,7 +1203,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:1000});
         else if (stepSelect.check.length <= 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP.CONTENT,life:1000});
-        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
+        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Test Steps has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
         else setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
     const onDeleteTestStep = () => {
@@ -1388,7 +1388,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         stepList.push(...stepSelect.check)
         let newChecks = Array.from(new Set(stepList))
         setStepSelect({edit: false, check: newChecks, highlight: []});
-        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== findData.testCases.length;
         setShowSM(false);
     }
 
@@ -1501,6 +1502,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                             </div>
                         </div>
                     </Dialog>} */}
+                    { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} show={showSM} selectSteps={selectSteps} upperLimit={data.testCases.length} /> }
                     { showPS && <PasteStepDialog setShow={setShowPS} show={showPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
                     { showConfPaste && <ConfPasteStep />}
                     { showConfirmPop && ConfirmPopups() }

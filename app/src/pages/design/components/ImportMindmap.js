@@ -678,6 +678,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                     style={{width:'20rem', marginLeft:'4rem'}}
                                     defaultValue={'def-val'}
                                     onChange={(e)=>setSheetValue(e.value)}
+                                    disabled={projectValue !== null?false:true}
                                 />
                         {/* <label>Select Sheet: </label>
                         <select defaultValue={"def-val"} ref={sheetRef}>
@@ -719,6 +720,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                                     style={{width:'20rem', marginLeft:'4rem'}}
                                     defaultValue={'def-val'}
                                     onChange={(e)=>setSheetValue(e.value)}
+                                    disabled={projectValue !== null?false:true}
                                 />
                         {/* <label>Select Sheet: </label>
                         <select defaultValue={"def-val"} ref={sheetRef}>
