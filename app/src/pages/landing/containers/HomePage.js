@@ -36,7 +36,7 @@ const HomePage = () => {
             }
           })();
         }
-      }, [userInfo?.rolename === "Quality Manager", savedCreateProject]);
+      }, [userInfo?.rolename, savedCreateProject]);
 
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
