@@ -220,7 +220,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
             switch (selectedscreen.name) {
                 case 'Jira':
                 try{
-                        setLoading('Updating...');
+                    setLoading('Updating...');
                     var data = await manageJiraDetails(isEmpty?"create":"update", loginDetails);
                         setLoading(false);
                     if(data.error){
@@ -247,7 +247,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     if(zephyrLoginDetails.token) {
                             zephyrObj['token'] = zephyrLoginDetails.token;
                         }
-                        setLoading('Updating...');
+                    setLoading('Updating...');
                     var data = await manageZephyrDetails(isEmpty?"create":"update", zephyrObj);
                         setLoading(false);
                     if(data.error){
@@ -263,7 +263,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     break;
                 case 'Azure DevOps':
                 try{
-                        setLoading('Updating...');
+                    setLoading('Updating...');
                     var data = await manageAzureDetails(isEmpty?"create":"update", AzureLoginDetails);
                         setLoading(false);
                     if(data.error){
@@ -423,7 +423,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 <div className="input-cls">
                                     <span>Username <span style={{ color: 'red' }}>*</span></span>
                                     <span style={{ marginLeft: '1.5rem' }}>
-                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} />
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="username" value={selectedscreen.name === 'Jira' ? loginDetails.username : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.username : zephyrLoginDetails.username} onChange={(e) => handleLogin('username', e.target.value)} autoComplete="off" />
                                         {/* <label htmlFor="username">Username</label> */}
                                     </span>
                                 </div>
@@ -437,7 +437,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
                                     <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
                                     {/* <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} feedback={false} /> */}
-                                <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem', paddingRight:'2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"}/>
+                                <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem', paddingRight:'2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} autoComplete="new-password"/>
                                     {(loginDetails.password || zephyrLoginDetails.password || AzureLoginDetails.password) && <div className='p-input-icon-right cursor-pointer'>
                                         <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`}
                                             onClick={() => { setShowPassword(!showPassword) }} />
@@ -447,7 +447,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 <div className="url-cls">
                                     <span>URL <span style={{ color: 'red' }}>*</span></span>
                                     <span style={{ marginLeft: '4.5rem' }}>
-                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} autoComplete="off" />
                                         {/* <label htmlFor="username">URL</label> */}
                                     </span>
                                 </div>
@@ -465,14 +465,14 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 <div className="url-cls">
                                     <span>URL <span style={{ color: 'red' }}>*</span></span>
                                     <span style={{ marginLeft: '4.5rem' }}>
-                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} />
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.url : zephyrLoginDetails.url} onChange={(e) => handleLogin('url', e.target.value)} autoComplete="off"/>
                                         {/* <label htmlFor="username">URL</label> */}
                                     </span>
                                 </div>
                                 <div className="url-cls">
                                     <span>Token <span style={{ color: 'red' }}>*</span></span>
                                     <span style={{ marginLeft: '3.7rem' }}>
-                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token : zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} />
+                                        <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem' }} className="input-txt1" id="URL" value={selectedscreen.name === 'Jira' ? loginDetails.token : zephyrLoginDetails.token} onChange={(e) => handleLogin('token', e.target.value)} autoComplete="new-password"/>
                                         {/* <label htmlFor="username">Token</label> */}
                                     </span>
                                 </div>
