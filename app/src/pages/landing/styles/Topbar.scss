@@ -1,6 +1,17 @@
 @import "../../global/styles/ColorVariables.scss";
 .Topbar_Menu{
-    height: 6.5vh;
+    .p-menubar {
+        padding: 0;
+    }
+    .p-menubar-start {
+        width: 37%;
+    }
+    .p-menubar-end {
+        width: 63%;
+        height: 100%;
+    }
+    height: 3rem;
+    // height: 6.5vh;
         .Header_size {
         position: relative;
         height: 100%;
@@ -11,7 +22,8 @@
     display: flex;
     flex-wrap: nowrap;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;;
+    justify-content: space-between;
     cursor: pointer;
 }
 
@@ -19,14 +31,18 @@
     color: #030229;
     display: flex;
     font-family: Open Sans;
+    height: 100%;
+    align-items: flex-end;
     font-size: 16px;
     font-style: normal;
     font-weight: 500;
     gap: 46px;
+    margin-bottom: 0.1rem;
     line-height: 2.4rem;
+    height: 100%;
     position: relative;
-    right: 35rem;
-    top: 0.5rem;
+    // right: 35rem;
+    // top: 0.5rem;
     font: $f6_regular;
 }
 

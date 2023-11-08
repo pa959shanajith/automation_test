@@ -9,18 +9,25 @@
         // margin-left: 1%;
         padding: 1%;
         width: 100%;
-        height: 41vh;
+        // height: 41vh;
+        .MuiStepConnector-vertical {
+            position: relative;
+            .MuiStepConnector-lineVertical {
+                position: absolute;
+                bottom: -12px;
+            }
+        }
     }
     
     .CreateProj-card{
         display: flex;
-        height: 16vh;
+        // height: 16vh;
         justify-content: center;
         margin-bottom: 1rem;
         margin-left: 0.7rem;
         top: 1rem;
         width: 98%;
-        height: 16vh;
+        // height: 16vh;
         .p-card-body{
             padding: 0.5rem !important;
             width: 100%;
@@ -50,7 +57,7 @@
 
     .gotoadmin-card{
         display: flex;
-        height: 21vh;
+        // height: 21vh;
         justify-content: center;
         margin-bottom: 1rem;
         margin-left: 0.7rem;
