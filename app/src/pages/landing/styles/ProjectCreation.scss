@@ -47,7 +47,9 @@
                     font:$f7_semibold;
                 }
             }
-
+        }
+        .CreateDisable_Title{
+            cursor: not-allowed !important;
         }
         
     }  

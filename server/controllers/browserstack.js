@@ -31,13 +31,17 @@ exports.saveBrowserstackData = function(req, res) {
         const reqData = req.body;
         var browserstackUsername = reqData.BrowserstackPayload.BrowserstackUsername;
         var browserstackAccessKey = reqData.BrowserstackPayload.Browserstackkey;
+        var check_BrowserStackUploadApk =(reqData.BrowserstackPayload.uploadApkValuesBS);
+        
         var inputs = {
             "Browserstack_uname": browserstackUsername,
             "BrowserstackAccessKey": browserstackAccessKey,
+            "BrowserstackUploadApk": check_BrowserStackUploadApk,
             "action": reqData.BrowserstackPayload.action
+            
         };
 
-        if (inputs.action === 'webDetails' || inputs.action === 'mobileWebDetails') {
+        if (inputs.action === 'webDetails' || inputs.action === 'mobileWebDetails' || inputs.action === 'BrowserStackMobileUploadDetails') {
             // Login to Browserstack
             if (!validateData(browserstackUsername, "empty") && !validateData(browserstackAccessKey, "empty")) {
                 logger.debug("IP's connected: %s", Object.keys(myserver.allSocketsMap).join());

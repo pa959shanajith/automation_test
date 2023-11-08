@@ -1647,3 +1647,32 @@ export const updateIrisDataset = data => {
         .catch(error=>reject(error));
     });
 }
+
+
+export const importDefinition = async(sourceUrl) => {
+    console.log("inside API importDefinition")
+    try{
+        const res = await axios(url+'/importDefinition', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data : {
+                param : 'importDefinition_ICE',
+                sourceUrl: sourceUrl
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            // RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
