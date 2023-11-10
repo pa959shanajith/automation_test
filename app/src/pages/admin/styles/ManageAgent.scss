@@ -1,8 +1,10 @@
 @import "../../global/styles/ColorVariables.scss";
-.agent-container {
+.agents-container {
     padding: 1%;
+    width:100%;
+    height: 80vh;
 }
-.page-taskName {
+.page-agent-taskName {
     margin-top: 2rem;
     font: $f5_semibold;
 }
@@ -62,7 +64,7 @@
     }
 }
 
-.api-ut__btnGroup__agent {
+.api-ut__btnGroup__agents {
     width: 100%;
     margin-bottom: 1.5%;
     height: 6vh;
@@ -234,13 +236,6 @@
     border-radius: 4px;
     line-height: 2;
 }
-// .icon{
-//     font-size: 22px;
-//     padding: 5px;
-//     width: auto;
-//     display: block;
-  
-// }
 .tkn-table__row{
     display: flex;
 }
@@ -527,12 +522,15 @@
 
 }
 .search_agent{
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
     position: relative;
-    right: 31rem;
+    right: 1rem;
 }
 .savebtn_div{
     position: relative;
-    right: 29rem;
+    left: 1rem;
     .save__agent{
         .p-button{
             border: none;
@@ -550,6 +548,11 @@
     .p-inputtext{
         width: 3rem !important;
   }
+}
+.save__agent{
+    display: flex;
+    float: right;
+    margin-left: 1rem;
 }
 
 
