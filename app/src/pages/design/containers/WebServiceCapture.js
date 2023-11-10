@@ -10,7 +10,7 @@ import { disableAction,actionError, WsData, wsdlError, disableAppend} from '../d
 import * as api from '../api';
 import * as scrapeApi from '../api';
 import { Button } from 'primereact/button';
-import { Dropdown } from 'primereact/Dropdown';
+import { Dropdown } from 'primereact/dropdown';
 import { TabView, TabPanel } from 'primereact/tabview';
 
 
