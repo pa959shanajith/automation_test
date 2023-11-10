@@ -389,6 +389,10 @@ padding-bottom: 1.5rem;}
     margin-right: auto;
     /* margin-left: 9rem; */
     display: flex;
-    margin-left: 7.5rem;
+    &__forWS {
+        margin-left: 5rem;
+    }&__forNonWS {
+        margin-left: 7rem;
+    }
   }
   

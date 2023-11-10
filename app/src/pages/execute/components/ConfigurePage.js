@@ -230,7 +230,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   else userInfo = userInfo;
 
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject.projectId)
+    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
   }, [selectProjects]);
 
   useEffect(() => {
@@ -1632,17 +1632,17 @@ const showToast = (severity, detail) => {
         },
         WY: {
           recurringValue: `0 0 * * ${selectedWeek
-            .map((el) => el.key)
+            .map((el) => el.key === "ALL" ? "0,1,2,3,4,5,6" : el.key )
             .toString()}`,
           recurringString: "Every Week",
-          recurringStringOnHover: `Occurs on every  ${selectedWeek.map(
-            (el) => el.name
+          recurringStringOnHover: `Occurs on every ${selectedWeek.map(
+            (el) => el.name === "All" ? "day" : el.name
           )}`,
         },
         MY: {
           recurringValue:
             selectedMonthly?.key === "daymonth"
-              ? `0 0 * * ${scheduleOption?.monthday} /${scheduleOption?.monthweek}`
+              ? `0 0 ${scheduleOption?.monthday} */${scheduleOption?.monthweek} *`
               : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
@@ -1813,7 +1813,7 @@ const showToast = (severity, detail) => {
             const arg = {"action":"provider","channel":"email","args":"smtp"};
             const data = await getNotificationChannels(arg);
             if (data) {
-                setDefaultValues({ ...defaultValues, EmailSenderAddress: data.sender.email });
+                setDefaultValues({ ...defaultValues, EmailSenderAddress: data?.sender?.email });
             }
             else {
                 setDefaultValues({ ...defaultValues, EmailSenderAddress: 'avoassure-alerts@avoautomation.com' });
@@ -2314,7 +2314,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
-            disabled={userInfo.rolename.trim()==="Quality Engineer"}
+            disabled={userInfo?.rolename?.trim()==="Quality Engineer"}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2351,7 +2351,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo.rolename.trim() === "Quality Engineer"}>
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo?.rolename?.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
@@ -2411,6 +2411,7 @@ Learn More '/>
               typeOfExecution={typeOfExecution}
               checkedExecution={checkedExecution}
               setCheckedExecution={setCheckedExecution}
+              typesOfAppType={typesOfAppType ? typesOfAppType : localStorageDefaultProject?.appType }
             />
           }
           headerTxt="Execution Configuration set up"

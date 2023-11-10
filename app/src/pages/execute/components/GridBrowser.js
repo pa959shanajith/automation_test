@@ -34,7 +34,8 @@ const GridBrowser = ({
   onHide,
   onClick,
   checkedExecution,
-  setCheckedExecution
+  setCheckedExecution,
+  typesOfAppType
 }) => {
   const dispatch = useDispatch();
   avogrids.forEach((el, index, arr) => {
@@ -42,8 +43,6 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
-  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
-  const typesOfAppType = NameOfAppType.appType;
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
   
   const determineIntegration = (integrationData) => {
