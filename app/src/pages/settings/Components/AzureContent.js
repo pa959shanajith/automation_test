@@ -245,7 +245,7 @@ const paginatedDataTestPlan = testPlansDropdown.slice(startIdx, endIdx);
             if (findMappedId && findMappedId.length) {
                 unSyncObj.push({
                     'mapid': findMappedId[0]._id,
-                    'testCaseNames': [].concat(secondOption && secondOption.name === 'Story' ? findMappedId[0].userStoryId : findMappedId[0].TestSuiteId),
+                    'testCaseNames': [].concat(findMappedId[0].itemType==="UserStory" ? findMappedId[0].userStoryId : findMappedId[0].TestSuiteId),
                     'testid': [].concat(null),
                     'testSummary': [].concat(null)
                 })

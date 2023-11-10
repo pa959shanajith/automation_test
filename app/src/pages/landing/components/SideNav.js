@@ -29,7 +29,7 @@ const SideNav = () => {
     }, []);
 
     const dashboardLicense ={
-        value: userInfo?.licensedetails.MD === 'false',
+        value: userInfo?.licensedetails?.MD === 'false',
         msg: "You do not have access for Dashboard"
     }
 
