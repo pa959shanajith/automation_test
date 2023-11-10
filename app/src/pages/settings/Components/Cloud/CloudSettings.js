@@ -187,11 +187,11 @@ const CloudSettings = () => {
                 }})
                 setLoading(false)
                 console.log(data)
-                if (data == "name"){
-                    toastSuccess(MSG.SETTINGS.ERR_UPLOAD_APK)
+                if (data.statusCode === 201){
+                    toastSuccess(MSG.SETTINGS.SUCC_UPLOAD_APK)
                 }
                 else {
-                    toastError(MSG.SETTINGS.SUCC_UPLOAD_APK) 
+                    toastError(MSG.SETTINGS.ERR_UPLOAD_APK) 
                 }
             }
         catch {
