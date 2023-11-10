@@ -1421,7 +1421,7 @@ const showToast = (severity, detail) => {
       toast.current.show({
         severity: 'success',
         summary: 'Success',
-        detail:"Configuration created successfully.",
+        detail:setupBtn === "CancelSave" ? "Configuration created successfully." : "Configuration updated successfully.",
         life: 5000
       });
     } else if(getConfigData?.setupExists?.error?.CONTENT){
