@@ -43,6 +43,9 @@
           }
         .p-treetable-table {
             border: 1px solid #dee2e6;
+            .p-column-title {
+                display: inline-block;
+            }
         }
     }
     .ruleMap_table {
