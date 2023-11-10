@@ -1094,7 +1094,7 @@ setPreventDefaultModule(true);
                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                      {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}
                      <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
-                     <img  className=" testsuiteimg custom-target-icon" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  />
+                     <img  className={`testsuiteimg testsuiteimg__${(props.appType ==="Webservice")?"forWS" : "forNonWS" } custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  />
                      </>) : null}
                    
                   
