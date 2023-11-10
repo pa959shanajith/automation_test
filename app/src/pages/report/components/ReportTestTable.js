@@ -612,7 +612,7 @@ export default function BasicDemo() {
             : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
-          <div key={modifiedChild.key} style={{ display: "flex" }}>
+          <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
             <img
               src={statusIcon}
               alt=""
@@ -885,40 +885,40 @@ export default function BasicDemo() {
           expandedKeys={expandedKeys}
           dataKey="id"
           onToggle={(e) => handdleExpend(e)}
-          tableStyle={{ minWidth: "50rem" }}
+          tableStyle={{ minWidth: "50rem", textAlign: "center" }}
         >
           <Column
             field="slno"
             header="S No."
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
             header="Steps"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
             header="Description"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
           />
           <Column
             field="EllapsedTime"
             header="Time Elapsed"
-            style={{ width: "10rem", padding: "0rem" }}
+            style={{ width: "10rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="status"
             header="Status"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="Comments"
             header="Comments"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             header="No. Defect ID"
@@ -928,7 +928,7 @@ export default function BasicDemo() {
           <Column
             body={screenShotLink}
             header="Action"
-            style={{ padding: "0rem" }}
+            style={{ padding: "0rem", textAlign: "center" }}
           />
         </TreeTable>
       ) : (
