@@ -54,7 +54,8 @@ const ConfigureSetup = ({
   onClick,
   typeOfExecution,
   checkedExecution,
-  setCheckedExecution
+  setCheckedExecution,
+  typesOfAppType
 }) => {
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
@@ -404,6 +405,7 @@ const ConfigureSetup = ({
             onClick={onClick}
             checkedExecution={checkedExecution}
             setCheckedExecution={setCheckedExecution}
+            typesOfAppType={typesOfAppType}
           />
         </div>
       </div>

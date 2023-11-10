@@ -2411,6 +2411,7 @@ Learn More '/>
               typeOfExecution={typeOfExecution}
               checkedExecution={checkedExecution}
               setCheckedExecution={setCheckedExecution}
+              typesOfAppType={typesOfAppType ? typesOfAppType : localStorageDefaultProject?.appType }
             />
           }
           headerTxt="Execution Configuration set up"
