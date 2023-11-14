@@ -10,7 +10,7 @@ const SamlConf = () => {
   const [issueDetails, setIssueDetails] = useState("");
   return (
     <div className="grid saml_container">
-      <div className="col-6 lg:col-4 xl:col-4 md:col-6 sm:col-12">
+      <div className="col-6 lg:col-6 xl:col-6 md:col-6 sm:col-12">
         <AvoInput
           htmlFor="servername"
           labelTxt="Server Name"
@@ -55,7 +55,7 @@ const SamlConf = () => {
             <p className="m-0">Drag and drop files to here to upload.</p>
           }
         />
-        <div className="col-6 lg:col-4 xl:col-4 md:col-6 sm:col-12 flex">
+        <div className="col-8 lg:col-8 xl:col-8 md:col-6 sm:col-12 flex">
             <Button label="Cancel" link />
             <Button label="Submit" />
         </div>

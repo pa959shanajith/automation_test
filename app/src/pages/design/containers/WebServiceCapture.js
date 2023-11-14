@@ -10,6 +10,10 @@ import { disableAction,actionError, WsData, wsdlError, disableAppend} from '../d
 import * as api from '../api';
 import * as scrapeApi from '../api';
 import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
+import { TabView, TabPanel } from 'primereact/tabview';
+
+
 // import * as actions from '../state/action';
 import "../styles/WebserviceScrape.scss";
 // import * as actionTypes from '../state/action';
@@ -413,6 +417,7 @@ const WebserviceScrape = (props) => {
                 />}
             </div>}
         />
+
     );
 }
 

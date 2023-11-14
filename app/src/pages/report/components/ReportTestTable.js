@@ -204,7 +204,8 @@ export default function BasicDemo() {
           iceinfo?.current?.show({ severity: 'info', summary: 'Info', detail: 'Ice is not connected.' });
         };
         const getUserInfo = JSON.parse(localStorage.getItem('userInfo'));
-        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id, reportData?.overallstatus?.scenarioName);
+        const scn = reportData?.rows.length ? reportData?.rows[0].scenario_id : reportData?.overallstatus?.scenarioName
+        const getMappedAdoProjects = await viewAzureMappedList_ICE(getUserInfo?.user_id,  scn);
         setMappedProjects(getMappedAdoProjects);
         setJiraDetails({
           ...getAzureDetails,
@@ -543,7 +544,7 @@ export default function BasicDemo() {
       return icon;
     };
 
-    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : rowData?.data?.Step === 'Terminated' ? null : (
+    return hasChildren ? null : returnBug(rowData?.data) ? returnBug(rowData?.data) : rowData?.data?.Step === 'Terminated' || rowData?.data?.flag === "Terminate" ? null : (
       <img
         src={getIcon(bugTitle)}
         alt="bug defect"
@@ -602,6 +603,7 @@ export default function BasicDemo() {
             );
           }
         }
+        modifiedChild.flag = modifiedChild.status;
         const statusIcon =
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
@@ -610,7 +612,7 @@ export default function BasicDemo() {
             : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
-          <div key={modifiedChild.key} style={{ display: "flex" }}>
+          <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
             <img
               src={statusIcon}
               alt=""
@@ -883,40 +885,40 @@ export default function BasicDemo() {
           expandedKeys={expandedKeys}
           dataKey="id"
           onToggle={(e) => handdleExpend(e)}
-          tableStyle={{ minWidth: "50rem" }}
+          tableStyle={{ minWidth: "50rem", textAlign: "center" }}
         >
           <Column
             field="slno"
             header="S No."
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
             header="Steps"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
             header="Description"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
           />
           <Column
             field="EllapsedTime"
             header="Time Elapsed"
-            style={{ width: "10rem", padding: "0rem" }}
+            style={{ width: "10rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="status"
             header="Status"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="Comments"
             header="Comments"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             header="No. Defect ID"
@@ -926,7 +928,7 @@ export default function BasicDemo() {
           <Column
             body={screenShotLink}
             header="Action"
-            style={{ padding: "0rem" }}
+            style={{ padding: "0rem", textAlign: "center" }}
           />
         </TreeTable>
       ) : (

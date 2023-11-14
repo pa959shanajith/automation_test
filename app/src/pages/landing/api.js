@@ -67,6 +67,29 @@ export const userCreateProject_ICE = (details) => {
     })
 }
 
+export const validateProject = () => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/validateProject", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
 
 /*Component TaskSection
   api returns {"appType":[""],"appTypeName":[""],"cycles":{"":[""]},"domains":[],"projectId":[],"projectName":[],"projecttypes":{},"releases":[[{"cycles":[{"_id":"","name":""}],"name":""}]]}

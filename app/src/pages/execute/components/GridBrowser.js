@@ -34,7 +34,8 @@ const GridBrowser = ({
   onHide,
   onClick,
   checkedExecution,
-  setCheckedExecution
+  setCheckedExecution,
+  typesOfAppType
 }) => {
   const dispatch = useDispatch();
   avogrids.forEach((el, index, arr) => {
@@ -42,8 +43,6 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
-  const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
-  const typesOfAppType = NameOfAppType.appType;
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
   
   const determineIntegration = (integrationData) => {
@@ -121,6 +120,13 @@ const GridBrowser = ({
     });
   }
 
+  const emailNotificationFooter = () => <>
+    <Button
+      className="savebutton"
+      label="Save"
+      size="small"
+      onClick={() => { handleSubmit(defaultValues) }} />
+    </>
 
   return (
     <>
@@ -213,8 +219,7 @@ const GridBrowser = ({
                     onHide={() => onHide('displayModal')}
                     header="Email Notification Configuration"
                     modal
-                    style={{ width: '40rem', height: "25rem" }}
-
+                    footer={emailNotificationFooter}
                   >
                     <label className="receiver_lable">Receiver:</label>
                     <InputText className='receiver_name' value={defaultValues.EmailRecieverAddress} onChange={(event) => {
@@ -227,9 +232,6 @@ const GridBrowser = ({
                       <label className="offpopup">off</label>
                       <InputSwitch className="switch_notify" checked={isNotifyOnExecutionCompletion} onChange={() => { setIsNotifyOnExecutionCompletion(!isNotifyOnExecutionCompletion) }} />
                       <label className="onPopup">On</label>
-                    </div>
-                    <div>
-                      <Button className="savebutton" size="small" onClick={() => { handleSubmit(defaultValues) }} >Save</Button>
                     </div>
                   </Dialog>
                 </div> : null

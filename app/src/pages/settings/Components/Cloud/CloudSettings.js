@@ -10,7 +10,7 @@ import BrowserstackDeleteModal from "../BrowserstackDeleteModal";
 import {Messages as MSG, setMsg} from '../../../global';
 import ScreenOverlay from '../../../global/components/ScreenOverlay';
 import { Toast } from "primereact/toast";
-import { saveSauceLabData } from '../../../execute/api';
+import { saveSauceLabData, saveBrowserstackData } from '../../../execute/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { screenType, saucelabsInitialState,browserstackInitialState} from '../../settingSlice';
 
@@ -40,6 +40,9 @@ const CloudSettings = () => {
     const [uploadapk, setUploadapk ] = useState('');
     const [apkname, setapkname] = useState('');
     const [uploadapkValues, setUploadapkfile] = useState({});
+    const [uploadapkBS, setUploadapkBS ] = useState('');
+    const [apkNameBS, setapkNameBS] = useState('');
+    const [uploadapkValuesBS, setUploadapkfileBS] = useState({});
 
     useEffect(() => {
         getSaucelabsDetails();
@@ -146,11 +149,25 @@ const CloudSettings = () => {
         const uploadapk = value.toString().replaceAll('"', "");
         setUploadapk(uploadapk)
     }
+
+    const browserStackapkuploadhandler = event => {
+        let value = event.target.value.trim();
+        const uploadapkBS = value.toString().replaceAll('"', "");
+        setUploadapkBS(uploadapkBS)
+    }
+
     const apknamehandler = (event) => {
         setapkname(event.target.value);
         setUploadapkfile(event.target.value);
-    }    
+    }   
+    
+    const apknamehandlerBS = (event) => {
+        setapkNameBS(event.target.value);
+        setUploadapkfileBS(event.target.value);
+    }
     const isUploadButtonVisible = apkname && uploadapk;
+
+    const isUploadButtonVisibleBS = apkNameBS && uploadapkBS;
 
     const handleUpload = async (event) => {
         event.preventDefault();
@@ -170,17 +187,45 @@ const CloudSettings = () => {
                 }})
                 setLoading(false)
                 console.log(data)
-                if (data == "name"){
-                    toastSuccess(MSG.SETTINGS.ERR_UPLOAD_APK)
+                if (data.statusCode === 201){
+                    toastSuccess(MSG.SETTINGS.SUCC_UPLOAD_APK)
                 }
                 else {
-                    toastError(MSG.SETTINGS.SUCC_UPLOAD_APK) 
+                    toastError(MSG.SETTINGS.ERR_UPLOAD_APK) 
                 }
             }
         catch {
             console.log('some error occured')
         }
     };
+
+    const handleUpload_BS = async (event) => {
+            event.preventDefault();
+            try {
+                    setLoading("Uploading...")
+                    const data = await saveBrowserstackData( 
+                        {                    
+                            "BrowserstackPayload" : {
+                                "uploadApkValuesBS":{
+                                    "apkName": apkNameBS,
+                                    "apkPath":uploadapkBS,
+                                },
+                                "BrowserstackUsername": BrowserstackUsername,
+                                "Browserstackkey": BrowserstackAPI,
+                                "action":"BrowserStackMobileUploadDetails"
+                    }})
+                    setLoading(false)
+                    if (data === 'Apk Uploaded Successfully'){
+                        toastSuccess(MSG.SETTINGS.SUCC_UPLOAD_APK)
+                    }
+                    else {
+                        toastError(MSG.SETTINGS.ERR_UPLOAD_APK) 
+                    }
+                }
+            catch {
+                console.log('some error occured')
+            }
+        };
 
     const manageDetails = async (action, SaucelabsObj) =>{
          try{
@@ -314,11 +359,11 @@ const CloudSettings = () => {
                 <div className="side-panel">
                     <div className={`icon-wrapper ${selectedscreen?.name === 'saucelab' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'saucelab', code: 'sl' })} >
                         <span><img src="static/imgs/Saucelabs-1.png" className="img__azure"></img></span>
-                        <span className="text__jira">sauceLabs</span>
+                        <span className="text__saucelabs">SauceLabs</span>
                     </div>
                     <div className={`icon-wrapper ${selectedscreen?.name === 'browserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
                         <span><img src="static/imgs/browserstack_icon 48x48.svg" className="img__alm"></img></span>
-                        <span className="text__jira">BrowserStack</span>
+                        <span className="text__browserstack">BrowserStack</span>
                     </div>
                 </div>
         </div>
@@ -408,6 +453,24 @@ const CloudSettings = () => {
                             <Button data-test="delete-test" className="saucelabs-delete" onClick={(e) => { e.preventDefault(); setShowBrowserstackDelete(true); }}>Delete</Button>
                         </div>
                     </div>) : ""}
+                    {selectedscreen.name==="browserstack" && (
+                <div>
+                    <div>
+                        <hr /> {/* Add this line to create a horizontal line */}
+                        <span style={{ fontWeight: 'bold' }}> Native Mobile Test App Resources </span>
+                    </div>
+                    <Toast ref={toast} position="bottom-center" />
+                    <div className="apk__name">
+                        <span> Enter APK details <span style={{ color: 'red' }}></span></span>
+                        <span style={{ marginLeft: '1.5rem' }}></span>
+                            <InputText style={{ width: '20rem', height: '2.5rem' }} type="text" id="Additional-Input" placeholder="Enter apk name" className={`${classes["first_name"]} ${classes["all-inputs"]}`} value={apkNameBS} onChange={apknamehandlerBS} />
+                        <div className="apk__path">
+                            <InputText style={{ width: '20rem', height: '2.5rem' }} type="text" id="BrowseStack-APK" placeholder="Enter apk Path" className={`${classes["first_name"]} ${classes["all-inputs"]}`} value={uploadapkBS} onChange={browserStackapkuploadhandler} disabled={!apkNameBS} />&#160;
+                            {isUploadButtonVisibleBS && <Button data-test="upload-btn"  className="action-button" onClick={(event)=>handleUpload_BS(event)}>Upload</Button>}
+                        </div>    
+                    </div>
+                </div>
+                )}
 
             </Card>
           

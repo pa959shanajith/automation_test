@@ -6,8 +6,8 @@ import { getDetails_BROWSERSTACK } from '../api';
 import { Messages as MSG, setMsg } from '../../global';
 import AvoModal from '../../../globalComponents/AvoModal';
 import { Dropdown } from 'primereact/dropdown';
-const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser }) => {
-    const [defaultValues, setDefaultValues] = useState({});
+const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,browserstackValues,setBrowserstackValues }) => {
+    // const [defaultValues, setDefaultValues] = useState({});
     const [isEmpty, setIsEmpty] = useState(false);
     const getBrowserstackDetails = async () => {
         try {
@@ -16,7 +16,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
             if (data.error) { setMsg(data.error); return; }
             if (data !== "empty") {
                 setIsEmpty(true);
-                setDefaultValues(data);
+                setBrowserstackValues(data);
                 setBrowserstackUser(data);
             } else {
                 setIsEmpty(false);
@@ -48,27 +48,27 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
                                 className="saucelabs_input" /> */}
                         </div>
                         <div className="flex flex-row">
-                            <InputText value={defaultValues.BrowserstackUsername} type="text" id="Browserstack-username" name="Browserstack-username" placeholder="Enter Browserstack username"
+                            <InputText value={browserstackValues.BrowserstackUsername} type="text" id="Browserstack-username" name="Browserstack-username" placeholder="Enter Browserstack username"
                                 onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, BrowserstackUsername: event.target.value })
+                                    setBrowserstackValues({ ...browserstackValues, BrowserstackUsername: event.target.value })
                                 }}
                                 className="Browserstack_input_URL" />
                         </div>
                         <div className="flex flex-row">
-                            <InputText value={defaultValues.Browserstackkey} type="text" id="Browserstack-API" name="Browserstack-API" placeholder="Enter Browserstack Access key"
+                            <InputText value={browserstackValues.Browserstackkey} type="text" id="Browserstack-API" name="Browserstack-API" placeholder="Enter Browserstack Access key"
                                 onChange={(event) => {
-                                    setDefaultValues({ ...defaultValues, Browserstackkey: event.target.value })
+                                    setBrowserstackValues({ ...browserstackValues, Browserstackkey: event.target.value })
                                 }}
                                 className="Borwserstack_input_Accesskey" />
                         </div>
                         <div>
-                            {isEmpty && defaultValues.BrowserstackUsername && defaultValues.Browserstackkey ? "" : <div data-test="intg_log_error_span" className="Browserstack_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
+                            {isEmpty && browserstackValues.BrowserstackUsername && browserstackValues.Browserstackkey ? "" : <div data-test="intg_log_error_span" className="Browserstack_ilm__error_msg">Save Credentials in Settings for Auto Login </div>}
                         </div>
                     </div>
                 </form>
                 
                 <Button id='Saucelabs_submit' label="Submit"
-                    onClick={() => handleBrowserstackSubmit(defaultValues)}
+                    onClick={() => handleBrowserstackSubmit(browserstackValues)}
                 />
                 </>}headerTxt='BrowserStack login' modalSytle={{
                 width: "39vw",
@@ -82,7 +82,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
     )
 });
 const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProjects, mobileDetailsBrowserStack, displayBasic7, onHidedia,changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-    smartMode, selectedICE, setSelectedICE,availableICE, dataExecution, browserlist, CheckStatusAndExecute, iceNameIdMap,browserstackUser,showBrowserstack }) => {
+    smartMode, selectedICE, setSelectedICE,availableICE, dataExecution, browserlist, CheckStatusAndExecute, iceNameIdMap,browserstackUser,showBrowserstack,setBrowserstackValues,browserstackValues }) => {
     const [newOsNames, setNewOsNames] = useState([])
     const [selectedOS, setSelectedOS] = useState('');
     const [browserstackOsVersion, setBrowserstackOsVersion] = useState([]);
@@ -99,6 +99,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     const [mobileVersion, setMobileVersion] = useState([]);
     const [selectApk, setSelectApk] = useState('');
     const [selectedApk, setApk] = useState([]);
+    const [selectApkId, setSelectApkId] = useState('');
      
     useEffect(() => {
         setNewOsNames([]);
@@ -153,6 +154,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             index: element,
             versions: element,
             name:element,
+            id: mobileDetailsBrowserStack.stored_files[element],
         }))
         setApk(findapk);
           setPlatforms(platformArray);
@@ -268,6 +270,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
 
         const onApkChange = async (option) => {
             setSelectApk(option.key)
+            setSelectApkId(option.id)
         }    
     
     return (
@@ -437,7 +440,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     if ((ExeScreen === true ? smartMode : "") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename) => selectedICE[icename]);
                     else dataExecution.targetUser = selectedICE
                     dataExecution['executionEnv'] = 'browserstack'
-                    dataExecution['browserstackDetails'] = browserstackUser
+                    dataExecution['browserstackDetails'] = browserstackUser && browserstackValues;
                     if (!showBrowserstack) {
                         dataExecution['os'] = selectedOS;
                         dataExecution['osVersion'] = selectedOsVersions;
@@ -450,7 +453,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                             "platformName": selectedMobilePlatforms,
                             "deviceName": selectedDevices,
                             "platformVersion": selectedMobileVersion,
-                            "uploadedApk": selectedApk,
+                            "uploadedApk": selectApkId,
                             "browserName": "Chrome"
                             
                         }

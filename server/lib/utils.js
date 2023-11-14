@@ -70,6 +70,12 @@ module.exports.allSess = async () => {
 	return myserver.rsStore.pAll();
 };
 
+module.exports.allSessCount = async (clientName) => {
+    const sessList = await this.allSess();
+    var count = sessList.filter(ki => clientName == ki.client).length
+    return count;
+};
+
 module.exports.delSession = async (data,host) => {
 	const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
 	var clientName=this.getClientName(host);

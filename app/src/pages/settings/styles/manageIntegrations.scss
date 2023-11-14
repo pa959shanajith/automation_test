@@ -335,6 +335,18 @@ height: 2.5rem !important;
         cursor: pointer;
     }
 
+    .img__alm_disabled{
+        height: 2rem;
+        width: 33px;
+        cursor: not-allowed;
+        background-color: gray;
+    }
+
+    .text__alm_disabled{
+        color: gray;
+        cursor: not-allowed;
+    }
+
     .text__git{
         position: relative;
         right: 2.05rem;

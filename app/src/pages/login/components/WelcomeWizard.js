@@ -455,7 +455,7 @@ const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
       {
         title:"To install Avo Assure client follow the below steps:", 
         items:[
-          {title:"Intialise installation",imageName:"WW_win_3_1"},
+          {title:"Initialize installation",imageName:"WW_win_3_1"},
           {title:"Extracting files",imageName:"WW_win_3_2"},
           {title:"Finish and Launch",imageName:"WW_win_3_3"}
         ],

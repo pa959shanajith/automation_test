@@ -528,23 +528,24 @@ const elementTypeProp =(elementProperty) =>{
 
           }
           else if (typeof data === "object" && typesOfAppType === "Webservice") {
-            haveItems = data.view[0].endPointURL && data.view[0].method;
+            haveItems = data.endPointURL && data.method;
+            console.log(haveItems)
             if (haveItems) {
 
               let localReqBody = "";
-              if (data.view[0].body) localReqBody = getProcessedBody(data.view[0].body, 'fetch');
+              if (data.body) localReqBody = getProcessedBody(data.body, 'fetch');
 
               let localRespBody = "";
-              if (data.view[0].responseBody) localRespBody = getProcessedBody(data.view[0].responseBody, 'fetch');
+              if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
 
               dispatch(WsData({
-                endPointURL: data.view[0].endPointURL,
-                method: data.view[0].method,
-                opInput: data.view[0].operations || "",
-                reqHeader: data.view[0].header ? data.view[0].header.split("##").join("\n") : "",
+                endPointURL: data.endPointURL,
+                method: data.method,
+                opInput: data.operations || "",
+                reqHeader: data.header ? data.header.split("##").join("\n") : "",
                 reqBody: localReqBody,
-                paramHeader: data.view[0].param ? data.view[0].param.split("##").join("\n") : "",
-                respHeader: data.view[0].responseHeader ? data.view[0].responseHeader.split("##").join("\n") : "",
+                paramHeader: data.param ? data.param.split("##").join("\n") : "",
+                respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
                 respBody: localRespBody
               }));
               setSaved({ flag: true });
@@ -1149,7 +1150,7 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
-    {(selectedCapturedElement.length>0 && NameOfAppType.appType == "Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {(selectedCapturedElement.length>0 && typesOfAppType==="Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
@@ -1741,7 +1742,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-      {!props.testSuiteInUse?<div className="card_modal">
+      {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
               {!showPanel && <div className='insprint__block1'>
@@ -1910,7 +1911,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
-              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?(screenshotData.isIris?'491px':'392px'):typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':""}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?(screenshotData.isIris?'491px':'392px'):typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':typesOfAppType==="MobileApp"?'490px':""}}>
                 <div className="screenshot_pop__content" >
                  <div className="scrsht_outerContainer" id="ss_ssId">
                   <div data-test="ssScroll" className="ss_scrsht_insideScroll">

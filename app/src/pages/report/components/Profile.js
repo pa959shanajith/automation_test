@@ -521,8 +521,8 @@ const Profile = () => {
                     (item) =>
                       item === "Terminate" ||
                       item === "Skipped" ||
-                              item === "Incomplete"||
-                              item === "fail"||
+                      item === "Incomplete" ||
+                      item === "fail" ||
                       item === "Fail"
                   )
                   .map(
@@ -603,12 +603,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete"
-                  )
+                  .filter((item) => item === "Skipped" || item === "Incomplete")
                   .map(
                     (e) =>
                       el.scenarioStatus.reduce(
@@ -666,12 +661,7 @@ const Profile = () => {
                     {}
                   )
                 )
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete"
-                  )
+                  .filter((item) => item === "Skipped" || item === "Incomplete")
                   .map(
                     (e) =>
                       el.scenarioStatus.reduce(

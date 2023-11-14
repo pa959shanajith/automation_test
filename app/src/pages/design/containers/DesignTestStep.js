@@ -2,28 +2,23 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserDetails, getNotificationGroups } from '../api';
-import { Messages as MSG,ScreenOverlay,RedirectPage,SelectRecipients} from "../../global";
+import { Messages as MSG,ScreenOverlay,RedirectPage,ResetSession } from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import { Accordion, AccordionTab } from 'primereact/accordion';
 import { Divider } from 'primereact/divider';
 import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { Dropdown } from 'primereact/dropdown';
-import { Tag } from 'primereact/tag';
 import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
-import { InputText } from 'primereact/inputtext';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
 import { ReactSortable } from 'react-sortablejs';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import DetailsDialog from "../components/DetailsDialog";
-import RemarkDialog from "../components/RemarkDialog";
 import PasteStepDialog from "../components/PasteStepDialog";
 import SelectMultipleDialog from "../components/SelectMultipleDialog";
 import { Checkbox } from 'primereact/checkbox';
@@ -31,8 +26,6 @@ import { Checkbox } from 'primereact/checkbox';
 
 const DesignModal = (props) => {
     const toast = useRef();
-    const testcaseDropdownRef = useRef();
-    const toastImpact=useRef(null)
     const headerCheckRef = useRef();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -41,14 +34,11 @@ const DesignModal = (props) => {
     const modified = useSelector(state => state.design.Modified);
     const saveEnable = useSelector(state => state.design.SaveEnable);
     const mainTestCases = useSelector(state => state.design.TestCases);
-    const [showTable, setShowTable] = useState(false);
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
-    const [testCases, setTestCases] = useState(null);
     const [addedTestCase, setAddedTestCase] = useState([]);
     const [overlay, setOverlay] = useState("");
     const [keywordList, setKeywordList] = useState(null);
-    const [keywordListTable, setKeywordListTable] = useState([]);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
     const [stepSelect, setStepSelect] = useState({ edit: false, check: [], highlight: [] });
@@ -59,17 +49,11 @@ const DesignModal = (props) => {
     const [draggedFlag, setDraggedFlag] = useState(false);
     const [reusedTC, setReusedTC] = useState(false);
     const [pastedTC, setPastedTC] = useState([]);
-    const [showPopup, setShow] = useState({});
     const [debugEnable, setDebugEnable] = useState(false);
-    const [keyword, setKeyword] = useState('');
     const [testCaseIDsList, setTestCaseIDsList] = useState([]);
     const [testcaseList, setTestcaseList] = useState([]);
     const [dependencyTestCaseFlag, setDependencyTestCaseFlag] = useState(false);
-    const [deleteTestDialog, setDeleteTestDialog] = useState(false);
-    const [testCase, setTestCase] = useState(null)
     const [selectedTestCases,setSelectedTestCases]=useState([]);
-    const [selectedOptions, setSelectedOptions] = useState(null);
-    const [disableStep, setDisableStep] = useState(true);
     const [idx, setIdx] = useState(false);
     const [imported, setImported] = useState(false);
     const [showConfirmPop, setShowConfirmPop] = useState(false);
@@ -79,14 +63,10 @@ const DesignModal = (props) => {
     const [selectedTestCase, setSelectedTestCase] = useState(null);
     const [visible, setVisible] = useState(false);
     const [edit, setEdit] = useState(false);
-    const [showRemarkDlg, setShowRemarkDlg] = useState(false);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
     const [showSM, setShowSM] = useState(false);
     const [showConfPaste, setShowConfPaste] = useState(false);
     const [showPS, setShowPS] = useState(false);
-    const [recipients,setRecipients] =useState({groupids:[],additionalrecepients:[]})
-    const [allUsers,setAllUsers] = useState([])
-    const [groupList,setGroupList] = useState([])
     const [rowChange, setRowChange] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
@@ -131,11 +111,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     shouldDisable = true;
                 }
             }
-            // Object.values(testCaseData).forEach(value => {
-            //     if (value.custname === "" || value.custname==="OBJECT_DELETED") {
-            //         shouldDisable = true;         
-            //      }
-            //     });
             setDebugEnable(shouldDisable);
         }
     }
@@ -170,17 +145,15 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 fetchTestCases(i)
                 .then(data=>{
                     if (data==="success")
-                        // setMsg(MSG.DESIGN.SUCC_TC_IMPORT);
-                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:3000})
+                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
                     else 
-                        // setMsg(MSG.DESIGN.WARN_DELETED_TC_FOUND);
-                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
+                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
                     setImported(false)
                     setStepSelect({edit: false, check: [], highlight: []});
                     setChanged(false);
                     headerCheckRef.current.indeterminate = false;
                 })
-                .catch(error=>console.error("Error: Fetch TestCase Failed ::::", error));
+                .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
             }
         }
         //eslint-disable-next-line
@@ -207,27 +180,23 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setSelectedTestCase({name:props.fetchingDetails['name'], id:props.fetchingDetails['_id']})
     },[])
     useEffect(() => {
-        // if (Object.keys(userInfo).length) {
-            //  && Object.keys(props.current_task).length) {
             for(var i = 0 ; i<parentScreen.length; i++){
                 fetchTestCases(i)
                 .then(data => {
                     data !== "success" &&
-                        toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:2000});
+                        toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:3000});
                         setEdit(false);
                     setStepSelect({ edit: false, check: [], highlight: [] });
                     headerCheckRef.current.indeterminate = false;
                     setDraggable(false);
                     setChanged(false);
                     setHeaderCheck(false);
-                    // setIsUnderReview(props.current_task.status === "underReview")
                 })
-                .catch(error => console.error("Error: Fetch TestCase Failed ::::", error));
+                .catch(error => console.error("Error: Fetch Test Steps Failed ::::", error));
             }
             setOverlay("Loading...")
             if (screenLevelTestCases.length !== 0) {
                 // Create an array to store unique items
-                
                 const uniqueSteps = [];
                 for (const item of screenLevelTestCases) {
                     const reuesd = item.reused;
@@ -249,7 +218,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                   setScreenLevelTastSteps(uniqueSteps);
                 }
             setScreenLevelTastSteps(screenLevelTestCases)
-        // }
         //eslint-disable-next-line
     }, [imported]);
 
@@ -269,19 +237,11 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     for (let i = dtcLength - 1; i >= 0; i--) {
                         let tc = dependentTestCases[i];
                         tc.disableAndBlock = disableAndBlock;
-                        // if (Object.keys(props.checkedTc).length <= 0 && !disableAndBlock) {
-                        //     tc.checked = true;
-                        // }
-
-                        // if ((i in props.checkedTc) && !disableAndBlock) tc.checked = true;
                         if (tc.testCaseName === props.fetchingDetails.name) disableAndBlock = false;
-
                         testCases.push(tc);
                     }
-
                     testCases.reverse();
                     setTestcaseList(testCases);
-                    // console.log(testCases);
                 }
             })
             .catch(error => console.error("ERROR::::", error));
@@ -302,7 +262,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     let taskObj = props.current_task
                     if (data.screenName && data.screenName !== taskObj.screenName) {
                         taskObj.screenName = data.screenName;
-                        // dispatch({type: pluginActions.SET_CT, payload: taskObj});
                     }
 
                     if (data.del_flag) {
@@ -310,22 +269,12 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                         setDisableActionBar(true); //disable left-top-section
                     }
                     else setDisableActionBar(false); //enable left-top-section
-
-                    // setHideSubmit(data.testcase.length === 0);
                     setReusedTC(data.reuse);
 
                     DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails.parent['_id'], props.fetchingDetails.projectID, props.fetchingDetails['parent']['children'][j]["_id"])
                         .then(scriptData => {
                             if (scriptData === "Invalid Session") return;
-
                             setTestScriptData(scriptData.view);
-                            // props.setMirror(scriptData.mirror);
-
-                            // DesignApi.getKeywordDetails_ICE(props.appType)
-                            //     .then(keywordData => {
-                            //         if (keywordData === "Invalid Session") return;
-
-                            //         setKeywordList(keywordData);
                             DesignApi.getKeywordDetails_ICE(props.appType)
                             .then(keywordData => {
                                 if (keywordData === "Invalid Session") return RedirectPage(navigate);
@@ -344,28 +293,12 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                             }));
                                         }
                                     };
-                                    // console.log('firstList', firstList);
-                                    // console.log('secondList', secondList);
                                     secondList = [...firstList, ...secondList];
-                                    // console.log('secondList2', secondList);
-                                    
                                     let keyWordObject = {};
-                                    // secondList = secondList.forEach((keyword) => {
-                                    //     keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0]
-                                    // });
-                                    
                                     for(let keyword of secondList){
                                         if(keyword&& Object.keys(keyword)[0] && Object.values(keyword)[0])
                                             keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0];
-                                        // console.log('Object.keys(keyword)[0]', Object.keys(keyword)[0]);
-                                        // console.log('Object.values(keyword)[0]', Object.values(keyword)[0]);
                                     }
-                                    // console.log('keyWordObject', keyWordObject);
-                                    // sortedKeywordList[object] = secondList.reduce((kerwordobjects, currentKeyword) => {
-                                    //     return ({...kerwordobjects, [Object.keys(currentKeyword)[0]]: Object.values(currentKeyword)[0]})
-                                    // }, {});
-                                    // console.log('sortedKeywordList[object]', sortedKeywordList[object]);
-                                    // sortedKeywordList[object] = { ...secondList };
                                     sortedKeywordList[object] = keyWordObject;
                                 }
                                 setKeywordList(sortedKeywordList);
@@ -389,13 +322,11 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                                 }
                                                 testcase[i].stepNo = (i + 1);
                                                 let temp = testcase[i].keywordVal
-                                                // testcase[i].keywordVal = testcase[i].keywordVal[0].toLowerCase() + testcase[i].keywordVal.slice(1,);
                                                 if(testcase[i].custname !== "OBJECT_DELETED"){
                                                     let objType = getKeywordList(testcase[i].custname,keywordData,props.appType,scriptData.view)
                                                     testcase[i]["keywordTooltip"] = keywordData[objType.obType][temp]?.tooltip!==undefined?keywordData[objType.obType][temp].tooltip:testcase[i].keywordVal;
                                                     testcase[i]["keywordDescription"] = keywordData[objType.obType][temp]?.description!==undefined?keywordData[objType.obType][temp].description:testcase[i].keywordVal;
                                                 }else{
-                                                    // let objType = getKeywordList(testcase[i].custname,keywordData,props.appType)
                                                     testcase[i]["keywordTooltip"] = testcase[i].keywordVal;
                                                     testcase[i]["keywordDescription"] = testcase[i].keywordVal ;
                                                 }
@@ -406,9 +337,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     }
                                     setDraggable(false);
                                     screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
-                                    // console.log("screen", screenLevelTestCases)
-                                    setTestCaseData([...testCaseData,testcaseArray]);
-                                    // setnewtestcase([...newtestcase, testcaseArray]); 
+                                    setTestCaseData([...testCaseData,testcaseArray]); 
                                     setPastedTC([]);
                                     setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
@@ -421,7 +350,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     setKeywordList(null);
                                     setObjNameList(null);
                                     console.error("Error getObjectType method! \r\n ", error);
-                                    toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT,life:2000});
+                                    toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT,life:5000});
                                     reject("fail");
                                 });
                     })
@@ -431,7 +360,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                         setTestScriptData(null);
                         setKeywordList(null);
                         setObjNameList(null);
-                        toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:2000});
+                        toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:5000});
                         console.error("Error getObjectType method! \r\n " + (error));
                         reject("fail");
                     });
@@ -442,7 +371,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 setTestScriptData(null);
                 setKeywordList(null);
                 setObjNameList(null);
-                toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:2000});
+                toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT, life:5000});
                 console.error("Error getTestScriptData method! \r\n " + (error));
                 reject("fail");
             });
@@ -453,7 +382,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const saveTestCases = (e, confirmed) => {
         if (userInfo.role !== "Viewer") {
             if (reusedTC && !confirmed) {
-                setShowConfirmPop({ 'title': 'Save Testcase', 'content': 'Testcase has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
+                setShowConfirmPop({ 'title': 'Save Test Steps', 'content': 'Test Steps has been reused. Are you sure you want to save?', 'onClick': () => { setShowConfirmPop(false); saveTestCases(null, true) } });
                 return;
             }
             let testCaseId = '';
@@ -468,7 +397,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             }
 
 
-            // let { screenId, testCaseId, testCaseName, versionnumber } = props.current_task;
             let import_status = false;
 
             if (String(screenId) !== "undefined" && String(testCaseId) !== "undefined") {
@@ -482,17 +410,14 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                   }));
                 testCases = modifiedTestCases
                 for (let i = 0; i < testCases.length; i++) {
-                    // let step = i + 1
-                    // testCases[i].stepNo = step
 
                     if (!testCases[i].custname || !testCases[i].keywordVal) {
                         let col = "Object Name";
                         if (!testCases[i].keywordVal) col = "keyword";
-                        toast.current.show({severity:'warn', summary:'Warning', detail:`Please select ${col} Name at Step No. ${testCases[i].stepNo}`, life:2000});
+                        toast.current.show({severity:'warn', summary:'Warning', detail:`Please select ${col} Name at Step No. ${testCases[i].stepNo}`, life:3000});
                         errorFlag = true;
                         break;
                     } else {
-                        // testCases[i].custname = testCases[i].custname.trim();
                          if (testCases[i].keywordVal === 'SwitchToFrame' && String(testScriptData) !== "undefined") {
                             let scriptData = [...testScriptData];
                             for (let j = 0; j < scriptData.length; j++) {
@@ -510,10 +435,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                               ];
                         }
                     }
-                    // if (!testCases[i].url) testCases[i].url = "";
-                    
-                    // if (!testCases[i].cord) testCases[i].cord = "";
-
                 }
                 
                 if (!errorFlag) {
@@ -523,7 +444,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                             if (data === "success") {
                                 if (props.appType.toLowerCase() === "web" && Object.keys(modified).length !== 0) {
                                     let scrape_data = {};
-                                    // let { appType, projectId, testCaseId, versionnumber } = props.current_task;
 
                                     DesignApi.getScrapeDataScreenLevel_ICE(props.appType, props.fetchingDetails['parent']['_id'], props.fetchingDetails.projectID, testCaseId)
                                         .then(res => {
@@ -553,65 +473,61 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                                 
                                                 if (data1 === "Success") {    
                                                     for(var i = 0; parentScreen.length>i;i++) {
-                                                        fetchTestCases(i)
-                                                        .then(msg=>{
-                                                            setChanged(false);
-                                                            msg === "success"
-                                                            ? toast.current.show({severity:"success", summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT , life:3000})
-                                                            : toast.current.show({severity:"warn", summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:2000})
-                                                        })
-                                                        .catch(error => {
-                                                            // setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                                            toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                                            console.error("Error: Fetch TestCase Failed ::::", error)
-                                                        });
+                                                        if(parentScreen[i]._id === rowExpandedName.id){
+                                                            fetchTestCases(i)
+                                                            .then(msg=>{
+                                                                setChanged(false);
+                                                                msg === "success"
+                                                                ? toast.current.show({severity:"success", summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT , life:2000})
+                                                                : toast.current.show({severity:"warn", summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
+                                                            })
+                                                            .catch(error => {
+                                                                toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:5000})
+                                                                console.error("Error: Fetch Test Steps Failed ::::", error)
+                                                            });
+                                                        }
                                                     }        
-                                                } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
-                                                // setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                                                } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:5000})
                                             })
                                             .catch(error => {
-                                                // setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                                                toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                                                toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:5000})
                                                 console.error("Error::::", error)
                                             })
                                 })
                                 .catch(error=> {
-                                    // setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                                    toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
+                                    toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:5000})
                                     console.error("Error:::::", error)
                                 });
                             }
                             else{
                                 for (var i = 0; parentScreen.length>i; i++){
-                                    fetchTestCases(i)
-                                    .then(data=>{
-                                        setChanged(false);
-                                        data === "success" 
-                                        ? toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT, life:3000}) 
-                                        : toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT, life:2000})
-                                    })
-                                    .catch(error=>{
-                                        // setMsg(MSG.DESIGN.ERR_FETCH_TC);
-                                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:2000})
-                                        console.error("Error: Fetch TestCase Failed ::::", error)
-                                    });
+                                    if(parentScreen[i]._id === rowExpandedName.id){
+                                        fetchTestCases(i)
+                                        .then(data=>{
+                                            setChanged(false);
+                                            data === "success" 
+                                            ? toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_SAVE.CONTENT, life:2000}) 
+                                            : toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT, life:3000})
+                                        })
+                                        .catch(error=>{
+                                            toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_FETCH_TC.CONTENT , life:5000})
+                                            console.error("Error: Fetch Test Steps Failed ::::", error)
+                                        });
+                                    }
                                 }
                             }
-                        } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:2000})
-                        // setMsg(MSG.DESIGN.ERR_SAVE_TC);
+                        } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_SAVE_TC.CONTENT , life:5000})
                     })
                     .catch(error => { 
-                        // setMsg(MSG.DESIGN.ERR_SAVE_TC);
-                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:2000})
+                        toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:5000})
                         console.error("Error::::", error);
                     });
                     errorFlag = false;
                 }
-            } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:2000}) 
-            // setMsg(MSG.DESIGN.ERR_UNDEFINED_SID_TID);
+            } else toast.current.show({severity:"error", summary:'Error', detail:MSG.DESIGN.ERR_UNDEFINED_SID_TID.CONTENT , life:5000})
         }
         setStepSelect({edit: false, check: [], highlight: []});
-        // headerCheckRef.current.indeterminate = false;
+        headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setDebugEnable(false);
     }
@@ -638,13 +554,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             testCases.splice(updateData.testCases.length, 0, emptyRowDataIndex);
             insertedRowIdx.push(updateData.testCases.length)
         }
-        let oldScreenLevelTestSTeps=[...testCases]
-        // let testCaseUpdated = screenLavelTestSteps.find((screen) => screen.name === rowExpandedName.name);
-        // let emptyRowDataIndex = { ...emptyRowData, stepNo: testCaseUpdated.testCases.length + 1 };
-        // let data = [...testCaseUpdated.testCases, emptyRowDataIndex];
-        // let updatedTestCase = { ...testCaseUpdated, testCases: data };
-        // let index=screenLavelTestSteps.findIndex(screen=>screen.name === rowExpandedName.name)
-        // oldScreenLevelTestSTeps.splice(index, 1, updatedTestCase)
         let updatedScreenLevelTestSteps = screenLavelTestSteps.map((screen) => {
             if (screen.name === rowExpandedName.name) {
                 return { ...screen, testCases: testCases };
@@ -652,13 +561,10 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             return screen;
         });
         setScreenLevelTastSteps(updatedScreenLevelTestSteps)
-        // setTestCaseData(testCases);
         setStepSelect({edit: false, check: [], highlight: insertedRowIdx});
         setHeaderCheck(false);
         setChanged(true);
         headerCheckRef.current.indeterminate = false;
-        // setEdit(false);
-       
     }
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
@@ -667,19 +573,19 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
 
     //Debug function
     const showSuccess = (success) => {
-        toast.current.show({severity:'success', summary: 'Success', detail:success, life: 3000});
+        toast.current.show({severity:'success', summary: 'Success', detail:success, life: 2000});
     }
 
     const showInfo = (Info) => {
-        toast.current.show({severity:'info', summary: 'Info', detail:Info, life: 2000});
+        toast.current.show({severity:'info', summary: 'Info', detail:Info, life: 3000});
     }
 
     const showWarn = (Warn) => {
-        toast.current.show({severity:'warn', summary: 'Warning', detail:Warn, life: 2000});
+        toast.current.show({severity:'warn', summary: 'Warning', detail:Warn, life: 3000});
     }
 
     const showError = (Error) => {
-        toast.current.show({severity:'error', summary: 'Error', detail:Error, life: 3000});
+        toast.current.show({severity:'error', summary: 'Error', detail:Error, life: 5000});
     }
     const debugTestCases = selectedBrowserType => {
         setVisibleDependentTestCaseDialog(false);
@@ -688,7 +594,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
 
         if (props.appType !== "MobileWeb" && props.appType !== "Mainframe") browserType.push(selectedBrowserType);
 
-        // globalSelectedBrowserType = selectedBrowserType;5
         let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
         if (dependencyTestCaseFlag){
             testCaseIDsList.push(findTestCaseId.id);
@@ -696,11 +601,11 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         } 
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
-        // ResetSession.start();
+        ResetSession.start();
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
             .then(data => {
                 setOverlay("");
-                // ResetSession.end();
+                ResetSession.end();
                 if (data === "Invalid Session") return ;
                 else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
                 else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
@@ -718,20 +623,17 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     });
                     dispatch(Modified(rows));
                     dispatch(SaveEnable(!saveEnable))
-                    // setMsg(MSG.DESIGN.SUCC_DEBUG);
                     setSelectedTestCases([])
-                    toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:3000})
+                    toast.current.show({severity: 'success',summary: 'Success', detail:MSG.DESIGN.SUCC_DEBUG.CONTENT, life:2000})
                 } else {
-                    // setMsg(data);
-                    toast.current.show({severity: 'success',summary: 'Success', detail:data, life:3000})
+                    toast.current.show({severity: 'success',summary: 'Success', detail:data, life:2000})
                 }										
             })
             .catch(error => {
                 setOverlay("");
-                // ResetSession.end();
-                // setMsg(MSG.DESIGN.ERR_DEBUG);
-                toast.current.show({severity:'error',summary: 'Error', detail:MSG.DESIGN.ERR_DEBUG.CONTENT, life:2000})
-                console.log("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+                ResetSession.end();
+                toast.current.show({severity:'error',summary: 'Error', detail:MSG.DESIGN.ERR_DEBUG.CONTENT, life:5000})
+                console.log("Error while traversing while executing debugTeststeps method! \r\n " + (error.data));
             });
     };
 
@@ -743,15 +645,11 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         }
     };
 
-    const toggleTableVisibility = (e) => {
-        setShowTable(true);
-        console.log(e)
-    };
     const handleAdd = (testCase) => {
         const isTestIDPresent = addedTestCase.some(item => item.testCaseID === testCase.testCaseID);
     
         if (isTestIDPresent) {
-            toastError("Duplicate Dependent Testcase found");
+            toastError("Duplicate Dependent Test Steps found");
         } else {
             const addTestcaseData = {
                 testCaseID: testCase.testCaseID,
@@ -785,30 +683,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setTestCaseIDsList(prevIDs => prevIDs.filter(id => id !== testCaseToRemove.testCaseID));
         setDependencyTestCaseFlag(true);
     };
-    // const handleAdd = () => {
-    //     const update = { ...testCases };
-    //     const addTestcaseData = {};
-    //     const TestIDPresent = addedTestCase.filter(item => {
-    //         return item.testCaseID === testCases.testCaseID
-    //     });
-    //     // console.log("TestIDPresent", TestIDPresent);
-    //     if (TestIDPresent.length > 0) {
-    //         toastError("Duplicate Dependent Testcase found");
-    //     }
-    //     else {
-    //         addTestcaseData["testCaseID"] = update.testCaseID;
-    //         addTestcaseData["testCaseName"] = update.testCaseName;
-    //         addTestcaseData["disableAndBlock"] = update.disableAndBlock;
-    //         addTestcaseData["checked"] = true;
-    //         setTestCaseIDsList([...testCaseIDsList, update.testCaseID])
-    //         setAddedTestCase([...addedTestCase, addTestcaseData]);
-    //         setDependencyTestCaseFlag(true);
-    //         setTestCases(null);
-    //     }
-    // };
 
     const toastError = (errMessage) => {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 10000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: errMessage, life: 5000 });
     }
 
     const history = useNavigate();
@@ -853,10 +730,10 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const headerTemplate = (
         <>
             <div>
-                <h5 className='dailog_header1'>Design Test steps</h5>
+                <h5 className='dailog_header1'>Design Test Steps</h5>
                 <h4 className='dailog_header2'>{props.fetchingDetails["parent"]["name"]}</h4>
                 <img className="btn_test_screen" src="static/imgs/bi_code-square.svg" alt='screen icon' />
-                {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
+                {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} alt='' title="Read Only Access"/>:null}
 
             </div>
         </>
@@ -880,16 +757,16 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                         setOverlay("Loading...");
                         let resultString = JSON.parse(reader.result);
                         if (!Array.isArray(resultString)) 
-                            throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT,life:2000})
+                            throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT,life:5000})
                         for (let i = 0; i < resultString.length; i++) {
                             if (!resultString[i].appType)
-                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_JSON_IMPORT.CONTENT,life:2000})
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_JSON_IMPORT.CONTENT,life:5000})
                             if (
                                 resultString[i].appType.toLowerCase() !== "generic" && 
                                 resultString[i].appType.toLowerCase() !== "pdf" &&
                                 resultString[i].appType !== props.appType
                             ) 
-                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_NO_MATCH_APPTYPE.CONTENT,life:2000})
+                                throw toast.current.show({severity:"error",summary:'Error',detail:MSG.DESIGN.ERR_NO_MATCH_APPTYPE.CONTENT,life:5000})
                         }
                         DesignApi.updateTestCase_ICE(testCaseId, testCaseName, resultString, userInfo, 0, import_status)
                             .then(data => {
@@ -902,13 +779,12 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                 console.error("ERROR::::", error)
                             });
                         
-                    } else throw  toast.current.show({severity:'error', summary:"Error", detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT, life:1000});
+                    } else throw  toast.current.show({severity:'error', summary:"Error", detail:MSG.DESIGN.ERR_FILE_FORMAT.CONTENT, life:5000});
                 }
                 catch(error){
                     setOverlay("");
-                    if (typeof(error)==="object") toast.current.show({severity:'error', summary:'Error', detail:error, life:1000});
-                    else toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_TC_JSON_IMPORT.CONTENT, life:1000})
-                    // setMsg(MSG.DESIGN.ERR_TC_JSON_IMPORT)
+                    if (typeof(error)==="object") toast.current.show({severity:'error', summary:'Error', detail:error, life:5000});
+                    else toast.current.show({severity:'error', summary:'Error', detail:MSG.DESIGN.ERR_TC_JSON_IMPORT.CONTENT, life:5000})
                     console.error(error);
                 }
             }
@@ -954,8 +830,8 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    {/* <img src='static/imgs/ic-selmulti.png' alt='Select Steps' className='select' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>selectMultiple()}/>
-                    <Tooltip target='.select' position='bottom' content='  Select Test Step(s)'/> */}
+                    <i className='pi pi-check-square' style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black'}} onClick={()=>selectMultiple()}/>
+                    <Tooltip target='.pi-check-square' position='bottom' content='  Select Test Step(s)'/>
                     <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
                     <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
@@ -1016,33 +892,10 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
         </div>
     );
-    // const deleteProduct = () => {
-    //     let findData = screenLavelTestSteps.find(screen => screen.name === rowExpandedName.name);
-
-    //     if (findData) {
-    //     let testcases = findData.testCases.filter(objFromA => {
-    //         return selectedOptions === objFromA.stepNo
-    //     });
-    //     let updatedScreenLavelTestSteps = screenLavelTestSteps.map(screen => {
-    //         if (screen.name === rowExpandedName.name) {
-    //         return { ...screen, testCases:  testcases.length === 0 ? [emptyRowData] : testcases };
-    //         } else {
-    //         return screen;
-    //         }
-    //     });
-    //     setScreenLevelTastSteps(updatedScreenLavelTestSteps);
-    //     }
-    //     setDeleteTestDialog(false);
-    //     setTestCase(emptyRowData);
-    //     // setSelectedTestCases(null)
-    //     setSelectedOptions(null)
-    //     toast.current.show({severity:'success', summary:'Success',detail:'success full deleted test steps', life:3000});
-    // };
     
     const DependentTestCaseDialogHideHandler = () => {
         setVisibleDependentTestCaseDialog(false);
         setDependencyTestCaseFlag(false);
-        setTestCases(null);
         setTestCaseIDsList([]);
         setAddedTestCase([]);
         setSelectedTestCases([]);
@@ -1062,19 +915,17 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         )
         setExpandedRows(_expandedRow)
         setRowExpandedName({name:event.data.name,id:event.data.id});
-        // toast.current.show({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
     };
 
     const onRowCollapse = (event) => {
         setRowExpandedName({});
-        // toast.current.show({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
     };
     const editRow = () => {
         let check = [...stepSelect.check];
         let highlight = [...stepSelect.highlight]
         let focus = [];
         runClickAway = false;
-        if (check.length === 0 && highlight.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_DEL.CONTENT,life:1000});
+        if (check.length === 0 && highlight.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_DEL.CONTENT,life:3000});
         else {
             if (check.length === 1) focus = check;
             else if (highlight.length === 1 && !check.length) { focus = highlight; check = highlight }
@@ -1106,13 +957,13 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         let copyContent = {}
         let copyErrorFlag = false;
         let updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
-        if (selectedRows.length === 0) toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_SELECT_STEP_COPY.CONTENT,life:1000});
+        if (selectedRows.length === 0) toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_SELECT_STEP_COPY.CONTENT,life:3000});
         else{
             let sortedSteps = selectedRows.map(step=>parseInt(step)).sort((a,b)=>a-b)
             for (let idx of sortedSteps) {
                 if (!updateData.testCases[idx].custname) {
-                    if (selectedRows.length === 1) toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_EMPTY_TC_COPY.CONTENT,life:1000});
-                    else toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_INVALID_OBJ_REF.CONTENT,life:1000});
+                    if (selectedRows.length === 1) toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_EMPTY_TC_COPY.CONTENT,life:5000});
+                    else toast.current.show({severity:'error',summary:'Error', detail: MSG.DESIGN.ERR_INVALID_OBJ_REF.CONTENT,life:5000});
                     copyErrorFlag = true;
                     break
                 } 
@@ -1137,7 +988,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setStepSelect(oldState => ({...oldState, highlight: []}));
 
         if (!copiedContent.testCaseId){
-            toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_NO_TC_PASTE.CONTENT,life:1000});
+            toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_NO_TC_PASTE.CONTENT,life:3000});
             return;
         }
 
@@ -1150,8 +1001,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
             }
             if (copiedContent.appType !== props.appType && appTypeFlag) {
-                // setMsg(MSG.DESIGN.WARN_DIFF_PROJTYPE);
-                toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_DIFF_PROJTYPE.CONTENT,life:1000});
+                toast.current.show({severity:'warn',summary:'Warning',detail:MSG.DESIGN.WARN_DIFF_PROJTYPE.CONTENT,life:3000});
             }
             else{
                 setShowConfPaste(true);
@@ -1165,9 +1015,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [ ...findData.testCases ]
         runClickAway = false;
-        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:1000});
-        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
-        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:1000});
+        if (highlighted.length === 0 && selectedIndexes.length === 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP_SKIP.CONTENT, life:3000});
+        else if (selectedIndexes.length === 1 && !testCases[selectedIndexes[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:3000});
+        else if (highlighted.length === 1 && !testCases[highlighted[0]].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_EMP_STEP_COMMENT.CONTENT, life:3000});
         else{
             let toComment = [...new Set([...highlighted, ...selectedIndexes])]; 
             for(let idx of toComment){
@@ -1184,8 +1034,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
                 return screen;
             });
-            setScreenLevelTastSteps(updatedScreenLevelTestSteps)
-            // setTestCaseData(testCases);
+            setScreenLevelTastSteps(updatedScreenLevelTestSteps);
             setStepSelect({edit: false, check: [], highlight: []});
             setHeaderCheck(false);
             setChanged(true);
@@ -1201,9 +1050,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const deleteTestcase = () => {
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
-        if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:1000});
-        else if (stepSelect.check.length <= 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP.CONTENT,life:1000});
-        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Testcase has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
+        if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
+        else if (stepSelect.check.length <= 0) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_SELECT_STEP.CONTENT,life:3000});
+        else if (reusedTC) setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Test Steps has been reused. Are you sure you want to delete?', 'onClick': ()=>{setShowConfirmPop(false);onDeleteTestStep()}});
         else setShowConfirmPop({'title': 'Delete Test Step', 'content': 'Are you sure, you want to delete?', 'onClick': ()=>onDeleteTestStep()});
     }
     const onDeleteTestStep = () => {
@@ -1227,8 +1076,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             }
             return screen;
         });
-        setScreenLevelTastSteps(updatedScreenLevelTestSteps)
-        // setTestCaseData(testCases);
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps);
         setStepSelect({edit: false, check: [], highlight: []});
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
@@ -1335,8 +1183,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             }
             return screen;
         });
-        setScreenLevelTastSteps(updatedScreenLevelTestSteps)
-        // setTestCaseData(testCases);
+        setScreenLevelTastSteps(updatedScreenLevelTestSteps);
         setShowPS(false);
         setStepSelect({edit: false, check: [], highlight: toFocus});
         headerCheckRef.current.indeterminate = false;
@@ -1357,45 +1204,18 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             <Button onClick={()=>setShowConfPaste(false)} label='No'/>
         </>
     )
-    const fetchSelectRecipientsData = async () => {
-        let checkAddUsers = document.getElementById("dc__checkbox").checked
-        if(!checkAddUsers) resetData()
-        else {
-            var userOptions = [];
-            let data = await getUserDetails("user");
-            if(data.error){ toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000});return;}
-            for(var i=0; i<data.length; i++) if(data[i][3] !== "Admin") userOptions.push({_id:data[i][1],name:data[i][0]}); 
-            setAllUsers(userOptions.sort()); 
-            data = await getNotificationGroups({'groupids':[],'groupnames':[]});
-            if(data.error){
-                if(data.val === 'empty'){
-                    toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000});
-                    data = {};
-                } else{  toast.current.show({severity:'error', summary:'Error', detail:data.error, life:1000}); return true; }
-            }
-            setGroupList(data.sort())
-        }
-    }
-    const checkAddUsers = () => {
-        if(document.getElementById("dc__checkbox") === null) return true
-        let checked = document.getElementById("dc__checkbox").checked
-        return !checked
-    }
-    // const ConfirmPopup = () => (
-        
-    // )
     const selectSteps = stepList => {
         stepList.push(...stepSelect.check)
         let newChecks = Array.from(new Set(stepList))
         setStepSelect({edit: false, check: newChecks, highlight: []});
-        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== testCaseData.length;
+        const findData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        headerCheckRef.current.indeterminate = newChecks.length!==0 && newChecks.length !== findData.testCases.length;
         setShowSM(false);
     }
 
 
     const showRemarkDialog = (rowIdx) => {
         setStepSelect(oldState => ({ ...oldState, highlight: []}));
-        setShowRemarkDlg(String(rowIdx));
     }
 
     const showDetailDialog = (rowIdx) => {
@@ -1418,7 +1238,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
 
     const updateChecklist = (RowIdx, click, msg) => {
         let check = [...stepSelect.check]
-        setSelectedOptions(RowIdx)
         let headerCheckFlag = false
         let focusIdx = [];
         let loc = check.indexOf(RowIdx);
@@ -1434,8 +1253,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         if (msg === "noFocus") focusIdx = [];
         // checkArray = check;
         setHeaderCheck(headerCheckFlag);
-        setStepSelect({edit: false, check: check, highlight: focusIdx});
-        headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testCaseData.length;
+        setStepSelect({edit: true, check: check, highlight: focusIdx});
+        const testDatarow = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
+        headerCheckRef.current.indeterminate = check.length!==0 && check.length !== testDatarow.testCases.length;
     }
     const onDrop = (e) => {
         if (!changed)setChanged(true)
@@ -1445,11 +1265,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         handleSetList(newtestcase);
     }
 
-    const resetData = () => {
-        setAllUsers([]);
-        setGroupList([]);
-        setRecipients({groupids:[],additionalrecepients:[]});
-    }
     const onCheckAll = (event) => {
         let checkList = [...stepSelect.check]
         if (event.target.checked) {
@@ -1470,37 +1285,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     const rowExpansionTemplate = (data) => {
         return (
             <div className="p-1 dataTableChild">
-                    {/* <DataTable className='datatable__col'
-                        value={data.testCases.length>0?data.testCases:[]}
-                        selectionMode="checkbox" selection={selectedTestCases}
-                        onSelectionChange={(e) => setSelectedTestCases(e.value)}  
-                        emptyMessage={newtestcase.length === 0?emptyMessage:null} onRowEditComplete={onRowEditComplete}
-                        rowReorder editMode="row" reorderableRows onRowReorder={(e) => reorderTestCases(e)} resizableColumns showGridlines size='small' >
-                            <Column style={{ width: '3em' ,textAlign: 'center', paddingLeft:'0.5rem' }} rowReorder />
-                            <Column selectionMode="multiple" style={{ width: '3em', paddingLeft:'0.5rem' }} />
-                            <Column field="custname" header="Element Name" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => elementEditor(options)} ></Column>
-                            <Column field="keywordDescription" tooltip="keywordTooltip" header="Operation" style={{paddingLeft:'0.5rem'}} editor={(options) => keywordEditor(options)}  ></Column>
-                            <Column field="inputVal" header="Input" bodyStyle={{maxWidth:'10rem', textOverflow:'ellipsis',textAlign: 'left',paddingLeft: '0.5rem',paddinfRight:'0.5rem'}} editor={(options) => inputEditor(options)} ></Column>
-                            <Column field="outputVal" header="Output" bodyStyle={{maxWidth:'10rem',textOverflow: 'ellipsis',textAlign: 'left',paddingLeft: '0.5rem', paddinfRight:'0.5rem'}} editor={(options) => outputEditor(options)} ></Column>
-                            <Column field="remarks" header="Remarks" style={{paddingLeft:'0.5rem'}}/>
-                            <Column rowEditor field="action" header="Actions"  className="action" bodyStyle={{ textAlign: 'center',paddingLeft:'0.5rem' }} ></Column>
-                            <Tooltip target=".action " position="left" content="  Edit the test step."/>
-                    </DataTable> */}
-                    {/* { showPopup && <Dialog visible={showPopup} header={showPopup.title} style={{width:'20rem'}} onHide={()=>{setShow(false);resetData()}}>
-                        <div>
-                            <span>Are you sure you want to {showPopup.content} the task ?</span>
-                            <p className="dc__checkbox-addRecp" >
-                                <input  id="dc__checkbox" onChange={()=>{fetchSelectRecipientsData()}} type="checkbox" title="Notify Additional Users" className="checkAddUsers"/>
-                                <span >Notify Additional Users</span>
-                            </p>
-                            <div className='dc__select-recpients'>
-                                <div>
-                                    <span className="leftControl" title="Token Name">Select Recipients</span>
-                                    <SelectRecipients disabled={checkAddUsers()} recipients={recipients} setRecipients={setRecipients} groupList={groupList} allUsers={allUsers} />
-                                </div>
-                            </div>
-                        </div>
-                    </Dialog>} */}
+                    { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} show={showSM} selectSteps={selectSteps} upperLimit={data.testCases.length} /> }
                     { showPS && <PasteStepDialog setShow={setShowPS} show={showPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
                     { showConfPaste && <ConfPasteStep />}
                     { showConfirmPop && ConfirmPopups() }
@@ -1513,7 +1298,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <span className="keyword_col d__key_head" >Keywords</span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
-                    {/* <span className="remark_col d__rem_head" >Remarks</span> */}
                     <span className="details_col d__det_head" >Details</span>
                 </div>
                 <div style={{height: '66vh' }}>
@@ -1528,9 +1312,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                 data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
                                     key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
                                     getKeywords={getKeywords} getRowPlaceholders={getRowPlaceholders} stepSelect={stepSelect}
-                                    updateChecklist={updateChecklist} setStepSelect={setStepSelect} editRow={editRow}
+                                    updateChecklist={updateChecklist} setStepSelect={setStepSelect} 
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
-                                    rowChange={rowChange} keywordData={keywordList} setDeleteTestDialog={setDeleteTestDialog}
+                                    rowChange={rowChange} keywordData={keywordList} 
                                     testcaseDetailsAfterImpact={props.testcaseDetailsAfterImpact}
                                     impactAnalysisDone={props.impactAnalysisDone}
                                     />)
@@ -1559,7 +1343,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     }
     return (
         <>
-        {/* <Toast ref={toast} position="bottom-center" /> */}
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
@@ -1582,7 +1365,6 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                             <p className='debug__otp__text'>Choose Browsers</p>
                         </span>
                         <span className='browser__col'>
-                            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' alt='explorer'/>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span> */}
                             <span onClick={() => handleSpanClick("1")} className={selectedSpan === "1" ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' alt='chrome' />Google Chrome {selectedSpan === "1" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
                             <span onClick={() => handleSpanClick("2")} className={selectedSpan === "2" ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' alt='firefox' />Mozilla Firefox {selectedSpan === "2" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
                             <span onClick={() => handleSpanClick("8")} className={selectedSpan === "8" ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' alt='edge' />Microsoft Edge {selectedSpan === "8" && <img className='sel__tick' src='static/imgs/ic-tick.png' alt='tick' />}</span>
@@ -1591,7 +1373,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <div>
                         <div className='design__fst__card'>
                         <span className='debug__opt'>
-                            <span className='AD__test'>Add Dependent Test Step (Optional)</span>
+                            <span className='AD__test'>Add Dependent Test Steps (Optional)</span>
                             </span>
                             <div className='card__testcases'>
                             <div className='add__test__case_check'>
