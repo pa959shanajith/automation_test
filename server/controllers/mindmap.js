@@ -602,7 +602,7 @@ exports.saveEndtoEndData = function (req, res) {
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-			
+			qObj.host=req.headers.host;			
 			create_ice.saveMindmapE2E(qObj, function (err, data) {
 				if (err) {
 					res.status(500).send(err);
