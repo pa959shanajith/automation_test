@@ -22,8 +22,6 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
 import CollapsibleCard from "./CollapsibleCard";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { Menu } from "primereact/menu";
-import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "primereact/divider";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
@@ -33,6 +31,7 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import "../styles/ReportTestTable.scss";
 import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
+import AvoInputText from "../../../globalComponents/AvoInputText";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -612,7 +611,7 @@ export default function BasicDemo() {
             : "static/imgs/treminated.png";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
-          <div key={modifiedChild.key} style={{ display: "flex" }}>
+          <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
             <img
               src={statusIcon}
               alt=""
@@ -885,40 +884,40 @@ export default function BasicDemo() {
           expandedKeys={expandedKeys}
           dataKey="id"
           onToggle={(e) => handdleExpend(e)}
-          tableStyle={{ minWidth: "50rem" }}
+          tableStyle={{ minWidth: "50rem", textAlign: "center" }}
         >
           <Column
             field="slno"
             header="S No."
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
             header="Steps"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
             header="Description"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
           />
           <Column
             field="EllapsedTime"
             header="Time Elapsed"
-            style={{ width: "10rem", padding: "0rem" }}
+            style={{ width: "10rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="status"
             header="Status"
-            style={{ width: "8rem", padding: "0rem" }}
+            style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="Comments"
             header="Comments"
-            style={{ width: "18rem", padding: "0rem" }}
+            style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             header="No. Defect ID"
@@ -928,7 +927,7 @@ export default function BasicDemo() {
           <Column
             body={screenShotLink}
             header="Action"
-            style={{ padding: "0rem" }}
+            style={{ padding: "0rem", textAlign: "center" }}
           />
         </TreeTable>
       ) : (
@@ -1099,42 +1098,26 @@ export default function BasicDemo() {
             <Divider />
             {bugTitle !== "Jira" && (
               <div className="col-12">
-                <div>
-                  <label>
-                    <span>Summary</span>
-                    <img
-                      src="static/imgs/Required.svg"
-                      className="required_icon"
-                    />
-                  </label>
-                </div>
-                <InputTextarea
+                <AvoInputText
                   name="Summary"
-                  rows={2}
-                  className="text_desc"
+                  rows={1}
+                  customeClass="text_desc"
                   value={inputSummary}
-                  onChange={(e) => setInputSummary(e.target.value)}
+                  onInputTextChange={(e) => setInputSummary(e.target.value)}
+                  required={true}
+                  labelTxt="Summary"
                 />
               </div>
             )}
             <div className="col-12">
-              <div>
-                <label>
-                  <span>
-                    {bugTitle === "Jira" ? "Description" : "Repro Steps"}
-                  </span>
-                  <img
-                    src="static/imgs/Required.svg"
-                    className="required_icon"
-                  />
-                </label>
-              </div>
-              <InputTextarea
+              <AvoInputText
                 name="Description"
                 rows={2}
-                className="text_desc"
+                customeClass="text_desc"
                 value={inputDesc}
-                onChange={(e) => setInputDesc(e.target.value)}
+                onInputTextChange={(e) => setInputDesc(e.target.value)}
+                required={true}
+                labelTxt={bugTitle === "Jira" ? "Description" : "Repro Steps"}
               />
             </div>
             {!Array.isArray(mappedProjects) && (
@@ -1174,32 +1157,31 @@ export default function BasicDemo() {
                           : getElDropdown(el.name)
                       }
                       parentClass="flex flex-column"
-                      required={true}
+                      required={el.disabled}
                     />
                   ) : (
                     <>
-                      <div>
-                        <label>
-                          <span>
-                            {el.name !== "Iteration ID" && el.name !== "Area ID"
-                              ? el.name
-                              : getElName(el.name)}
-                          </span>
-                          {el.disabled && (
-                            <img
-                              src="static/imgs/Required.svg"
-                              className="required_icon"
-                            />
-                          )}
-                        </label>
-                      </div>
-                      <InputTextarea
-                        className="text_desc"
-                        rows={1}
+                      <AvoInputText
                         name={el.name}
-                        value={(el.name === "Attachment" && selectedRow[0]?.screenshot_path) ? selectedRow[0]?.screenshot_path : configValues[el.name]}
-                        onChange={(e) => handleConfigValues(e)}
-                        disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
+                        rows={1}
+                        customeClass="text_desc"
+                        value={
+                          el.name === "Attachment" &&
+                          selectedRow[0]?.screenshot_path
+                            ? selectedRow[0]?.screenshot_path
+                            : configValues[el.name]
+                        }
+                        onInputTextChange={(e) => handleConfigValues(e)}
+                        required={el.disabled}
+                        labelTxt={
+                          el.name !== "Iteration ID" && el.name !== "Area ID"
+                            ? el.name
+                            : getElName(el.name)
+                        }
+                        disabled={
+                          el.name === "Attachment" &&
+                          selectedRow[0]?.screenshot_path
+                        }
                       />
                     </>
                   )}
@@ -1210,6 +1192,27 @@ export default function BasicDemo() {
         }
         customClass="jira_modal"
         headerTxt="Create Issue"
+        isDisabled={
+          !(
+            jiraDropDown &&
+            issueDropDown &&
+            !!configureFeilds.length &&
+            inputSummary &&
+            inputDesc &&
+            !configureFeilds
+              .filter((el) => {
+                if (el?.disabled && el.name !== "Repro Steps" && el.name !== "Value Area" ) return el;
+              })
+              .map((e) =>
+                configValues[e?.name]
+                  ? typeof configValues[e?.name] === "object"
+                    ? !!configValues[e?.name].name
+                    : !!configValues[e?.name]
+                  : false
+              )
+              .includes(false)
+          )
+        }
         addLoader={bugLoader}
         modalSytle={{
           width: "60vw",

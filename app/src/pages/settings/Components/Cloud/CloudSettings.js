@@ -187,11 +187,11 @@ const CloudSettings = () => {
                 }})
                 setLoading(false)
                 console.log(data)
-                if (data == "name"){
-                    toastSuccess(MSG.SETTINGS.ERR_UPLOAD_APK)
+                if (data.statusCode === 201){
+                    toastSuccess(MSG.SETTINGS.SUCC_UPLOAD_APK)
                 }
                 else {
-                    toastError(MSG.SETTINGS.SUCC_UPLOAD_APK) 
+                    toastError(MSG.SETTINGS.ERR_UPLOAD_APK) 
                 }
             }
         catch {
@@ -359,11 +359,11 @@ const CloudSettings = () => {
                 <div className="side-panel">
                     <div className={`icon-wrapper ${selectedscreen?.name === 'saucelab' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'saucelab', code: 'sl' })} >
                         <span><img src="static/imgs/Saucelabs-1.png" className="img__azure"></img></span>
-                        <span className="text__jira">sauceLabs</span>
+                        <span className="text__saucelabs">SauceLabs</span>
                     </div>
                     <div className={`icon-wrapper ${selectedscreen?.name === 'browserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
                         <span><img src="static/imgs/browserstack_icon 48x48.svg" className="img__alm"></img></span>
-                        <span className="text__jira">BrowserStack</span>
+                        <span className="text__browserstack">BrowserStack</span>
                     </div>
                 </div>
         </div>

@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Tooltip } from 'primereact/tooltip';
-import "../styles/Agents.scss";
+import "../styles/ManageAgent.scss";
 import { Button } from "primereact/button";
 import { InputNumber } from "primereact/inputnumber";
 import { InputSwitch } from "primereact/inputswitch";
@@ -235,29 +235,27 @@ const AgentsList = ({ setLoading, setShowConfirmPop, toastError, toastSuccess })
   return (
     <>
       <Toast ref={toastWrapperRef} position="bottom-center" />
-      <span className="page-taskName taskname">Download Agent</span>
+      <span className="page-agent-taskName">Download Agent</span>
       <pre>
         <code className="downld_cls">
           Click <u><a onClick={onDownloadAgentClick} style={{ color: "purple", cursor: 'pointer', textDecoration: 'underline' }}>Here</a></u> to Download the Agent
         </code>
       </pre>
-      <div className="page-taskName">
-        <span data-test="page-title-test" className="taskname">
+      <div className="page-agent-taskName">
+        <span data-test="page-title-test">
           Manage Agent
         </span>
       </div>
       <div
-        className="api-ut__btnGroup__agent">
-        <div className="agent_state__legends">
+        className="api-ut__btnGroup__agents">
           {showLegend("inactive", "Inactive")}
           {showLegend("idle", "Active - Idle")}
           {showLegend("in-progress", "Active - In Progress")}
           {showLegend("busy", "Active - Busy")}
           {showLegend("offline", "Offline")}
-        </div>
         <div className="p-input-icon-left search_agent">
           <i className="pi pi-search" />
-          <InputText className="Search_name"
+          <InputText 
             placeholder="Search"
             value={searchText}
             onChange={(event) =>
@@ -266,13 +264,13 @@ const AgentsList = ({ setLoading, setShowConfirmPop, toastError, toastSuccess })
               handleSearchChange(event.target.value)}
             title=" Search all projects."
           />
-        </div>
         <div className="savebtn_div">
-          <Button className="save__agent" label="Save" onClick={handleAgentsSave}></Button>
+        <Button className="save__agent" label="Save" onClick={handleAgentsSave} />
+        </div>
         </div>
       </div>
-      <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available" }}>
-        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable scrollHeight="20rem">
+      <div style={{ position: "absolute", width: "70%", height: "-webkit-fill-available",top : '19rem'}}>
+        <DataTable showGridlines value={searchText.length > 0 ? filteredList : agentData} scrollable scrollHeight="23.5rem">
           <Column header="Agent Name" body={(agent) => (
             <div className="agent_state">
               <Tooltip target={`agent-name-${agent.name}`} content={agent.state} position="top" />

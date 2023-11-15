@@ -5,7 +5,7 @@ import ClickAwayListener from 'react-click-away-listener';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import { ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global';
 import ExportDataTable from './ExportDataTable';
-// import * as actionTypes from '../state/action';
+import { setCopyCells } from '../../utilities/UtilittSlice';
 import ImportPopUp from './ImportPopUp';
 import * as utilApi from '../api';
 import DtPasteStepDialog from './DtPasteStepDialog';
@@ -152,7 +152,7 @@ const TableActionButtons = props => {
             if (resp.isEmpty)
             toastError(MSG.UTILITY.ERR_EMPTY_COPY);
             else{
-                // dispatch({type: actionTypes.SET_COPY_CELLS, payload: resp.copiedData});
+                dispatch(setCopyCells(resp.copiedData));
                 props.setCheckList({type: 'row', list: []})
             }
         }
@@ -203,7 +203,7 @@ const TableActionButtons = props => {
         <>
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
         <div className="dt__table_ac_btn_grp">
-            { showPS && <DtPasteStepDialog setShow={setShowPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
+            { showPS && <DtPasteStepDialog setShow={setShowPS} show={showPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
                     <button data-test="dt__tblActionBtns" key={i} className={"dt__tblBtn "+(props.dnd && btn.alt && btn.alt==="Drag Row"?"selected-btn":"")} onClick={()=>btn.onClick()}>

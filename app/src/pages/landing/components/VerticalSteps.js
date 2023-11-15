@@ -36,13 +36,13 @@ const VerticalSteps = (props) => {
       project = JSON.parse(localStorageDefaultProject);
     }
     const buttonStyle_design = {
-      background:" #605bff",color:"white" , fontFamily:"Open Sans",padding:"0.3rem 0.8rem"
+      background:" #605bff",color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem"
     };
     const buttonStyle_genius = {
-      background:" #605bff",color:"white" , fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+      background:" #605bff",color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
     };
     const buttonStyle_genius_disabled = {
-      background:"rgb(160, 200, 255)" ,color:"white" , fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+      background:"rgb(160, 200, 255)" ,color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
     };
 
     const buttonStyle_execute = {
@@ -57,7 +57,7 @@ const VerticalSteps = (props) => {
     };
     
     const agsLicense = {
-      value: userInfo?.licensedetails.AGS === false,
+      value: userInfo?.licensedetails?.AGS === false,
       msg: "You do not have access for Avo Genius."
     }
 
