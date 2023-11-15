@@ -12,7 +12,7 @@ import stepsSlice from './pages/landing/components/VerticalComponentsSlice';
 import landingReducer from './pages/landing/LandingSlice';
 import configurePageSlice from "./pages/execute/configurePageSlice";
 import settingSlice from "./pages/settings/settingSlice";
-import UtilittSlice from "./pages/utilities/UtilittSlice";
+import UtilitySlice from "./pages/utilities/UtilitySlice";
 
 export default configureStore({
     reducer: {
@@ -26,7 +26,7 @@ export default configureStore({
         progressbar: globalSlice,
         setting: settingSlice,
         admin: adminSlice,
-        utility:UtilittSlice
+        utility:UtilitySlice
 
     }
 })
