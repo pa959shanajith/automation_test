@@ -248,15 +248,20 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
   return (
     <>
       <Toast ref={toastWrapperRef} position="bottom-center" />
-      <div className="page-taskName">
-        <span data-test="page-title-test" className="taskname">
-          {/* { props.currentIntegration.name === '' ? 'Create New' : 'Update'} Grid */}
-          Create New Grid
-        </span>
-      </div>
-
-      <div className="flex flex-row">
-        <Button
+      <div className="create_new_grid surface-100 gap-2">
+        <label className="page-taskName_grid">Create New Grid</label>
+        <div className="config_name">
+          <label className="api-ut__inputLabel_text">Avo Grid Name :</label>
+            <InputText
+              value={gridName}
+              style={{ width: "25rem" }}
+              label="Avo Grid Name"
+              onChange={(e) => setGridName(e.target.value)}
+              autoComplete="off"
+              placeholder="Enter Grid Name"
+            />
+             <div className="grid_button">
+          <Button
           className="save_grid_btn"
           data-test="submit-button-test"
           size="small"
@@ -271,7 +276,14 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
           onClick={() => setCurrentGrid(false)}
           label={dataUpdated ? "Cancel" : "Back"}
         />
-        <div className="searchBox_grid">
+        </div>
+        </div>
+        <div className="agent_state__legends_grids">
+          {showLegend("inactive", "Inactive")}
+          {showLegend("idle", "Active - Idle")}
+          {showLegend("in-progress", "Active - In Progress")}
+          {showLegend("busy", "Active - Busy")}
+          {showLegend("offline", "Offline")}
           <InputText
             placeholder="Search"
             style={{ width: "20rem" }}
@@ -280,37 +292,6 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
             onChange={(e) => handleSearchChange(e.target.value)}
           />
         </div>
-        <div className="config_name">
-          <span className="api-ut__inputLabel_text">Avo Grid Name :</span>
-          <span className="api-ut__inputLabel">
-            <InputText
-              value={gridName}
-              style={{ width: "21rem" }}
-              label="Avo Grid Name"
-              onChange={(e) => setGridName(e.target.value)}
-              autoComplete="off"
-              placeholder="Enter Grid Name"
-            />
-          </span>
-        </div>
-      </div>
-      <div>
-        <div className="agent_state__legends_grid">
-          {showLegend("inactive", "Inactive")}
-          {showLegend("idle", "Active - Idle")}
-          {showLegend("in-progress", "Active - In Progress")}
-          {showLegend("busy", "Active - Busy")}
-          {showLegend("offline", "Offline")}
-        </div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          width: "98%",
-          height: "-webkit-fill-available",
-          marginTop: "1.5%",
-        }}
-      >
         <DataTable
           value={(searchText.length > 0 ? filteredList : agentData).map(
             (agent) => ({
@@ -365,7 +346,7 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
           selectionMode="single"
           className="Grid_table"
           scrollable
-          scrollHeight="25rem"
+          scrollHeight="23rem"
         >
           {agentListHeader.map((col) => (
             <Column

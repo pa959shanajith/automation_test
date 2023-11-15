@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ModalContainer } from '../../global';
+import { Button } from 'primereact/button';
 import "../styles/DtPasteStepDialog.scss";
 
 /*
@@ -51,9 +52,8 @@ const DtPasteStepDialog = (props) => {
     };
     
     return (<ModalContainer 
-        data-test="d__psd"
-        modalClass="modal-sm"
         title="Paste Test Step"
+        show={props.show}
         content={
         <div className="ps_dialog"> 
             <div className="ps_lbl" data-test="d__pslbl">Paste after {props.pasteType==="rows" ? "Row No." : "Column No."}:</div>
@@ -67,7 +67,7 @@ const DtPasteStepDialog = (props) => {
             showPasteError("");
             props.setShow(false)
         }}
-        footer={ <button onClick={pasteCopiedSteps} data-test="d__psbtn">Submit</button> }
+        footer={ <Button onClick={pasteCopiedSteps} label="Submit" data-test="d__psbtn"/> }
     />
 )
 }

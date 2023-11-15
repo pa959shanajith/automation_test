@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Messages as MSG, VARIANT, setMsg, ModalContainer, ScrollBar, ScreenOverlay, Footer } from '../../global';
-import '../styles/Agents.scss';
+import '../styles/ManageAgent.scss';
 import AgentsList from './AgentsList';
 import { Toast } from "primereact/toast";
 import { Button } from 'primereact/button';
@@ -60,7 +60,7 @@ const Agents = () => {
         <Toast ref={toast} position="bottom-center" baseZIndex={1300} />
         {loading ? <ScreenOverlay content={loading} /> : null}
         {showConfirmPop && <ConfirmPopup />}
-        <div className='agent-container'>
+        <div className='agents-container'>
             <AgentsList toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} setShowConfirmPop={setShowConfirmPop} showMessageBar={showMessageBar} setLoading={setLoading} />
         </div>
     </>);
