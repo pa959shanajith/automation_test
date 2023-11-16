@@ -132,6 +132,7 @@ const ChangePassword = (props) => {
                                 onChange={newPasswordOnChangeHandler}
                                 placeholder='Enter new password'
                                 type={showNewPassword ? "text" : "password"}
+                                autocomplete="off" 
                             />
                         </div>
 
@@ -169,6 +170,7 @@ const ChangePassword = (props) => {
                             />
                             <InputText
                                 style={{ width: '25vw' }}
+                                autocomplete="off" 
                                 id="confirmPassword"
                                 onFocus={() => setConfirmPasswordFocus(true)}
                                 className={`input_field ${confirmPasswordFocus && newpassword !== confirmNewpassword ? 'p-invalid' : 'input_field_success' }`}
