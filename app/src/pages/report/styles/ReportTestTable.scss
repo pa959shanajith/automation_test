@@ -8,6 +8,14 @@
     .screenshot_view {
         cursor: pointer;
     }
+    .action_items{
+     display: flex;
+     flex-direction: row;
+     gap: 1rem;
+    }
+    .plug_icon{
+        cursor: pointer;
+    }
     .desc_text {
         padding-left: 0.4rem;
         overflow: hidden;
