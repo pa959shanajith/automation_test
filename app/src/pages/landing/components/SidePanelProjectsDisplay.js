@@ -46,7 +46,7 @@ export default function BasicDemo() {
                         <div className="card flex flex-wrap justify-content-center gap-3">
                             <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
-                                <InputText id='i' placeholder="Search" />
+                                <InputText id='i' placeholder="Search" autoComplete='off'/>
                             </span>
                             {/* <span>{Dispalyproject.description}</span> */}
                         </div>
