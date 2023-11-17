@@ -186,6 +186,8 @@ const CreateUser = (props) => {
                     }
                 } else if (data === "exists") {
                     props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
+                }  else if (data === "email exists") {
+                    props.toastWarn(MSG.CUSTOM("User with provided mail already exist",VARIANT.ERROR));
                 } else if (data === "fail") {
                     if (action === "create") click();
                     else edit();
@@ -659,14 +661,14 @@ const CreateUser = (props) => {
                                     className= {`w-full md:w-20rem p-inputtext-sm ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
                                     onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
-                                    disabled={editUser}
+                                    // disabled={editUser}
                                 />
                             </div>
                             {/* Admin Check */}
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
                                     <label htmlFor="admin_check" className="adminlable_header pb-3 font-medium">Secondary Role</label>
-                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} disabled={editUser} checked={adminCheck} />
+                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
                             )}
