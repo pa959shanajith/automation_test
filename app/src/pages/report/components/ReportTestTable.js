@@ -146,16 +146,21 @@ export default function BasicDemo() {
   }, [selectedRow]);
 
   useEffect(() => {
-    const parent = [];
-    if (reportData && Array.isArray(reportData?.rows)) {
-      for (const obj of reportData?.rows) {
+  let parent = [];
+  let child = [];
+  const getFiltered = Array.isArray(reportData?.rows) ? reportData?.rows.filter((el) => (el?.StepDescription.toLowerCase().includes(searchTest.toLowerCase()) || !el.hasOwnProperty("Step") || el?.Step.toLowerCase().includes(searchTest.toLowerCase()))) : [];
+    if (getFiltered && Array.isArray(getFiltered)) {
+      for (const obj of getFiltered) {
         if (obj.hasOwnProperty("Step") && obj?.Step !== "Terminated") {
           if (!parent[parent.length - 1]?.children) {
+            child.push(obj)
             parent[parent.length - 1].children = [obj]; // Push the new object into parent array
           } else {
-            parent[parent.length - 1]?.children.push(obj); // Push the object into existing children array
+            child.push(obj)
+            parent[parent.length - 1].children = [ ...child];
           }
         } else {
+          child = []
           parent.push(obj); // Push the object into parent array
         }
       }
@@ -164,7 +169,7 @@ export default function BasicDemo() {
       // console.error("reportData.rows is not defined or not an array.");
     }
     setReportViewData(parent);
-  }, [reportData]);
+  }, [reportData, searchTest]);
 
   const handdleExpend = (e) => {
     setExpandedKeys(e.value);
@@ -466,7 +471,7 @@ export default function BasicDemo() {
             type="search"
             className="search_testCase"
             onInput={(e) => setSearchTest(e.target.value)}
-            placeholder="Search for Test Cases"
+            placeholder="Search for Test Steps and Description"
           />
         </div>
       </div>
@@ -877,7 +882,7 @@ export default function BasicDemo() {
       <br></br>
       {reportid ? (
         <TreeTable
-          globalFilter={searchTest}
+          // globalFilter={searchTest}
           header={getTableHeader}
           value={treeData}
           className={reportSummaryCollaps ? "viewTable" : "ViewTable"}
@@ -953,7 +958,7 @@ export default function BasicDemo() {
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
-          globalFilter={searchTest}
+          // globalFilter={searchTest}
           header={getTableHeader}
           className="ruleMap_table"
         >

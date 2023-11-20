@@ -2047,6 +2047,7 @@ Learn More '/>
             headerTxt={`Execute Now : ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
             modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
+            isDisabled={(radioButton_grid === "Execute with Avo Assure Client" && !selectedICE)}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
