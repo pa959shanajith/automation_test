@@ -61,6 +61,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
+import { Paginator } from "primereact/paginator";
 export var navigate
 
 
@@ -81,6 +82,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
   const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
+  const [firstPage, setFirstPage] = useState(0);
+  const [rowsPage, setRowsPage] = useState(10);
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
@@ -137,6 +140,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserTxt, setBrowserTxt] = useState("");
   const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [fetechConfig, setFetechConfig] = useState([]);
+  const [configPages, setConfigPages] = useState(0);
   const [configItem, setConfigItem] = useState({});
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
@@ -1050,19 +1054,21 @@ const handleSubmit1 = async (SauceLabPayload) => {
     msg: "You do not have access for CICD."
   }
 
-  const tableUpdate = async () => {
+  const tableUpdate = async (getPageNo = 1) => {
     const getState = [];
     setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
+      page: getPageNo
     });
     setLoader(false);
-    setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {
+    setFetechConfig(configurationList?.data);
+    setConfigPages(configurationList?.pagination?.totalcount);
+    configurationList?.data.forEach((item, idx) => {
       getState.push({
         sno: (
           <span className="sno_header" style={{marginLeft:"2rem",width:"1%"}}>
-            {idx + 1}
+            {idx + 1 + ((getPageNo -1) * 10)}
           </span>
         ),
         profileName: item.configurename,
@@ -1847,7 +1853,11 @@ const showToast = (severity, detail) => {
     }   
   }
 
- 
+  const onPageChange = (e) => {
+      setFirstPage(e.first);
+      setRowsPage(e.rows);
+      tableUpdate(e.page + 1);
+  };
  
   const renderTable = () => {
     if (!!configList.length) {
@@ -1859,7 +1869,6 @@ const showToast = (severity, detail) => {
          <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
          <Tooltip target="#CICD_Disable_tooltip" position="bottom" content={cicdLicense.msg}/> 
          {loading ? <ScreenOverlay content={loading} /> : null}
-
           <DataTable
             showGridlines
             resizableColumns
@@ -1920,6 +1929,7 @@ const showToast = (severity, detail) => {
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
+          <Paginator first={firstPage} rows={rowsPage} totalRecords={configPages} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
           <AvoModal
           visible={visible_saucelab}
           onhide={visible_saucelab}
