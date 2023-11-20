@@ -53,15 +53,25 @@ const IceProvisionForm = (props) => {
 		}
 
 		let tokeninfo = {
-			userid: props.edit?props.edit.userId:props.userid[1],
+			userid: props.userid[1],
 			icename: props.icename.trim(),
 			icetype: icetype,
 			action: "provision",
-			email:props.edit? props.edit.email:props.userid[6],
-			username:props.edit?props.edit.userName:props.userid[0],
-			firstName: props.edit?props.edit.firstName:props.userid[4],
-			lastName: props.edit?props.edit.lastName:props.userid[5],
+			email:props.userid[6],
+			username:props.userid[0],
+			firstName: props.userid[4],
+			lastName: props.userid[5],
 			url:new URL(window.location.href).origin,
+// ------------need it for reference----------- 
+			// userid: props.edit?props.edit.userId:props.userid[1],
+			// icename: props.icename.trim(),
+			// icetype: icetype,
+			// action: "provision",
+			// email:props.edit? props.edit.email:props.userid[6],
+			// username:props.edit?props.edit.userName:props.userid[0],
+			// firstName: props.edit?props.edit.firstName:props.userid[4],
+			// lastName: props.edit?props.edit.lastName:props.userid[5],
+			// url:new URL(window.location.href).origin,
 		};
 		setLoading("Provisioning Token...");
 		const data = await provisions(tokeninfo);

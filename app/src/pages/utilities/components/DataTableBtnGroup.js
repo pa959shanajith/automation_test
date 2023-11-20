@@ -5,7 +5,7 @@ import ClickAwayListener from 'react-click-away-listener';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import { ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global';
 import ExportDataTable from './ExportDataTable';
-import { setCopyCells } from '../../utilities/UtilittSlice';
+import { setCopyCells } from '../UtilitySlice';
 import ImportPopUp from './ImportPopUp';
 import * as utilApi from '../api';
 import DtPasteStepDialog from './DtPasteStepDialog';

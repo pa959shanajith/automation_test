@@ -18,6 +18,7 @@ import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { SelectButton } from 'primereact/selectbutton';
 import { testTypesOptions, viewByOptions } from '../../utility/mockData';
 import { useNavigate } from 'react-router-dom';
+import { Paginator } from 'primereact/paginator';
 export var navigate
 
 const reports = () => {
@@ -30,11 +31,14 @@ const reports = () => {
     const [selectedOption, setSelectedOption] = useState("");
     const [searchReportData, setSearchReportData] = useState("");
     const [configProjectId, setConfigProjectId] = useState("");
+    const [configPages, setConfigPages] = useState(0);
     const [projectList, setProjectList] = useState([]);
     const [show, setShow] = useState(false);
     const [viewBy, setViewBy] = useState(viewByOptions[0]?.value);
     const [testType, setTestType] = useState(testTypesOptions[0]?.value);
     const [project, setProject] = useState({});
+    const [firstPage, setFirstPage] = useState(0);
+    const [rowsPage, setRowsPage] = useState(10);
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
     );
@@ -83,15 +87,18 @@ const reports = () => {
         })();
     }, [viewBy, testType]);
 
-    const fetchReportData = async (initProj) => {
+    const fetchReportData = async (initProj, getPageNo = 1) => {
         try {
           let executionProfileName = [];
           let accessibilityScreen;
           if (testType === "Functional Test" && viewBy === "Execution Profile") {
-            executionProfileName = await fetchConfigureList({
+              const getExecutionProfileName = await fetchConfigureList({
               projectid: initProj,
               param: "reportData",
+              page: getPageNo
             });
+            executionProfileName = getExecutionProfileName?.data;
+            setConfigPages(getExecutionProfileName?.pagination?.totalcount);
           } else if (testType === "Functional Test" && viewBy === "Test Suites") {
             executionProfileName = await getFunctionalReports(
               initProj,
@@ -201,6 +208,12 @@ const reports = () => {
     const viewByTemplate = (option) => {
       return <div><i className={option.icon}></i><span>{option.value}</span></div>;
     };
+
+    const onPageChange = (e) => {
+      setFirstPage(e.first);
+      setRowsPage(e.rows);
+      fetchReportData(initProj, e.page + 1);
+  };
 
     return (
       <div className="reports_container">
@@ -459,6 +472,16 @@ const reports = () => {
             )}
             {show && <ReportTestTable />}
           </div>
+          {activeIndex === "Functional Test" &&
+            executionButon === "View by Execution Profile" && (
+              <Paginator
+                first={firstPage}
+                rows={rowsPage}
+                totalRecords={configPages}
+                rowsPerPageOptions={[10, 20, 30]}
+                onPageChange={onPageChange}
+              />
+            )}
           <div>
             <Footer />
           </div>
