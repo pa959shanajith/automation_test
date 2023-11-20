@@ -120,16 +120,8 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   let addMore = useRef(false);
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  let AppTypeElementIdentifier;
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
-
-
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-  if (localStorageDefaultProject) {
-    NameOfAppType = JSON.parse(localStorageDefaultProject);
-    AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
-}
 
   useEffect(() => {
     fetchScrapeData()
@@ -1157,7 +1149,7 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
-    {(selectedCapturedElement.length>0 && (NameOfAppType.appType=="Web" || AppTypeElementIdentifier=="Web")) ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {(selectedCapturedElement.length>0 && typesOfAppType==="Web" )?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
@@ -1654,7 +1646,10 @@ const footerSave = (
   };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
-  // const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+      NameOfAppType = JSON.parse(localStorageDefaultProject);
+  }
  
 
 
