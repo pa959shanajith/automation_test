@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { manageUserDetails } from '../api'
 import '../styles/EditProfile.scss';
+import  UserProfile  from './UserProfile';
 
 
 
@@ -19,7 +20,7 @@ const EditProfile = (props) => {
     const { showDialogBox, setShowDialogBox } = props;
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const toastWrapperRef = useRef(null);
-
+    const [updateUserDetails, setUpdateUserDetails] = useState(false);
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -112,6 +113,7 @@ const EditProfile = (props) => {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
+                    setUpdateUserDetails(true);
                     props.toastSuccess('Profile changed successfully');
                     localStorage.setItem("userInfo", JSON.stringify(userdetail))
                     dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage }))
@@ -177,7 +179,7 @@ const EditProfile = (props) => {
 
 
     return (
-        <>
+        <>  {updateUserDetails && <UserProfile/>}
             <div className='surface-card'>
                 <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
