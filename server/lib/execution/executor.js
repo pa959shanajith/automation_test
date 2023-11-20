@@ -527,7 +527,7 @@ class TestSuiteExecutor {
         executionRequest.recieverEmailAddress = batchExecutionData.recieverEmailAddress;
 
         if (execType == "SCHEDULE") executionRequest.scheduleId = batchExecutionData.scheduleId;
-        if(batchExecutionData['batchInfo'][0]['appType'] == 'MobileApp') {
+        if(batchExecutionData['batchInfo'][0]['appType'] == 'MobileApp' && batchExecutionData['executionEnv'] !== 'default') {
             // Fetch the apk details from DAS
             const inputs = {
                 name : batchExecutionData['mobile']['uploadedApk'],
