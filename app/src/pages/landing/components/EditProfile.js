@@ -118,7 +118,7 @@ const EditProfile = (props) => {
                 } else if (data === "exists") {
                     props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
                 } else if (data === "email exists") {
-                    props.toastWarn(MSG.CUSTOM("User with provided mail already exist",VARIANT.ERROR));
+                    props.toastWarn(MSG.CUSTOM("User with provided mail already exists",VARIANT.ERROR));
                 } else if (data === "fail") {
                     props.toastError(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
                 }
