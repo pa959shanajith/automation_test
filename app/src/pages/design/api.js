@@ -1663,6 +1663,10 @@ export const importDefinition = async(sourceUrl) => {
             },
             credentials: 'include'
         });
+        if(res.data =='unavailableLocalServer') {
+            console.log(res.data)
+            return res.data
+        }
         if(res.status === 401 || res.data === "Invalid Session"){
             // RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
