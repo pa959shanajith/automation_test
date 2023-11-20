@@ -115,7 +115,7 @@ const UserList = (props) => {
                     style={{ height: "20px", width: "20px" }} disa
                     className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
                 />
-                {rowData.userId === userInfo?.user_id && <Tooltip target=".edit__usericon__disabled" content='Action not allowed'></Tooltip>}
+                {rowData.userId === userInfo?.user_id && <Tooltip target=".edit__usericon__disabled" content='Action not allowed' position='bottom'></Tooltip>}
                 <img
                     src="static/imgs/ic-delete-bin.png" alt="deleteUserIcon"
                     style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
