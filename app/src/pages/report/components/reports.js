@@ -78,7 +78,7 @@ const reports = () => {
                     if(!initProj || !data.find((proj)=> proj.id === initProj)){
                         handeSelectProject(data[0]?.id || '');
                     }else{
-                        fetchReportData(initProj, selectProjects);
+                        fetchReportData(initProj);
                     }
                 }
             }catch(error){
@@ -473,7 +473,7 @@ const reports = () => {
             {show && <ReportTestTable />}
           </div>
           {activeIndex === "Functional Test" &&
-            executionButon === "View by Execution Profile" && (
+            executionButon === "View by Execution Profile" && viewBy === "Execution Profile" && (
               <Paginator
                 first={firstPage}
                 rows={rowsPage}
