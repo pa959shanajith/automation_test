@@ -112,7 +112,7 @@ const UserList = (props) => {
         return (
             <div className='flex flex-row' style={{justifyContent:"center", gap:"0.5rem"}}>
                 <img src="static/imgs/ic-edit.png" alt="editUserIcon"
-                    style={{ height: "20px", width: "20px" }} disa
+                    style={{ height: "20px", width: "20px" }}
                     className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
                 />
                 {rowData.userId === userInfo?.user_id && <Tooltip target=".edit__usericon__disabled" content='Action not allowed' position='bottom'></Tooltip>}
