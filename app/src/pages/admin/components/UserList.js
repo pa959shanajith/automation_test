@@ -11,6 +11,7 @@ import { Footer, ModalContainer } from '../../global';
 import CreateUser from './CreateUser';
 import { AdminActions } from '../adminSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { Tooltip } from 'primereact/tooltip';
 
 
 
@@ -23,7 +24,7 @@ const UserList = (props) => {
     const [editUserData, setEditUserData] = useState('')
     const allUserList = useSelector(state => state.admin.allUsersList);
     const [showDeleteConfirmPopUp, setShowDeleteConfirmPopUp] = useState(false);
-
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
     useEffect(() => {
         (async () => {
@@ -99,6 +100,14 @@ const UserList = (props) => {
         setEditUserData(rowData);
     }
 
+    const editHandler = (event, rowData) => {
+        if(rowData.userId !== userInfo?.user_id){
+            editRowData(rowData);
+            setShowDeleteConfirmPopUp(true);
+            dispatch(AdminActions.EDIT_USER(false));
+        }
+        else event.preventDefault();
+    }
     const actionBodyTemplate = (rowData) => {
         return (
             <div className='flex flex-row' style={{justifyContent:"center", gap:"0.5rem"}}>
@@ -106,11 +115,12 @@ const UserList = (props) => {
                     style={{ height: "20px", width: "20px" }}
                     className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
                 />
+                {rowData.userId === userInfo?.user_id && <Tooltip target=".edit__usericon__disabled" content='Action not allowed' position='bottom'></Tooltip>}
                 <img
                     src="static/imgs/ic-delete-bin.png" alt="deleteUserIcon"
                     style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-                    className="delete__usericon"
-                    onClick={() => { editRowData(rowData); setShowDeleteConfirmPopUp(true); dispatch(AdminActions.EDIT_USER(false)); }}
+                    className={`${rowData.userId === userInfo?.user_id ? "edit__usericon__disabled" :"edit__usericon"}`}
+                    onClick={(e) => { editHandler(e, rowData) }}
                 />
             </div>
         );

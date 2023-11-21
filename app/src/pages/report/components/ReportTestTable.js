@@ -32,6 +32,7 @@ import "../styles/ReportTestTable.scss";
 import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
+import NetworkOperation from "./NetworkOperation";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -67,6 +68,9 @@ export default function BasicDemo() {
   const [responseFeilds, setResponseFeilds] = useState({});
   const [configValues, setConfigValues] = useState({});
   const [selectedRow, setSelectedRow] = useState([]);
+  const [networkDialog, setNewtorkDialog] = useState(false);
+  const [networkData, setNetworkData] = useState([]);
+  const [description, setDescription] = useState(null);
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -765,20 +769,41 @@ export default function BasicDemo() {
     return itemObj;
   };
 
-  const screenShotLink = (getLink) =>
-    getLink?.data?.screenshot_path && (
-      <div
-        className="screenshot_view"
-        onClick={async () => {
-          setVisibleScreen(true);
-          let data = await openScreenshot(getLink?.data?.screenshot_path);
-          let image = "data:image/PNG;base64," + data;
-          setVisibleScreenShot(image);
-        }}
-      >
-        View Screenshot
+  const screenShotLink = (getLink) =>{
+    return (
+    <div className="action_items">
+      {getLink?.data?.screenshot_path && (
+        <div
+          className="screenshot_view"
+          onClick={async () => {
+            setVisibleScreen(true);
+            let data = await openScreenshot(getLink?.data?.screenshot_path);
+            let image = "data:image/PNG;base64," + data;
+            setVisibleScreenShot(image);
+          }}
+        >
+         <img src="static/imgs/view_screenshot_icon_before.svg" />
+        </div>
+      )}
+      {getLink?.data?.Network_Data && (
+      <div>
+        <img
+          className="plug_icon"
+          src="static/imgs/plug_icon.svg"
+              onClick={() => { setNewtorkDialog(true);
+                 setNetworkData(getLink?.data?.Network_Data);
+                  setDescription(reportData?.rows.filter((el) => el?.slno === getLink?.data?.slno)[0]?.StepDescription);
+                }}
+        />
       </div>
-    );
+      )}
+    </div>
+  )}
+
+  const hideNetworkDialog = () => {
+    setNewtorkDialog(false);
+  };
+
 
   const returnMap = (getMap) => {
     switch(getMap){
@@ -833,6 +858,7 @@ export default function BasicDemo() {
   }
 
   return (
+    <>
     <div className="reportsTable_container">
       <div className="reportSummary">
         <Accordion
@@ -1260,5 +1286,8 @@ export default function BasicDemo() {
         }}
       />
     </div>
+
+    <NetworkOperation visible={networkDialog} onHide={hideNetworkDialog} setNetworkData={setNetworkData} networkData={networkData} setDescription={setDescription} description={description}/>
+    </>
   );
 }
