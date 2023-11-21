@@ -1,0 +1,111 @@
+@import "../../global/styles/ColorVariables.scss";
+.text_url{
+    // width: 43rem;
+}
+.Network_Dialog{
+ width: 60rem;
+ .p-dialog-content{
+    overflow-y: hidden;
+ }
+}
+
+.ellipsis-column{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 15rem;
+  }
+
+.request_url{
+    word-wrap: break-word;
+}
+.response__content__header{
+  font-family: Open Sans;
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.NetworkData__header2{
+  font-family: Open Sans !important;
+  font: $f7_regular !important;
+  color: #212121 !important;
+  margin-top: 0.5rem;
+}
+.response__content{
+    word-wrap: break-word;
+}
+
+.status_code {
+    display: flex;
+    align-items: center;
+    margin-right: 2rem;
+    &__div {
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 50%;
+        margin-right: 0.3rem;
+    }
+    &__idle {
+        background-color: #008C5D;
+    }
+    &__in-progress{
+        background-color: #ffbf00;
+    }
+    &__busy {
+        background-color: #d81b1f;
+    }
+    &__offline{
+        background-color: #323130;
+    }
+    &__inactive{
+        background-color: #a19f9d;
+    }
+}
+
+.code__text{
+    position: relative;
+    left: 1.5rem;
+    bottom: 1.2rem;
+}
+
+.networkData__table{
+      .p-datatable-wrapper .p-datatable-tbody>tr>td:nth-child(2) {
+        border-left: none;
+      }
+      .p-datatable-wrapper .p-datatable-tbody>tr>td:nth-child(1) {
+        padding: 0rem;
+      }
+      .p-datatable-wrapper .p-datatable-thead>tr>th:nth-child(2) {
+        border-left: none;
+        text-align: center;
+      }
+      .p-datatable-wrapper .p-datatable-thead>tr>th:nth-child(1) {
+        padding: 0rem;
+      }
+      .p-datatable-wrapper .p-datatable-thead>tr>th {
+       text-align: center;
+      }
+      width: 55.5rem;
+}
+
+.networkData__header1{
+    font-family: Open Sans;
+    font: $f7_semibold;
+    color: #212121;
+}
+
+.accordion__txt{
+    font-family: Open Sans;
+    font: $f6_regular;
+    color: #212121;
+    word-wrap: break-word;
+}
+
+.response__txt{
+    width: 51rem;
+    overflow: auto;
+    display: flex;
+    height: 3rem;
+    word-wrap: break-word;
+}
