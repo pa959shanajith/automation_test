@@ -115,7 +115,7 @@ const ChangePassword = (props) => {
                 <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Change Password" className="changePassword_dialog" visible={showDialog} style={{ width: '30vw' }} onHide={resetFields} footer={changePasswordFooter}>
                     <div className='pt-3'>
-                        <form autocomplete="off">
+                        <form autoComplete="off">
                             {/* New Password Input Field */}
                             <label className='input_label' htmlFor="newPassword">New Password <span className='text-red-500'>*</span></label>
                             <div className="p-input-icon-right mb-1 mt-2">
@@ -132,7 +132,7 @@ const ChangePassword = (props) => {
                                     onChange={newPasswordOnChangeHandler}
                                     placeholder='Enter new password'
                                     type={showNewPassword ? "text" : "password"}
-                                    autocomplete="off"
+                                    autoComplete="off"
                                 />
                             </div>
 
@@ -170,7 +170,7 @@ const ChangePassword = (props) => {
                                 />
                                 <InputText
                                     style={{ width: '25vw' }}
-                                    autocomplete="off" 
+                                    autoComplete="off" 
                                     id="confirmPassword"
                                     onFocus={() => setConfirmPasswordFocus(true)}
                                     className={`input_field ${confirmPasswordFocus && newpassword !== confirmNewpassword ? 'p-invalid' : 'input_field_success'}`}
