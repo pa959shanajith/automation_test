@@ -426,7 +426,7 @@ const CreateProject = (props) => {
       }
 
       var projData = {
-        projectName: value,
+        projectName: value.trim(),
         type: selectedApp.code,
         assignedUsers: filteredUserDetails,
         domain: "banking",
@@ -471,7 +471,7 @@ const CreateProject = (props) => {
     }));
 
     var upadtedProjData = {
-      projectName: value,
+      projectName: value.trim(),
       type: selectedApp.code,
       assignedUsers: filteredUserDetails,
       domain: "banking",
