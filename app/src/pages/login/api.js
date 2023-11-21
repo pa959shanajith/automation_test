@@ -1,8 +1,9 @@
 import axios from 'axios';
 import {url} from '../../App';
 
-/*Component LoginFields
-  api returns String (restart/validCredential/inValidCredential/invalid_username_password/userLogged/inValidLDAPServer/invalidUserConf)
+
+/*Component LoginPage
+  api returns String (restart/ validCredential/ inValidCredential/ invalid_username_password/ userLogged/ inValidLDAPServer/ invalidUserConf)
 */
 export const authenticateUser = async(username, password) => {
     try{
@@ -25,6 +26,80 @@ export const authenticateUser = async(username, password) => {
         return {error: 'Failed to Authenticate User'}
     }
 }
+
+/*Component LoginPage
+  api returns {proceed:true} / invalidServerConf
+*/
+export const checkUser = async(user) => {
+    try{
+        const res = await axios(url+"/checkUser", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'username': user},
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            console.log(user);
+            return {error: 'Failed to check user'}
+        }
+    }
+    catch(err){
+        console.log(err);
+        return {error: 'Failed to check user'}
+    }
+}
+
+/*Component LoginPage
+  api returns 
+*/
+export const forgotPasswordEmail = async(args) => {
+    try{
+        const res = await axios(url+"/forgotPasswordEmail", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: args,
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err);
+    }
+}
+
+export const restartService = async(i) => {
+    try{
+        const res = await axios(url+"/restartService", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {id: i},
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
+        }
+        else{
+            console.log(res.status);
+        }
+    }
+    catch(err){
+        console.log(err)
+    }
+} 
 
 /*Component BasePage
   api returns {"user_id":"","username":"","email_id":"","additionalrole":[],"firstname":"","lastname":"","role":"","taskwflow":bool,"token":"","dbuser":bool,"ldapuser":bool,"samluser":bool,"openiduser":bool,"rolename":"","pluginsInfo":[{"pluginName":"","pluginValue":bool}],"page":"plugin"}
@@ -72,31 +147,30 @@ export const validateUserState = async() => {
     }
 }
 
-/*Component LoginFields
-  api returns {proceed:true} / invalidServerConf
-*/
-export const checkUser = async(user) => {
+export const storeUserDetails = async(userData) => {
     try{
-            const res = await axios(url+"/checkUser", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                data: {'username': user},
-                credentials : 'include'
-            });
-            if (res.status === 200){
-                return res.data;
-            }
-            else{
-                return {error: 'Failed to check user'}
-            }
+        const res = await axios(url+"/storeUserDetails", {
+            method : 'POST',
+            headers : {
+                'Content-type' : "application/json"
+            },
+            data: {
+                action: "storeUserDetails",
+                userDetails : userData
+            },
+            credentials : 'include'
+        });
+        if (res.status === 200) {
+            return res.data;
         }
+        else{
+            console.log(res.status);
+        }
+    }
     catch(err){
-        return {error: 'Failed to check user'}
+        console.log(err);
     }
 }
-
 /*Component Login
   api returns true / false
 */
@@ -126,145 +200,28 @@ export const shouldShowVerifyPassword = async(user_id) => {
   api returns flag and/or user
 */
 export const shouldResetPassword = async(uid) => {
-  try{
-      const res = await axios(url+"/checkForgotExpiry", {
-          method: "POST",
-          headers: {
-              "Content-type": "application/json"
-          },
-          data: { uid },
-          credentials : 'include'
-      });
-      if (res.status === 200){
-          return res.data;
-      }
-      else{
-          return {error: 'Failed to verify user'}
-      }
+    try{
+        const res = await axios(url+"/checkForgotExpiry", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: { uid },
+            credentials : 'include'
+        });
+        if (res.status === 200){
+            return res.data;
+        }
+        else{
+            return {error: 'Failed to verify user'}
+        }
+    }
+    catch(err){
+        return {error: 'Failed to verify user'}
+    }
   }
-  catch(err){
-      return {error: 'Failed to verify user'}
-  }
-}
 
-export const restartService = async(i) => {
-    try{
-        const res = await axios(url+"/restartService", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: {id: i},
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err)
-    }
-} 
-
-export const storeUserDetails = async(userData) => {
-    try{
-        const res = await axios(url+"/storeUserDetails", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: {
-                action: "storeUserDetails",
-                userDetails : userData
-            },
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-export const forgotPasswordEmail = async(args) => {
-    try{
-        const res = await axios(url+"/forgotPasswordEmail", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: args,
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-export const unlockAccountEmail = async(username) => {
-    try{
-        const res = await axios(url+"/unlockAccountEmail", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: {
-                username: username
-            },
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
-export const unlock = async(username, password) => {
-    try{
-        const res = await axios(url+"/unlock", {
-            method : 'POST',
-            headers : {
-                'Content-type' : "application/json"
-            },
-            data: {
-                username: username,
-				password: password
-            },
-            credentials : 'include'
-        });
-        if (res.status === 200) {
-            return res.data;
-        }
-        else{
-            console.log(res.status);
-        }
-    }
-    catch(err){
-        console.log(err);
-    }
-}
-
+  
 export const UpdateUserInfoforLicence = async(username) => {
     try{
         const res = await axios(url+"/hooks/upgradeLicense", {

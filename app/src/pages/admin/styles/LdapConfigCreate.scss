@@ -4,6 +4,7 @@
 }
 .btn-margin-ldap{
     margin-right:10px;
+    float: right;
 }
 .form-group-ldap{
     margin-bottom:15px;
@@ -12,28 +13,31 @@
 .adminForm-ldap {
 	padding-top: 5%;
 }
+.adminForm-ldap-container{
+    width: 100%;
+    float: left;
+    overflow-y: auto;
+    height: 31rem;
+}
 .leftControl-ldap {
 	float: left;
 	width: 47%;
 }
 .adminControl-ldap {
 	margin-bottom: 3%;
-    padding: 0px 0px;
+    padding: 0rem 0.2rem;
     position: relative;
     float: left;
-    width: 100%;
+    width: 50%;
 }
 
 .adminControl-ldap div span {
-    display: inline-block;
     font-size: small;
-    width: 130px;
-    font-weight: 700;
-    margin-top: 5px;
+    font-weight: 600;
 }
-.adminControl-ldap div input, .adminControl-ldap div select {
-	width: calc(100% - 130px);
-}
+// .adminControl-ldap div input, .adminControl-ldap div select {
+// 	width: calc(100% - 130px);
+// }
 .form-control-custom-ldap{
 	border: 1px solid $borderOne !important;
 	border-left:0 !important;
@@ -79,9 +83,10 @@
     height: 100%;
     float: left;
     padding-bottom: 55px;
+    width:100%;
 }
 .ldap_container-create{
-    width: 100%;
+    width: 71%;
     padding: 20px;
-    height: 100%;
+    // height: 100%;
 }

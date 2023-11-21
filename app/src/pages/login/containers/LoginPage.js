@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import LoginFields from "../components/LoginFields.js";
-import { SetProgressBar} from '../../global';
-import { persistor } from '../../../reducer';
+import LoginFields from '../components/Loginfields';
+// import { SetProgressBar} from '../../global';
+// import { persistor } from '../../../reducer';
 import StaticElements from '../components/StaticElements';
 
 /*
@@ -14,14 +14,14 @@ import StaticElements from '../components/StaticElements';
 
 const LoginPage = () => {
      
-    useEffect(()=>{
-        persistor.purge();
-        SetProgressBar('complete');
-    }, []);
+    // useEffect(()=>{
+    //     persistor.purge();
+    //     SetProgressBar('complete');
+    // }, []);
 
     return (
         <StaticElements>
-             <LoginFields SetProgressBar={SetProgressBar} verifyPage={window.location.pathname==="/verify"?true:false} resetPassword={window.location.pathname==="/reset"?true:false}/>
+             <LoginFields verifyPage={window.location.pathname==="/verify"?true:false} resetPassword={window.location.pathname==="/reset"?true:false}/>
         </StaticElements>
     );
 }

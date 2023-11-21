@@ -1,0 +1,18 @@
+.avo_multiselect {
+    .required_icon {
+        padding: 0.3rem;
+    }
+    .p-multiselect {
+        width: 100%;
+    }
+    .validation_container {
+        height: 1rem;
+        .txt_valid {
+            visibility: hidden;
+        }
+        .txt_invalid {
+            visibility: visible;
+            color: #D1272C;
+        }
+    }
+}

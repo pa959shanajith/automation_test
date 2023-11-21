@@ -7,18 +7,17 @@ import "../styles/FooterTwo.scss"
     Props: None
 
 */
-
+const {REACT_APP_VERSION} = process.env;
 const Footer = () => {
     return (
         <div className="main-footer">
             <div className="main-footer-content">
             <span className="right-text">
-                © {new Date().getFullYear()}  Avo Automation. All Rights Reserved
+                <img src='static/imgs/Copyright.svg' className='copyImg' alt='copyright'/> Copyright {new Date().getFullYear()} Avo Automation - <span className='terms'>Terms of Use</span>
             </span>
-            {/* <span className="left-text">
-                Powered By
-                <img className="footer-logo_two" alt="logo" src="static/imgs/ftr-avo-logo.png"/>
-            </span> */}
+            <span className="left-text">
+                Avo Assure v{REACT_APP_VERSION}
+            </span>
             </div>
         </div>
     );

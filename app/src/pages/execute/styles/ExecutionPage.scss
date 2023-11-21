@@ -1,0 +1,21 @@
+@import "../../global/styles/ColorVariables.scss";
+.Terminate_Execution{
+    width: 1.2rem;
+    margin-left: 1rem;
+    cursor: pointer;
+}
+.Manage_execution_Queue{
+    font:$f5_semibold ;
+    margin-left: 1.1rem;
+    margin-top: 1rem;
+    .p-icon {
+        display: inline-block !important;
+        margin-top: 0.3rem !important; 
+    }
+}
+.treeitems{
+    .p-icon {
+        display: inline-block !important;
+        margin-bottom: -0.3rem !important; 
+    }
+}

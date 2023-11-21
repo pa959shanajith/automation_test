@@ -245,7 +245,17 @@ exports.saveData = async (req, res) => {
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
-				if (e.type == "testcases") nObj[nObj.length - 1]['pid_c'] = e._id||null;
+				if(e.scrapedurl) {
+					nObj[nObj.length - 1]['scrapedurl'] = e.scrapedurl
+				}
+				if(e.scrapeinfo) {
+					nObj[nObj.length - 1]['scrapeinfo'] = e.scrapeinfo
+				}
+				if (e.type == "testcases") {
+					nObj[nObj.length - 1]['pid_c'] = e._id||null;
+					if(e.steps)
+						nObj[nObj.length - 1]['steps'] = e.steps;
+				};
 				if (idDict[e.pid] !== undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 				idDict[e.id] = uidx++;
 			});
@@ -255,10 +265,17 @@ exports.saveData = async (req, res) => {
 					var tcList = [];
 					s.children.forEach(function (tc, i) {
 						tcList.push({ "screenid": s._id||null, "testcaseid": tc._id||null, "testcaseName": tc.name, "task": tc.task,"state":tc.state ,"childIndex":parseInt(tc.childIndex)});
-						
+						if(tc.steps) 
+							tcList[tcList.length - 1]['steps'] = tc.steps;
 					});
 					tcList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
 					sList.push({ "screenid": s._id||null, "screenName": s.name, "task": s.task, "testcaseDetails": tcList,"state":s.state,"childIndex":parseInt(s.childIndex) });
+					if(s.scrapedurl) {
+						sList[sList.length - 1]['scrapedurl'] = s.scrapedurl
+					}
+					if(s.scrapeinfo) {
+						sList[sList.length - 1]['scrapeinfo'] = s.scrapeinfo
+					}
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
@@ -585,7 +602,7 @@ exports.saveEndtoEndData = function (req, res) {
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-			
+			qObj.host=req.headers.host;			
 			create_ice.saveMindmapE2E(qObj, function (err, data) {
 				if (err) {
 					res.status(500).send(err);
@@ -1399,7 +1416,6 @@ exports.deleteScenario = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const inputs = {};
-		console.log(req.body);		
 		const result = await utils.fetchData(req.body, "mindmap/deleteScenario", fnName);
 		return res.status('200').send(result);
 	}catch (exception){
@@ -1412,7 +1428,6 @@ exports.deleteScenarioETE = async(req,res) => {
 	logger.info("Inside UI service: " + fnName)
 	try{
 		const inputs = {};
-		console.log(req.body);		
 		const result = await utils.fetchData(req.body, "mindmap/deleteScenarioETE", fnName);
 		return res.status('200').send(result);
 	}catch (exception){
@@ -1453,10 +1468,10 @@ exports.exportToMMSkel = async (req, res) => {
 	try {
 		const inputs= {
 			"tab":req.body.data.tab,
-		"projectid":req.body.data.projectid,
-		"moduleid":req.body.data.moduleid,
-		"cycleid":null,
-		"name":"getModules"
+		    "projectid":req.body.data.projectid,
+		    "moduleid":req.body.data.moduleid,
+		    "cycleid":null,
+		    "name":"getModules"
 		}
 		var data=[]
 		var output = await getModule(inputs);
@@ -1531,102 +1546,191 @@ exports.dropTempExpImpColl = async () => {
     const fnName= "dropTempExpImpColl"
 	const inputs = { "query": "dropTempExpImpColl" };
 	const result = await utils.fetchData(inputs, "mindmap/dropTempExpImpColl");
-    if (result == "fail") logger.error( fnName + " : Error occured while deleting Temporary collections");
-    else logger.info( fnName + " :Temporary collections got deleted successfully");
-}
-exports.singleExcelToMindmap = function (req, res) {
-	const fnName = "excelToMindmap";
-	logger.info("Inside UI service: " + fnName);
-	try {
-		var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
-		if (req.body.data.flag == 'sheetname') {
-			return res.status(200).send(wb1.SheetNames);
-		}
-		var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
-		var numSheets = myCSV.length / 2;
-		var qObj = [];
-		var err;
-		if (numSheets == 0) {
-			return res.status(200).send("emptySheet");
-		}
-		for (var k = 0; k < numSheets; k++) {
-			var cSheet = myCSV[k * 2 + 1];
-			var cSheetRow = cSheet.split('\n');
-			var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
-			var uniqueIndex = 0;
-			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-				if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
-				if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-				if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
-			});
-			if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
-				err = true;
-				break;
-			}
-			var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
-			for (var i = 1; i < cSheetRow.length; i++) {
-				var row = cSheetRow[i].split(',');
-				if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
-					return res.status(200).send('valueError');
-				}
-				if (row.length < 3) continue;
-				if (row[modIdx] !== '') {
-					if (i == 1){
-					e = { id: uuidV4(), name: row[modIdx], type: 0 };
-					qObj.push(e);}
-					else{return res.status(200).send('Multiple modules');}
-				}
-				if (row[scoIdx] !== '') {
-					lastSco = uniqueIndex; lastScr = -1; scrDict = {};
-					e = { id: uuidV4(), name: row[scoIdx], type: 1 };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
-				if (row[scrIdx] !== '' && lastSco != -1) {
-					var tName = row[scrIdx];
-					var lScr = qObj[lastScr];
-					if (lScr === undefined || (lScr)) {
-						if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
-						lastScr = uniqueIndex;
-						e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
-						qObj.push(e);
-						nodeDict[e.id] = uniqueIndex;
-						uniqueIndex++;
-					}
-				}
-				if (row[sctIdx] !== '' && lastScr != -1) {
-					e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
-					qObj.push(e);
-					nodeDict[e.id] = uniqueIndex;
-					uniqueIndex++;
-				}
-			}
-		}
-		if (err) res.status(200).send('fail');
-		else res.status(200).send(qObj);
-	} catch(exception) {
-		logger.error("Error occurred in mindmap/"+fnName+":", exception);
-		return res.status(500).send("fail");
-	}
+    if (result == "fail")
+	logger.error( fnName + " : Error occured while deleting Temporary collections");
+    else 
+	logger.info( fnName + " :Temporary collections got deleted successfully");
 };
+
+exports.singleExcelToMindmap = function (req, res) {
+    const fnName = "excelToMindmap";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var wb1 = xlsx.read(req.body.data.content, { type: 'binary' });
+        if (req.body.data.flag == 'sheetname') {
+            return res.status(200).send(wb1.SheetNames);
+        }
+        var myCSV = xlsToCSV(wb1, req.body.data.sheetname);
+        var numSheets = myCSV.length / 2;
+        var qObj = [];
+        var err;
+        if (numSheets == 0) {
+            return res.status(200).send("emptySheet");
+        }
+        for (var k = 0; k < numSheets; k++) {
+            var cSheet = myCSV[k * 2 + 1];
+            var cSheetRow = cSheet.split('\n');
+            var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
+            var uniqueIndex = 0;
+            cSheetRow[0].split(',').forEach(function (e, i) {
+                if(i== 0 && e.toLowerCase()=="module") modIdx = i;
+                if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+                if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
+                if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+            });
+            if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
+                err = true;
+                break;
+            }
+            var e, lastSco = -1, lastScr = -1, nodeDict = {}, scrDict = {};
+            for (var i = 1; i < cSheetRow.length; i++) {
+                var row = cSheetRow[i].split(',');
+                if (i==1 && (row[0]=="" || row[1]=="" || row[2]=="" || row[3]=="")) {
+                    return res.status(200).send('valueError');
+                }
+                if (row.length < 3) continue;
+                if (row[modIdx] !== '') {
+                    if (i == 1){
+                    e = { id: uuidV4(), name: row[modIdx], type: 0 };
+                    qObj.push(e);}
+                    else{return res.status(200).send('Multiple modules');}
+                }
+                if (row[scoIdx] !== '') {
+                    lastSco = uniqueIndex; lastScr = -1; scrDict = {};
+                    e = { id: uuidV4(), name: row[scoIdx], type: 1 };
+                    qObj.push(e);
+                    nodeDict[e.id] = uniqueIndex;
+                    uniqueIndex++;
+                }
+                if (row[scrIdx] !== '' && lastSco != -1) {
+                    var tName = row[scrIdx];
+                    var lScr = qObj[lastScr];
+                    if (lScr === undefined || (lScr)) {
+                        if (scrDict[tName] === undefined) scrDict[tName] = uuidV4();
+                        lastScr = uniqueIndex;
+                        e = { id: scrDict[tName], name: tName, type: 2, uidx: lastScr };
+                        qObj.push(e);
+                        nodeDict[e.id] = uniqueIndex;
+                        uniqueIndex++;
+                    }
+                }
+                if (row[sctIdx] !== '' && lastScr != -1) {
+                    e = { id: uuidV4(), name: row[sctIdx], type: 3, uidx: lastScr };
+                    qObj.push(e);
+                    nodeDict[e.id] = uniqueIndex;
+                    uniqueIndex++;
+                }
+            }
+        }
+        if (err) res.status(200).send('fail');
+        else res.status(200).send(qObj);
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
+   }
+};
+
 exports.checkExportVer = async (req, res) => {
-	const fnName = "checkExportVer";
+    const fnName = "checkExportVer";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        const exportname= req.body.exportname;
+        const query = req.body.query;
+        const projectId = req.body.projectId || "default"
+        const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
+        const result = await utils.fetchData(inputs, "/git/checkExportVer", fnName);
+        if (result == "fail") {
+            return res.send('fail');}
+        else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
+    }
+};
+
+exports.updateE2E = async (req, res) => {
+	const fnName = "updateE2E";
 	logger.info("Inside UI service: " + fnName);
 	try {
-		const exportname= req.body.exportname;
-		const query = req.body.query;
-		const projectId = req.body.projectId || "default"
-		const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
-		const result = await utils.fetchData(inputs, "git/checkExportVer", fnName);
+		var userid = req.session.userid;
+		const inputs={ 
+			"query": "updateE2E",
+			"scenarioID": req.body.scenarioID,
+			// "projectID": req.body.projectID
+		 };
+		const result = await utils.fetchData(inputs, "mindmap/updateE2E", fnName);
 		if (result == "fail") {
-			return res.send('fail');}
-		else {
+			return res.send("fail");
+		} else {
 			return res.send(result);
 		}
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+
+
+exports.importDefinition = async (req, res) => {
+	try {
+        logger.info("Inside UI service: importDefinition");
+        var username=req.session.username;
+		var clientName=utils.getClientName(req.headers.host);
+        var icename = undefined
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+        // redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		var action = req.body.param;
+		if(action == 'importDefinition_ICE' && icename!=undefined){
+			var sourceUrl = req.body.sourceUrl;
+			try {
+				// var wsdlurl = req.body.wsdlurl;
+				logger.info("Sending socket request for debugTestCase to cachedb");
+				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl};
+				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+				var socket = require('../lib/socket');
+				var mySocket;
+				var clientName=utils.getClientName(host);
+				mySocket = socket.allSocketsMap[clientName][icename];
+				if(mySocket.connected){
+
+					logger.info("Sending request to ICE for importDefinition_ICE");
+					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
+					function result_WS_ImportDefinition_listener(message) {
+						let data = message;
+						//LB: make sure to send recieved data to corresponding user
+						mySocket.removeListener('result_WS_ImportDefinition', result_WS_ImportDefinition_listener);
+						try {
+							if(!Object.keys(data).length){
+								logger.info('Error Occured in fetching');
+								// res.status(resultData.Error.status).send(resultData.Error.msg);
+								// return;
+							}
+							res.send(data);
+						} catch (exception) {
+							res.send("fail");
+							logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
+						}
+					}
+					// redisServer.redisSubServer.on("message",result_WS_ImportDefinition_listener);
+					mySocket.on("result_WS_ImportDefinition",result_WS_ImportDefinition_listener)
+				} else {
+					flag = "unavailableLocalServer";
+					logger.error("Error occurred in the service importDefinition - result_WS_ImportDefinition: Socket not Available");
+					res.send(flag);
+				}
+				
+			} catch (exception) {
+				logger.error("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: %s", exception);
+			}
+		} else {
+			flag = "unavailableLocalServer";
+			logger.error("Error occurred in the service importDefinition - result_WS_ImportDefinition: Socket not Available");
+			res.send(flag);
+		}
+	} catch (exception) {
+        logger.error("Exception in the service importDefinition: %s", exception);
+        res.send("Fail");
+    }
 };

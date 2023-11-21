@@ -53,7 +53,7 @@ exports.saveMindmapE2E = function(req,res) {
 	var inputs = {
 		"data": RequestedJSON 
 	};
-	inputs.host = headers.headers.host;
+	inputs.host = inputs.data.host;
 	var args = {
 		data: inputs,
 		headers: {

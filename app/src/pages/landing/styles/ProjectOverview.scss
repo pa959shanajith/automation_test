@@ -1,0 +1,62 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.OverviewSection {
+  position: sticky;
+  width: 100%;
+  height: 91vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.manage-btn {
+  border: none;
+  background-color: transparent;
+  color: #605bff;
+  border-color: inherit;
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 13rem;
+}
+
+.tab-menu {
+
+  // font: $f5_semibold;
+  .p-menuitem-link {
+    padding: 0.9rem !important;
+    box-shadow: none !important;
+    font-family: 'Open Sans' !important;
+    font-style: normal !important;
+    font-weight: bold !important;
+    font-size: 18px !important;
+    line-height: 21px !important;
+    color: #030229;
+    font: $f5_semibold !important;
+  }
+
+  .p-menuitem-text {
+    font: $f5_semibold !important;
+  }
+}
+
+.DefaultProject {
+  background-color: #fff;
+  color: #030229;
+  display: flex;
+  font-weight: 400;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.DefaultProjectName {
+  margin-left: 0.5rem;
+  font: $f4_semibold;
+  max-width: 50%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

@@ -1,0 +1,107 @@
+@import "../../global/styles/ColorVariables.scss";
+.letfnav{
+    float: left;
+    position: relative;
+    left: 10rem;
+    top: 4rem;
+}
+.Utility_Label{
+    height: 87%;
+    width: 100%;
+}
+.util_header{
+    position: relative;
+    font: $f4_semibold;
+    color: #212121;
+    top: 1rem;
+}
+.util_header_Encryption{
+    font: $f5_regular;
+    color: #212121;
+}
+
+.letfnav h4{
+    text-align: center;
+    font: $f6_regular;
+}
+.letfnav span{
+    list-style-type: none;
+    float: left;
+    width: 80%;
+    // color: $whiteColor;
+    line-height: inherit;
+    text-align: center;
+    margin: 16% 10% 10%;
+    font-size: 12px;
+    cursor: pointer;
+
+    img{
+        padding: 8px 10px;
+    }
+}
+.encrypt_drodown{
+    height: 2.5rem !important;
+}
+
+#selected{
+    border-radius: 5px;
+}
+
+.util__execution_ic{
+    padding: 10px;
+}
+.util__devOps {
+    width: 4.5rem;
+}
+
+.active_tab_encryption {
+    display: flex;
+    align-items: center;
+    width: 95%;
+    background: #e3cff0 !important;
+    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    position: relative;
+    top: 2rem;
+}
+
+.not_active_tab_encryption {
+    background-color: none !important;
+    font: $f7_regular;
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 2rem;
+}
+
+.active_tab_data {
+    display: flex;
+    align-items: center;
+    width: 95%;
+    background: #e3cff0 !important;
+    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    position: relative;
+    top: 3rem;
+}
+
+.not_active_tab_data {
+    background-color: none !important;
+    font: $f7_regular;
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 3rem;
+}
+.left_side_panel{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.notelabel{
+    margin-left: 1rem;
+    font: $f6_semibold;
+}
+.notecontent{
+    margin-left: 4rem;
+    margin-top: -1.5rem;
+   font:$f6_regular
+}

@@ -1,0 +1,142 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.dt__btn{
+    border: none;
+    outline: none;
+    border-radius: 20px;
+}
+
+.dt__btngroup{
+    display: flex;
+    max-width: 100%;
+    margin-bottom: 15px;
+}
+
+.dt__table_ac_btn_grp{
+    display: inherit;
+    padding-top: 1rem;
+}
+
+.dt__tblBtn{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    &:active {
+      background-color: #0003 !important;
+      border-radius: 5px;
+    }
+}
+
+.dt__tblBtn_ic{
+    padding: 6px 16px;
+    font-size: 14px;
+    margin: 0 3px;
+    vertical-align: middle;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.dt__taskBtns{
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    left: 10rem;
+    gap: 1rem;
+}
+
+.dt__taskBtn{
+    padding: 3px 12px;
+    margin-right: 10px;
+    width: 100px;
+    height: 2.5rem;
+    &:disabled{
+        cursor: not-allowed;
+    }
+}
+
+.dt__faBtn{
+    height: 37px;
+    width: 50px;
+    display: flex!important;
+    font-size: 1.5em!important;
+    color: $primaryColor!important;
+    justify-content: center;
+    align-items: center;
+}
+
+.dt__searchDataTable{
+    position: relative;
+    z-index: 1;
+    height: 60%;
+    width: 50%;
+    bottom: 1rem;
+    right: 1rem;
+
+    input{
+        position: absolute;
+        width: 80%;
+        margin-left: 20px;
+        z-index: 1;
+    }
+
+    .dt__form_dropdown{
+        position: absolute;
+        margin-left: 20px;
+        top: 30px;
+        font-size: 14px;
+        box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
+        display: block;
+        max-height:10rem;
+        width: 80%;
+        overflow: auto;
+        background: white;
+        z-index: 1;
+        margin-top: 2px;
+        option{
+            padding-left: 2px;
+            margin: 4px;
+            width: calc(100% - 14px);
+        }
+        option:hover{
+            border-radius: 3px;
+            color: $black;
+            cursor: pointer;
+            background: #e3cff0;
+        }
+    }
+    
+}
+
+.dt__tableName, .dt__selectTable{
+    font-size: 14px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+    padding-top: 1rem;
+}
+
+.dt__tableName{
+    div{
+        margin-left: 20px;
+    }
+    input{
+        margin-left: 20px;
+        width: 20%;
+        height: 36px;
+        padding: 6px 12px;
+        line-height: 1.42857143;
+        color: $primaryText;
+        background-image: none;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    }
+}
+
+.selected-btn {
+  background: #0003 !important;
+  border-radius: 5px !important;
+}

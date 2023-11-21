@@ -1,0 +1,175 @@
+@import '../../global/styles/ColorVariables.scss';
+
+.reportSummary{
+    margin: 1.5vh;
+}
+
+.reportsTable_container {
+    .screenshot_view {
+        cursor: pointer;
+    }
+    .action_items{
+     display: flex;
+     flex-direction: row;
+     gap: 1rem;
+    }
+    .plug_icon{
+        cursor: pointer;
+    }
+    .desc_text {
+        padding-left: 0.4rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .p-input-icon-left {
+        width: 100%;
+    }
+    .search_testCase {
+        width: 100%;
+    }
+    .viewTable{
+        bottom: 1.5rem;
+        overflow-y: auto;
+        height: 65vh;
+        margin: 1.5vh;
+        border-radius: 0.6rem;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+        .p-treetable-table {
+            border: 1px solid #dee2e6;
+            .p-column-title {
+                display: inline-block;
+            }
+        }
+    }
+    .ruleMap_table {
+        height: 50vh;
+    }
+    .ViewTableOnClose{
+        bottom: 1.5rem;
+        max-height: 46vh;
+        overflow-y: auto;
+        height: 46vh;
+        .p-treetable-thead>tr>th {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }
+    }
+}
+
+.reports_download {
+    width: 10%;
+    .p-overlaypanel-content {
+        height: 8rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        .p-checkbox {
+            margin-left: 0.5rem;
+        }
+    }
+}
+
+.content{
+    .p-accordion-content{
+        padding: 0 !important;
+    }
+}
+.p-treetable .p-treetable-header{
+    padding: 0.5rem !important;
+}
+
+.jira_modal {
+    .jira_credentials {
+        width: 100%;
+        padding: 0.4rem;
+    }
+    .jira_user {
+        padding: 0.22rem;
+    }
+    .username {
+        top: 9.1rem;
+        width: 92.3%;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        padding: 0.4rem;
+        position: absolute;
+        &:hover {
+            background: #FAF9F6;
+         }
+    }
+    .text_desc {
+        width: 100%;
+    }
+    .avo_multiselect {
+        width: 100%;
+        .p-multiselect {
+           padding: 0.3rem;
+        }
+    }
+}
+
+.screenshot_modal {
+    .img_screenShot {
+        width: 100%;
+        height: 94vh;
+    }
+}
+
+.p-overlaypanel.report_bug {
+    width: 12rem;
+    .p-overlaypanel-content {
+        padding: 0;
+        width: 12rem;
+        height: auto;
+        .downloadItem {
+            width: 12rem;
+            height: 2rem;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .downloadItem:hover {
+            background-color: lightgray;
+        }
+    }
+    .img_jira {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+    .img_azure {
+        height: 1rem;
+        margin-right: 0.3rem;
+    }
+}
+
+.p-overlaypanel.jira_user {
+    width: 37%;
+    .p-overlaypanel-content {
+        padding: 0;
+        width: 100%;
+        .p-menu.p-component {
+            width: 100%;
+        }
+    }
+}

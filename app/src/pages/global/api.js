@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 import {url} from '../../App';
 
@@ -27,8 +28,33 @@ export const logoutUser = () => {
     });
 }
 
-/*Component ResetSession
+/*Component ChangePassword 
+ ------------------Reset Current password--------------------------
+  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
 */
+export const resetPassword = (newpassword, currpassword=null, userData=null) => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/resetPassword", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: {'newpassword': newpassword, userData,currpassword},
+            credentials : 'include'
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
 export const keepSessionAlive = () => {
     return new Promise((resolve, reject)=>{
         axios(url+"/keepSessionAlive", {
@@ -47,114 +73,6 @@ export const keepSessionAlive = () => {
             reject(err)
         })
     });
-}
-
-/*Component TaskContents
-  api returns fail/inprogress
-*/
-export const updateTaskStatus = obj => {
-    return new Promise((resolve, reject) => {
-        axios(url+"/updateTaskstatus_mindmaps", {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            data : {'obj': obj},
-            credentials : 'include',
-        })
-        .then(res=>{
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status)
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    });
-}
-
-/*Component ChangePassword
-  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
-*/
-export const resetPassword = (newpassword, currpassword=null, userData=null) => {
-    return new Promise((resolve, reject) => {
-        axios(url+"/resetPassword", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'newpassword': newpassword, currpassword, userData},
-            credentials : 'include'
-        })
-        .then(res => {
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status);
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
-}
-
-/*Component ChangePassword
-  api returns "Invalid Session"/"success"/"same"/"incorrect"/"fail"
-*/
-export const updatePassword = (newpassword, user_id) => {
-    return new Promise((resolve, reject) => {
-        axios(url+"/updatePassword", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'newpassword': newpassword, user_id},
-            credentials : 'include'
-        })
-        .then(res => {
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status);
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
-}
-
-/*Component Header
-  api returns {"": ""}
-*/
-export const getRoleNameByRoleId = async(roleasarray) => {
-    return new Promise((resolve, reject)=>{
-        axios(url+"/getRoleNameByRoleId", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: {'action': "getRoleNameByRoleId", 'role': roleasarray},
-            credentials : 'include'
-        })
-        .then(res => {
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status);
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
 }
 
 /*Component ChangeDefaultIce
@@ -183,6 +101,33 @@ export const getUserICE = async() => {
     })
 }
 
+
+/*Component ChangeDefaultIce
+  api returns string mssg ex. "success"
+*/
+export const setDefaultUserICE = async(defaultICE) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/setDefaultUserICE", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: { defaultICE : defaultICE},
+            credentials : 'include'
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
 /*Component DesignContent
   api returns fail/inprogress
 */ 
@@ -204,33 +149,6 @@ export const reviewTask = (projectId, taskid, taskstatus, version, batchTaskIDs,
                     extragroups:groupids,
                     extrausers:additionalrecepients
                 },
-            credentials : 'include'
-        })
-        .then(res => {
-            if (res.status === 200){
-                resolve(res.data);
-            }
-            else{
-                reject(res.status);
-            }
-        })
-        .catch(err => {
-            reject(err);
-        })
-    })
-}
-
-/*Component ChangeDefaultIce
-  api returns string mssg ex. "success"
-*/
-export const setDefaultUserICE = async(defaultICE) => {
-    return new Promise((resolve, reject)=>{
-        axios(url+"/setDefaultUserICE", {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json"
-            },
-            data: { defaultICE : defaultICE},
             credentials : 'include'
         })
         .then(res => {

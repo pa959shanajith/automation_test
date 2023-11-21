@@ -1,6 +1,5 @@
 const utils = require('../utils');
 var uuidV4 = require('uuid-random');
-const redisServer = require('../redisSocketHandler');
 const cache = require("../cache.js").getClient(2);
 const executionListCache = require("../cache.js").getClient(4)
 var logger = require('../../../logger.js');
@@ -61,13 +60,6 @@ module.exports.Execution_Queue = class Execution_Queue {
             this.ice_list[ice_name]["connected"] = true
         } else {
             this.connect_ice(ice_name);
-        }
-        //check if callback for ICE has already been registred
-        if (!(ice_name in this.registred_ICE)) {
-            logger.info("Registering execution call back for ICE: " + ice_name);
-            redisServer.redisSubServer.subscribe('ICE_STATUS_' + ice_name);
-            redisServer.redisSubServer.on("message", this.triggerExecution);
-            this.registred_ICE[ice_name] = true;
         }
     }
 
@@ -146,6 +138,8 @@ module.exports.Execution_Queue = class Execution_Queue {
             //check if target ICE was specified or not
             if (userInfo && userInfo.icename && userInfo.icename != EMPTYUSER) {
                 targetICE = userInfo.icename;
+                var fnName = 'execAutomation';
+                const storeInExecutionList =  await utils.fetchData({"executionData": batchExecutionData}, "devops/executionList", fnName);
             } else {
                 userInfo.icename = EMPTYUSER
             }
@@ -199,22 +193,15 @@ module.exports.Execution_Queue = class Execution_Queue {
             } else {
                 //check if target ice is connected but not preset in any pool, execute directly if true
                 if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
-                    const sockmode = await utils.channelStatus(targetICE);
-                    if ((!sockmode.normal && !sockmode.schedule)) {
-                        response["status"] = "pass";
-                        response["message"] = "Can't establish connection with ICE: " + targetICE + " Re-Connect to server!";
-                        response['variant'] = "error";
-                        return response;
-                    }
-                    if (this.ice_list[targetICE]['status']) {
-                        response["status"] = "pass";
-                        response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
-                        response['variant'] = "info";
-                        if (type && type == "SCHEDULE"){
-                            scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
-                        }
-                        return response;
-                    }
+                    // if (this.ice_list[targetICE]['status']) {
+                    //     response["status"] = "pass";
+                    //     response["message"] = "Execution or Termination already in progress on ICE: " + targetICE;
+                    //     response['variant'] = "info";
+                    //     if (type && type == "SCHEDULE"){
+                    //         scheduler.updateScheduleStatus(batchExecutionData.scheduleId,'Skipped')
+                    //     }
+                    //     return response;
+                    // }
                     if ((this.ice_list[targetICE]["mode"] && userInfo.userid === userInfo.invokinguser) || !this.ice_list[targetICE]["mode"]) {
                         if (type == "ACTIVE") {
                             this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
@@ -239,9 +226,13 @@ module.exports.Execution_Queue = class Execution_Queue {
                 } else {
                     let executionRequest = '' 
                     if(batchExecutionData['configurekey'] && batchExecutionData['configurekey'] != '' && batchExecutionData['configurename'] && batchExecutionData['configurename'] != '' ){
+                        if (batchExecutionData['scheduleId'] && batchExecutionData['scheduleId'] != '' && batchExecutionData['execType'] && batchExecutionData['execType'] != '') {
+                            type = batchExecutionData['execType'];
+                        }
                         executionRequest = await this.executionInvoker.executeActiveTestSuite(batchExecutionData, execIds, userInfo, type);
                         return executionRequest;
                     }
+
                     response['status'] = "pass";
                     response["message"] = "Avo Client not selected."
                     response['variant'] = "info";
@@ -308,12 +299,6 @@ module.exports.Execution_Queue = class Execution_Queue {
                     
                 } else if (this.ice_list[targetICE] && this.ice_list[targetICE]["connected"]) {
                     //ICE sent is not part of pool but is connected
-                    const sockmode = await utils.channelStatus(targetICE);
-                    if ((!sockmode.normal && !sockmode.schedule)) {
-                        // ICE is not available
-                        res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['461'])
-                        return res.status("461").send({ "error": "Can't establish connection with ICE Re-Connect to server!" })
-                    }
                     if (this.ice_list[targetICE]['status']) {
                         // ICE is busy
                         res.setHeader(constants.X_EXECUTION_MESSAGE, constants.STATUS_CODES['409'])
@@ -358,12 +343,13 @@ module.exports.Execution_Queue = class Execution_Queue {
     * @param {dictionary} ice_data
     * Function responsible to update ICE status when it changes and execute a test suite from queue when required
     */
-    static triggerExecution = async (channel, ice_data) => {
+    static triggerExecution = async (ice_data) => {
         let data = JSON.parse(ice_data);
         let result = false;
         //check if the triggered request id for ice status change and check if the request is duplicate or not 
-        if (channel != "ICE_STATUS_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
+        //if (channel != "ICE_STATUS_" + data.username || data.onAction != 'ice_status_change' || data["reqID"] in this.request_ids) return result;
         let ice_name = data.username
+        this.registred_ICE[ice_name] = true;
         //register this request so that dupliacte requests can be ignored
         this.request_ids[data["reqID"]] = 1;
         //check if target ice is in this.ice_list or not, refer init method of queues for contents this.ice_list
@@ -391,12 +377,6 @@ module.exports.Execution_Queue = class Execution_Queue {
         //iterate over execution queue 
         for (let i = 0; i < queue.length; i++) {
             let testSuite = queue[i];
-            const sockmode = await utils.channelStatus(ice_name);
-            if (data.value.status || (!sockmode.normal && !sockmode.schedule)) {
-                // TODO shift below queue check
-                logger.info("Could not execute on: " + ice_name + " ICE is either Executing a test suite or Server not connected to ice");
-                return result;
-            }
             //check if target ice for testsuite and the actual ice which has communicated it's status is same or not, accept if ice_name matches or is "any"
             if (testSuite.userInfo.icename === ice_name || testSuite.userInfo.icename === EMPTYUSER) {
                 testSuite.userInfo.icename = ice_name;
@@ -601,12 +581,21 @@ module.exports.Execution_Queue = class Execution_Queue {
         if("executionType" in req.body) {
             executionData.executionData.executiontype = req.body.executionType;
         }
+
+        // check for execType is scheduling or not
+        if ('execType' in req.body && 'scheduleId' in req.body) {
+            executionData.executionData.execType = req.body.execType;
+            executionData.executionData.scheduleId = req.body.scheduleId;
+            response["message"] = "Execution will be started on " + executionData.executionData.avoagents[0];
+        }
+
         // Checking for executionLevel 
         if(executionData.executionData.execType) {
             execType = 'scenarioParallel'
         }
         const newExecutionListId = uuidV4()
         executionData['executionData']['executionListId'] = newExecutionListId;
+        executionData['executionData']['executionThrough'] = req.body.executionThrough || "Pipeline";
         const gettingTestSuiteIds = await suitFunctions.ExecuteTestSuite_ICE({
             'body': executionData,
             'session':executionData.session,
@@ -835,6 +824,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     inputs['scenarioIndex'] = scenarioIndex;
                                 }
                                 executionData = await utils.fetchData(inputs, "devops/getExecScenario", fnName);
+                                executionData[0]['executionData']['executingOn'] = "Agent"
                                 // changes to support scenarioParallel
                                 if (testSuites['execType'] == 'scenarioParallel'){
                                     executionData[0]['executionData']['scenarioParallelExec'] = true;
@@ -843,10 +833,16 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         executionData[0]['executionData']['scenarioParallelBatchId'] = batchId;
                                     }
                                 }
-                                const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
-                                    'body': executionData[0],
-                                    'session':executionData[0].session,
-                                });
+                                // const executionRequest = await suitFunctions.ExecuteTestSuite_ICE({
+                                //     'body': executionData[0],
+                                //     'session':executionData[0].session,
+                                //     'req':req
+                                // });
+                                let updatedReq = {};
+                                updatedReq = {...req};
+                                updatedReq['body'] = executionData[0];
+                                updatedReq['session'] = executionData[0].session;
+                                const executionRequest = await suitFunctions.ExecuteTestSuite_ICE(updatedReq);
                                 if (executionData == "fail" || executionData == "forbidden") {
                                     response['status'] = "fail";
                                     return response;
@@ -992,7 +988,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         reportExecutionData.reportData.push({ suiteDetails: suiteDetailsInfo });
                                     })
                                     if (executionData[0].executionData.isEmailNotificationEnabled === true) {
-                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey });
+                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough });
                                     }
                                 }
                                 

@@ -347,11 +347,11 @@ module.exports.verifyUser = async (req, res) => {
 		let proceed = false;
 		if (userInfo === "fail") return res.send(proceed);
 
-		if (userInfo && userInfo.firstTimeLogin){
+		if (userInfo && userInfo.welcomeStepNo === 0){
 			proceed = true;
 		}
 
-		return res.send(proceed);
+		return res.send({proceed,userInfo});
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
@@ -493,6 +493,7 @@ const checkAssignedProjects = async (username, usertype) => {
 	}
 	const userid = userInfo._id;
 	const roleid = userInfo.defaultrole;
+	const isadminuser = userInfo.isadminuser ? userInfo.isadminuser : false;
 	if (userInfo.projects != null) assignedProjects = userInfo.projects.length !== 0;
 	// Get Rolename by role id
 	inputs = {
@@ -502,7 +503,7 @@ const checkAssignedProjects = async (username, usertype) => {
 	const userRole = await utils.fetchData(inputs, "login/loadPermission", fnName);
 	if (userRole == "fail") return { err: 'fail' };
 	else if (userRole === null) return { err: 'invalid_username_password'};
-	else return { err: null, userid, role: userRole.rolename, assignedProjects };
+	else return { err: null, userid, role: userRole.rolename, assignedProjects, isadminuser };
 }
 
 // Check User login State - Avo Assure
@@ -567,7 +568,7 @@ module.exports.validateUserState = async (req, res) => {
 						return res.send("fail");
 					}
 				} else {
-					const { err, userid, role, assignedProjects } = await checkAssignedProjects(username, user.type);
+					const { err, userid, role, assignedProjects, isadminuser } = await checkAssignedProjects(username, user.type);
 					const ip = (!req.headers['client-ip'])? req.headers['client-ip'] : req.ip;
 					if (err) {
 						logger.error("Error occurred in validateUserState. Cause: "+ err);
@@ -577,47 +578,37 @@ module.exports.validateUserState = async (req, res) => {
 						emsg = "noProjectsAssigned";
 					} else {
 						emsg = "ok";
-						const vstatus = await utils.fetchData({},"/hooks/validateStatus");
-                        if(vstatus.status === 'pass'){
-							var vuser = { 'status' : 'pass'}
-							if(req.user.username != 'admin'){
-							   vuser = await utils.fetchData({},"/hooks/validateUser");
-							}
-							if(vuser.status === 'pass'){
-								res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-								req.session.userid = userid;
-								req.session.ip = ip;
-								req.session.loggedin = (new Date()).toISOString();
-								req.session.username = username;
-								req.session.uniqueId = req.session.id;;
-								req.session.usertype = user.type;
-								req.session.client = clientName;
-								logger.rewriters[0] = function(level, msg, meta) {
-									meta.username = username;
-									meta.userid = userid;
-									meta.userip = ip;
-									return meta;
-								};
-							}else{
-								return res.send(vuser)
-							}
-						}else{
-							return res.send(vstatus)
-						}
-						
-						// res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
-						// req.session.userid = userid;
-						// req.session.ip = ip;
-						// req.session.loggedin = (new Date()).toISOString();
-						// req.session.username = username;
-						// req.session.uniqueId = req.session.id;;
-						// req.session.usertype = user.type;
-						// logger.rewriters[0] = function(level, msg, meta) {
-						// 	meta.username = username;
-						// 	meta.userid = userid;
-						// 	meta.userip = ip;
-						// 	return meta;
-						// };
+						const result = await utils.fetchData({}, "admin/getAvailablePlugins", "getAvailablePlugins");
+                        currentDate = new Date();
+                        currentDate.setHours(0,0,0,0);
+                        expiryDate = new Date(result.ExpiresOn)
+                        if(result.Status == "Active" && expiryDate >= currentDate){
+                            if(!result.USER.includes("Unlimited") && username != 'admin') {
+                                const sesscount = await utils.allSessCount(clientName);
+                                if(sesscount >= parseInt(result.USER))
+                                {
+                                    emsg = {'status':"fail",'message':"Max Users Already loggedin"}
+                                    return res.send(emsg);
+                                }
+                            }
+                            res.cookie('maintain.sid', uidsafe.sync(24), {path: '/', httpOnly: true, secure: true, signed: true, sameSite: true});
+                            req.session.userid = userid;
+                            req.session.ip = ip;
+                            req.session.loggedin = (new Date()).toISOString();
+                            req.session.username = username;
+                            req.session.uniqueId = req.session.id;;
+                            req.session.usertype = user.type;
+                            req.session.client = clientName;
+                            logger.rewriters[0] = function(level, msg, meta) {
+                                meta.username = username;
+                                meta.userid = userid;
+                                meta.userip = ip;
+                                return meta;
+                            };
+                        }else{
+                            emsg = {'status':"fail",'message':"License is not active"}
+                            return res.send(emsg);
+                        }
 					}
 				}
 			} catch (err) {

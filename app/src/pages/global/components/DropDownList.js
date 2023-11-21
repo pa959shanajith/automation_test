@@ -1,6 +1,6 @@
 import React ,  { Fragment, useEffect, useState, useRef} from 'react';
 import ClickAwayListener from 'react-click-away-listener';
-import { ScrollBar } from '../../global';
+import ScrollBar from './ScrollBar';
 import '../styles/DropDownList.scss'
 
 /*Component DropDownList
@@ -59,8 +59,8 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
             <ClickAwayListener onClickAway={()=>setDropDown(false)}>
             <div>
                 <input autoComplete={"off"} ref={inputRef} className={ (inputErrorBorder?" dropdownInputError ":"") + "btn-users edit-user-dropdown-edit"} onChange={inputFilter} onClick = {resetField} id="userIdName" placeholder={placeholder}/>
-                <div className={sauceLab !== false?"dropdown_saucelabs":"form-inp-dropdown-popup"} role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
-                    <ScrollBar thumbColor="#929397" >
+                <div className="form-inp-dropdown-popup" role="menu" aria-labelledby="userIdName" style={{display: (dropDown?"block":"none")}}>
+                    
                     {list.length>0?list.map((ice,index) => (  
                         <ul key={index} role="presentation" style={{ display: (!(smartMode==='normal') && JSON.parse(ice.statusCode !== "Online") && (ExeScreen===true) ) ? 'none' : 'block' }} className="dropdown-ul">
                             <li value={ice.icename} onClick={(event)=>{selectOption(ice.icename,event)}} title={ice.statusCode} className={"dropdown-list-item "+((selectedICE[ice.icename]!==undefined && selectedICE[ice.icename]===true)?" selectedCheckBox":"") } >
@@ -74,7 +74,7 @@ const DropDownList = ({inputErrorBorder, setInputErrorBorder, data,smartMode,sel
                               No ICE Available 
                           </li>
                         </ul>}
-                    </ScrollBar>
+                 
                 </div>
             </div>
             </ClickAwayListener>

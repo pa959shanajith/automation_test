@@ -17,8 +17,9 @@ agenda
 exports.prepareSchedulingRequest = async (session, body) => {
     logger.info("Inside UI service testSuitesScheduler_ICE");
     const fnName = "testSuitesScheduler_ICE";
-    const userInfo = { "userid": session.userid, "username": session.username, "role": session.activeRoleId || session.role };
+    const userInfo = { "userid": session.userid, "username": session.username, "role": session.activeRoleId || session.role, "host": session.host };
     const multiExecutionData = body.executionData;
+    multiExecutionData.host = session.host;
     var batchInfo = multiExecutionData.batchInfo;
     let poolid = body.executionData.batchInfo[0].poolid;
     let recurringString = body.executionData.batchInfo[0].recurringString;
@@ -26,6 +27,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let timeValue = body.executionData.batchInfo[0].time;
     let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
     let endAfter = body.executionData.batchInfo[0].endAfter ? body.executionData.batchInfo[0].endAfter : 0;
+    let scheduleThrough = body.executionData.batchInfo[0].scheduleThrough ? body.executionData.batchInfo[0].scheduleThrough : "agent";
     let startDate = (recurringStringOnHoverValue === "One Time") ? (+ new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))).toString() : (body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp)
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {
@@ -114,7 +116,8 @@ exports.prepareSchedulingRequest = async (session, body) => {
             "startDate": startDate.toString(),
             "configureKey": multiExecutionData.configureKey,
             "configureName": multiExecutionData.configureName,
-            "endAfter": endAfter
+            "endAfter": endAfter,
+            "scheduleThrough": scheduleThrough
         };
         for (let i = 0; i < batchIdx.length; i++) {
             let suite = batchInfo[batchIdx[i]];
@@ -184,6 +187,7 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
         if (batchExecutionData.targetUser === "") batchExecutionData.targetUser = constants.EMPTYUSER
         let userInfo = userInfoMap[batchExecutionData.targetUser];
         Object.assign(userInfo, batchExecutionData.scheduledby);
+        userInfo.host = batchExecutionData.host;
         const scheduleTime = batchExecutionData.timestamp;
         const scheduleId = batchExecutionData.scheduleId;
         const smartId = batchExecutionData.smartScheduleId;
@@ -195,15 +199,20 @@ const scheduleTestSuite = async (multiBatchExecutionData) => {
             // definations of the job.	
             agenda.define(scheduleId, async (job, done) => {	
                 let result;	
-                execIds['scheduleId'] = scheduleId;	
-                result = queue.Execution_Queue.addTestSuiteToQueue(batchExecutionData, execIds, userInfo, "SCHEDULE", batchExecutionData.batchInfo[0].poolid);	
-                schedFlag = result['message'];	
+                job.attrs.data.execIds['scheduleId'] = scheduleId;	
+                if (job.attrs.data.scheduleData.batchInfo[0].scheduleThrough == "client") {
+                    result = queue.Execution_Queue.addTestSuiteToQueue(job.attrs.data.scheduleData, job.attrs.data.execIds, job.attrs.data.userInfo, "SCHEDULE", job.attrs.data.scheduleData.batchInfo[0].poolid);
+                }
+                else {
+                    result = queue.Execution_Queue.execAutomation({ body: { key: job.attrs.data.scheduleData.configureKey, execType: 'SCHEDULE', scheduleId: scheduleId }});	
+                }
+                schedFlag = result['message'];
                 done();	
             });	
             // triggerring the agenda job with schedule option(one time).	
             (async function () {	
                 await agenda.start();	
-                await agenda.schedule(parseInt(scheduleTime), scheduleId, { scheduleData: batchExecutionData });	
+                await agenda.schedule(parseInt(scheduleTime), scheduleId, { scheduleData: batchExecutionData, execIds: execIds, userInfo: userInfo });	
             })();
         } catch (ex) {
             logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
@@ -439,6 +448,7 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
     let clientTime = multiExecutionData.batchInfo[0].clientTime;
     let clientTimeZoneValue = multiExecutionData.batchInfo[0].clientTimeZone;
     let timeValue = multiExecutionData['batchInfo'][0]['time'];
+    let scheduleThrough = multiExecutionData.batchInfo[0].scheduleThrough ? multiExecutionData.batchInfo[0].scheduleThrough : "agent";
     timeValue = getScheduleTime(clientTime, timeValue, clientTimeZoneValue);
     recurringPattern = recurringPattern.split(" ");
     recurringPattern[0] = timeValue.split(":")[1];
@@ -522,7 +532,8 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
         startDate: createdDate.toString(),
         configureKey: multiExecutionData.configureKey,
         configureName: multiExecutionData.configureName,
-        endAfter: endAfter
+        endAfter: endAfter,
+        scheduleThrough: scheduleThrough
     };
 
     const insResult = await utils.fetchData(inputs, "suite/ScheduleTestSuite_ICE", fnName);
@@ -587,7 +598,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     let startDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate() - nextRun), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
                     let endDate = new Date(startDate)
                     endDate.setDate(endDate.getDate() + nextRun);
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -645,7 +661,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const dailyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -704,7 +725,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                 const weeklyJob = agenda.create(scheduleId, { scheduleData: body.executionData });
                 await agenda.start();
                 let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                    endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                }
+                else {
+                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                }
                 await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
             })();
         }
@@ -807,7 +833,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -877,7 +908,12 @@ exports.scheduleRecurringTestSuite = async (session, body) => {
                     const monthlyJob = agenda.create(scheduleId, { scheduleData: body.executionData, runCount: 0 });
                     await agenda.start();
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    if (['Week', 'Weeks'].includes(endAfter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(endAfter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(endAfter[0]));
+                    }
                     await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -1003,7 +1039,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         startDate = new Date(parseInt(startDate[3]), parseInt(month), parseInt(startDate[2]) - nextRun, parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
                         let endDate = new Date(startDate)
                         endDate.setDate(endDate.getDate() + nextRun);
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await dailyJob.schedule(startDate).repeatEvery(nextRunString, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1052,7 +1093,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = schd.time;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await dailyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1102,7 +1148,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                     await agenda.start();
                     let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;;
                     let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                    endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                    if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                        endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                    }
+                    else {
+                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                    }
                     await weeklyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                 })();
             }
@@ -1210,7 +1261,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }
@@ -1265,7 +1321,12 @@ exports.reScheduleRecurringTestsuite = async () => {
                         await agenda.start();
                         let timeValue = multiBatchExecutionData.executionData.batchInfo[0].differenceInTime;
                         let endDate = new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), parseInt(timeValue.split(':')[0]), parseInt(timeValue.split(':')[1]));
-                        endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        if (['Week', 'Weeks'].includes(schd.endafter.split(" ")[1])) {
+                            endDate.setDate(endDate.getDate() + parseInt(schd.endafter[0]) * 7);
+                        }
+                        else {
+                            endDate.setMonth(endDate.getMonth() + parseInt(schd.endafter[0]));
+                        }
                         await monthlyJob.repeatEvery(recurringPattern, { skipImmediate: true, endDate: endDate }).save();
                     })();
                 }

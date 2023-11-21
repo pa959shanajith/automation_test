@@ -1,6 +1,6 @@
 import React, { useState, useLayoutEffect, Fragment, useEffect, useRef } from 'react';
-import PerfectScrollbar from 'react-perfect-scrollbar';
-import 'react-perfect-scrollbar/dist/css/styles.css';
+// import PerfectScrollbar from 'react-perfect-scrollbar';
+// import 'react-perfect-scrollbar/dist/css/styles.css';
 
 /*Component Scrollbar
   use: Wrapper function extends react-custom-scollbars;
@@ -117,10 +117,10 @@ const ScrollBar = (props) => {
                     : ''
                 }
                 `}
-            </style>
-            <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={scrnType !== 'Azure' ? {maxHeight:'inherit',height:'inherit'}:null}  onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
+            </style> 
+            {/* <PerfectScrollbar ref={scrollRef} options={{minScrollbarLength:props.minScrollbarLength || 20,wheelPropagation:true,suppressScrollX:props.hideXbar, useBothWheelAxes:false,suppressScrollY:props.hideYbar}} style={{maxHeight:'inherit',height:'inherit'}} onScrollX={props.onScrollX} onScrollY={props.onScrollY} >
                 {props.children}
-            </PerfectScrollbar>
+            </PerfectScrollbar> */}
         </Fragment>
         </>
     )

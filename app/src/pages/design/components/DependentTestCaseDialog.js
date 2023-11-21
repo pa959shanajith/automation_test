@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Handlebars from 'handlebars';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import { ModalContainer, ScrollBar, Report, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { readTestCase_ICE, getTestcasesByScenarioId_ICE } from '../api';
@@ -21,7 +21,7 @@ import "../styles/DependentTestCaseDialog.scss";
 
 const DependentTestCaseDialog = props => {
 
-    const history = useHistory();
+    const history = useNavigate();
     const [tcList, setTcList] = useState([]);
     const [error, setError] = useState("");
 
@@ -115,8 +115,8 @@ const DependentTestCaseDialog = props => {
 
 const TestCaseItem = ({index, testCase, updateChecklist}) => {
 
-    const history =  useHistory();
-    const userInfo = useSelector(state=>state.login.userinfo);
+    const history =  useNavigate();
+    const userInfo = useSelector(state=>state.landing.userinfo);
     const [check, setCheck] = useState(false);
 
     useEffect(()=>{

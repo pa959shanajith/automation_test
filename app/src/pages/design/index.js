@@ -1,21 +1,22 @@
-import React, { useEffect } from 'react';
-import {useHistory} from 'react-router-dom';
+import React,{ useEffect } from 'react';
+import MindmapHome from './containers/MindmapHome';
+import { useNavigate } from 'react-router-dom';
 import { RedirectPage } from '../global';
-import DesignHome from './containers/DesignHome';
+export var navigate
+
+/*Component App
+  use: defines components for each url
+*/
 
 const Design = () => {
-    const history = useHistory();
-
-    useEffect(()=>{
-        if(window.localStorage['navigateScreen'] !== "TestCase"){
-            RedirectPage(history, { reason: "screenMismatch" });
-        }
-        //eslint-disable-next-line
-    }, []);
-
-    return (
-        <DesignHome />
-    );
-};
-
+  navigate =  useNavigate()
+  useEffect(()=>{
+    if(window.localStorage['navigateScreen'] !== "design"){
+        RedirectPage(navigate, { reason: "screenMismatch" });
+    }
+  }, []);
+  return (
+      <MindmapHome/>
+  );
+}
 export default Design;

@@ -1,9 +1,9 @@
 import React, { Fragment, useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch }  from  "react-redux";
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Thumbnail, ResetSession, RedirectPage, Messages as MSG, setMsg } from '../../global';
 import * as DesignApi from "../api";
-import * as DesignActions from '../state/action';
+import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
 import "../styles/ActionBarItems.scss"
 
 /*
@@ -29,13 +29,13 @@ import "../styles/ActionBarItems.scss"
 const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, setShowDlg, dTcFlag, checkedTc, showDlg, fetchingDetails}) => {
 
 
-    const userInfo = useSelector(state=>state.login.userinfo);
-    const current_task = useSelector(state=>state.plugin.CT);
+    const userInfo = useSelector(state=>state.landing.userinfo);
+    // const current_task = useSelector(state=>state.plugin.CT);
     const mainTestCases = useSelector(state=>state.design.testCases);
     const saveEnable = useSelector(state=>state.design.saveEnable);
 
-    let appType = useSelector(state=>state.mindmap.appType);
-    const history = useHistory();
+    let appType = useSelector(state=>state.design.appType);
+    const history = useNavigate();
     const dispatch = useDispatch();
 
     const [dependCheck, setDependCheck] = useState(false);
@@ -101,7 +101,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
         // globalSelectedBrowserType = selectedBrowserType;
 
         if (dTcFlag) testcaseID = Object.values(checkedTc);
-        else testcaseID.push(current_task.testCaseId);
+        else testcaseID.push();
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
         DesignApi.debugTestCase_ICE(browserType, fetchingDetails['_id'], userInfo, appType)
@@ -123,8 +123,8 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                             rows[testCase.custname]=data[index+1].xpath;
                         }
                     });
-                    dispatch({type: DesignActions.SET_MODIFIED, payload: rows});
-                    dispatch({type: DesignActions.SET_SAVEENABLE, payload: !saveEnable})
+                    dispatch(Modified(rows));
+                    dispatch(SaveEnable(!saveEnable))
                     setMsg(MSG.DESIGN.SUCC_DEBUG);
                 } else {
                     console.log(data);
@@ -167,9 +167,9 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
 
 const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fetchingDetails, appType}) => {
 
-    const current_task = useSelector(state=>state.plugin.CT);
-    const userInfo = useSelector(state=>state.login.userinfo);
-    const history = useHistory();
+    // const current_task = useSelector(state=>state.plugin.CT);
+    const userInfo = useSelector(state=>state.landing.userinfo);
+    const history = useNavigate();
     const hiddenInput = useRef(null);
 
     const exportTestCase =  () => {

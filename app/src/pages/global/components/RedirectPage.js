@@ -1,5 +1,5 @@
 import { logoutUser } from '../api';
-import { persistor } from '../../../reducer'
+// import { persistor } from '../../../reducer'
 
     /* 
         Method : RedirectPage
@@ -16,9 +16,9 @@ import { persistor } from '../../../reducer'
                         6. userPrefHandle (On Decline/Fail to Accept Agreement)
     */
 
-const RedirectPage = (history, args = { reason: "invalidSession" }) => {
+const RedirectPage = (navigate, args = { reason: "invalidSession" }) => {
 
-    persistor.purge();
+    // persistor.purge();
     window.localStorage.clear();
     window.sessionStorage.clear();
 
@@ -26,7 +26,7 @@ const RedirectPage = (history, args = { reason: "invalidSession" }) => {
 
     logoutUser()
     .then(data=>{
-        history.push('/')
+        navigate('/');
     })
     .catch(error => {
         console.error("Failed to logout user\nCause:", error);

@@ -1,6 +1,7 @@
 import React from 'react';
-import { FooterOne } from '../../global';
 import "../styles/StaticElements.scss";
+import { Toast } from 'primereact/toast';
+import { FooterTwo as Footer } from '../../global';
 
 
 /*
@@ -10,23 +11,27 @@ import "../styles/StaticElements.scss";
     Todo: none
 */
 
-const StaticElements = ({children}) => {
+const StaticElements = ({ children }) => {
 
     return (
-        <div className="bg-container">
-            <img className="bg-img" alt="bg-img" src="static/imgs/login-bg.png"/>
-            <div className="element-holder">
-                <div className="greet-text">
-                    <h1>Hello</h1>
-                    <h2>Welcome to Avo Assure</h2>
-                    <h3>Login to Experience Intelligence.</h3>
+        <div className='flex flex-column'>
+            <div className="login_container">
+                <div className="split_left">
+                <div><span id='Header'>Hello,</span></div>
+                <div><span id='Header'>Welcome to Avo  Assure!</span></div>
+                <div><span id='Test_automation'>
+                        Experience the <span style={{ color: "white" }}>next-gen</span> test automation platform
+                    </span></div>
+                    <img src="static/imgs/animated_login.gif" alt="Login" style={{width:"100%"}}/>
                 </div>
-                <div className="login-block">
-                    <span className="logo-wrap"><img className="logo-img" alt="logo" src="static/imgs/AssureLogo_horizonal.svg"/></span>
-                    {children}
+                <div className="split_right">
+                    <div className="right_side_login">
+                        <img className="icon_img" src="static/imgs/AssureLogo_horizonal.svg"></img>
+                        {children}
+                    </div>
                 </div>
+                <div><Footer /></div>
             </div>
-            <FooterOne/>
         </div>
     );
 

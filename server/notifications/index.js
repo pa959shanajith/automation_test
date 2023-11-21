@@ -2,7 +2,7 @@ const utils = require('../lib/utils');
 const generator = require('./generator');
 const email = require('./email');
 const logger = require('../../logger');
-const notfEvents = ["test", "report", "userUpdate", "schedule", "iceAssign", "projectAssign", "forgotPassword", "unlockAccount", "taskWorkFlow","verifyUser", "onExecutionStart", "reportOnCICDExecution"];
+const notfEvents = ["test", "report", "userUpdate", "schedule", "iceAssign", "projectAssign", "forgotPassword", "unlockAccount", "taskWorkFlow","verifyUser",'welcomenewuser', "onExecutionStart", "reportOnCICDExecution"];
 const channels = {};
 const preferences = {};
 

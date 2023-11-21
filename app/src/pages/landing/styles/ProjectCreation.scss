@@ -1,0 +1,92 @@
+@import "../../global/styles/ColorVariables.scss";
+.list_btns{
+    display: flex;
+    justify-content: center;
+    font-size: small;
+    }
+    .VerticalStepBox{
+        // margin-top: 1%;
+        // margin-left: 1%;
+        padding: 1%;
+        width: 100%;
+        // height: 41vh;
+        .MuiStepConnector-vertical {
+            position: relative;
+            .MuiStepConnector-lineVertical {
+                position: absolute;
+                bottom: -12px;
+            }
+        }
+    }
+    
+    .CreateProj-card{
+        display: flex;
+        // height: 16vh;
+        justify-content: center;
+        margin-bottom: 1rem;
+        margin-left: 0.7rem;
+        top: 1rem;
+        width: 98%;
+        // height: 16vh;
+        .p-card-body{
+            padding: 0.5rem !important;
+            width: 100%;
+            overflow: auto;
+            .p-card-title{
+                font-size: 1.2rem !important;
+                position: relative !important;
+                margin-bottom: 0rem !important;
+                text-align: center !important;
+                font: $f4_bold !important;
+             }
+            .p-card-content {
+                padding: 0.5rem;
+                justify-content: center;
+                display: flex;
+                .CreateProj_btn{
+                    font:$f7_semibold;
+                }
+            }
+        }
+        .CreateDisable_Title{
+            cursor: not-allowed !important;
+        }
+        
+    }  
+    .main-card{
+        width: 47rem;
+    }
+
+    .gotoadmin-card{
+        display: flex;
+        // height: 21vh;
+        justify-content: center;
+        margin-bottom: 1rem;
+        margin-left: 0.7rem;
+        top: 2rem;
+        width: 98%;
+        .p-card-body{
+            padding: 0.5rem !important;
+            width: 100%;
+            overflow: auto;
+            .p-card-title{
+                font-size: 1.2rem !important;
+                position: relative !important;
+                margin-bottom: 0rem !important;
+                text-align: center !important;
+                font: $f4_bold !important;
+             }
+            .p-card-content {
+                padding: 0rem !important;
+                font: $f6_regular !important;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .admin-btn{
+                    font:$f7_semibold;
+                }
+            }
+            
+        }
+    }
+    

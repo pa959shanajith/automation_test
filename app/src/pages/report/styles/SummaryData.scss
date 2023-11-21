@@ -1,0 +1,17 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.summary-data-container{
+    display: grid;
+    grid-template-columns: auto auto auto;
+    font-size: $avoFontLarge;
+    flex-grow: 1;
+    row-gap: 5px;
+    margin-top: 5px;
+    margin: 1rem;
+}
+@media screen and (max-width: 992px)
+{
+    .summary-data-container{
+        width: 100% !important;
+    }
+}

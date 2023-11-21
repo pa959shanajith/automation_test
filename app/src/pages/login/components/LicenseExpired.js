@@ -1,6 +1,5 @@
 import React from 'react';
 import "../styles/LicenseExpired.scss";
-import { FooterOne } from '../../global';
 
 /*
     Component: LicenseExpired
@@ -21,7 +20,6 @@ const LicenseExpired = () => {
               <a className='ls-contact-link' href="mailto:sales@avoautomation.com">Contact Us</a>
             </div>
           </div>
-          <FooterOne/>
         </div>
     );
 

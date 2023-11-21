@@ -1,0 +1,36 @@
+*{
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+  }
+
+  .main_content{
+    top: 0vh;
+    left: 0vh;
+    height: 100vh;
+  }
+
+  .sidebar_sidepanel_homepage{    
+    display: inline-flex;
+    flex-direction: row;
+    width:100%;
+    height: 100vh;
+  }
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #C7C7C7;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #8E8E8E; 
+  border-radius: 100px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}

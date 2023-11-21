@@ -1,5 +1,7 @@
 import React from 'react';
-import { ModalContainer, ScrollBar } from '../../global';
+import  ModalContainer from '../../global/components/ModalContainer';
+import ScrollBar  from '../../global/components/ScrollBar';
+
 import "../styles/TermsAndConditions.scss";
 
 const TermsAndConditions = props => (

@@ -1,0 +1,27 @@
+.sidebar_sidepanel_homepage{    
+    display: inline-flex;
+    flex-direction: row;
+
+    .sidepanel_container{
+      height: 100%;
+      width: 23%;
+      border-right: solid 2px rgba(223, 220, 220, 0.925);
+      min-width: 12rem;
+    }
+
+    .origin_container{
+      width: 77%;
+      height: 91vh;
+    }
+  }
+
+  .HomePage_container{
+    display: flex;
+    flex-direction: row;
+    width : 95%;
+    height: 100%;
+    &__withTab{
+        overflow: overlay;
+        margin: 1% 3%;
+    }
+}

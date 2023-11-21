@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-		var redisStore = require('connect-redis')(sessions);
+				var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -162,7 +162,7 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 			}
-			return next();
+						return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -239,9 +239,13 @@ if (cluster.isMaster) {
 
 		var suite = require('./server/controllers/suite');
 		var report = require('./server/controllers/report');
-    var plugin = require('./server/controllers/plugin');
-    var azure = require('./server/controllers/azure');
-
+    	var plugin = require('./server/controllers/plugin');
+		var azure = require('./server/controllers/azure');
+		var devOps = require('./server/controllers/devOps');
+		var mindmap = require('./server/controllers/mindmap');
+		var admin = require('./server/controllers/admin');
+        var designscreen = require('./server/controllers/designscreen');
+		var browserstack = require('./server/controllers/browserstack');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -254,11 +258,20 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/getGeniusData',plugin.getGeniusData);		
+		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
+		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
+		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
+		app.post('/updateTestSuiteInUseBy',designscreen.updateTestSuiteInUseBy)
+		app.post('/updateE2E', mindmap.updateE2E);
+		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
+		app.post('/fetchModSceDetails', report.fetchModSceDetails);
+		app.get('/viewReport', report.viewReport);
+		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
-		
+		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.use(csrf({
-			cookie: true
+		cookie: true
 		}));
 
 		app.all('*', function(req, res, next) {
@@ -293,25 +306,25 @@ if (cluster.isMaster) {
 
 		//Only Admin have access
 		app.get('/admin', function(req, res) {
-			var roles = ["Admin"]; //Allowed roles
+			var roles = ["Admin", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Only Test Engineer and Test Lead have access
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
-			var roles = ["Test Lead", "Test Engineer", "Test Manager"]; //Allowed roles
+			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|seleniumtoavo|settings|genius)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead", "Test Engineer"]; //Allowed roles
+		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin)$/, function(req, res) {
+			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(webocular|neuronGraphs\/|integration)$/, function(req, res) {
-			var roles = ["Test Manager", "Test Lead"]; //Allowed roles
+		app.get(/^\/(webocular|neuronGraphs\/|integration|admin)$/, function(req, res) {
+			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
 
@@ -366,7 +379,6 @@ if (cluster.isMaster) {
 				return res.send({status});
 			}
 		});
-
 		app.get('/downloadExportfile', async (req, res) => {
 			let projName = req.query.projName	
 			projName = projName.replace(/\s+/g, '');
@@ -383,8 +395,7 @@ if (cluster.isMaster) {
 			} else {
 				let status = "na";
 				try {
-					let stats = await fs.promises.stat(path.resolve(exportfile))
-					
+					let stats = await fs.promises.stat(path.resolve(exportfile))					
 					if(stats.isFile()){
 						status = "available";
 					}else {
@@ -396,7 +407,6 @@ if (cluster.isMaster) {
 				return res.send({status});
 			}
 		});
-
 		app.get('/downloadAgent', async (req, res) => {
 			try {
 				let agentFile = uiConfig.avoAgentConfig;
@@ -452,7 +462,7 @@ if (cluster.isMaster) {
 		var mindmap = require('./server/controllers/mindmap');
 		var pdintegration = require('./server/controllers/pdintegration');
 		var login = require('./server/controllers/login');
-		var admin = require('./server/controllers/admin');
+		// var admin = require('./server/controllers/admin');
 		var design = require('./server/controllers/design');
 		var designscreen = require('./server/controllers/designscreen');
 		var utility = require('./server/controllers/utility');
@@ -467,17 +477,18 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
 		var SauceLab = require('./server/controllers/sauceLab');
+var browserstack = require('./server/controllers/browserstack');
 
 
 
 		//-------------Route Mapping-------------//
 		// Mindmap Routes
 		app.post('/getProjectsNeo', (req, res) => (res.send("false")));
-		app.post('/populateProjects', auth.protect, mindmap.populateProjects);
+		app.post('/populateProjects',auth.protect, mindmap.populateProjects);
 		app.post('/populateUsers', auth.protect, mindmap.populateUsers);
 		app.post('/getProjectTypeMM', auth.protect, mindmap.getProjectTypeMM);
 		app.post('/populateScenarios', auth.protect, mindmap.populateScenarios);
-		app.post('/getModules', auth.protect, mindmap.getModules);
+		app.post('/getModules',auth.protect, mindmap.getModules);
 		app.post('/reviewTask', auth.protect, mindmap.reviewTask);
 		app.post('/saveData', auth.protect, mindmap.saveData);
 		app.post('/saveEndtoEndData', auth.protect, mindmap.saveEndtoEndData);
@@ -499,6 +510,8 @@ if (cluster.isMaster) {
 		app.post('/jsonToMindmap', auth.protect, mindmap.jsonToMindmap);
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
+		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
+		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
 		app.post('/validateUserState', authlib.validateUserState);
@@ -515,7 +528,7 @@ if (cluster.isMaster) {
 		app.post('/storeUserDetails', auth.protect, login.storeUserDetails);
 		app.post ('/hooks/upgradeLicense', login.upgradeLicense)
 		//Admin Routes
-		app.post('/getUserRoles', auth.protect, admin.getUserRoles);
+		// app.post('/getUserRoles', auth.protect, admin.getUserRoles);
 		app.post('/getDomains_ICE', auth.protect, admin.getDomains_ICE);
 		app.post('/createProject_ICE', auth.protect, admin.createProject_ICE);
 		app.post('/updateProject_ICE', auth.protect, admin.updateProject_ICE);
@@ -526,7 +539,7 @@ if (cluster.isMaster) {
 		app.post('/getAvailablePlugins', auth.protect, admin.getAvailablePlugins);
 		app.post('/manageSessionData', auth.protect, admin.adminPrivilegeCheck, admin.manageSessionData);
 		app.post('/unlockUser', auth.protect, admin.unlockUser);
-		app.post('/manageUserDetails', auth.protect, admin.adminPrivilegeCheck, admin.manageUserDetails);
+		app.post('/manageUserDetails', auth.protect, admin.manageUserDetails);
 		app.post('/getUserDetails', auth.protect, admin.getUserDetails);
 		app.post('/fetchLockedUsers', auth.protect, admin.fetchLockedUsers);
 		app.post('/testLDAPConnection', auth.protect, admin.testLDAPConnection);
@@ -614,9 +627,13 @@ if (cluster.isMaster) {
 		app.post('/openScreenShot', auth.protect, report.openScreenShot);
 		app.post('/viewJiraMappedList_ICE', auth.protect, report.viewJiraMappedList_ICE);
 		app.post('/saveJiraDetails_ICE', auth.protect, report.saveJiraDetails_ICE);
-		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);
+		app.post('/getAvoDetails', auth.protect, report.getAvoDetails);	
+		app.post('/fetchAgentModuleList',auth.protect, report.fetchAgentModuleList);
+		app.post('/fetchHistory',auth.protect, report.fetchHistory);
+
 		//Plugin Routes
 		app.post('/userCreateProject_ICE', auth.protect, plugin.userCreateProject_ICE);
+		app.post('/validateProject', auth.protect, plugin.validateProject);
         app.post('/userUpdateProject_ICE', auth.protect, plugin.userUpdateProject_ICE);
         app.post('/getUsers_ICE', auth.protect, plugin.getUsers_ICE)
 		app.post('/getProjectIDs', auth.protect, plugin.getProjectIDs);
@@ -706,10 +723,17 @@ if (cluster.isMaster) {
 		app.post('/manageSaucelabsDetails', auth.protect, admin.manageSaucelabsDetails);
 		app.post('/saveSauceLabData', auth.protect, SauceLab.saveSauceLabData);
 
+		  //Browserstack API's
 
+		app.post('/getDetails_BROWSERSTACK', auth.protect, admin.getDetails_BROWSERSTACK);
+		app.post('/manageBrowserstackDetails', auth.protect, admin.manageBrowserstackDetails);
+		app.post('/saveBrowserstackData',auth.protect, browserstack.saveBrowserstackData);
 
+		// Added Report API's
+		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
+		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
+		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
 		
-
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
 

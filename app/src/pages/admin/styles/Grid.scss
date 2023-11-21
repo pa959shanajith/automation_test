@@ -1,0 +1,93 @@
+@import "../../global/styles/ColorVariables.scss";
+.Grid__box{
+    width: 32rem;
+    height: 24.5rem;
+    box-shadow: none !important;
+    border: 0.5px solid #dee2e6 !important;
+    padding: none !important;
+}
+.page-taskName_grid {
+    margin-top: 2rem;
+    font: $f5_semibold;
+}
+.grid_arrows{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.Search_name{
+    width: 22rem;
+}
+.search__grid{
+    position: relative;
+    bottom: 2rem;
+}
+.agent_state__legends_grids {
+    display: flex;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    width: inherit;
+}
+.grid_img{
+    display: flex;
+    height: 16rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    width: 65rem;
+}
+.create_grid{
+    width: 100%;
+    height: 78vh;
+.grid_btn {
+    position: relative;
+    top: 24rem;
+    left: 29rem;
+}
+.newGrid__grid{
+    position: relative;
+    top: 73rem;
+    right: 155rem;
+}
+}
+.search_newGrid{
+    float: right;
+    display: flex;
+    gap: 2rem;
+    padding: 1rem;
+}
+.searchBox{
+    position: relative;
+    left: 22rem;
+}
+.searchBox_grid{
+    position: relative;
+    top: 0rem;
+    left: 23rem;
+}
+.config_name{
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+}
+.grid_button{
+    margin-left: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+.grid_inputnumber {
+   .p-inputtext{
+      width: 3rem !important;
+}
+}
+.create_new_grid{
+    width: 100%;
+    height: 80vh;
+    padding: 1rem;
+}
+
+   

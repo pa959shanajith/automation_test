@@ -1,0 +1,30 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.dt__exportPopup{
+    display: grid;
+    grid-template-columns: auto auto;
+    row-gap: 20px;
+}
+
+.dt__import-popup{
+    margin: 15px;
+    label{
+        width: 110px;
+        font-weight: 600;
+    }
+    select,input{
+        border: 1px solid $black;
+        width: 70%;
+        height: 25px;
+        margin: 5px;
+
+    }
+    input::-webkit-file-upload-button{
+        // background: $primaryColor!important;
+        border: none;
+        // color: $whiteColor;
+    }
+    select:focus,input:focus{
+        outline: none;
+    }
+}

@@ -1,0 +1,60 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.mp__import-popup{
+    margin: 15px;
+    label{
+        width: 110px;
+        font-weight: 600;
+    }
+    select{
+        border: 1px solid $black;
+        width: 70%;
+        height: 25px;
+        margin: 5px;
+
+    }
+    input{
+        width: 369px;
+        height: 41px;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 18px;
+        align-items: center;
+        color: #121212;
+        margin-left: 2rem;
+    }
+    input::-webkit-file-upload-button{
+        background: $whiteColor!important;
+        border: 1px solid $black !important;
+        font-family: 'Open Sans';
+        font-style: normal;
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 17px;
+        color: #4B4B4B;
+        width: 100px;
+        height: 40px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.06), 0px 24px 60px rgba(0, 0, 0, 0.12);
+        border-radius: 4px;
+    }
+    select:focus,input:focus{
+        outline: none;
+    }
+}
+
+.ImportDialog{
+    background: $whiteColor;
+    .p-dialog-header{
+        background: rgba(96,91,255,.08)!important;
+        font-family: Open Sans!important;
+        font-size: 20px!important;
+        font-style: normal!important;
+        font-weight: 600!important;
+        padding: 1rem!important;
+    }
+}
+.paddingLabel{
+    padding: 1rem;
+}

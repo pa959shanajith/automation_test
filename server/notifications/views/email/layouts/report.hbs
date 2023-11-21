@@ -5,7 +5,7 @@
 		<tbody>
 			<tr>
 				<td>
-					<h2>Execution Report</h2>
+					<h2>Test Execution Report</h2>
 				</td>
 			</tr>
 		</tbody>
@@ -24,34 +24,31 @@
 						<tbody>
 							<tr>
 								<td style="padding:10.5pt 0in;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#8C8C8C">Project</span></p>
-								</td>
-								<td width="75%" style="width:75.0%;padding:11pt 0in 10.5pt 3.75pt;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#333333"> {{projectName}} </span></p>
+									<h2><span>Summary</span></h2>
 								</td>
 							</tr>
 							<tr>
 								<td style="padding:10.5pt 0in;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#8C8C8C">Release</span></p>
+									<p><span style="font-size:11.5pt;color:#333333">Execution Profile Name:</span></p>
 								</td>
 								<td width="75%" style="width:75.0%;padding:11pt 0in 10.5pt 3.75pt;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#333333"> {{releaseName}} </span></p>
+									<p><span style="font-size:11.5pt;color:#333333"> {{ profileName }} </span></p>
 								</td>
 							</tr>
 							<tr>
 								<td style="padding:10.5pt 0in;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#8C8C8C">Cycle</span></p>
+									<p><span style="font-size:11.5pt;color:#333333">Start Date and Time:</span></p>
 								</td>
 								<td width="75%" style="width:75.0%;padding:11pt 0in 10.5pt 3.75pt;border:none;border-top:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#333333"> {{cycleName}} </span></p>
+									<p><span style="font-size:11.5pt;color:#333333"> {{ startDate }} </span></p>
 								</td>
 							</tr>
 							<tr>
-								<td style="padding:10.5pt 0in;border:none;border-top:1.0pt solid #EDEDED;border-bottom:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#8C8C8C">Test Suite</span></p>
+								<td style="padding:10.5pt 0in;border:none;border-top:1.0pt solid #EDEDED">
+									<p><span style="font-size:11.5pt;color:#333333">Type of Execution:</span></p>
 								</td>
-								<td width="75%" style="width:75.0%;padding:11pt 0in 10.5pt 3.75pt;border:none;border-top:1.0pt solid #EDEDED;border-bottom:1.0pt solid #EDEDED">
-									<p><span style="font-size:11.5pt;color:#333333"> {{suiteName}} </span></p>
+								<td width="75%" style="width:75.0%;padding:11pt 0in 10.5pt 3.75pt;border:none;border-top:1.0pt solid #EDEDED">
+									<p><span style="font-size:11.5pt;color:#333333"> {{ executionType }} </span></p>
 								</td>
 							</tr>
 						</tbody>
@@ -64,7 +61,13 @@
 						<thead>
 							<tr>
 								<th style="background-color: #9e9e9e; padding: 10px 10px">
-									<span style="color:#ffffff; font-size: 12pt"> Scenario Name </span>
+									<span style="color:#ffffff; font-size: 12pt"> Project </span>
+								</th>
+								<th style="background-color: #9e9e9e; padding: 10px 10px">
+									<span style="color:#ffffff; font-size: 12pt"> Test Suite Name </span>
+								</th>
+								<th style="background-color: #9e9e9e; padding: 10px 10px">
+									<span style="color:#ffffff; font-size: 12pt"> Test Case Name </span>
 								</th>
 								<th style="background-color: #9e9e9e; padding: 10px 10px">
 									<span style="color:#ffffff; font-size: 12pt"> Status </span>
@@ -79,21 +82,22 @@
 						</thead>
 						<tbody>
 							{{#each reports}}
-							<tr>
-								<td style="padding: 10px 10px">
-									<span> {{scenarioname}} </span>
-								</td>
-								<td style="padding: 10px 10px; text-align: center">
-									{{#if pass}}
-									<span style="color: #28a745; font-size: 12pt"> Pass </span>
-									{{else if fail}}
-									<span style="color: #dc3545; font-size: 12pt"> Fail </span>
-									{{else if terminate}}
-									<span style="color: #ffc107; font-size: 12pt"> Terminate </span>
-									{{else if incomplete}}
-									<span style="color: #343a40; font-size: 12pt"> Incomplete </span>
-									{{else if skipped}}
-									<span style="color: #343a40; font-size: 12pt"> Skipped </span>
+								{{#each reportData}}
+								<tr>
+									{{#if @first}}
+										<td style="padding: 10px 10px">
+											<span> {{projectName}} </span>
+										</td>
+										<td style="padding: 10px 10px">
+											<span> {{testsuiteName}} </span>
+										</td>
+									{{else}}
+										<td style="padding: 10px 10px">
+											<span></span>
+										</td>
+										<td style="padding: 10px 10px">
+											<span></span>
+										</td>
 									{{/if}}
 									<td style="padding: 10px 10px">
 										<span> {{scenarioname}} </span>

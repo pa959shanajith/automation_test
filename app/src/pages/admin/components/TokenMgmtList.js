@@ -98,7 +98,6 @@ const TokenMgmtList = (props) => {
 					</div>
                     {props.showList ?
                         <div id="activeUsersToken" className="wrap active-users-token" >
-                            <ScrollBar scrollId='activeUsersToken' thumbColor="#929397" >
                             <table className = "table table-hover sessionTable" id="tokensDetail">
                                 <tbody >
                                 <tr className="tkn-table__row">
@@ -118,7 +117,6 @@ const TokenMgmtList = (props) => {
                                 ))}
                                 </tbody>
                             </table>
-                            </ScrollBar>
                         </div>
                     :null}
                 </div>

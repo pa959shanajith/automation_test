@@ -1,20 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../styles/WelcomeWizard.scss";
 import axios from "axios";
-import {ProgressIndicator , AnimationClassNames} from "@fluentui/react";
 import { Stepper } from 'react-form-stepper';
 import { Messages as MSG, setMsg, RedirectPage, BrowserFp } from '../../global';
-import { ScrollBar } from '../../global';
 import { useSelector, useDispatch } from 'react-redux';
-import * as actionTypes from '../state/action';
 import "../styles/TermsAndConditions.scss";
 import * as api from '../api';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { manageUserDetails } from '../../admin/api';
-import { IconButton } from "@avo/designcomponents"
-
-
-const WelcomeWizard = ({showWizard, setPopover}) => {
+import { Button } from "primereact/button"
+import { loadUserInfoActions } from '../../landing/LandingSlice'
+import { ProgressBar } from 'primereact/progressbar';
+const WelcomeWizard = ({showWizard, userInfo, setPopover}) => {
   const [percentComplete,setPercentComplete] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
   const [showIndicator, setShowIndicator] = useState(false);
@@ -22,7 +19,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [showLinuxOSSelection, setShowLinuxOSSelection] = useState(false);
   const [selectedMacOS, setSelectedMacOS] = useState("");
   const [downloadPopover, setDownloadPop] = useState("");
-  const userInfo = useSelector(state=>state.login.userinfo);
+//   const userInfo = useSelector(state=>state.landing.userinfo);
   const [docLink,setDocLink] = useState("#");
   const [vidLink,setVidLink] = useState("#");
   const [config, setConfig] = useState({});
@@ -33,7 +30,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const [tncAcceptEnabled, setTncAcceptEnabled] = useState(false);
   const animationInterval = useRef(undefined);
   const TnCInnerRef = useRef(undefined);
-  const history = useHistory();
+  const history = useNavigate();
   const dispatch = useDispatch();
   const [showImage , setShowImage] = useState("")
   const[videoUrl,setVideoUrl]=useState("")
@@ -93,7 +90,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   },[activeStep])
 
   useEffect(()=>{
-    if (percentComplete === 1) {
+    if (percentComplete === 100) {
         updateStepNumber(1);
         showDownloadPopover();
     }
@@ -113,7 +110,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         welcomeStepNo:stepNo
     }
     try{
-        dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,welcomeStepNo:stepNo}});
+        const dataUser = {...userInfo, welcomeStepNo:stepNo}
+        dispatch(loadUserInfoActions.setUserInfo({...userInfo,welcomeStepNo:stepNo}));
+        localStorage.setItem("userInfo", JSON.stringify(dataUser))
         var data = await manageUserDetails("stepUpdate", userObj);
     } catch(err) {
         console.log(err)
@@ -154,7 +153,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
             RedirectPage(history, { reason: "userPrefHandle" });
         }
         else {
-            dispatch({type:actionTypes.SET_USERINFO, payload: {...userInfo,tandc:false}});
+            const data = {...userInfo, tandc:false}
+            dispatch(loadUserInfoActions.setUserInfo({...userInfo,tandc:false}));
+            localStorage.setItem("userInfo", JSON.stringify(data))
             setPopover(true);
             setActiveStep((prevStep)=>prevStep+1);
             setTimeout(()=>{showWizard(false)},1000);
@@ -205,7 +206,9 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 method: "GET",
                 responseType: "blob", 
                 onDownloadProgress(progress) {
-                    setPercentComplete(progress.loaded/progress.total)
+                    // setPercentComplete(progress.loaded/progress.total)
+                    const newPercentComplete = Math.round((progress.loaded / progress.total) * 100);
+                    setPercentComplete(newPercentComplete);
                 }
             }).then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -215,7 +218,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 if (config[clientVer].split(".").pop() === 'zip'){
 					link.setAttribute('download',  "AvoAssureClient.zip");
 				} else {
-					link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
+					link.setAttribute('download',  "AvoAssureClient"+(userInfo['licenseID'])+window.location.host+"."+config[clientVer].split(".").pop());
 				}
 				 
                 // link.setAttribute('download',  "AvoAssureClient"+(userInfo.isTrial?"1_":"0_")+window.location.host+"."+config[clientVer].split(".").pop());
@@ -266,8 +269,8 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
     document.getElementsByClassName("stepper")[0].style.visibility="hidden";
     return (
         <div>
-            <img src={`static/imgs/${imageName}.jpg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "enlargeImage-modified" :"enlargeImage"}/>
-            <img src={`static/imgs/close-btn.svg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "close-btn-modified" : "close-btn"} onClick={()=>
+            <img src={`static/imgs/${imageName}.jpg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "enlargeImage-modified" :"enlargeImage"} alt=""/>
+            <img src={`static/imgs/close-btn.svg`} className={["WW_win_2_1", "WW_win_2_2", "WW_win_3_1", "WW_win_3_2", "WW_win_3_3", "WW_win_4_1", "WW_win_4_2", "WW_mac_4_1"].includes(imageName) ? "close-btn-modified" : "close-btn"} alt="" onClick={()=>
                 {setShowImage("");
                 document.getElementsByClassName("form-container")[0].style.visibility="visible";
                 document.getElementsByClassName("stepper")[0].style.visibility="visible";}} />
@@ -294,20 +297,20 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   const getTermsAndConditions = () => {
       return (
             <div id="tnc_content" ref={TnCInnerRef}>
-                <h4 className="tnc_header">SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT</h4>
-                <p className="tnc_bold">THIS SOFTWARE {userInfo.isTrial?"TRIAL":""} LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION, A DIVISION OF SLK SOFTWARE PVT LTD (FORMERLY KNOWN AS SLK SOFTWARE SERVICES PVT LTD) (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
+                <h4 className="tnc_header">SOFTWARE LICENSE AGREEMENT</h4>
+                <p className="tnc_bold">THIS SOFTWARE LICENSE AGREEMENT (“LICENSE AGREEMENT”) IS A LEGAL CONTRACT BETWEEN AVO AUTOMATION (“LICENSOR”) AND YOU, EITHER AS AN INDIVIDUAL OR AN ENTITY (“LICENSEE”). IF THE LICENSEE IS ACCEPTING ON BEHALF OF AN ENTITY, THE LICENSEE REPRESENTS AND WARRANTS THAT THE LICENSEE HAS THE AUTHORITY TO BIND THAT ENTITY TO THIS AGREEMENT LICENSORIS WILLING TO AUTHORIZE LICENSEE’S USE OF THE SOFTWARE ASSOCIATED WITH THIS LICENSE AGREEMENT ONLY UPON THE CONDITION THAT LICENSEE ACCEPTS THIS LICENSE AGREEMENT WHICH GOVERNS LICENSEE’S USE OF THE SOFTWARE. BY DOWNLOADING, INSTALLING, OR ACCESSING AND USING THE SOFTWARE, LICENSEE INDICATES LICENSEE’S ACCEPTANCE OF THIS LICENSE AGREEMENT AND LICENSEE’S AGREEMENT TO COMPLY WITH THE TERMS AND CONDITIONS OF THIS LICENSE AGREEMENT.</p>
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">1.        </span> DEFINITIONS</h5>
                     <div>
                         <p><span className="tnc_num_idx">1.1.    </span> <b>Specific Words or Phrases.</b> For purposes of this License Agreement, each word or phrase listed below shall have the meaning designated. Other words or phrases used in this License Agreement may be defined in the context in which they are used and shall have the respective meaning there designated.</p>
                         <p>"<b>Affiliate</b>" means and includes any entity that directly or indirectly controls, is controlled by, or is under common control with Licensee, where "control" means the ownership of, or the power to vote, at least fifty percent (50%) of the voting stock, shares or interests of such entity. An entity that otherwise qualifies under this definition will be included within the meaning of "Affiliate" even though it qualifies after the execution of this Agreement.</p>
-                        <p>"<b>License Agreement</b>" or "<b>Agreement</b>" means the terms of this Software {userInfo.isTrial?"Trial":""} License Agreement, together with the appendices and other exhibits attached hereto or incorporated herein by reference.</p>
+                        <p>"<b>License Agreement</b>" or "<b>Agreement</b>" means the terms of this Software {userInfo?"Trial":""} License Agreement, together with the appendices and other exhibits attached hereto or incorporated herein by reference.</p>
                         <p>"<b>Authorized Users</b>" shall mean and include Licensee, its employees and contract employees of the Licensee who are working for the Licensee.</p>
                         <p>"<b>Intellectual Property Rights</b>" means all trade secrets, patents and patent applications, trademarks (whether registered or unregistered and including any goodwill acquired in such trade marks), service marks, trade names, business names, internet domain names, e-mail address names, copyrights (including rights in computer software), moral rights, database rights, design rights, rights in know-how, rights in confidential information, rights in inventions (whether patentable or not) and all other intellectual property and proprietary rights (whether registered or unregistered, and any application for the foregoing), and all other equivalent or similar rights which may subsist anywhere in the world.</p>
                         <p>"<b>License</b>" means a license to use the Software granted pursuant to the terms and conditions of this License Agreement.</p>
                         <p>"<b>Licensee</b>" means the person or entity that has entered into this License Agreement.</p>
-                        <p>"<b>Licensor</b>" means Avo Automation, a division of SLK Software Pvt Ltd (formerly known as SLK Software Services Pvt Ltd).</p>
+                        <p>"<b>Licensor</b>" means Avo Automation.</p>
                         <p>"<b>Party</b>" means either the "Licensor" or "Licensee", individually as the context so requires; and "<b>Parties</b>" means the "Licensor" and "Licensee", collectively.</p>
                         <p>"<b>Personnel</b>" means and includes a Party’s or an Affiliate’s directors, officers, employees, agents, auditors, consultants, contract employees and subcontractors.</p>
                         <p>"<b>Software</b>" means the appropriate software product licenses made available to Licensee and its Authorized Users by Licensor under this License Agreement.</p>
@@ -317,7 +320,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 <div>
                     <br/>
                     <h5><span className="tnc_num_idx">2.        </span> TERM AND TERMINATION</h5>
-                    <p><span className="tnc_num_idx">2.1.    </span> <b>Term.</b> This License Agreement shall remain in effect for {userInfo.isTrial?"a period of fifteen (15) days":"the provided period"} from the date of installation of the Software (‘Term’). The License term shall automatically expire on the end of the Term.</p>
+                    <p><span className="tnc_num_idx">2.1.    </span> <b>Term.</b> This License Agreement shall remain in effect for {userInfo?"a period of fifteen (15) days":"the provided period"} from the date of installation of the Software (‘Term’). The License term shall automatically expire on the end of the Term.</p>
                     <p><span className="tnc_num_idx">2.2.    </span> <b>Termination for Cause.</b> If Licensee breaches a material obligation under this Agreement, then Licensor may terminate this Agreement with immediate effect.</p>
                 </div>
                 <div>
@@ -410,7 +413,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <h5><span className="tnc_num_idx">16.        </span> FORCE MAJEURE</h5>
                     <p>A Party will be excused from a delay in performing, or a failure to perform, its obligations under this Agreement to the extent such delay or failure is caused by the occurrence of any contingency beyond the reasonable control including epidemics and pandemics, and without any fault, of such Party. In such event, the performance times shall be extended for a period of time equivalent to the time lost because of the excusable delay. However, if an excusable delay continues more than sixty (60) days, the Party not relying on the excusable delay may, at its option, terminate the Agreement in whole or in part, upon notice to the other Party. In order to avail itself of the relief provided in this Section for an excusable delay, the Party must act with due diligence to remedy the cause of, or to mitigate or overcome, such delay or failure.</p>
                 </div>
-                <div>
+                <div id="lastStepTnC">
                     <br/>
                     <h5><span className="tnc_num_idx">17.        </span> CONSTRUCTION</h5>
                     <p><span className="tnc_num_idx">17.1.    </span> <b>Modification.</b> The terms, conditions, covenants and other provisions of this Agreement may hereafter be modified, amended, supplemented or otherwise changed only by a written instrument (excluding e-mail or similar electronic transmissions) that specifically purports to do so and is physically executed by a duly authorized representative of each Party.</p>
@@ -418,12 +421,12 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     
                 </div>
                 <br/>
-                <p id="lastStepTnC"><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
+                <p><b>By clicking the “Agree” button, Licensee hereby agrees to be bound by all the terms and conditions stated herein</b></p>
             </div>)
   }
 
   const getWelcomeStep = ()=>{
-    return <div className={"welcomeInstall "+AnimationClassNames.slideDownIn20} style={{justifyContent:"unset !important"}}>
+    return <div className={"welcomeInstall " + "slideDownIn20"} style={{justifyContent:"unset !important"}}>
         {/* <div className="step1">
             <div>Terms and Conditions</div>
         </div> */}
@@ -452,7 +455,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
       {
         title:"To install Avo Assure client follow the below steps:", 
         items:[
-          {title:"Intialise installation",imageName:"WW_win_3_1"},
+          {title:"Initialize installation",imageName:"WW_win_3_1"},
           {title:"Extracting files",imageName:"WW_win_3_2"},
           {title:"Finish and Launch",imageName:"WW_win_3_3"}
         ],
@@ -506,7 +509,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   ]
 
   const afterDownloadInstructions = () => {
-      return <div className={"welcomeInstall "+(animationDir?AnimationClassNames.slideRightIn400:AnimationClassNames.slideLeftIn400)} style={{justifyContent:"space-evenly"}}>
+      return <div className={"welcomeInstall "+(animationDir?"slideRightIn400":"slideLeftIn400")} style={{justifyContent:"space-evenly"}}>
         <div className="d-p-header">
             <div className="d-p-header__title"><div>Thanks for downloading !</div></div>
             <div className="d-p-header__subtitle">If your download didn't start you can download it from the <b>"User Profile" dropdown</b> on <b>landing page.</b></div>
@@ -514,7 +517,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
         <div className="installation-instructions-container">
             <div className="d-p-card-container">
                 { cardListNo===0 ? null : 
-                    <IconButton id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} icon="chevron-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
+                    <i id="arrow__WW" data-type={cardListNo===0?"disabled":"not-disabled"} disabled={cardListNo===0} className="pi pi-angle-left" styles={{root:{left:0, height:"4rem !important", background:"transparent !important",fontSize: '2rem'}}} onClick={() => {setCardListNo((prevState)=>prevState-1)}} variant="borderless" />
                 }
                 {OS==="Windows" && InstallationSteps_win.map((item,idx)=>{
                     if (cardListNo===idx){
@@ -535,7 +538,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     else return null;
                 })}
                 { cardListNo===3 ? null : 
-                <IconButton id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} icon="chevron-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important"}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
+                <i id="arrow__WW" disabled={cardListNo===3} data-type={cardListNo===3?"disabled":"not-disabled"} className="pi pi-angle-right" styles={{root:{right:0, height:"4rem !important", background:"transparent !important",fontSize: '2rem'}}} onClick={() => {setCardListNo((prevState)=>prevState+1)}} variant="borderless" />
                 }
             </div>
             <div style={{display:"flex", flexDirection:"row"}}>
@@ -552,7 +555,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   }
 
   const getDownloadStep = ()=>{
-    return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
+    return <div className={"welcomeInstall " + "slideLeftIn400"}>
                 {!showIndicator && <span className="animate-text-container">
                     {downloadScreenCounter===0 && <span>Automate.</span>}
                     {downloadScreenCounter===1 && <span>Work.</span>}
@@ -561,7 +564,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     {/* <img src={"static/imgs/WelcomeInstall.svg"} alt="install-avo-client" height="100%"/> */}
                 </span>}
 
-                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 5 - 10 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
+                {(showIndicator) ? <div className="step2" style={{marginBottom:"1rem"}}>{"This will take approximately 1 - 5 minutes to complete"}</div>: <img className="specifications" src={`static/imgs/specifications_${OS}.svg`} />
                 // <div className="step2" style={{marginBottom:"1rem"}}>{"Please Download The Avo Assure Client"}</div>
                 }
 
@@ -569,14 +572,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                     <>
                         <div className="step2" style={{marginBottom:"0.5rem"}}>{"Downloading the Avo Assure Client"}</div>
                         <div className="downloadProgress">
-                            <ProgressIndicator 
-                            barHeight={30}
-                            styles = {{
-                                root:{width:"90%"},
-                                progressBar: { background:"#643693"},
-                                itemName: { fontSize: '1em', marginBottom: '0.6em',color:"black", display:"none" },
-                                itemDescription: { fontSize: '1em', marginTop: '0.6em' },
-                            }} label={'Downloading ICE Package...'} percentComplete={percentComplete} />
+                        <ProgressBar value={percentComplete} style={{width:'100rem'}}  showValue={false}></ProgressBar>
                         </div>
                     </>
                 :
@@ -589,7 +585,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   };
 
   const getStartTrialStep = ()=>{
-      return <div className={"welcomeInstall "+AnimationClassNames.slideLeftIn400}>
+      return <div className={"welcomeInstall " + "slideLeftIn400"}>
                 <span style={{height:"30%"}}>
                     <img src={"static/imgs/green_thumbs_up.svg"} alt="thanks-for-downloading" style={{height:"100%"}}/>
                 </span>
@@ -607,16 +603,16 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
   }
 
   return (
-      <div className={"WW_container "+(activeStep>3?AnimationClassNames.fadeOut500:AnimationClassNames.fadeIn100)}>
+      <div className={"WW_container " + (activeStep>3?"fadeOut500":"fadeOut100")}>
         <div className="form">
         {showImage !== "" && <GetImageModal imageName = {showImage} /> } 
         <div className="progressbar">
              <Stepper
                 steps={[
-                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="fa fa-check"></i>},
-                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="fa fa-check"></i>},
-                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="fa fa-solid fa-check"></i>},
-                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="fa fa-solid fa-check"></i>}]}
+                    { label: 'Accept Terms and Conditions', active:activeStep===0, completed:activeStep>0, children:activeStep===0?1:<i className="pi pi-check"></i>},
+                    { label: 'Download Avo Assure Client', active:activeStep===1, completed:activeStep>1, children:activeStep<=1?2:<i className="pi pi-check"></i>},
+                    { label: 'Setup Avo Assure Client', active:activeStep===2, completed:activeStep>2, children:(activeStep<=2)?3:<i className="pi pi-solid pi-check"></i>},
+                    { label: 'Getting Started', active:activeStep===3, completed:activeStep>3, children:(activeStep<=3)?4:<i className="pi pi-solid pi-check"></i>}]}
                 className="stepper"
                 stepClassName="stepButtons"
                 styleConfig={{
@@ -661,7 +657,7 @@ const WelcomeWizard = ({showWizard, setPopover}) => {
                 </div>
                 :null
             }
-          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="no-referrer">click here</a> OR <a href="mailto:support@avoautomation.com">contact us</a></div>}
+          {<div className="WelcomeContactUs">For help <a href="https://avoautomation.gitbook.io/avo-trial-user-guide/" target="_blank" rel="noopener noreferrer" >click here</a> OR <a href="mailto:support@avoautomation.com">contact us</a></div>}
         </div>
         </div>
     </div>

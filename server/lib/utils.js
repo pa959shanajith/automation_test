@@ -10,6 +10,7 @@ const Client = require("node-rest-client").Client;
 const client = new Client();
 const axios = require("axios");
 const https = require('https');
+const mySocket = require('./socket')
 
 const getChannelNum_cb = (channel,cb) => {
 	redisServer.redisPubICE.pubsub('numsub', channel, function(err, redisres) {
@@ -69,13 +70,21 @@ module.exports.allSess = async () => {
 	return myserver.rsStore.pAll();
 };
 
-module.exports.delSession = async (data) => {
+module.exports.allSessCount = async (clientName) => {
+    const sessList = await this.allSess();
+    var count = sessList.filter(ki => clientName == ki.client).length
+    return count;
+};
+
+module.exports.delSession = async (data,host) => {
 	const dataToSend = JSON.stringify({"emitAction":"killSession","username":data.user,"cmdBy":data.cmdBy,"reason":data.reason});
+	var clientName=this.getClientName(host);
 	if (data.action == "disconnect") {
-		redisServer.redisPubICE.publish("ICE1_"+data.key+"_"+data.user, dataToSend);
+		if(clientName in mySocket.allSocketsMap && data.user in mySocket.allSocketsMap[clientName]){
+			mySocket.allSocketsMap[clientName][data.user].emit("killSession", data.cmdBy, data.reason);
+		}
 		return true;
 	} else {
-		redisServer.redisPubICE.publish("UI_notify_"+data.user, dataToSend);
 		const sessDeletePromise = myserver.rsStore.pDestroy(data.key);
 		return sessDeletePromise;
 	}
@@ -225,3 +234,15 @@ exports.originalURL = function(req) {
 	const path = req.url || '';
 	return protocol + '://' + host + base+ path;
 };
+
+// Get client Name from host value
+module.exports.getClientName = (host) =>{
+	let clientName="avoassure";
+	if(host != null && host != undefined)
+	{
+			if(!(host.includes("localhost") || require('net').isIP(host)>0)){
+					clientName=host.split('.')[0]
+			}
+	}
+	return clientName;
+}

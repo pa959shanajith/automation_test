@@ -3,6 +3,9 @@ const TokenGenerator = require('uuid-token-generator')
 const async = require('async');
 const fs = require('fs');
 const path = require('path');
+const generator = require('../notifications/generator');
+const email = require('../notifications/email');
+const mySocket = require('../lib/socket');
 const archiver = require('archiver');
 const activeDirectory = require('activedirectory');
 const Client = require("node-rest-client").Client;
@@ -59,7 +62,9 @@ exports.manageUserDetails = async (req, res) => {
 			const inputs = {
 				action,
 				user:reqData,
-				name:reqData.username
+				name:reqData.username,
+				userimage:reqData.userimage || '',
+				isadminuser : reqData.isadminuser
 			}
 			const result = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 			if (result == "fail" || result == "forbidden") return res.status(500).send("fail");
@@ -69,6 +74,8 @@ exports.manageUserDetails = async (req, res) => {
 			action: action,
 			createdby: req.session.userid,
 			createdbyrole: req.session.activeRoleId,
+			userimage: reqData.userimage || '',
+			isadminuser : reqData.isadminuser,
 			name: (reqData.username || "").trim(),
 			auth: {
 				type: reqData.type,
@@ -177,7 +184,8 @@ exports.manageUserDetails = async (req, res) => {
 				res.send(result["status"]);			
 				let uData = result["userData"];
 				try{
-					notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+					// notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+					// notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
 				}catch(error) {
 					logger.error("Error occurred in admin/"+fnName,error);
 				}
@@ -207,7 +215,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage]);
 				}
 			} else {
 				data = {
@@ -218,6 +226,7 @@ exports.getUserDetails = async (req, res) => {
 					lastname: result.lastname,
 					email: result.email,
 					role: result.defaultrole,
+					profileimage: result.profileimage,
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,
@@ -350,18 +359,23 @@ exports.manageSessionData = async (req, res) => {
 		if (action == "get") {
 			logger.info("Inside UI service: manageSessionData/getSessions");
 			const data = {sessionData: [], clientData: []};
-			const connectusers = await utils.getSocketList("ICE");
-			connectusers.forEach(function(e) {
-				data.clientData.push({
-					username: e[0],
-					mode: e[1],
-					ip: e[2]
-				});
-			});
+			var clientName=utils.getClientName(req.headers.host);
+			const connectusers = mySocket.allSocketsMap[clientName]
+			const allICEIPMap = mySocket.allICEIPMap[clientName]
+			for (ice in connectusers){
+				if(ice != undefined && connectusers[ice].connected){
+					data.clientData.push({
+								username: ice,
+								mode: false,
+								ip: allICEIPMap[ice]
+							});
+				}
+			}
 			try {
 				const sessions = await utils.allSess();
 				sessions.forEach(function(e) {
 					if (e.uniqueId && currUser != e.username) {
+						if(e.client == clientName){
 						data.sessionData.push({
 							username: e.username,
 							id: Buffer.from(e.uniqueId).toString("base64"),
@@ -369,6 +383,7 @@ exports.manageSessionData = async (req, res) => {
 							loggedin: (new Date(e.loggedin)).toLocaleString(),
 							ip: e.ip
 						});
+						}
 					}
 				});
 			} catch(err) {
@@ -393,14 +408,11 @@ exports.manageSessionData = async (req, res) => {
 					}
 				}
 			} else if (action == "disconnect" && key == '?') {
-				const icemode = await utils.channelStatus(user);
-				if (icemode.schedule) key = "schedule";
-				else if (icemode.normal) key = "normal";
-				else return res.send("success");
+				res.send("success");
 			}
 			const d2s = {"action":action, "key":key, "user":user, "cmdBy":currUser, "reason": reason};
 			try {
-				const status = await utils.delSession(d2s);
+				const status = await utils.delSession(d2s,req.headers.host);
 				return res.send("success");
 			} catch (err) {
 				logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
@@ -1805,6 +1817,18 @@ exports.provisionICE = async (req, res) => {
 			query: tokeninfo.action
 		};
 		const result = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+		if(result !== 'fail'){
+			const uData = {
+				uid: tokeninfo.userid,
+				email: tokeninfo.email,
+				token:result,
+				url:tokeninfo.url,
+			    firstname: tokeninfo.firstName,
+			    lastname: tokeninfo.lastName,
+				username: tokeninfo.username,
+			}
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+		}
 		res.send(result);
 	} catch (exception) {
 		logger.error("Error occurred in admin/"+fnName+":", exception);
@@ -2411,9 +2435,9 @@ exports.manageJiraDetails = async (req, res) => {
 			}
 			result = await utils.fetchData(inputs, "admin/manageJiraDetails", actionName);
 		}else{
-			const jiraURL = data.user.jiraURL;
-			const jiraUsername = data.user.jiraUsername;
-			const jiraAPI = data.user.jiraAPI;
+			const jiraURL = data.user.url;
+			const jiraUsername = data.user.username;
+			const jiraAPI = data.user.password;
 			let inputs = {
 				"userId": userId,
 				"jiraUrl": jiraURL,
@@ -2528,11 +2552,11 @@ exports.manageZephyrDetails = async (req, res) => {
 				"action":action
 			}
 		}else{
-			const zephyrUrl = data.user.zephyrUrl;
-			const zephyrUsername = data.user.zephyrUsername;
-			const zephyrPassword = data.user.zephyrPassword;
-			const zephyrToken = data.user.zephyrToken;
-			const zephyrAuthType = data.user.zephyrAuthType;
+			const zephyrUrl = data.user.url;
+			const zephyrUsername = data.user.username;
+			const zephyrPassword = data.user.password;
+			const zephyrToken = data.user.token;
+			const zephyrAuthType = data.user.authType;
 			inputs = {
 				"userId": userId,
 				"zephyrUrl": zephyrUrl,
@@ -2567,9 +2591,9 @@ exports.manageAzureDetails = async (req, res) => {
 			result = await utils.fetchData(inputs, "admin/manageAzureDetails", actionName);
 
 		}else{
-			const AzureUrl = data.user.AzureURL;
-			const AzureUsername = data.user.AzureUsername;
-			const AzurePAT = data.user.AzurePAT;
+			const AzureUrl = data.user.url;
+			const AzureUsername = data.user.username;
+			const AzurePAT = data.user.password;
 			
 			inputs = {
 				"AzureUrl": AzureUrl,
@@ -2665,17 +2689,18 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 		const userid = req.session.userid;
 		const activeRole = req.session.activeRole;
 		const roleId = req.session.activeRoleId;
-		if (roleId === '5db0022cf87fdec084ae49a9' && activeRole === "Admin") return next();
+		const isAdminUser = req.session.isadminuser;
+		if (roleId === '5db0022cf87fdec084ae49ab' && activeRole === "Quality Manager" && isAdminUser === true) return next();
 		switch (req.path) {
 			case "/manageUserDetails":
 			    if(req.body.action == "stepUpdate") return next();
 				if (req.body.user.userid == userid && req.body.action == 'update') return next();
 				break;
 			case "/manageCIUsers":
-				if (req.body.CIUser.userId == userid) return next();
+				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
-				if (req.body.tokeninfo.userid == userid) return next();
+				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":
 				if (req.body.userId == userid) return next();
@@ -2685,7 +2710,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 					const iceName = req.body.user;
 					const inputs = { user: userid };
 					const result = await utils.fetchData(inputs, "admin/fetchICE", "fetchICE");
-					if (result.some(x => x.icename === iceName)) return next()
+					if (result != 'fail') return next()
 				} catch (exception) {
 					logger.error("Error occurred in adminPrivilegeCheck:", exception);
 					return res.status("500").send("fail");
@@ -2813,5 +2838,63 @@ exports.fetchAvoDiscoverMap = async (req, res) => {
 	} catch (exception) {
 		logger.error("Error occurred in admin/fetchAvoDiscoverMap:", exception);
 		res.send("fail");
+	}
+};
+
+exports.manageBrowserstackDetails = async (req, res) => {
+	const actionName = "manageBrowserstackDetails";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const data = req.body;
+		const userId = req.session.userid;
+		const action = data.action;
+		let result;
+		let inputs;
+		if(action==='delete'){
+			inputs = {
+				"userId": userId,
+				"action":action
+			}
+			result = await utils.fetchData(inputs, "admin/manageBrowserstackDetails", actionName);
+		}else{
+			const BrowserstackUsername = data.user.BrowserstackUsername;
+			const BrowserstackAPI = data.user.BrowserstackAPI;
+			let inputs = {
+				"userId": userId,
+				"BrowserstackUsername": BrowserstackUsername,
+				"BrowserstackAPI": BrowserstackAPI,
+				"action": action
+			};
+		
+		result = await utils.fetchData(inputs, "admin/manageBrowserstackDetails", actionName);
+		}
+		return res.send(result);
+	} catch (exception) {
+		logger.error("Exception in the service gitSaveConfig: %s", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.getDetails_BROWSERSTACK= async (req, res) => {
+	const actionName = "getDetails_BROWSERSTACK";
+	logger.info("Inside UI service: " + actionName);
+	try {
+		const userId = req.session.userid;
+		let inputs = {
+			"userId": userId
+		};
+		const result = await utils.fetchData(inputs, "admin/getDetails_BROWSERSTACK", actionName);
+		if (result === "fail") res.status(500).send("fail");
+		else if (result === "empty") res.send("empty");
+		else {
+			let data = {
+				BrowserstackURL: result['url'],
+				BrowserstackUsername: result['username'],
+				Browserstackkey: result['api']
+			};
+			return res.send(data);
+		}
+	} catch (exception) {
+		logger.error("Exception in the service getDetails_BROWSERSTACK: %s", exception);
+		return res.status(500).send("fail");
 	}
 };

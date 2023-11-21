@@ -8,7 +8,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var validator = require('validator');
 var logger = require('../../logger');
-var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
 let headers
@@ -20,10 +19,12 @@ module.exports.setReq = async (req) =>
 exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username = req.session.username;
 		var name = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) name = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][name];
 		logger.debug("ICE Socket requesting Address: %s" , name);
 		var check_qcUrl = !validator.isEmpty(req.body.qcURL);
 		var check_qcUsername = !validator.isEmpty(req.body.qcUsername);
@@ -33,8 +34,7 @@ exports.loginQCServer_ICE = function (req, res) {
 			return res.send("invalidurl");
 		}
 		if(check_qcUrl && check_qcUsername &&  check_qcPassword) {
-			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]>0) {
+			if(mySocket != undefined) {	
 					var username = req.body.qcUsername;
 					var password = req.body.qcPassword;
 					var url = req.body.qcURL;
@@ -46,37 +46,20 @@ exports.loginQCServer_ICE = function (req, res) {
 						"qcaction": qcaction
 					};
 					logger.info("Sending socket request for qclogin to cachedb");
-					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function qclogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',qclogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in loginQCServer_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								data = data.value;
-								res.send(data);
-							}
-						}
+					mySocket.emit("qclogin", qcDetails);
+					function qclogin_listener(message) {
+						var data = message;
+							mySocket.removeListener('qcresponse',qclogin_listener);
+							data = data;
+							res.send(data);
 					}
-					redisServer.redisSubServer.on("message",qclogin_listener);
+					mySocket.on("qcresponse",qclogin_listener);
 				} else {
-					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
+					flag = "unavailableLocalServer";
+					logger.info("ICE Socket not Available");
+					res.send(flag);
 				}
-			});
+			
 		} else {
 			logger.info("Error occurred in loginQCServer_ICE: Invalid QC Credentials");
 			res.send("invalidcredentials");
@@ -94,14 +77,15 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		"qc_projects": ""
 	};
 	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var username = req.session.username;
 		var name= undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) name = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) name = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][name];	
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.debug("ICE Socket requesting Address: %s" , name);
-		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-			if (redisres[1]>0) {
+		if(mySocket != undefined) {	
 				var userid = req.session.userid;
 				var qcDetails = {
 					"domain": req.body.domain,
@@ -110,49 +94,34 @@ exports.qcProjectDetails_ICE = function (req, res) {
 				getProjectsForUser(userid, function (projectdata) {
 					// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
 					logger.info("Sending socket request for qclogin to cachedb");
-					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					function qclogin_listener(channel,message) {
-						var data = JSON.parse(message);
-						if(name == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-							redisServer.redisSubServer.removeListener('message',qclogin_listener);
-							if (data.onAction == "unavailableLocalServer") {
-								logger.error("Error occurred in qcProjectDetails_ICE: Socket Disconnected");
-								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-									var soc = myserver.socketMapNotify[name];
-									soc.emit("ICEnotAvailable");
-								}
-							} else if (data.onAction == "qcresponse") {
-								if (data == "fail")
-									res.send("fail");
-								else {
-									data = data.value;
-									try {
-										projectDetailList.avoassure_projects = projectdata;
-										projectDetailList.qc_projects = data.project;
-										res.send(projectDetailList);
-									} catch (ex) {
-										logger.error(ex);
-										res.send("fail");
-									}
-								}
+					mySocket.emit("qclogin", qcDetails);
+					function qclogin_listener(message) {
+						var data = message;
+						mySocket.removeListener('qcresponse',qclogin_listener);
+							
+						if (data == "fail")
+							res.send("fail");
+						else {
+							data = data;
+							try {
+								projectDetailList.avoassure_projects = projectdata;
+								projectDetailList.qc_projects = data.project;
+								res.send(projectDetailList);
+							} catch (ex) {
+								logger.error(ex);
+								res.send("fail");
 							}
 						}
+							
+						
 					}
-					redisServer.redisSubServer.on("message",qclogin_listener);
+					mySocket.on("qcresponse",qclogin_listener);
 				});
 			} else {
-				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
-					var flag="";
-					if (found) flag = "scheduleModeOn";
-					else {
-						flag = "unavailableLocalServer";
-						logger.info("ICE Socket not Available");
-					}
-					res.send(flag);
-				});
+				flag = "unavailableLocalServer";
+				logger.info("ICE Socket not Available");
+				res.send(flag);
 			}
-		});
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send('fail');
@@ -280,51 +249,34 @@ function projectandscenario(projectid, cb) {
 exports.qcFolderDetails_ICE = function (req, res) {
 	logger.info("Inside UI service: qcFolderDetails_ICE");
 	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
 		var qcDetails = req.body;
 		var username=req.session.username;
 		var icename = undefined
-		if(myserver.allSocketsICEUser[username] && myserver.allSocketsICEUser[username].length > 0 ) icename = myserver.allSocketsICEUser[username][0];
-		redisServer.redisSubServer.subscribe('ICE2_' + icename);
+		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		mySocket = myserver.allSocketsMap[clientName][icename];	
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.debug("ICE Socket requesting Address: %s" , icename);
-		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + icename,function(err,redisres){
-			if (redisres[1]>0) {
+		if(mySocket != undefined) {	
 				logger.info("Sending socket request for qclogin to cachedb");
-				dataToIce = {"emitAction" : "qclogin","username" : icename, "responsedata":qcDetails};
-				redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
-				function qclogin_listener(channel,message) {
-					var data = JSON.parse(message);
-					if(icename == data.username && ["unavailableLocalServer", "qcresponse"].includes(data.onAction)){
-						redisServer.redisSubServer.removeListener('message',qclogin_listener);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occurred in qcFolderDetails_ICE: Socket Disconnected");
-							if('socketMapNotify' in myserver &&  username in myserver.socketMapNotify){
-								var soc = myserver.socketMapNotify[username];
-								soc.emit("ICEnotAvailable");
-							}
-						} else if (data.onAction == "qcresponse") {
-							data = data.value;
-							res.send(data);
-						}
-					}
+				mySocket.emit("qclogin", qcDetails);
+				function qclogin_listener(message) {
+					var data = message;
+					mySocket.removeListener('qcresponse',qclogin_listener);	
+					data = data;
+					res.send(data);
 				}
-				redisServer.redisSubServer.on("message",qclogin_listener);
+				mySocket.on("qcresponse",qclogin_listener);
 			} else {
 				try {
-					utils.getChannelNum('ICE1_scheduling_' + icename, function(found){
-						var flag="";
-						if (found) flag = "scheduleModeOn";
-						else {
-							flag = "unavailableLocalServer";
-							logger.info("ICE Socket not Available");
-						}
-						res.send(flag);
-					});
+					flag = "unavailableLocalServer";
+					logger.info("ICE Socket not Available");
+					res.send(flag);
 				} catch (exception) {
 					logger.error(exception.message);
 				}
 			}
-		});
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send('fail');

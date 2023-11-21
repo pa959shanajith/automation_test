@@ -18,7 +18,7 @@
 .WW_container{
     background: #faf9f859;
     display: flex;
-    height: 100%;
+    height: 90%;
     width: 100%;
     z-index: 100;
     position: fixed;
@@ -127,7 +127,6 @@
     border-radius: 1.2rem;
     color: #fff;
     border: none;
-    font-family: 'Mulish';
     font-size: 1.5rem;
     padding: 0.5rem 1rem;
     margin-top: 3rem;
@@ -629,3 +628,77 @@
         transform: translate(0);
     }
 }
+@keyframes slideDownIn20 {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .slideDownIn20 {
+    animation: slideDownIn20 0.5s ease-in-out forwards;
+  }
+  /* Slide in from the right */
+@keyframes slideRightIn400 {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Slide in from the left */
+  @keyframes slideLeftIn400 {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Apply the animation class based on your condition */
+  .slideRightIn400 {
+    animation: slideRightIn400 0.4s ease-in-out forwards;
+  }
+  
+  .slideLeftIn400 {
+    animation: slideLeftIn400 0.4s ease-in-out forwards;
+  }
+  /* Fade in animation */
+@keyframes fadeIn100 {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  /* Fade out animation */
+  @keyframes fadeOut500 {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  
+  /* Apply the animation classes */
+  .fadeIn100 {
+    animation: fadeIn100 1s ease-in-out forwards;
+  }
+  
+  .fadeOut500 {
+    animation: fadeOut500 0.5s ease-in-out forwards;
+  }

@@ -55,6 +55,82 @@ $pass:#28a745;
 $glossyGrape:#A08AB7;
 $gunMetal:#343a40;
 $lavenderFlower:#a784d4;
+$pruple:#605BFF;
+$primaryColor: #643693;
+$primaryColorLight: #764ba2;
+$primaryColorDark: #321e4f;
+$primaryColorRich: #983fd3;
+$primaryColorLightest: #b875da;
+$primaryColorLogin: #9f62e1;
+$backgroundOne: #e0e0e0;
+$backgroundTwo: #969696;
+$backgroundFour:#f9f9f9;
+$backgroundLogin:#ca99ff;
+$backgroundThree:#997cb8;
+$backgroundFive:#e8e6fe;
+$backgroundYellowOne:#fdf59a;
+$backgroundYellowTwo:#fdd49a;
+$backgroundYellowThree:#fde19a;
+$backgroundYellowFour:#fbed50;
+$borderOne: #656565;
+$borderTwo: #c4c4c4;
+$borderGray: #5e636b;
+$borderThree: #e6e7e9;
+$borderFour: #d2d2d2;
+$borderFive:#999;
+$pinkLight: #f0e1ff ;
+$lavenderBlue: #e3caff ;
+$primaryText: #777777;
+$whisper: #F3F2F1;
+$primaryColorDarkest:#331d4c;
+$hovorIcon: #5F338F;
+$whiteColor: #ffffff;
+$redError: #B62330;
+$darkGray: #333;
+$tableHeader: #5e626b;
+$black: #000;
+$red:red;
+$summerSky: #4299e2;
+$medLightGray: #aaa;
+$iceColor:#cae0f3;
+$yellowColor:#efa022;
+$blueColor:#5c5ce5;
+$cyanColor:#19baae;
+$pluginGray:#8A8886;
+$darkestGray:#212529;
+$btest:#55348a;
+$tableHeaderSelected: #605E5C;
+$electricIndigo:#8233FF;
+$custObj:#bb9cda;
+$submitBtn:#ff7300;
+$grayColor: gray;
+$PrimaryShadow:#8469a0;
+$pistachio:#6FB453;
+$lightGray:#ced4da;
+$blueViolet: #391F56;
+$selectedAlm:#c8c8e6;
+$pass:#28a745;
+$glossyGrape:#A08AB7;
+$gunMetal:#343a40;
+$lavenderFlower:#a784d4;
+$greyishText: #323130;
+$nullPass: #81E7C5;
+$minorPass: #00D990;
+$moderatePass: #309F7A;
+$seriousPass: #008C5D;
+$criticalPass: #00593B;
+$nullFail: #FF9596;
+$minorFail: #DF5E60;
+$majorFail: rgba(254, 80, 70, 1);
+$moderateFail: #D81B1F;
+$seriousFail: #A61416;
+$criticalFail: #590B0C;
+$incompleteStatus: #FFBF00;
+$scheduledStatus: #32348F;
+$inprogressStatus: #8D328F;
+$executedStatus: #001345;
+$overlayBg: rgba(255, 255, 255, 0.84);
+$disabledGreyColor: #A19F9D;
 
 /* AVO ASSURE FONT FAMILY */
 
@@ -65,3 +141,52 @@ $avoBoldFont: "LatoWebBold";
 $avoThinFont: "LatoWebThin";
 $avoBlackFont: "LatoWebBlack";
 $avoFontOther: "sans-serif";
+
+/* AVO ASSURE FONT SIZE */
+
+$avoFontSmallest: 0.7rem;
+$avoFontSmaller: 0.9rem;
+$avoFontSmall: 0.95rem;
+$avoFontNormal: 1rem;
+$avoFontMedium: 1.1rem;
+$avoFontLarge: 1.2rem;
+$avoFontLarger: 1.3rem;
+$avoFontLargest: 1.4rem;
+$avoFontHuge: 1.5rem;
+$avoFontHeader: 2rem;
+
+$fontName: "Open Sans";
+
+$f1_regular: 400 3rem/4rem $fontName;
+$f1_semibold: 600 3rem/4rem $fontName;
+$f1_bold: 700 3rem/4rem $fontName;
+
+$f2_regular: 400 2.4375rem/3.5rem $fontName;
+$f2_semibold: 600 2.4375rem/3.5rem $fontName;
+$f2_bold: 700 2.4375rem/3.5rem $fontName;
+
+$f3_regular: 400 1.9375rem/2.5rem $fontName;
+$f3_semibold: 600 1.9375rem/2.5rem $fontName;
+$f3_bold: 700 1.9375rem/2.5rem $fontName;
+
+$f4_regular: 400 1.5625rem/2rem $fontName;
+$f4_semibold: 600 1.5625rem/2rem $fontName;
+$f4_bold: 700 1.5625rem/2rem $fontName;
+
+$f5_regular: 400 1.25rem/1.5rem $fontName;
+$f5_semibold: 600 1.25rem/1.5rem $fontName;
+$f5_bold: 700 1.25rem/1.5rem $fontName;
+
+$f6_regular: 400 1rem/1.5rem $fontName;
+$f6_semibold: 600 1rem/1.5rem $fontName;
+$f6_bold: 700 1rem/1.5rem $fontName;
+
+$f7_regular: 400 0.8125rem/1rem $fontName;
+$f7_semibold: 600 0.8125rem/1rem $fontName;
+$f7_bold: 700 0.8125rem/1rem $fontName;
+
+$f8_regular: 400 0.625rem/1rem $fontName;
+$f8_semibold: 600 0.625rem/1rem $fontName;
+$f8_bold: 700 0.625rem/1rem $fontName;
+
+

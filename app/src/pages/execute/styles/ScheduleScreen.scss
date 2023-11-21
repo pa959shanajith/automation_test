@@ -1,0 +1,132 @@
+.schedule_container {
+    margin: 1rem 2rem 0rem 2rem;
+    .schedule_options {
+        margin-bottom: -1.5rem;
+    }
+    .p-calendar {
+        width: 100%;
+        .p-inputtext {
+            padding: 0.3rem 0.5rem;
+        }
+
+        .p-button {
+            padding: 0.3rem 0.5rem;
+            background: white;
+            color: #dee2e6;
+            width: 2rem;
+            border: 1px solid #dee2e6;
+            .p-button-icon {
+                color: #495057;
+            }
+        }
+    }
+    .make_recurring {
+        padding: .3rem .5rem;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        color: #495057;
+        text-align: left;
+        .p-button-label {
+            font-weight: 400;
+        }
+    }
+    .p-button.make_recurring.p-button-info:enabled:hover {
+        background: #fff;
+        color: #495057;
+    }
+    .btn_container {
+        padding: 0.5rem 0;
+        .recurring_btn {
+            margin-left: 1rem;
+        }
+    }
+    .avo_input {
+        position: relative;
+        top: 3rem;
+        z-index: 2;
+        width: 30%;
+        left: 70%;
+        .p-input-icon-left {
+            width: 100%;
+        }
+    }
+    .schedule_btn {
+        padding: 0.3rem 1rem;
+        width: 100%;
+    }
+    .p-datatable-wrapper {
+        height: 42vh;
+        .p-datatable-thead>tr>th {
+            color: #030229;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
+}
+
+.recurrence_container {
+    max-width: 50%;
+    .p-calendar {
+        width: 20rem;
+        .p-inputtext {
+            padding: 0.3rem 0.5rem;
+        }
+
+        .p-button {
+            padding: 0.3rem 0.5rem;
+            background: white;
+            color: #dee2e6;
+            width: 2rem;
+            border: 1px solid #dee2e6;
+            .p-button-icon {
+                color: #495057;
+            }
+        }
+    }
+    .radioBtn {
+        padding-bottom: 1rem;
+    }
+    .dailyContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        .radioBtndaily {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.4rem;
+            .every_day {
+                width: 3rem;
+                .p-inputtext {
+                    width: 100%;
+                }
+            }
+            .day_week {
+                display: flex;
+                align-items: center;
+            }
+        }
+    }
+    .with_border {
+        border-right: 1px solid #000000;
+    }
+    .without_border {
+        border: none;
+    }
+    .checkbox_padding {
+        padding: 0.7rem;
+    }
+    .dropdown_enddate {
+        width: 15rem;
+        .p-inputtext {
+            padding: 0.4rem;
+        }
+    }
+}

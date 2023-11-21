@@ -1,0 +1,57 @@
+
+@import "../../global/styles/ColorVariables.scss";
+.ss__content{
+    display: flex;
+    flex-direction: column;
+    // flex: 0 1 100%;
+    min-width: 96px;
+    // padding: 20px;
+    margin: 0px 0px 0px 1px;
+    // margin: -11px -38px 11px -3px;
+    background-color: $whiteColor;
+    width: 100%;
+}
+
+// .ss__task_title{
+//     margin-bottom: 15px;
+//     max-width: 80%;
+// }
+// #bluecolor{
+//     color: blue;
+// }
+// a:hover{
+//     text-decoration: none;
+// }
+// #bluecolor:hover{
+//     list-style: none;
+//     text-decoration:none ;
+//    cursor: not-allowed;
+// }
+// #graycolor{
+//     color:gray
+// }
+// #graycolor:hover{
+//     list-style: none;
+//     text-decoration:none ;
+//    cursor: not-allowed;
+// }
+// .ss__task_name{
+//     cursor: pointer;
+//     background-color: $primaryColorDarkest;
+//     color: $whiteColor;
+//     padding: 1px 14px 0;
+//     font-family: $avoSecondaryFont;
+//     font-size: 18px;
+//     width: fit-content;
+//     white-space: nowrap;
+//     text-overflow: ellipsis;
+//     border-radius: 5px;
+//     margin: 18px 15px 19px 24px;
+// }
+// .breadcrumb-item {
+//     + .breadcrumb-item::before {
+//       content: ">>" !important;
+//       align-self: baseline;
+//       color: #7d8daa;
+//     }
+//   }

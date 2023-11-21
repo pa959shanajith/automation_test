@@ -60,7 +60,7 @@ exports.userCreateProject_ICE = async (req, res) =>{
 		const inputs = {
 			name: createProjectObj.projectName,
 			domain: createProjectObj.domain,
-			type: createProjectObj.appType,
+			type: createProjectObj.type,
 			releases: createProjectObj.releases,
       assignedUsers:createProjectObj.assignedUsers,
 			createdby: userid,
@@ -90,8 +90,31 @@ exports.userCreateProject_ICE = async (req, res) =>{
         return res.send("fail");
 
     }
-
 };
+
+exports.validateProject = async (req, res) =>{
+  const fnName = "validateProject";
+  logger.info("Inside UI service: validateProject ");
+
+  var status = "fail";
+  const createProjectObj=req.body;
+  const inputs = {
+    query : "validateproject"
+  }
+   try {
+    const validateproject = await utils.fetchData(inputs, "/hooks/validateProject");
+    if(validateproject.status === 'pass'){
+        return res.send(validateproject)
+    }
+    else{
+      return res.send(validateproject)
+    }
+  } catch(exception) {
+      logger.error("Error occurred in validating project :", exception);
+      return res.send(validateproject);
+  }
+};
+
 exports.userUpdateProject_ICE = async (req, res) =>{
     const fnName = "userUpdateProject_ICE"
     logger.info("Inside UI service: updateProject_ICE ");

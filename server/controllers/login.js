@@ -23,7 +23,10 @@ exports.loadUserInfo = async (req, res) => {
 			additionalrole: userData.addroles,
 			firstname: userData.firstname,
 			lastname: userData.lastname,
+			createdon: userData.createdon,
 			role: userData.defaultrole,
+			isadminuser:userData.isadminuser,
+			userimage: userData.profileimage || '',
 			taskwflow: configpath.strictTaskWorkflow,
 			token: configpath.defaultTokenExpiry,
 			dateformat: configpath.dateFormat,
@@ -42,7 +45,7 @@ exports.loadUserInfo = async (req, res) => {
 		req.session.additionalroles = userData.addroles,
 		req.session.firstname = userData.firstname,
 		req.session.lastname = userData.lastname,
-
+              		
 		inputs = {
 			"roleid": selectedRole,
 			"query": "permissionInfoByRoleID"
@@ -54,15 +57,11 @@ exports.loadUserInfo = async (req, res) => {
 			logger.error("User role not found");
 			return res.send("fail");
 		}
-		if (permData.pluginresult.length === 0) {
-			logger.info("User plugins not found");
-			return res.send("fail");
-		}
 		if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
 		req.session.activeRole = rolename;
 		userProfile.rolename = req.session.defaultRole;
-		userProfile.pluginsInfo = permData.pluginresult;
-		userProfile.page = (userProfile.rolename == "Admin")? "admin":"plugin";
+		userProfile.licensedetails = permData.licenseDetails;
+		userProfile.page = (userProfile.rolename == "Admin")? "admin":"landing";
 		userProfile.tandc = false;
 		userProfile.isTrial = permData.isTrial;
 		if (userProfile.rolename != "Admin" && configpath.showEULA) {
@@ -73,6 +72,9 @@ exports.loadUserInfo = async (req, res) => {
 			const eulaData = await utils.fetchData(inputs, "login/checkTandC", fnName);
 			if (eulaData != "success") userProfile.tandc = true;
 		}
+		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
+        userProfile['licenseID']='4_'
+		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
@@ -129,8 +131,8 @@ exports.resetPassword = async (req, res) => {
 	const fnName = "resetPassword";
 	logger.info("Inside UI Service: " + fnName);
 	try {
-    if(req.body.userData){
-      const user = req.body.userData;
+    if(req.body.currpassword){
+      const user = req.body.currpassword;
       const newpassword = req.body.newpassword;
       const userData = {username:user.name, newpass: newpassword, oldpass: user.auth.password?user.auth.password:""};
       const fresh = await verifyPasswordHistory(userData);
@@ -156,7 +158,8 @@ exports.resetPassword = async (req, res) => {
         modifiedby: userData.user._id,
         modifiedbyrole: userData.user.defaultrole,
         password: password,
-        oldPassword: userData.oldpass
+        oldPassword: "resetpassword",
+		userimage:''
       };
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
       if (status == "fail" || status == "forbidden") return res.send("fail");
@@ -209,7 +212,8 @@ exports.resetPassword = async (req, res) => {
 			modifiedby: userData.user._id,
 			modifiedbyrole: userData.user.defaultrole,
 			password: password,
-			oldPassword: userData.oldpass
+			oldPassword: userData.oldpass,
+			userimage:''
 		};
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");

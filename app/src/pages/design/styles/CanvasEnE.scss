@@ -1,0 +1,13 @@
+#ene {
+    .mp__canvas {
+        position: absolute;
+        top: 145px;
+        height: calc(100% - 145px);
+        overflow: hidden;
+        border: 1px solid transparent;
+        width: 100%;
+    }
+}
+.p-tag-value{
+    width: 0;
+}

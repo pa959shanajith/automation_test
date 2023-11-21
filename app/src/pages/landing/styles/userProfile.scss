@@ -1,0 +1,52 @@
+@import "../../global/styles/ColorVariables.scss";
+.UserProfileContainer{
+.card {
+  background: var(--surface-card);
+  padding: 0.5rem;
+  border-radius: 10px;
+  margin-left: 50rem;
+}
+
+}
+
+.p-tieredmenu.custom-tieredmenu {
+  background:linear-gradient(180deg,#EDECEC 15%,#fafafb 13%)!important;
+  border-radius: 8px !important;
+  width: 13.8rem !important;
+  position: relative;
+  z-index: 2;
+  position: absolute;
+  top: 2.6rem;
+  right: 0.2rem;
+  font: $f6_regular !important;
+  .p-menuitem-link:not(.p-disabled):hover {
+    background: #bec2be !important;
+    font: $f6_regular !important;
+  }
+  .ProfileDisplay  {
+    text-align: center;
+    margin-bottom: 0.8rem;
+    margin-right: 0.5rem;
+    margin-top: 1rem;
+  }
+  .user_name{
+    font: $f6_semibold;
+  }
+  .user_role{
+    font: $f7_regular;
+  }
+  
+  .tooltipEmailId{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    left: 0.8rem;
+    position: relative;
+    cursor: pointer;
+    color: #495057;
+    font: $f7_regular;
+    }
+  .p-avatar.p-avatar-image{
+    border:2px solid white !important;
+  }
+}

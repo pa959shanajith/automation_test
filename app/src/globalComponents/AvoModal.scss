@@ -1,0 +1,579 @@
+@import "../pages/global/styles/ColorVariables.scss";
+.modalClass {
+    .p-dialog-header {
+      height: 5rem;
+      background: rgba(96, 91, 255, 0.08);
+      .p-dialog-title {
+         font: $f5_semibold;
+      }
+    }
+    .p-dialog-content {
+      padding: 0;
+    }
+    .p-dialog-footer {
+      height: 4.25rem;
+      padding: 0;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .p-button.save_button, .p-button.next_button {
+      background: #605BFF;
+      margin-right: 1.6rem;
+      border-radius: 0.25rem;
+      width: 7.125rem;
+      height: 2.25rem;
+      .p-button-label {
+        font: $f7_semibold;
+        color: #FFFFFF;
+      }
+    }
+    .p-button.close_button {
+      border-radius: 0.25rem;
+      width: 7.125rem;
+      height: 2.25rem;
+      .p-button-label {
+        font: $f7_semibold;
+        color: #030229;
+      }
+    }
+}
+
+.loaderClass {
+  .p-dialog-content {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  .spinnerClass {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+}
+
+.schedule_modal {
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+.MobileWeb {
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // justify-content: center;
+    height: 5.4rem;
+    // display: flex;
+    // flex-direction: column;
+    justify-content: space-around;
+    /* align-items: center; */
+    padding:0 0 0 2rem;
+    .inputContent{
+      align-items: center;
+        // display: flex;
+        // flex-flow: column;
+        height: 5.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* align-items: center; */
+    padding-left: 2rem;
+    }
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+.SAP {
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+.SAP {
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+
+.MobileApp {
+  height: 50vh;
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    background-color: red;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0rem;
+    .inputContent {
+        // margin: 0.5rem;
+        // padding: 0.5rem;
+        border-radius: 4px;
+        // width: 30rem;
+        // min-width: 10rem;
+        // height: 2rem;
+        height: 13rem;
+    /* margin: 0.5rem; */
+    min-width: 10rem;
+    /* padding: 0.5rem; */
+    width: 30rem;
+    // padding-left: 1rem;
+    justify-content: space-evenly;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    }
+    .wholeAndroidContainer{
+display: flex;
+flex-direction: column;
+    .AndroidContent{
+      align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 32rem;
+    justify-content: space-evenly;
+    height: 7rem;
+    .p-component{
+      height: 2rem;
+      width: 25rem;
+    }
+    .versionSelect{
+      height: 2rem;
+      width: 25rem;
+    }
+    }
+    span{
+      color:red;
+      a{
+        text-decoration: underline;
+      }
+    }
+ 
+  }
+    .inputIos {
+      border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    height: 19rem;
+    justify-content: space-evenly;
+    min-width: 10rem;
+    padding-left: 1rem;
+    width: 28rem;
+    .iOSContent{
+      display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    /* align-items: center; */
+    width: 26rem;
+    height: 12rem;
+    .p-component{
+      height: 2rem;
+    }
+    }
+  }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+.OEBS {
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}
+.Desktop {
+  .p-dialog-header{
+    height: 3.5rem;
+  }
+  .p-dialog-footer {
+    height: 3.5rem;
+    .Launch_button{
+      width:5rem;
+      height:2.5rem;
+      justify-content: center;
+    }
+  }
+  .p-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    // justify-content: center;
+    .allContent{
+      align-items: center;
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
+        height: 92%;
+        .gap-3 {
+          margin-top: 5%;
+          padding-right: 16%;
+        }
+        .inputContent{
+          display:flex;
+          flex-direction: column;
+        }
+    }
+    input {
+        margin: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        width: 30rem;
+        min-width: 10rem;
+        height: 2rem;
+    }
+    .ice_label {
+      margin-top: 1rem;
+    }
+    .ice_container {
+      .ice_status {
+      .available {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: green;
+        display: inline-block;
+        margin: 0 1rem 0 1rem;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .unavailable {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ff9f42;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      .dnd {
+        height: 0.75rem;
+        width: 0.75rem;
+        background-color: #ea5455;
+        display: inline-block;
+        border-radius: 50%;
+        padding: 0.5rem;
+        margin: 0 1rem 0 1rem;
+      }
+      margin-left: 0.5rem;
+    }
+    }
+  }
+}

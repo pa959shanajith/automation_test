@@ -1,0 +1,614 @@
+
+@import "../../global/styles/ColorVariables.scss";
+.dropdown-class{
+    margin-top: 1rem;
+}
+.dropdown-integration {
+    .p-dropdown{
+        width: 205px !important;
+        height: 36px !important;
+
+    }
+}
+
+.basic_login{
+    position: relative;
+    left: 0.5rem;
+}
+
+.token_login{
+    position: relative;
+    left: 0.5rem;
+}
+
+.login-cls{
+    font-size: 23px;
+    font-weight: 600;
+    position: absolute;
+    bottom: 20rem;
+}
+.input-cls, .passwrd-cls, .url-cls{
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1.5rem;
+}
+.input-txt1{
+    .p-inputtext{
+width: 20rem !important;
+height: 2.5rem !important;
+    }
+}
+.loginbtn-jira{
+    .p-button {
+        height: 2.5rem !important;
+        width: 6rem !important;
+        position: relative !important;
+        left: 14rem !important;
+    }
+}
+.logout__btn{
+    position: absolute !important;
+    left: 53rem !important;
+    background: white !important;
+    color: blue !important;
+    .p-button{
+     width: 7rem !important;
+    }
+}
+
+.selected_projName{
+    padding: 0.5rem;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    // width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 13rem;
+    margin-top: 0.5rem;
+    width: 28rem;
+    display: flex;
+    height: 2.7rem;
+
+}
+
+.cross_icon{
+    position: absolute;
+    right: 2rem;
+    cursor: pointer;
+}
+
+.checkbox_cred{
+    position: relative;
+    left:7.5rem;
+    bottom: 0.5rem;
+}
+
+.credentials__txt{
+    position: relative;
+    left:8rem;
+    bottom: 0.5rem;
+}
+
+.scenario_label{
+    font: $f6_regular !important;
+}
+
+.cancel__btn{
+    position: absolute !important;
+    left: 59.1rem !important;
+    background: white !important;
+    color: blue !important;
+    bottom: 0rem;
+}
+
+.btn-footer-jira{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tab__cls{
+    margin-top: 0.5rem;
+    .p-tabview-nav-content {
+         height: 3rem !important;
+    }
+}
+.integration_header{
+    font:$f6_bold !important;
+}
+
+.data__mapping{
+    display: flex;
+    flex-direction:row;
+    height: 20rem;
+    gap: 7rem;
+}
+.card_data1{
+    margin-left: -1rem;
+    position: relative;
+    right: 0.7rem;
+    .p-component{
+        box-shadow: none !important;
+        border: 1px solid lightgray;
+    }
+}
+.card_data2{
+    position: relative;
+    right: 1.3rem;
+    .p-component{
+        box-shadow: none !important;
+        border: 1px solid lightgray;
+    }
+}
+.mapping_data_card1, .mapping_data_card2{
+    width: 30rem;
+   
+    .p-card-body{
+        height: 30.5rem;
+        width: 30rem;
+       
+    }
+}
+.dropdown-map1{
+    display: flex;
+    flex-direction:row;
+}
+.dropdown-map2{
+    display: flex;
+    flex-direction:row;
+    margin-top: 0.5rem;
+}
+.release_span{
+    position: relative;
+    left: 7rem;
+}
+
+.dropdown_project{
+    width: 12rem !important;
+    height: 2.7rem !important;
+}
+
+.dropdown_release{
+    width: 12rem !important;
+    height: 2.7rem !important;
+    position: relative;
+    left: 3rem;
+}
+.dropdown_div{
+    margin-top: -1.5rem;
+}
+
+//login screen jira changes 
+
+.login__jira {
+  
+    margin-left: 15rem;
+
+
+}
+
+.unmap_icon{
+    &:hover{
+        opacity: 0.5;
+      }
+}
+
+
+.login__div {
+
+    .login__btn {
+        position: relative;
+        height: 2.5rem !important;
+        width: 6rem !important;
+        left: 11rem;
+    }
+
+}
+
+
+
+
+.card__login__jira {
+
+    position: absolute;
+    height: 20rem;
+    width: 31rem;
+    bottom: 7rem;
+    left: 20rem;
+    box-shadow: none !important;
+
+
+
+    .p-card-body {
+
+        width: 33rem;
+
+    }
+
+
+
+
+}
+
+
+
+
+.manage_integrations {
+    .p-dialog-content {
+        overflow: hidden;
+    }
+    .p-dialog-header {
+        background: #e2e2ed !important;
+        padding: 0.75rem !important;
+    }
+    .p-dialog-footer{
+        padding: 0.5rem !important;
+    }
+
+}
+
+
+
+
+.login_container_integrations {
+
+    display: flex;
+
+    flex-direction: row;
+
+    position: relative;
+
+    top: 3rem;
+
+    .p-component{
+
+        box-shadow: none !important;
+
+    }
+
+}
+
+.manage_integrations{
+    .p-dialog-content{
+        overflow: hidden;
+    }
+}
+
+
+.side-panel_login {
+    .icon-wrapper {
+        position: relative;
+        top: 2rem;
+        width: 40px;
+        cursor: pointer;
+    }
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    top: 12rem;
+    /* bottom: -1rem; */
+    width: 5rem;
+    gap: 1.2rem;
+    position: absolute;
+
+    .img__saucelabs{
+        height: 2rem;
+        width: 38px;
+        cursor: pointer;
+        left: 1rem;
+        position: relative;
+    }
+
+
+    .img__jira {
+        height: 2rem;
+        width: 33px;
+        cursor: pointer;
+
+    }
+
+    .img__azure {
+        height: 2rem;
+        width: 33px;
+        cursor: pointer;
+    }
+
+    .img__zephyr {
+        height: 2rem;
+        width: 33px;
+        cursor: pointer;
+    }
+
+
+    .img__qtest {
+        height: 2rem;
+        width: 33px;
+        cursor: pointer;
+    }
+
+    .img__alm {
+        height: 2rem;
+        width: 33px;
+        cursor: pointer;
+    }
+
+    .img__alm_disabled{
+        height: 2rem;
+        width: 33px;
+        cursor: not-allowed;
+        background-color: gray;
+    }
+
+    .text__alm_disabled{
+        color: gray;
+        cursor: not-allowed;
+    }
+
+    .text__git{
+        position: relative;
+        right: 2.05rem;
+    }
+    .text_git{
+        position: relative;
+        left: 0.2rem;
+    }
+
+}
+
+.map__btn{
+    position: relative;
+    top: 13rem;
+    right: 2.3rem !important;
+    cursor: pointer;
+    cursor: pointer;
+     &:hover{
+       opacity: 0.5;
+     }
+     font: $f6_regular !important;
+}
+
+.view_map_card{
+    height: 30rem;
+    max-height: 32.5rem;
+    box-shadow: none !important;
+    border: 1px solid lightgray !important;
+    .toggle_btn{
+        position: relative;
+        bottom: 2rem;
+        gap: 1rem;
+    }
+    .accordion_testcase{
+            max-height: 30rem !important;
+            overflow-y: auto !important;
+    }
+}
+
+.side-panel_login .icon-wrapper.selected {
+    border: 1px solid #6837e6;
+    border-radius: 7px;
+    padding: 1rem 4rem 2rem 2rem;
+    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    cursor: pointer;
+  }
+
+  .leafId{
+    padding-left: 0.5rem;
+    color: #0052CC;
+    font: $f6_semibold !important;
+  }
+
+  .test__tcName{
+    padding-left: 0.5rem;
+    color: black;
+    position: relative;
+    font: $f6_regular !important;
+  }
+  .test_tree_leaves{
+    margin-bottom: 0.55rem;
+  }
+
+  .testcase__data{
+    padding-top: 1.5rem;
+    font: $f6_regular;
+    text-overflow: ellipsis;
+    overflow-y: auto;
+    max-height: 25rem;
+    max-width: 40rem;
+    overflow-x: hidden;
+  }
+
+  .bouncing-loader {
+    display: flex;
+    position: absolute;
+    top: 70%;
+    left: 40%;
+    // justify-content: center;
+    // align-items: center;
+    // height: 100%;
+  }
+  
+  .bouncing-loader > div {
+    width: 10px;
+    height: 10px;
+    margin: 3px 6px;
+    border-radius: 50%;
+    background-color: #7e4ef7;
+    opacity: 1;
+    animation: bouncing-loader 0.6s infinite alternate;
+  }
+
+  @keyframes bouncing-loader {
+    to {
+      opacity: 0.1;
+      transform: translateY(-16px);
+    }
+  }
+  
+  .bouncing-loader > div:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .bouncing-loader > div:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  .avotest__data{
+    margin-left: -1.5rem;
+    .p-tree{
+        border: none !important;
+        background: none !important;
+        overflow: auto;
+        height: 21.5rem;
+        padding: 1rem 0 0 1rem !important;
+        }
+        .avoProject_tree{
+            .p-treenode-content{
+                padding: 0 !important;
+            }
+        }
+        .p-treenode{
+            padding: 0 !important;
+        }
+  }
+
+  .apptype__token{
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  .unmap_icon{
+    &:hover{
+        opacity: 0.5;
+      }
+}
+
+.testcase__AVO__jira__paginator{
+
+    position: absolute;
+    top: 27rem;
+    left: 5rem;
+    .p-paginator-first {
+
+        display: none !important;
+
+    }
+
+    .p-paginator-last {
+
+        display: none !important;
+
+    }
+}
+.jira__paginator{
+    position: absolute;
+    top: 27rem;
+    left: 6rem;
+    .p-paginator-first {
+        display: none !important;
+    }
+    .p-paginator-last {
+        display: none !important;
+    }
+}
+
+
+.saucelabs-action{
+    left: 23rem;
+}
+
+.saucelabs-delete{
+    left: 24rem;
+}
+
+.Browserstack_input_URL{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -2.5rem;
+    position: relative;
+    
+}
+.Borwserstack_input_Accesskey{
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #ffffff;
+    background-image: none;
+    outline: none;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    box-shadow: 0;
+    // border-radius: 0;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    bottom: -4rem;
+    position: relative;
+}
+#Browserstack_dialog{
+    // max-height: 95% !important;
+    width: 39rem !important;
+    height: 20rem;
+}
+#Browserstack-form{
+    .input-label .left-opt {
+        display: inline-block;
+        width: 125%;
+        margin-left: 27px;
+    }
+}
+
+#Browserstack_submit{
+    margin: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    vertical-align: bottom;
+    text-align: center;
+    left: 30rem;
+    background-color: #633693;
+    border-radius: 20px;
+    outline: auto;
+    width: 6rem;
+    top: 5rem;
+    }
+
+.Browserstack_input{
+    display: flex;
+    flex-direction: column;
+}
+.Browserstack_ilm__error_msg{
+    font-family: "LatoWeb";
+    font-size: 14px;
+    color: black;
+    position: absolute;
+    right: 19rem;
+    bottom: 3rem;
+}

@@ -89,7 +89,7 @@ default_sub.on("message", (channel, message) => {
 		break;
 
 	case "focus":
-		mySocket.emit("focus", data.focusParam, data.elementURL, data.appType, data.top, data.left, data.width, data.height);
+		mySocket.emit("focus", data.focusParam, data.elementURL, data.appType, data.top, data.left, data.width, data.height,data.impactHighlight);
 		break;
 
 	case "debugTestCase":
@@ -422,6 +422,10 @@ module.exports.initListeners = mySocket => {
 	});
 	mySocket.on("checking_Mobile_Client", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "checking_Mobile_Client", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+	mySocket.on("get_serial_number", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "get_serial_number", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
 };
