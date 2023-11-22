@@ -98,7 +98,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setError('')
         if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
         if (e.target.value==="git"){ resetImportModules();setComMsgRef("");
-            setDisableSubmit(false)
+            // setDisableSubmit(false)
         }
     }
     const resetImportModule = async(e) => {
