@@ -128,7 +128,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, t
                     {gridList && gridList.length > 0 && (
                         <InputText placeholder="Search" className='search_grid' value={searchText} onClear={() => handleSearchChange('')} onChange={(event) => event && event.target && handleSearchChange(event.target.value)} />
                     )}
-                    {(gridList && gridList.length > 0) ? <Button className="grid_btn_list" label="New Grid" onClick={() => { setCurrentGrid({ name: '', agents: [] }) }} ></Button> : <Button className="grid_btn" label="New Grid" onClick={() => { setCurrentGrid({ name: '', agents: [] }) }} ></Button>}
+                    {(gridList && gridList.length > 0) && <Button className="grid_btn_list" label="New Grid" onClick={() => { setCurrentGrid({ name: '', agents: [] }) }} ></Button>}
                     </div>
                 {gridList && gridList.length > 0 ? (
                     <div style={{ position: 'absolute', width: '98%', height: '-webkit-fill-available', top: '13rem' }}>
@@ -149,6 +149,7 @@ const GridList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, t
                 ) : (
                     <div className="grid_img"> <img src="static/imgs/grid_page_image.svg" alt="Empty List Image" height="255" width='204' />
                         <span>No Grids Yet</span>
+                        <Button className="grid_btn" label="New Grid" onClick={() => { setCurrentGrid({ name: '', agents: [] }) }} ></Button>
                     </div>
                 )}
                  </div>
