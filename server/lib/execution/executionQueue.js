@@ -920,7 +920,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
-            let keyQueue = this.key_list[resultData.configkey];
+            let keyQueue = this.key_list[resultData.configkey] || [];
+            // console.log(keyQueue);
             let statusCount = 0;
             let updatedKeyQueue = [];
             if (dataFromIce.status == 'finished')
@@ -961,6 +962,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     const executionData = await utils.fetchData(inputs, "devops/getExecutionListDetails", fnName);
 
                                     const excutionIds = dataFromCache.map((data) => data.executionId);
+                                    console.log(excutionIds)
                                     const fnName1 = "reportStatusScenario";
                                     const inputs1 = {
                                         "query": "executiondetails",
@@ -1042,7 +1044,10 @@ module.exports.Execution_Queue = class Execution_Queue {
                     checkInCache = true
                 }
             }
-
+            console.log(checkInCache);
+            // if(!checkInCache) console.log('last--',resultData)
+            // console.log(resultData)
+            if(!checkInCache && dataFromIce.status == 'started') return {'status':'Terminated'};
             if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
                 resultData.reportData.overallstatus.overallstatus = 'Terminated';
             }
@@ -1122,8 +1127,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
 
-            const configurekey = req.body.configurekey;
-            const executionListId = req.body.executionListId;
+            const configurekey = req?.query?.configurekey || req.body.configurekey;
+            const executionListId = req?.query?.executionListId || req.body.executionListId;
 
             //to add the key list if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -1164,6 +1169,69 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
 
         return response;
+    }
+
+    
+    static runningStatus = async(req, res)=>{
+        let fnName = 'runningStatus'
+        try {
+            //to add the key list if its empty,, from the cache
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                // let cacheData = await cache.get('execution_list')
+                
+                //New Cache Implementation - deviding into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = JSON.parse(cacheData['execution_list']);
+                }
+            }
+            const inp = {};
+            console.log(req.query)
+            let configureKey = req.query.configureKey,executionListId = req.query.executionListId;
+
+            if(this.key_list[configureKey]) {
+                let cnt = 0,total = 0;
+                for(let executions of this.key_list[configureKey]) {
+                        if(executions.length && executions[0]['executionListId'] == executionListId)
+                            {
+                                total = executions.length;
+                                for(let modules of executions) {
+                                    cnt+=(modules['status'] == 'COMPLETED');
+                                }
+                            }
+                }
+                if(total)
+                    res.send(`${cnt} out of ${total} modules completed`);
+                else {
+                    // Generate Report
+                    let inputs = {
+                        'configureKey':configureKey,
+                        'executionListId': executionListId
+                    }
+                    let executionIds = await utils.fetchData(inputs, "devops/getExecutionAndScenarioDetails", fnName)
+                    let responseFromGetReportApi = [];
+                    for(let executions of executionIds) {
+                        const data = await reportFunctions.getDevopsReport_API({
+                            'body':executions,
+                            'req': req
+                        });
+                        responseFromGetReportApi.push(data);
+                    }
+                    res.send(responseFromGetReportApi)
+                }
+
+
+            } else {
+                res.send('Some Error Occured');
+            }
+
+        } catch (error) {
+            logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
+            return res.send("fail")
+        }
     }
 }
 

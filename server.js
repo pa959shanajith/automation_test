@@ -258,6 +258,8 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
+		app.post('/runningStatus', suite.runningStatus);
+		app.post('/terminateExecution', suite.deleteExecutionListId);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
@@ -712,6 +714,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/deleteExecutionListId', auth.protect, suite.deleteExecutionListId);
 		app.post('/hooks/validateExecutionSteps', devOps.executionSteps);
 		app.post('/hooks/validateParallelExecutions', devOps.executionParallel);
+		
 
 		// Azure integeration API's
 		app.post('/connectAzure_ICE',auth.protect, azure.connectAzure_ICE);

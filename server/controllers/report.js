@@ -863,9 +863,9 @@ exports.getDevopsReport_API = async (req) => {
     var statusCode = '500';
     logger.info("Inside UI service: " + fnName);
     try {
-        const execData = req.body.execution_data || {};
-		var executionId = execData.executionId || "";
-		var scenarioIds = execData.scenarioIds;
+        // const execData = req.body.execution_data || {};
+		var executionId = req.body._id || "";
+		var scenarioIds = req.body.scenariodetails;
 		var finalReport = [];
 		var tempModDict = {};
 		// const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
