@@ -1077,7 +1077,7 @@ const CanvasNew = (props) => {
   
         
         const addRowTestStep = () => {
-          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep };
+          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep, isEditing:false};
           setAddTestStep([...addTestStep, newRowTestStep]);
           setinputValTestStep("");
           setShowInputTestStep(true);
