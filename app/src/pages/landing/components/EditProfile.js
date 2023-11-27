@@ -214,6 +214,7 @@ const EditProfile = (props) => {
                                     value={firstName}
                                     type="text"
                                     onChange={(event) => { setFirstName(event.target.value) }}
+                                    disabled={true}
                                 />
                             </div>
                             <div className='pt-2'>
@@ -224,6 +225,7 @@ const EditProfile = (props) => {
                                     value={lastName}
                                     type="text"
                                     onChange={(event) => { setLastName(event.target.value) }}
+                                    disabled={true}
                                 />
                             </div>
 
@@ -235,7 +237,9 @@ const EditProfile = (props) => {
                                     id="edit_input"
                                     value={email}
                                     type="email"
-                                    onChange={(event) => { setEmail(event.target.value) }} />
+                                    onChange={(event) => { setEmail(event.target.value) }}
+                                    disabled={true}
+                                    />
                             </div>
 
                             {/* PrimaryRole Input Field */}

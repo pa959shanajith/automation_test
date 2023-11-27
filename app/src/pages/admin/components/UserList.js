@@ -40,7 +40,8 @@ const UserList = (props) => {
                             lastName: user[5],
                             email: user[6],
                             role: user[3],
-                            roleId: user[2]
+                            roleId: user[2],
+                            isAdmin: user[8]
 
                         };
                         filteredUserList.push(dataObject);
@@ -66,7 +67,8 @@ const UserList = (props) => {
                     lastName: user[5],
                     email: user[6],
                     role: user[3],
-                    roleId: user[2]
+                    roleId: user[2],
+                    isAdmin: user[8]
                 };
                 filteredUserList.push(dataObject);
             }

@@ -318,7 +318,7 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
                   disabled={agent.status !== "active"}
                   value={agent.icecount}
                   onChange={(e) => {
-                    const { value } = e.target || {};
+                    const { value } = e || {};
                     if (value !== undefined) {
                       onClientIceCountChange("update", agent.name, value);
                     }
