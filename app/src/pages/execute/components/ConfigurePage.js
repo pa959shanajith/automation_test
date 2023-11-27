@@ -912,7 +912,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
-    executionData["browserType"] = browserTypeExe;
+    // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
