@@ -271,17 +271,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
              "pat": azurepwd,
  
              }    
-       const domainDetails = await api.connectAzure_ICE(apiObj);
-
-        if (domainDetails.error) setToast('error','Error', domainDetails.error.CONTENT);
-        else if (domainDetails === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
-        else if (domainDetails === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        const domainDetails = await api.connectAzure_ICE(apiObj);
+        console.log("------domainDetails------", domainDetails)
+        if (domainDetails.error) {setToast('error','Error', domainDetails.error.CONTENT);}
+        else if (domainDetails === "unavailableLocalServer") {setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.")}
+        else if (domainDetails === "scheduleModeOn") {setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");}
         else if (domainDetails === "Invalid Session"){
             setToast('error','Error',"Invalid Session");
         }
-        else if (domainDetails === "invalidcredentials") setToast('error','Error',"Invalid Credentials");
-        else if (domainDetails === "fail") setToast('error','Error',"Fail to Login");
-        else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
+        else if (domainDetails === "invalidcredentials") {setToast('error','Error',"Invalid Credentials");}
+        else if (domainDetails === "fail" || domainDetails === "Fail") {setToast('error','Error',"Fail to Login");}
+        else if (domainDetails === "notreachable") {setToast('error','Error',"Host not reachable.");}
         else if (domainDetails) {
             if (Object.keys(domainDetails).length && domainDetails.projects) {
                 // {id:1,name:'Story'},{id:2,name:'TestPlans'}
