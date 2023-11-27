@@ -19,6 +19,7 @@ import { SelectButton } from 'primereact/selectbutton';
 import { testTypesOptions, viewByOptions } from '../../utility/mockData';
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from 'primereact/paginator';
+import useDebounce from '../../../customHooks/useDebounce';
 export var navigate
 
 const reports = () => {
@@ -39,6 +40,7 @@ const reports = () => {
     const [project, setProject] = useState({});
     const [firstPage, setFirstPage] = useState(0);
     const [rowsPage, setRowsPage] = useState(10);
+    const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
     );
@@ -52,13 +54,12 @@ const reports = () => {
     ];
     const defaultSort = sort[0].name;
     const [selectedItem, setSelectedItem] = useState(defaultSort);
-    const filteredExecutionData = reportData.filter((data) =>
-      data.configurename.toLowerCase().includes(searchReportData.toLowerCase())
-    );
+    const filteredExecutionData = reportData.filter((data) => data);
     const [selectedProject, setSelectedProject] = useState(null);
 
     const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
     const initProj = selectProjects.projectId;
+    const debouncedSearchValue = useDebounce(searchReportData, 500);
     const handeSelectProject=(initProj)=>{
         dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType: project?.appType[project?.projectId.indexOf(initProj)] }));
         fetchReportData(initProj);
@@ -87,15 +88,16 @@ const reports = () => {
         })();
     }, [viewBy, testType]);
 
-    const fetchReportData = async (initProj, getPageNo = 1) => {
+    const fetchReportData = async (initProj, getPageNo = 1, getSearch = "") => {
         try {
           let executionProfileName = [];
           let accessibilityScreen;
           if (testType === "Functional Test" && viewBy === "Execution Profile") {
               const getExecutionProfileName = await fetchConfigureList({
-              projectid: initProj,
+              projectid: initProj ? initProj : localStorageDefaultProject?.projectId,
               param: "reportData",
-              page: getPageNo
+              page: getPageNo,
+              searchKey: getSearch
             });
             executionProfileName = getExecutionProfileName?.data;
             setConfigPages(getExecutionProfileName?.pagination?.totalcount);
@@ -212,8 +214,13 @@ const reports = () => {
     const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
-      fetchReportData(initProj, e.page + 1);
+      fetchReportData(initProj, e.page + 1, debouncedSearchValue);
   };
+
+  useEffect(() => {
+    fetchReportData(initProj, 1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
 
     return (
       <div className="reports_container">
@@ -226,7 +233,7 @@ const reports = () => {
               <select
                 data-test="projectSelect"
                 className="projectSelectreport"
-                value={initProj}
+                value={initProj ? initProj : localStorageDefaultProject?.projectId}
                 onChange={(e) => {
                   handeSelectProject(e.target.value);
                 }}

@@ -14,7 +14,8 @@ export const fetchConfigureList = async(props) => {
             data: {
                 action: "configurelist",
                 'projectid': props.projectid,
-                page: props.page
+                page: props.page,
+                searchKey: props.searchKey
             }
         });
         if(res.status === 401){
