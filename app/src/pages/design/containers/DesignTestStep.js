@@ -142,18 +142,20 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 setOverlay("Loading...")
             }
             for(var i = 0 ; i<parentScreen.length; i++){
-                fetchTestCases(i)
-                .then(data=>{
-                    if (data==="success")
-                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
-                    else 
-                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
-                    setImported(false)
-                    setStepSelect({edit: false, check: [], highlight: []});
-                    setChanged(false);
-                    headerCheckRef.current.indeterminate = false;
-                })
-                .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                if(parentScreen[i]._id === rowExpandedName.id){
+                    fetchTestCases(i)
+                    .then(data=>{
+                        if (data==="success")
+                            toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
+                        else 
+                            toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
+                        setImported(false)
+                        setStepSelect({edit: false, check: [], highlight: []});
+                        setChanged(false);
+                        headerCheckRef.current.indeterminate = false;
+                    })
+                    .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                }
             }
         }
         //eslint-disable-next-line
@@ -219,7 +221,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
             setScreenLevelTastSteps(screenLevelTestCases)
         //eslint-disable-next-line
-    }, [imported]);
+    }, []);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -1192,7 +1194,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     }
     const ConfPasteStep = () =>{
          return (
-            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
+            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={()=>setShowConfPaste(false)} footer={footerPasteStep}>
                 <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
             </Dialog>
         );
