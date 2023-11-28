@@ -62,7 +62,7 @@ const DesignModal = (props) => {
     const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
     const [selectedTestCase, setSelectedTestCase] = useState(null);
     const [visible, setVisible] = useState(false);
-    const [edit, setEdit] = useState(false);
+    const [edit, setEdit] = useState(true);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
     const [showSM, setShowSM] = useState(false);
     const [showConfPaste, setShowConfPaste] = useState(false);
@@ -187,7 +187,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 .then(data => {
                     data !== "success" &&
                         toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:3000});
-                        setEdit(false);
+                        setEdit(true);
                     setStepSelect({ edit: false, check: [], highlight: [] });
                     headerCheckRef.current.indeterminate = false;
                     setDraggable(false);
@@ -532,6 +532,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setDebugEnable(false);
+        setEdit(true)
     }
 
     const addRow = () => {
@@ -1050,6 +1051,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setShowSM(true);
     }
     const deleteTestcase = () => {
+        setEdit(false)
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
