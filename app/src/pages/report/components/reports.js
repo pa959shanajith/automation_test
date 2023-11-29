@@ -106,8 +106,11 @@ const reports = () => {
               initProj,
               project?.releases[project?.projectId.indexOf(initProj)][0]?.name,
               project?.releases[project?.projectId.indexOf(initProj)][0]
-                ?.cycles[0]?._id
+                ?.cycles[0]?._id,
+              getPageNo,
+              getSearch
             );
+            setConfigPages(executionProfileName?.rows?.modules?.pagination?.totalcount);
           } else if (testType === "Accessibility Test") {
             accessibilityScreen = await getAccessibilityScreens(
               initProj,
@@ -131,11 +134,11 @@ const reports = () => {
             );
             setReportData(extractedExecutionProfileData);
           } else if (
-            !!executionProfileName?.rows?.modules.length &&
+            !!executionProfileName?.rows?.modules?.data.length &&
             testType === "Functional Test"
           ) {
             const extractedExecutionProfileData =
-              executionProfileName?.rows?.modules.map((obj) => ({
+              executionProfileName?.rows?.modules?.data.map((obj) => ({
                 configurename: obj?.name || "",
                 execDate: obj?.lastExecutedtime || "",
                 selectedModuleType: obj?.type || "",
@@ -275,6 +278,8 @@ const reports = () => {
                   itemTemplate={viewByTemplate}
                   onChange={(e) => {
                     setViewBy(e.value);
+                    setSearchReportData("");
+                    setFirstPage(1);
                   }}
                   options={viewByOptions}
                 />
@@ -479,16 +484,15 @@ const reports = () => {
             )}
             {show && <ReportTestTable />}
           </div>
-          {activeIndex === "Functional Test" &&
-            executionButon === "View by Execution Profile" && viewBy === "Execution Profile" && (
-              <Paginator
-                first={firstPage}
-                rows={rowsPage}
-                totalRecords={configPages}
-                rowsPerPageOptions={[10, 20, 30]}
-                onPageChange={onPageChange}
-              />
-            )}
+          {activeIndex !== "Accessibility Test" && (
+            <Paginator
+              first={firstPage}
+              rows={rowsPage}
+              totalRecords={configPages}
+              rowsPerPageOptions={[10, 20, 30]}
+              onPageChange={onPageChange}
+            />
+          )}
           <div>
             <Footer />
           </div>
