@@ -443,123 +443,161 @@
 
                     }
                 }
-
                 .ScenairoList {
-                    max-height: 85%;
+                    height: 23rem;
                     // border: 1px solid black;
                     overflow-y: auto;
 
-                    .EachScenarioNameBox {
-                        // border: 1px solid rgb(213, 30, 30);
-                        max-width: 100%;
-                        max-height: 10%;
-                        justify-content: center;
-                        // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        margin-top: 6px;
-                        cursor: pointer;
-
-                    }
-
-                    .EachScenarioNameBox:hover {
-                        background-color: rgba($color: #E9ECEF, $alpha: 0.2);
-                    }
-
-                    .ScenarioName {
+                    .selectedScenarioList {
                         display: flex;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        max-width: 97%;
-                        max-height: 100%;
-                        // border: 1px solid rgb(19, 225, 126);
-                        padding-left: 1rem;
-                        align-items: center;
-                        justify-content: space-between;
-                    
-                    .sceNme_Icon{
-                        display: flex;
-                        align-items: center;
-                        // width: 29rem;
-                    img{
-                        height: 25px;
-                        width: 25px;
-                        margin-top: 2px;
-                    }
-                    h4{
-                        font-size: 15.5px;
-                        font-family: "open sans";
-                        font-weight: 400;
-                        color: rgb(8, 8, 8, 1);
-                        padding-left: 0.8rem;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        width: 9rem;
-                    }
-                   
-                    .modIconSce {
-                        display: flex;
-                        width: 30%;
-                        h5{display: flex;
-                          font-size: 11px;
-                        img{
-                      
-                            height: 15px;
-                            width: 15px;
-                            // margin-top: 3px;
-                            }
-                        h3{
-                                font-size: 11px;
-                                font-family: "open sans";
-                                font-weight: 200;
-                                color: rgb(8, 8, 8, 1);
-                                // padding-left: 0.5rem;
+                        flex-direction: column;
+
+                        .rowOrders {
+                            display: flex;
+                            flex-direction: column;
+                            padding: 0rem;
+                            width: 1rem;
+                            height: 2rem;
+                            align-items: center;
+                            justify-content: center;
+                        }
+
+                        // .p-datatable-wrapper{
+                        // .p-datatable-tbody{
+                        // display:flex;
+                        // flex-direction: column;
+                        // padding: 0rem;
+                        .rowOfScenarios {
+                            padding: 0rem;
+
+                            .EachScenarioNameBox {
+                                // border: 1px solid rgb(213, 30, 30);
+                                max-width: 100%;
+                                max-height: 10%;
+                                justify-content: center;
+                                // background-color:rgba($color: #605BFF, $alpha: 0.2) ;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
-                                width: 9rem;
-                                margin-top: 1px;
+                                margin-left: 0.4rem;
+                                cursor: pointer;
+
+                            }
+
+                            .EachScenarioNameBox:hover {
+                                background-color: rgba($color: #E9ECEF, $alpha: 0.2);
+                            }
+
+                            .ScenarioName {
+                                display: flex;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                max-width: 97%;
+                                max-height: 100%;
+                                // border: 1px solid rgb(19, 225, 126);
+                                // padding-left: 1rem;
+                                align-items: center;
+                                justify-content: space-between;
+
+                                .sceNme_Icon {
+                                    display: flex;
+                                    align-items: center;
+
+                                    // width: 29rem;
+                                    img {
+                                        height: 22px;
+                                        width: 22px;
+                                        margin-top: 2px;
+                                    }
+
+                                    h4 {
+                                        font-size: 15.5px;
+                                        font-family: "open sans";
+                                        font-weight: 400;
+                                        color: rgb(8, 8, 8, 1);
+                                        padding-left: 0.6rem;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        width: 9rem;
+                                    }
+
+                                    .modIconSce {
+                                        display: flex;
+                                        width: 30%;
+
+                                        h5 {
+                                            display: flex;
+                                            font-size: 11px;
+
+                                            img {
+
+                                                height: 15px;
+                                                width: 15px;
+                                                // margin-top: 3px;
+                                            }
+
+                                            h3 {
+                                                font-size: 11px;
+                                                font-family: "open sans";
+                                                font-weight: 200;
+                                                color: rgb(8, 8, 8, 1);
+                                                // padding-left: 0.5rem;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                                width: 9rem;
+                                                margin-top: 1px;
+                                            }
+                                        }
+
+                                    }
+
+                                    .projIconSce {
+                                        display: flex;
+                                        width: 30%;
+                                        align-items: center;
+
+                                        h5 {
+                                            display: flex;
+                                            font-size: 11px;
+                                            position: absolute;
+                                            margin-left: 4rem;
+
+                                            img {
+
+                                                height: 15px;
+                                                width: 15px;
+                                                // margin-top: 3px;
+                                            }
+
+                                            h3 {
+                                                font-size: 11px;
+                                                font-family: "open sans";
+                                                font-weight: 200;
+                                                color: rgb(8, 8, 8, 1);
+                                                // padding-left: 0.5rem;
+                                                overflow: hidden;
+                                                text-overflow: ellipsis;
+                                                // width: 9rem;
+                                                margin-top: 1px;
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                .p-button.p-button-icon-only.p-button-rounded {
+                                    height: 0.1rem;
+                                    width: 1.6rem;
+                                    margin-right: 0.5rem;
+                                }
                             }
                         }
 
-                    }
-                    .projIconSce{
-                        display: flex;
-                        width: 30%;
-                        h5{display: flex;
-                          font-size: 11px;
-                        img{
-                      
-                            height: 15px;
-                            width: 15px;
-                            // margin-top: 3px;
-                            }
-                        h3{
-                                font-size: 11px;
-                                font-family: "open sans";
-                                font-weight: 200;
-                                color: rgb(8, 8, 8, 1);
-                                // padding-left: 0.5rem;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                // width: 9rem;
-                                margin-top: 1px;
-                            }
+                        .ScenarioName i {
+                            padding-left: 71%;
                         }
 
-                    }
-                   }
-                   .p-button.p-button-icon-only.p-button-rounded{
-                    height:0.1rem;
-                    width: 1.6rem;
-                    margin-right: 0.5rem;
-                   }
-                   }
-
-                    .ScenarioName i {
-                        padding-left: 71%;
                     }
                 }
-
             }
 
 
