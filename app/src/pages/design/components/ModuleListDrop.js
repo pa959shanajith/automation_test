@@ -72,7 +72,7 @@ const ModuleListDrop = (props) =>{
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
     const [initialText, setInitialText] = useState(E2EName? false : true);
-
+    const prjList = useSelector(state=>state.design.projectList)
 
     ////  /////ModuleListSidePanel'S dependencies
     const [showInput, setShowInput] = useState(false);
@@ -151,21 +151,13 @@ const ModuleListDrop = (props) =>{
      },[]);
 
      useEffect(()=>{
-        (async()=>{
-          var data=[]
-          const Projects = await getProjectList()
-          for(var i = 0; Projects.projectName.length>i; i++){
-              data.push({name:Projects.projectName[i], id:Projects.projectId[i]})
-            }
-            // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
-        //  const data =[ {
-        //     key: Projects.projectId,
-        //     value:Projects.projectNames
-        //   }]
-          setProjectList(data)
-          // console.log("data",data)
-          // console.log(" projects",projects)
-        })()
+        const arrayOfData =Object.entries(prjList)
+        const data = arrayOfData.map((e,i)=>{
+        return {
+               name: e[1].name,
+               id:e[1].id,
+            }})
+        setProjectList(data);
       },[showE2EPopup])
 
      useEffect (()=>{
@@ -1004,19 +996,9 @@ setPreventDefaultModule(true);
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {/* {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
-                              return (
-                                <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
-                                  <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                                    <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
-                                    <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projName})</h3></h5></div>
-                                  </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
-                                </div>
-                              )
-                            })} */}
-                            <DataTable value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
-                              <Column rowReorder headerStyle={{display:'none'}}/>
-                              <Column field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
+                            <DataTable className='selectedScenarioList' value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
+                              <Column className ="rowOrders" rowReorder headerStyle={{display:'none'}}/>
+                              <Column className='rowOfScenarios' field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
                             </DataTable>
                           </div>
                           </>
