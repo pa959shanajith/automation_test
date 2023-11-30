@@ -1372,7 +1372,10 @@ exports.getReportsData_ICE = async (req, res) => {
             logger.info("Inside UI service: " + fnName + " - allmodules");
             let inputs = {
                 "query": "getAlltestSuites",
-                "id": reportInputData.cycleId
+                "id": reportInputData.cycleId,
+                "page": reportInputData.page,
+                "searchKey": reportInputData.searchKey,
+
             };
             if(reportInputData['configurekey'] && reportInputData['cycleId'] == ''){
                 inputs = {

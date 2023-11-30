@@ -1004,31 +1004,21 @@ setPreventDefaultModule(true);
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {/* {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
-                              return (
-                                <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
-                                  <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                                    <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
-                                    <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projName})</h3></h5></div>
-                                  </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
-                                </div>
-                              )
-                            })} */}
-                            <DataTable value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
-                              <Column rowReorder headerStyle={{display:'none'}}/>
-                              <Column field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
+                            <DataTable className='selectedScenarioList' value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
+                              <Column className ="rowOrders" rowReorder headerStyle={{display:'none'}}/>
+                              <Column className='rowOfScenarios' field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
                             </DataTable>
                           </div>
                           </>
                             :
-                          <div className="initialText">
-                            <div className="initial1StText">
-                              <h3 className="textClass"> No Testcases Yet</h3>
-                            </div>
-                            <div className="initial2NdText">
-                              <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 >Select Testcases</h3>
+                         <div className="initialText">
+                           <div className="initial1StText">
+                             <h3 className="textClass"> No Testcases Yet</h3>
+                           </div>
+                           <div className="initial2NdText">
+                             <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 >Select Testcases</h3>
                             </div>
                           </div> 
                           }
