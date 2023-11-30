@@ -134,13 +134,13 @@ export const schedulePeriod = [
 ];
 
 export const scheduleWeeks = [
-  { name: 'Monday', key: 0 },
-  { name: 'Tuesday', key: 1 },
-  { name: 'Wednesday', key: 2 },
-  { name: 'Thursday', key: 3 },
-  { name: 'Friday', key: 4 },
-  { name: 'Saturday', key: 5 },
-  { name: 'Sunday', key: 6 },
+  { name: 'Monday', key: 1 },
+  { name: 'Tuesday', key: 2 },
+  { name: 'Wednesday', key: 3 },
+  { name: 'Thursday', key: 4 },
+  { name: 'Friday', key: 5 },
+  { name: 'Saturday', key: 6 },
+  { name: 'Sunday', key: 0 },
   { name: 'All', key: 'ALL' }
 ];
 

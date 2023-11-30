@@ -37,7 +37,8 @@ exports.loginToZephyr_ICE = function (req, res) {
 		var username = req.session.username;
 		var name = undefined;
 		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) name = myserver.allSocketsICEUser[clientName][username][0];
-		mySocket = myserver.allSocketsMap[clientName][name];	
+		mySocket = myserver.allSocketsMap[clientName][name];
+		if(mySocket != undefined && mySocket.connected){
 		logger.debug("ICE Socket requesting Address: %s" , name);
 		const reqData = req.body;
 		var check_zephyrURL = !validator.isEmpty(req.body.zephyrPayload.zephyrURL);
@@ -73,6 +74,10 @@ exports.loginToZephyr_ICE = function (req, res) {
 		} else {
 			logger.info("Error occurred in loginZephyrServer_ICE: Invalid Zephyr Credentials");
 			res.send("invalidcredentials");
+		}
+		}
+		else{
+			res.send("unavailableLocalServer");
 		}
 	} catch (exception) {
 		logger.error("Error occurred in loginZephyrServer_ICE:", exception.message);
