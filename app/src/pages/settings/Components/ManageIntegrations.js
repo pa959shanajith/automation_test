@@ -193,15 +193,17 @@ const ManageIntegrations = ({ visible, onHide }) => {
         const jirapwd = loginDetails.password || '';
 
         const domainDetails = await api.connectJira_ICE(jiraurl, jirausername, jirapwd);
-        if (domainDetails.error) {setToast('error','Error', domainDetails.error.CONTENT);}
-        else if (domainDetails === "unavailableLocalServer") {setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.")}
-        else if (domainDetails === "scheduleModeOn") {setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");}
-        else if (domainDetails === "Invalid Session"){
-            setToast('error','Error',"Invalid Session");
+        if (domainDetails.error) setToast("error", "Error", domainDetails.error);
+        else if (domainDetails === "unavailableLocalServer") setToast("error", "Error", "ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (domainDetails === "scheduleModeOn") setToast("warn", "Warning", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (domainDetails === "Invalid Session") {
+            setToast("error", "Error", "Session Expired please login again");
+            setIsSpin(false);
+            return RedirectPage(navigate);
         }
-        else if (domainDetails === "invalidcredentials") {setToast('error','Error',"Invalid Credentials");}
-        else if (domainDetails === "fail" || domainDetails === "Fail") {setToast('error','Error',"Fail to Login");}
-        else if (domainDetails === "notreachable") {setToast('error','Error',"Host not reachable.");}
+        else if (domainDetails === "invalidcredentials") setToast("error", "Error", "Invalid Credentials");
+        else if (domainDetails === "Fail") setToast("error", "Error", "Fail to Login");
+        else if (domainDetails === "notreachable") setToast("error", "Error", "Host not reachable.");
         else if (domainDetails) {
             if (Object.keys(domainDetails).length && domainDetails.projects) {
                 setProjectDetails(domainDetails.projects.map((el) => { return { label: el.name, value: el.code, key: el.id } }))
@@ -242,7 +244,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
         else if (domainDetails) {
-            console.log(domainDetails);
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
@@ -269,7 +270,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
  
              }    
         const domainDetails = await api.connectAzure_ICE(apiObj);
-        console.log("------domainDetails------", domainDetails)
         if (domainDetails.error) {setToast('error','Error', domainDetails.error.CONTENT);}
         else if (domainDetails === "unavailableLocalServer") {setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.")}
         else if (domainDetails === "scheduleModeOn") {setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");}
