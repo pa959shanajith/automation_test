@@ -1003,14 +1003,14 @@ setPreventDefaultModule(true);
                           </div>
                           </>
                             :
-                          <div className="initialText">
-                            <div className="initial1StText">
-                              <h3 className="textClass"> No Testcases Yet</h3>
-                            </div>
-                            <div className="initial2NdText">
-                              <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 >Select Testcases</h3>
+                         <div className="initialText">
+                           <div className="initial1StText">
+                             <h3 className="textClass"> No Testcases Yet</h3>
+                           </div>
+                           <div className="initial2NdText">
+                             <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 >Select Testcases</h3>
                             </div>
                           </div> 
                           }
