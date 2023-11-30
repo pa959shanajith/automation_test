@@ -951,7 +951,7 @@ export default function BasicDemo() {
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
-            header="No. Defect ID"
+            header="Defect"
             body={defectIDForJiraAndAzure}
             style={{ padding: "0rem", textAlign: "center" }}
           />
