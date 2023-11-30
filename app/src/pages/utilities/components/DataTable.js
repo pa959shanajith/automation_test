@@ -42,7 +42,7 @@ const DataTable = props => {
         { showModal && <Modal/>}
         { overlay && <ScreenOverlay content={overlay} /> }
         <div className="page-taskName" >
-            <span className="taskname" data-test="dt__pageTitle">
+            <span className="page-taskName-encryption" data-test="dt__pageTitle">
                 {currScreen} Data Table
             </span>
         </div>
@@ -138,7 +138,7 @@ const EditScreen = props => {
             <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />
             </div>
             <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} setTableName={setTableName} { ...props } />
-            <div className="dt__table_container full__dt">
+            <div>
                 { 
                     data.length > 0 && 
                     <Table 
@@ -159,8 +159,6 @@ const TableName = ({tableName, setTableName, error}) => {
     return (
         <div className="dt__tableName">
             Data Table Name:
-            {/* <input className={error?"dt__tableNameError":""} onChange={onChange} value={tableName} placeholder="Enter Data Table Name" />
-             */}
             <InputText
                 className={error ? 'dt__tableNameError' : ''}
                 onChange={onChange}

@@ -255,7 +255,8 @@ exports.fetchLockedUsers = async (req, res) => {
 			result.forEach(function(e) {
 				lockedUsers.push({
 					username: e.name,
-					role: e.defaultrole
+					role: e.defaultrole,
+					rolename : e.rolename
 				});
 			});
 			return res.send(lockedUsers);

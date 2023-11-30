@@ -1739,6 +1739,13 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
   if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
   setCapturedDataToSave(localScrapeItems);
 }
+
+const elementValuetitle=(rowdata)=>{
+  return (
+    <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+  )
+ }
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -2100,7 +2107,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
               <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
               {/* <column ></column> */}
               <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
             </DataTable>
           </div>
         </Dialog>: null }</>}
