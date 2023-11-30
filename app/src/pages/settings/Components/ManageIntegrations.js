@@ -230,7 +230,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         }
 
         const domainDetails = await api.loginToZephyr_ICE(zephyrPayload);
-        console.log(domainDetails,' its domainDetails');
         if (domainDetails.error) setToast('error','Error', domainDetails.error.CONTENT);
         else if (domainDetails === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (domainDetails === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
