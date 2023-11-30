@@ -55,12 +55,12 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     if (dNodes[pi].children.length > 0) { // new node has siblings
         index = dNodes[pi].children.length - 1;
         if (layout_vertical){
-            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
                 new_one = {
                     x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type] - 100
                 };// Go beside last sibling node
-            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null)){
+            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null) && (dNodes[pi].state!=="created")){
                 new_one = {
                     x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type] - 90
@@ -90,10 +90,24 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
             index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
             if (layout_vertical) {
-                new_one = {
-                    x: parseInt(dNodes[pi].x),
-                    y: parseInt(sections[node.type])
-                }; // go directly below parent
+                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])-100
+                    };
+                }
+                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])-100
+                    };
+                }
+                else{
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                } // go directly below parent
             } else {
                 new_one = {
                     x: parseInt(sections[node.type]),

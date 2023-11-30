@@ -339,9 +339,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     }
                                     setDraggable(false);
                                     screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
+                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     setTestCaseData([...testCaseData,testcaseArray]); 
                                     setPastedTC([]);
-                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                     resolve(msg);
                                 })
