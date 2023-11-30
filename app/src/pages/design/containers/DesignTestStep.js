@@ -850,7 +850,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():""} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     

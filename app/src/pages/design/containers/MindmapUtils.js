@@ -90,13 +90,20 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
             index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
             if (layout_vertical) {
-                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
-                    new_one = {
-                        x: parseInt(dNodes[pi].x),
-                        y: parseInt(sections[node.type])-100
-                    };
+                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                    if(dNodes[pi].childIndex === 1){
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])
+                        };
+                    }else{
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])-100
+                        };
+                    }
                 }
-                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
+                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null)){
                     new_one = {
                         x: parseInt(dNodes[pi].x),
                         y: parseInt(sections[node.type])-100
