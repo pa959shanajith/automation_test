@@ -136,7 +136,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch(savedList(true))}
         setWarning(false); 
-        if(dontShowFirstModules === true && currentId !== "")loadModule(currentId)
+        if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
      // eslint-disable-next-line react-hooks/exhaustive-deps
      }, [moduleLists, initProj])
      useEffect(()=> {
