@@ -154,8 +154,8 @@ const ModuleListDrop = (props) =>{
         const arrayOfData =Object.entries(prjList)
         const data = arrayOfData.map((e,i)=>{
         return {
-               name: e[1].name,
-               id:e[1].id,
+               name: e[1]?.name,
+               id:e[1]?.id,
             }})
         setProjectList(data);
       },[showE2EPopup])
