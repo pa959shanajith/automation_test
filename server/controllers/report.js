@@ -232,6 +232,7 @@ exports.connectJira_ICE = function(req, res) {
             "action": req.body.action,
             "inputs": inputs
         };
+        if (mySocket != undefined && mySocket.connected){
         if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
             var jiraurl = req.body.url;
             var jirausername = req.body.username;
@@ -246,7 +247,7 @@ exports.connectJira_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                        if(mySocket != undefined) {
+                        if(mySocket != undefined && mySocket.connected) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             mySocket.emit("jiralogin", req.body.action, inputs, dataToIce.project_selected, dataToIce.itemType);
                             var count = 0;
@@ -476,7 +477,9 @@ exports.connectJira_ICE = function(req, res) {
                 } else {
                     logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
                     res.send("Fail");
-                }}
+                }}} else{
+                    res.send("unavailableLocalServer");
+                }
     } catch (exception) {
         logger.error("Exception in the service connectJira_ICE: %s", exception);
         res.send("Fail");
