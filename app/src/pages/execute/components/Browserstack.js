@@ -434,7 +434,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     />
                   </div>
                 </div>
-                <Button label="Execute" title="Execute" className="Sacuelab_execute_button" onClick={async () => {
+                <Button label="Execute" title="Execute" className="Sacuelab_execute_button" disabled = {selectedICE == ''} onClick={async () => {
                     dataExecution.type = (ExeScreen === true ? ((smartMode === "normal") ? "" : smartMode) : "")
                     dataExecution.poolid = ""
                     if ((ExeScreen === true ? smartMode : "") !== "normal") dataExecution.targetUser = Object.keys(selectedICE).filter((icename) => selectedICE[icename]);
