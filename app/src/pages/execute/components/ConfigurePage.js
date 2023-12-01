@@ -21,6 +21,7 @@ import { Dropdown } from 'primereact/dropdown';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
+import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -233,6 +234,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   if (!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo;
 
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
   }, [selectProjects]);
@@ -375,7 +380,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
-        data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
+        data.push({ name: Projects.projectName[i], id: Projects.projectId[i], projectLevelRole: Projects.projectlevelrole[0][i]["assignedrole"] });
       }
       // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
       //  const data =[ {
@@ -1442,10 +1447,11 @@ const showToast = (severity, detail) => {
         ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
-        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
+        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)],
+        projectLevelRole: projectList.find((project)=>project.id === e.target.value)?.projectLevelRole
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
     }
     return (
       <nav>
@@ -2325,7 +2331,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
-            disabled={userInfo?.rolename?.trim()==="Quality Engineer"}
+            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2362,7 +2368,7 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo?.rolename?.trim() === "Quality Engineer"}>
+                <Button className="addConfig_button" onClick={() => { configModal("CancelSave"); setTypeOfExecution(""); }} size="small" disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

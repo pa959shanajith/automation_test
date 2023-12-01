@@ -1173,7 +1173,8 @@ export const parseProjList = (res) =>{
             'apptypeName':res.appTypeName[i],
             'id': res.projectId[i],
             'releases':res.releases[i],
-            'domains':res.domains[i]
+            'domains':res.domains[i],
+            'projectLevelRole':res.projectlevelrole[0][i]["assignedrole"]
         };
     });
     return proj

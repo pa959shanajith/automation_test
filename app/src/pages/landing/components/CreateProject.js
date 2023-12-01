@@ -460,7 +460,7 @@ const CreateProject = (props) => {
       }
     }
   };
-
+  
   /////////////////////////////////////// MANAGE PROJECT////////////////////////////////////////////////////////////////
  const handleUpdateProject = async () => {
 
@@ -482,8 +482,8 @@ const CreateProject = (props) => {
     const manageProject= await userUpdateProject_ICE(upadtedProjData)
 
     props.toastSuccess("Project Modified Successfully");
-     props.onHide();
-
+    props.onHide();
+    dispatch(loadUserInfoActions.updatedProject(true));
   }
 
   const dialogHeader = props.handleManageProject ? 'Manage Project' : 'Create Project';
