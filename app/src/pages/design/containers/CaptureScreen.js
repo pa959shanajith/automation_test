@@ -583,7 +583,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
+                objectProperty: item?.tag?.includes("iris")? elementTypeProp(item.tag.split(";")[1]): item?.tag ? elementTypeProp(item.tag):"Element",
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
