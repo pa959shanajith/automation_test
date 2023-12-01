@@ -115,7 +115,7 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
     },[submit])
     return (
         <div data-test='dt__import-popup' className = 'dt__import-popup'>
-                <div>
+                <div className='import_format'>
                     <label>Import Format:</label>
                     <select defaultValue={'def-val'} onChange={changeImportType} ref={ftypeRef}>
                         <option value={'def-val'} disabled>Select Import Format</option>
@@ -127,7 +127,7 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
                 {importType &&
                     <Fragment>
                         {
-                        <div>
+                        <div className='import_format'>
                             <label >Upload File: </label>
                             <input accept={acceptType[importType]} type='file' onChange={upload} ref={uploadFileRef}/>
                         </div>
@@ -138,7 +138,7 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
                     <Fragment>
                     {(importType==='excel')?
                     <Fragment>
-                    <div>
+                    <div className='import_format'>
                         <label>Select Sheet: </label>
                         <select defaultValue={"def-val"} ref={sheetRef}>
                             <option value="def-val" disabled>Please Select Sheet</option>
@@ -149,8 +149,10 @@ const Container = ({submit,setSubmit,setData,setHeaders,setImportPopup,setOverla
                     :null}
                     {(importType==='xml')?
                     <Fragment>
-                    <div>
+                    <div className='import_format'>
                         <label>Row Tag:</label><input placeholder={'Row tag (Optional)'} value={rowTag} ref={rowRef} onChange={handleRowTag} />
+                    </div>
+                    <div className='import_format'>
                         <label>Column Tags:</label><input placeholder={'Column tags (Optional)'} value={columnTagList} ref={colRef} onChange={handleColumnTagList} />
                     </div>
                     </Fragment>

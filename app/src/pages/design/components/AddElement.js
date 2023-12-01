@@ -161,8 +161,8 @@ const AddElement = (props) => {
                                     placeholder='Text Input'
                                     style={{ width: "15rem", marginLeft: "1.25rem" }} />
                             </div>
-                            <div style={{ marginLeft: "13.5rem" }}>
-                                <Button icon="pi pi-plus" size="small" disabled={!addElementInputValue} onClick={handleAddElementAdd} ></Button>
+                            <div style={{ marginLeft: "9rem" }}>
+                                <Button label='Add Element' size="small" disabled={!addElementInputValue} onClick={handleAddElementAdd} ></Button>
                             </div>
                         </div>
                     </Card>
