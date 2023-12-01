@@ -63,6 +63,7 @@ import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from "primereact/paginator";
+import useDebounce from "../../../customHooks/useDebounce";
 export var navigate
 
 
@@ -83,7 +84,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
   const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
-  const [firstPage, setFirstPage] = useState(0);
+  const [firstPage, setFirstPage] = useState(1);
   const [rowsPage, setRowsPage] = useState(10);
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
@@ -228,6 +229,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
+  const debouncedSearchValue = useDebounce(searchProfile, 500);
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -1059,12 +1061,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
     msg: "You do not have access for CICD."
   }
 
-  const tableUpdate = async (getPageNo = 1) => {
+  const tableUpdate = async (getPageNo = 1, getSearch = "") => {
     const getState = [];
     setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
-      page: getPageNo
+      page: getPageNo,
+      searchKey: getSearch
     });
     setLoader(false);
     setFetechConfig(configurationList?.data);
@@ -1198,8 +1201,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
 
-  
-
+  useEffect(() => {
+    tableUpdate(1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
 
   const profieTooltip = (rowdata) => {
     return   <span
@@ -1654,7 +1659,7 @@ const showToast = (severity, detail) => {
         MY: {
           recurringValue:
             selectedMonthly?.key === "daymonth"
-              ? `0 0 ${scheduleOption?.monthday} */${scheduleOption?.monthweek} *`
+              ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
               : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
@@ -1862,7 +1867,7 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
-      tableUpdate(e.page + 1);
+      tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
   const renderTable = () => {
@@ -1882,7 +1887,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            globalFilter={searchProfile}
+            // globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",
@@ -2358,7 +2363,6 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -2368,12 +2372,13 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => { configModal("CancelSave"); setTypeOfExecution(""); }} size="small" disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
+              {(!!configList.length  && activeIndex1 === 0)?  (
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
+              ) : null}
               </div>
-            ) : null}
           </div>
         </div>
         {activeIndex1 === 0 ? (

@@ -216,7 +216,7 @@ const action = event.currentTarget.innerText
                                   <Button data-id={index} onClick={(event)=>{unlock(event)}}  outlined  label='Unlock'/>
                                 </div>
                                 <div className='ipContainer'>
-                                  <span className='IP fontTag fontT'>Role</span><span className='semicolan'>:</span><h4 className='fontResults fontR'>{user.role}</h4>
+                                  <span className='IP fontTag fontT'>Role</span><span className='semicolan'>:</span><h4 className='fontResults fontR'>{user.rolename}</h4>
                                 </div>
                               </Card>
                             </div>

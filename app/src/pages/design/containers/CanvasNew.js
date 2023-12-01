@@ -152,7 +152,8 @@ const CanvasNew = (props) => {
     const[mainScrapedData,setMainScrapedData]=useState(null)
     const[orderList,setOrderList]=useState(null)
     const[fetchingDetailsScreen,setFetchingDetailsScreen]=useState(null)
-    const[testSuiteInUse,setTestSuiteInUse]=useState(false)
+    const[testSuiteInUse,setTestSuiteInUse]=useState(false);
+    const[inputValValid, setInputValValid] = useState(false);
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let Proj = reduxDefaultselectedProject;
@@ -1307,6 +1308,46 @@ const CanvasNew = (props) => {
     });
   };
 
+  
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    const specialCharRegex = /[!@#$%^&*()+{}|\[\]:;"'<>,.?/\\]/;
+
+    switch (name) {
+      case 'inputValScreen':
+        if (!specialCharRegex.test(value)) {
+          setinputValScreen(value);
+          setInputValValid(true);
+          // Additional logic for valid inputValScreen
+        } else {
+          setInputValValid(false);
+          // Handle invalid inputValScreen
+        }
+        break;
+      case 'inputValTestStep':
+        if (!specialCharRegex.test(value)) {
+          setinputValTestStep(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+        case 'inputValue':
+        if (!specialCharRegex.test(value)) {
+          setInputValue(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const columns = [
     // {
     //   field: "checkbox",
@@ -1322,7 +1363,7 @@ const CanvasNew = (props) => {
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            <InputText name="inputValue" className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={handleInputChange}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -1392,7 +1433,7 @@ const CanvasNew = (props) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
-            <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)}
+            <InputText name="inputValScreen" className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={handleInputChange}
             onBlur={() => {
               updateRowScreen(rowDataScreen, inputValScreen);
               setShowInputScreen(false);
@@ -1460,7 +1501,7 @@ const CanvasNew = (props) => {
         if (showInputTestStep && rowDataTestStep.id === addTestStep.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Test Step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)} onBlur={() => updateRowTestStep(rowDataTestStep, inputValTestStep)} />
-    <InputText className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)}
+    <InputText name="inputValTestStep" className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={handleInputChange}
     onBlur={() => {
       updateRowTestStep(rowDataTestStep, inputValTestStep);
       setShowInputTestStep(false);
