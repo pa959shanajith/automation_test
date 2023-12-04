@@ -72,7 +72,7 @@ const ModuleListDrop = (props) =>{
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
     const [initialText, setInitialText] = useState(E2EName? false : true);
-
+    const prjList = useSelector(state=>state.design.projectList)
 
     ////  /////ModuleListSidePanel'S dependencies
     const [showInput, setShowInput] = useState(false);
@@ -136,7 +136,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch(savedList(true))}
         setWarning(false); 
-        if(dontShowFirstModules === true && currentId !== "")loadModule(currentId)
+        if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
      // eslint-disable-next-line react-hooks/exhaustive-deps
      }, [moduleLists, initProj])
      useEffect(()=> {
@@ -151,21 +151,13 @@ const ModuleListDrop = (props) =>{
      },[]);
 
      useEffect(()=>{
-        (async()=>{
-          var data=[]
-          const Projects = await getProjectList()
-          for(var i = 0; Projects.projectName.length>i; i++){
-              data.push({name:Projects.projectName[i], id:Projects.projectId[i]})
-            }
-            // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
-        //  const data =[ {
-        //     key: Projects.projectId,
-        //     value:Projects.projectNames
-        //   }]
-          setProjectList(data)
-          // console.log("data",data)
-          // console.log(" projects",projects)
-        })()
+        const arrayOfData =Object.entries(prjList)
+        const data = arrayOfData.map((e,i)=>{
+        return {
+               name: e[1]?.name,
+               id:e[1]?.id,
+            }})
+        setProjectList(data);
       },[showE2EPopup])
 
      useEffect (()=>{
