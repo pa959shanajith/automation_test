@@ -28,6 +28,7 @@ const DisplayProject = (props) => {
   else userInfo = userInfo ;
   
   const createdProject = useSelector((state) => state.landing.savedNewProject);
+  const updatedProject = useSelector((state) => state.landing.updatedProject)
   const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
   const [showTooltip, setShowTooltip] = useState(false);
@@ -139,6 +140,7 @@ const DisplayProject = (props) => {
           createdDate: element.releases[0].createdon,
           appType: convertIdIntoNameOfAppType(element.type),
           projectId: element._id,
+          projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
         }
       });
       const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
@@ -154,7 +156,7 @@ const DisplayProject = (props) => {
   }, [showGeniusDialog]);
 
   useEffect(() => {
-    if (createdProject) {
+    if (createdProject || updatedProject) {
       (async () => {
         const ProjectList = await fetchProjects({ readme: "projects" });
         setProjectsDetails(ProjectList)
@@ -175,17 +177,19 @@ const DisplayProject = (props) => {
                 createdDate: element.releases[0].createdon,
                 appType: convertIdIntoNameOfAppType(element.type),
                 projectId: element._id,
+                projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
               }
             )
           })
           const sortedProject = arraynew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
           setProjectList(sortedProject);
           dispatch(loadUserInfoActions.savedNewProject(false))
+          dispatch(loadUserInfoActions.updatedProject(false))
         }
       })()
 
     }
-  }, [createdProject])
+  }, [createdProject, updatedProject])
 
 
   useEffect(() => {
@@ -257,7 +261,7 @@ const DisplayProject = (props) => {
       localStorage.setItem('DefaultProject', JSON.stringify(selectedProject));
       dispatch(loadUserInfoActions.setDefaultProject(selectedProject));
     }
-  }, [defaultProjectId]);
+  }, [defaultProjectId, updatedProject]);
 
 
   useEffect(() => { if (getProjectLists && getProjectLists.length > 0) { setDefaultProjectId(getProjectLists[0].projectId); } }, [getProjectLists]);

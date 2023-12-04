@@ -619,3 +619,28 @@ const replaceHtmlEntites = selectedText => {
 		return translate[entity];
 	}) );
 }
+
+const roles = {
+    "Quality Lead": "5db0022cf87fdec084ae49aa",
+    "Quality Manager": "5db0022cf87fdec084ae49ab",
+    "Quality Engineer": "5db0022cf87fdec084ae49ac"
+};
+
+export const roleIdentifiers = {
+    QALead: "Quality Lead",
+    QAManager: "Quality Manager",
+    QAEngineer: "Quality Engineer"
+};
+
+// Function to Check roleId belongs to QA Manager, QA Lead, QA Engineer
+export const checkRole = (roleName, roleId) => {
+    const roleIds = roles[roleName];
+    if ([String(roleId)].includes(roleIds)) {
+        return true;
+    }
+    return false;
+};
+
+export const getRoleId = (roleName) =>{
+    return roles[roleName];
+}
