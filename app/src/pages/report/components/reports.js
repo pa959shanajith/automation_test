@@ -61,6 +61,15 @@ const reports = () => {
     const initProj = selectProjects.projectId;
     const debouncedSearchValue = useDebounce(searchReportData, 500);
     const handeSelectProject=(initProj)=>{
+      const defaultProjectData = {
+        ...localStorageDefaultProject, // Parse existing data from localStorage
+        projectId: initProj,
+        projectName: projectList.find((project)=>project.id === initProj).name,
+        appType: project?.appTypeName[project?.projectId.indexOf(initProj)],
+        projectLevelRole: projectList.find((project)=>project.id === initProj).projectLevelRole
+
+      };
+      localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
         dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType: project?.appType[project?.projectId.indexOf(initProj)] }));
         fetchReportData(initProj);
     };
@@ -72,7 +81,8 @@ const reports = () => {
                 if(Projects && Projects.projectName && Projects.projectId){
                     const data = Projects.projectName.map((name,index)=>({
                         name,
-                        id:Projects.projectId[index]
+                        id:Projects.projectId[index],
+                        projectLevelRole: Projects.projectlevelrole[0][index]["assignedrole"]
 
                     }));
                     setProjectList(data);
