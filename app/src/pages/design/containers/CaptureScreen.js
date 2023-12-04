@@ -583,7 +583,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
+                objectProperty: item?.tag?.includes("iris")? elementTypeProp(item.tag.split(";")[1]): item?.tag ? elementTypeProp(item.tag):"Element",
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
@@ -1765,12 +1765,12 @@ const elementValuetitle=(rowdata)=>{
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
+                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
+                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
@@ -1796,12 +1796,12 @@ const elementValuetitle=(rowdata)=>{
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
-                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
+                  <img className='add_obj_upgrade' src="static/imgs/compare_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                  <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
+                  <img className='map_obj_upgrade' src="static/imgs/replace_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
                 </span>
@@ -1820,7 +1820,7 @@ const elementValuetitle=(rowdata)=>{
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
                 <span className="insprint_auto">
-                  <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
+                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                   <p className='text-600'>PDF Utility</p>
                 </span>
                 {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1840,7 +1840,7 @@ const elementValuetitle=(rowdata)=>{
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
                 <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
-                  <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
+                  <img className='map_obj' src="static/imgs/create_object_icon.svg"></img>
                   <p>Create Element</p>
                 </span>
                 {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
