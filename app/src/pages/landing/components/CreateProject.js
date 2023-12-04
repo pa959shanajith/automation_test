@@ -198,7 +198,7 @@ const CreateProject = (props) => {
     { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png', disabled: applicationLicenseCheck.mainframeLicense.value,title:applicationLicenseCheck.mainframeLicense.msg},
     { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png', disabled: applicationLicenseCheck.mobilewebLicense.value , title:applicationLicenseCheck.mobilewebLicense.msg},
     { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png', disabled: applicationLicenseCheck.mobileAppLicense.value, title:applicationLicenseCheck.mobileAppLicense.msg},
-    { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
+    // { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
   const appTypes = [
     { name: 'Web', code: 'Web',value:'5db0022cf87fdec084ae49b6', image: 'static/imgs/Web.svg' },
@@ -426,7 +426,7 @@ const CreateProject = (props) => {
       }
 
       var projData = {
-        projectName: value,
+        projectName: value.trim(),
         type: selectedApp.code,
         assignedUsers: filteredUserDetails,
         domain: "banking",
@@ -471,7 +471,7 @@ const CreateProject = (props) => {
     }));
 
     var upadtedProjData = {
-      projectName: value,
+      projectName: value.trim(),
       type: selectedApp.code,
       assignedUsers: filteredUserDetails,
       domain: "banking",

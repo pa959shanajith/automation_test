@@ -20,7 +20,6 @@
   .Project-search {
     position: relative !important;
     bottom: 0.8rem;
-    height: 6vh;
     width: 100%;
   }
 
@@ -89,6 +88,10 @@
     background: #FAFAFB !important;
     border: none !important;
     font: $f6_regular;
+  }
+
+  .project_search{
+    width: 100%;
   }
 
   .project {

@@ -147,7 +147,9 @@ const DisplayProject = (props) => {
       localStorage.setItem('DefaultProject', JSON.stringify(selectedProject));
       dispatch(loadUserInfoActions.setDefaultProject(selectedProject));
     }
+    if(!showGeniusDialog){
       setProjectList(sortedProject);
+    }
     })();
   }, [showGeniusDialog]);
 
@@ -157,7 +159,7 @@ const DisplayProject = (props) => {
         const ProjectList = await fetchProjects({ readme: "projects" });
         setProjectsDetails(ProjectList)
         if (ProjectList.error) {
-          // setMsg(MSG.CUSTOM("Error while fetching the project Details"));
+          props.toastError("Error while fetching the project Details");
         } else {
           const arraynew = ProjectList.map((element, index) => {
             const lastModified = DateTimeFormat(element.releases[0].modifiedon);
@@ -322,9 +324,13 @@ const DisplayProject = (props) => {
   return (
     <>
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
-        <div className="p-input-icon-left Project-search ">
-          <i className="pi pi-search" />
-          <InputText className="Search_name p-inputtext-sm" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
+        <div className="Project-search">
+          <form autoComplete="off">
+            <div className="p-input-icon-left project_search">
+            <i className="pi pi-search" />
+            <InputText autoComplete="off" className="Search_name p-inputtext-sm" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
+            </div>
+          </form>
         </div>
         <div className="project-list project">
           {filteredProjects.map((project) => (

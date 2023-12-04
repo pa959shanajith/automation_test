@@ -40,7 +40,7 @@ const IceProvision = (props) => {
       else {
         data.sort();
         data.map(user => {
-          if (userName && user.includes(userName)) {
+          if (userName === user[0]) {
             setUserid(user)
           }
         })
@@ -91,7 +91,7 @@ const IceProvision = (props) => {
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
           setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess}
-          edit={props.editUserIceProvision} toast={props.toast} />}
+          toast={props.toast} />}
         {(type === "inhouse" && editUser) ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
           userConfig={props.userConfig}
           refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp}
@@ -102,14 +102,16 @@ const IceProvision = (props) => {
           toastError={props.toastError} toastSuccess={props.toastSuccess} toast={props.toast}
         /> : null}
         {type === 'ldap' && <div>
-          <DataTable value={props.ldapSelectedUserList} editMode="row" size='normal'
+          <DataTable value={props.ldapSelectedUserList} editMode="row" size='normal' 
+            selectionMode={null}
             // loading={loading}
             // globalFilter={globalFilter}
             // header={header}
             emptyMessage="No users found"
             scrollable
             // scrollHeight='60vh'
-            showGridlines>
+            >
+            <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
             <Column field="name" header="User Name" style={{ width: '20%' }}></Column>
             <Column field="role" header="Role" style={{ width: '20%' }}></Column>
             {/* <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column> */}

@@ -5,11 +5,16 @@
     grid-template-columns: auto auto;
     row-gap: 20px;
 }
+.import_format{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 
 .dt__import-popup{
     margin: 15px;
     label{
-        width: 110px;
+        width: 148px;
         font-weight: 600;
     }
     select,input{

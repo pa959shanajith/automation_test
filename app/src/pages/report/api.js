@@ -14,7 +14,9 @@ export const fetchConfigureList = async(props) => {
             data: {
                 action: "configurelist",
                 'projectid': props.projectid,
-                'param':props.param
+                'param':props.param,
+                page: props.page,
+                searchKey: props.searchKey
             }
         });
         if(res.status === 401){
@@ -32,7 +34,7 @@ export const fetchConfigureList = async(props) => {
     }
 }
 
-export const getFunctionalReports = async(projId, relName, cycId) => {
+export const getFunctionalReports = async(projId, relName, cycId, pageNo, searchKey) => {
     try{
         const res = await axios(url+'/getReportsData_ICE', {
             method: 'POST',
@@ -46,6 +48,8 @@ export const getFunctionalReports = async(projId, relName, cycId) => {
                     cycleId: cycId,
                     configurekey: projId,
                     type:"allmodules",
+                    page: pageNo,
+                    searchKey: searchKey
                 }
             },
             credentials: 'include'

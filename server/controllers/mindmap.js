@@ -602,7 +602,7 @@ exports.saveEndtoEndData = function (req, res) {
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1)
 			qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex]._id||null, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList,"state":nObj[rIndex].state}];
-			
+			qObj.host=req.headers.host;			
 			create_ice.saveMindmapE2E(qObj, function (err, data) {
 				if (err) {
 					res.status(500).send(err);
@@ -1682,7 +1682,7 @@ exports.importDefinition = async (req, res) => {
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         // redisServer.redisSubServer.subscribe('ICE2_' + icename);
 		var action = req.body.param;
-		if(action == 'importDefinition_ICE'){
+		if(action == 'importDefinition_ICE' && icename!=undefined){
 			var sourceUrl = req.body.sourceUrl;
 			try {
 				// var wsdlurl = req.body.wsdlurl;
@@ -1692,9 +1692,11 @@ exports.importDefinition = async (req, res) => {
 				var socket = require('../lib/socket');
 				var mySocket;
 				var clientName=utils.getClientName(host);
-				mySocket = socket.allSocketsMap[clientName][icename];	
-				logger.info("Sending request to ICE for importDefinition_ICE");
-				mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
+				mySocket = socket.allSocketsMap[clientName][icename];
+				if(mySocket.connected){
+
+					logger.info("Sending request to ICE for importDefinition_ICE");
+					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
 					function result_WS_ImportDefinition_listener(message) {
 						let data = message;
 						//LB: make sure to send recieved data to corresponding user
@@ -1706,17 +1708,26 @@ exports.importDefinition = async (req, res) => {
 								// return;
 							}
 							res.send(data);
-							} catch (exception) {
-								res.send("fail");
-								logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
-							}
+						} catch (exception) {
+							res.send("fail");
+							logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
 						}
+					}
 					// redisServer.redisSubServer.on("message",result_WS_ImportDefinition_listener);
 					mySocket.on("result_WS_ImportDefinition",result_WS_ImportDefinition_listener)
+				} else {
+					flag = "unavailableLocalServer";
+					logger.error("Error occurred in the service importDefinition - result_WS_ImportDefinition: Socket not Available");
+					res.send(flag);
+				}
 				
 			} catch (exception) {
 				logger.error("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: %s", exception);
 			}
+		} else {
+			flag = "unavailableLocalServer";
+			logger.error("Error occurred in the service importDefinition - result_WS_ImportDefinition: Socket not Available");
+			res.send(flag);
 		}
 	} catch (exception) {
         logger.error("Exception in the service importDefinition: %s", exception);

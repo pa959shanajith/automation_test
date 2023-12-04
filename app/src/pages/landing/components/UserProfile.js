@@ -31,7 +31,9 @@ const UserDemo = (props) => {
     const [showUD, setShowUD] = useState(false);
     const [showOverlay, setShowOverlay] = useState("");
     const[OS,setOS]=useState("Windows")
-    const selectedProj = useSelector(state=>state.design.selectedProj)
+    const selectedProj = useSelector(state=>state.design.selectedProj);
+    const [userImage, setUserImage] = useState(''); 
+    const [label, setLabel] = useState('');
 
 
 
@@ -46,6 +48,8 @@ const UserDemo = (props) => {
             const lastNameInitial = userInfo.lastname ? userInfo.lastname.slice(0, 1) : '';
             const initials = (firstNameInitial + lastNameInitial).toUpperCase();
             setInitials(initials);
+            userInfo?.userimage !=="" ? setUserImage(userInfo.userimage) : setUserImage(initials);
+            userInfo?.userimage === "" ? setLabel(initials) : setLabel('');
         }
     }, [userInfo])
 
@@ -122,8 +126,8 @@ const UserDemo = (props) => {
 
                     userInfo && <div className='ProfileDisplay'>
                         <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                            image={userInfo?.userimage !=="" ? userInfo.userimage : ''}
-                            label={(userInfo?.userimage === "") ? initials : ''}
+                            image={userImage}
+                            label={label}
                             size="xlarge" shape="circle" />
                         <div className="flex flex-column">
                             <span className="font-bold user_name">{userInfo.username}</span>
@@ -239,9 +243,13 @@ const UserDemo = (props) => {
                 icon="pi pi-exclamation-triangle"
                 accept={confirmLogout} />
             <Avatar className="pl-0 mt-2 mb-2 bg-yellow-100 text-800"
-                image={userInfo?.userimage !=="" ? userInfo.userimage : initials}
-                label={(userInfo?.userimage === "") ? initials : ''}
-                onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" />
+                image={userImage}
+                label={label}
+                onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" 
+                // image={userInfo?.userimage !=="" ? userInfo.userimage : initials}
+                // label={(userInfo?.userimage === "") ? initials : ''}
+                // onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" 
+            />
         </div>
     </>
     );

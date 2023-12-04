@@ -115,7 +115,7 @@ const Analysis = (props) => {
                             <Column field="agent" header="Agents" className='Agents' sortable ></Column>
                             <Column field="agentCapacity" header="Capacity" className='Capacity' sortable ></Column>
                             <Column field="availableAgent" header="Available" className='Available' sortable ></Column>
-                            <Column field="utilization" header="Utilization" className='Utilization' sortable ></Column>
+                            <Column field="utilization" header="Utilization" className='Utilization' ></Column>
                             <Column field="lastUpdated" header="Last Updated" className='LastUpdated' sortable ></Column>
                             <Column field="currentStatus" header="Current Status" className='CurrentStatus' sortable ></Column>
                         </DataTable>

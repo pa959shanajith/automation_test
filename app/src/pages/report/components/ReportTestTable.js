@@ -22,8 +22,6 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Checkbox } from "primereact/checkbox";
 import CollapsibleCard from "./CollapsibleCard";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { Menu } from "primereact/menu";
-import { InputTextarea } from "primereact/inputtextarea";
 import { Divider } from "primereact/divider";
 import AvoDropdown from "../../../globalComponents/AvoDropdown";
 import AvoMultiselect from "../../../globalComponents/AvoMultiselect";
@@ -33,6 +31,8 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import "../styles/ReportTestTable.scss";
 import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
+import AvoInputText from "../../../globalComponents/AvoInputText";
+import NetworkOperation from "./NetworkOperation";
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -68,6 +68,9 @@ export default function BasicDemo() {
   const [responseFeilds, setResponseFeilds] = useState({});
   const [configValues, setConfigValues] = useState({});
   const [selectedRow, setSelectedRow] = useState([]);
+  const [networkDialog, setNewtorkDialog] = useState(false);
+  const [networkData, setNetworkData] = useState([]);
+  const [description, setDescription] = useState(null);
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -147,16 +150,21 @@ export default function BasicDemo() {
   }, [selectedRow]);
 
   useEffect(() => {
-    const parent = [];
-    if (reportData && Array.isArray(reportData?.rows)) {
-      for (const obj of reportData?.rows) {
+  let parent = [];
+  let child = [];
+  const getFiltered = Array.isArray(reportData?.rows) ? reportData?.rows.filter((el) => (el?.StepDescription.toLowerCase().includes(searchTest.toLowerCase()) || !el.hasOwnProperty("Step") || el?.Step.toLowerCase().includes(searchTest.toLowerCase()))) : [];
+    if (getFiltered && Array.isArray(getFiltered)) {
+      for (const obj of getFiltered) {
         if (obj.hasOwnProperty("Step") && obj?.Step !== "Terminated") {
           if (!parent[parent.length - 1]?.children) {
+            child.push(obj)
             parent[parent.length - 1].children = [obj]; // Push the new object into parent array
           } else {
-            parent[parent.length - 1]?.children.push(obj); // Push the object into existing children array
+            child.push(obj)
+            parent[parent.length - 1].children = [ ...child];
           }
         } else {
+          child = []
           parent.push(obj); // Push the object into parent array
         }
       }
@@ -165,7 +173,7 @@ export default function BasicDemo() {
       // console.error("reportData.rows is not defined or not an array.");
     }
     setReportViewData(parent);
-  }, [reportData]);
+  }, [reportData, searchTest]);
 
   const handdleExpend = (e) => {
     setExpandedKeys(e.value);
@@ -467,7 +475,7 @@ export default function BasicDemo() {
             type="search"
             className="search_testCase"
             onInput={(e) => setSearchTest(e.target.value)}
-            placeholder="Search for Test Cases"
+            placeholder="Search for Test Steps and Description"
           />
         </div>
       </div>
@@ -761,20 +769,41 @@ export default function BasicDemo() {
     return itemObj;
   };
 
-  const screenShotLink = (getLink) =>
-    getLink?.data?.screenshot_path && (
-      <div
-        className="screenshot_view"
-        onClick={async () => {
-          setVisibleScreen(true);
-          let data = await openScreenshot(getLink?.data?.screenshot_path);
-          let image = "data:image/PNG;base64," + data;
-          setVisibleScreenShot(image);
-        }}
-      >
-        View Screenshot
+  const screenShotLink = (getLink) =>{
+    return (
+    <div className="action_items">
+      {getLink?.data?.screenshot_path && (
+        <div
+          className="screenshot_view"
+          onClick={async () => {
+            setVisibleScreen(true);
+            let data = await openScreenshot(getLink?.data?.screenshot_path);
+            let image = "data:image/PNG;base64," + data;
+            setVisibleScreenShot(image);
+          }}
+        >
+         <img src="static/imgs/view_screenshot_icon_before.svg" />
+        </div>
+      )}
+      {getLink?.data?.Network_Data && (
+      <div>
+        <img
+          className="plug_icon"
+          src="static/imgs/plug_icon.svg"
+              onClick={() => { setNewtorkDialog(true);
+                 setNetworkData(getLink?.data?.Network_Data);
+                  setDescription(reportData?.rows.filter((el) => el?.slno === getLink?.data?.slno)[0]?.StepDescription);
+                }}
+        />
       </div>
-    );
+      )}
+    </div>
+  )}
+
+  const hideNetworkDialog = () => {
+    setNewtorkDialog(false);
+  };
+
 
   const returnMap = (getMap) => {
     switch(getMap){
@@ -829,6 +858,7 @@ export default function BasicDemo() {
   }
 
   return (
+    <>
     <div className="reportsTable_container">
       <div className="reportSummary">
         <Accordion
@@ -878,7 +908,7 @@ export default function BasicDemo() {
       <br></br>
       {reportid ? (
         <TreeTable
-          globalFilter={searchTest}
+          // globalFilter={searchTest}
           header={getTableHeader}
           value={treeData}
           className={reportSummaryCollaps ? "viewTable" : "ViewTable"}
@@ -921,7 +951,7 @@ export default function BasicDemo() {
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
-            header="No. Defect ID"
+            header="Defect"
             body={defectIDForJiraAndAzure}
             style={{ padding: "0rem", textAlign: "center" }}
           />
@@ -954,7 +984,7 @@ export default function BasicDemo() {
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
-          globalFilter={searchTest}
+          // globalFilter={searchTest}
           header={getTableHeader}
           className="ruleMap_table"
         >
@@ -1099,42 +1129,26 @@ export default function BasicDemo() {
             <Divider />
             {bugTitle !== "Jira" && (
               <div className="col-12">
-                <div>
-                  <label>
-                    <span>Summary</span>
-                    <img
-                      src="static/imgs/Required.svg"
-                      className="required_icon"
-                    />
-                  </label>
-                </div>
-                <InputTextarea
+                <AvoInputText
                   name="Summary"
-                  rows={2}
-                  className="text_desc"
+                  rows={1}
+                  customeClass="text_desc"
                   value={inputSummary}
-                  onChange={(e) => setInputSummary(e.target.value)}
+                  onInputTextChange={(e) => setInputSummary(e.target.value)}
+                  required={true}
+                  labelTxt="Summary"
                 />
               </div>
             )}
             <div className="col-12">
-              <div>
-                <label>
-                  <span>
-                    {bugTitle === "Jira" ? "Description" : "Repro Steps"}
-                  </span>
-                  <img
-                    src="static/imgs/Required.svg"
-                    className="required_icon"
-                  />
-                </label>
-              </div>
-              <InputTextarea
+              <AvoInputText
                 name="Description"
                 rows={2}
-                className="text_desc"
+                customeClass="text_desc"
                 value={inputDesc}
-                onChange={(e) => setInputDesc(e.target.value)}
+                onInputTextChange={(e) => setInputDesc(e.target.value)}
+                required={true}
+                labelTxt={bugTitle === "Jira" ? "Description" : "Repro Steps"}
               />
             </div>
             {!Array.isArray(mappedProjects) && (
@@ -1174,32 +1188,31 @@ export default function BasicDemo() {
                           : getElDropdown(el.name)
                       }
                       parentClass="flex flex-column"
-                      required={true}
+                      required={el.disabled}
                     />
                   ) : (
                     <>
-                      <div>
-                        <label>
-                          <span>
-                            {el.name !== "Iteration ID" && el.name !== "Area ID"
-                              ? el.name
-                              : getElName(el.name)}
-                          </span>
-                          {el.disabled && (
-                            <img
-                              src="static/imgs/Required.svg"
-                              className="required_icon"
-                            />
-                          )}
-                        </label>
-                      </div>
-                      <InputTextarea
-                        className="text_desc"
-                        rows={1}
+                      <AvoInputText
                         name={el.name}
-                        value={(el.name === "Attachment" && selectedRow[0]?.screenshot_path) ? selectedRow[0]?.screenshot_path : configValues[el.name]}
-                        onChange={(e) => handleConfigValues(e)}
-                        disabled={(el.name === "Attachment" && selectedRow[0]?.screenshot_path)}
+                        rows={1}
+                        customeClass="text_desc"
+                        value={
+                          el.name === "Attachment" &&
+                          selectedRow[0]?.screenshot_path
+                            ? selectedRow[0]?.screenshot_path
+                            : configValues[el.name]
+                        }
+                        onInputTextChange={(e) => handleConfigValues(e)}
+                        required={el.disabled}
+                        labelTxt={
+                          el.name !== "Iteration ID" && el.name !== "Area ID"
+                            ? el.name
+                            : getElName(el.name)
+                        }
+                        disabled={
+                          el.name === "Attachment" &&
+                          selectedRow[0]?.screenshot_path
+                        }
                       />
                     </>
                   )}
@@ -1210,6 +1223,27 @@ export default function BasicDemo() {
         }
         customClass="jira_modal"
         headerTxt="Create Issue"
+        isDisabled={
+          !(
+            jiraDropDown &&
+            issueDropDown &&
+            !!configureFeilds.length &&
+            inputSummary &&
+            inputDesc &&
+            !configureFeilds
+              .filter((el) => {
+                if (el?.disabled && el.name !== "Repro Steps" && el.name !== "Value Area" ) return el;
+              })
+              .map((e) =>
+                configValues[e?.name]
+                  ? typeof configValues[e?.name] === "object"
+                    ? !!configValues[e?.name].name
+                    : !!configValues[e?.name]
+                  : false
+              )
+              .includes(false)
+          )
+        }
         addLoader={bugLoader}
         modalSytle={{
           width: "60vw",
@@ -1252,5 +1286,8 @@ export default function BasicDemo() {
         }}
       />
     </div>
+
+    <NetworkOperation visible={networkDialog} onHide={hideNetworkDialog} setNetworkData={setNetworkData} networkData={networkData} setDescription={setDescription} description={description}/>
+    </>
   );
 }

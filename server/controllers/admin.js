@@ -215,7 +215,7 @@ exports.getUserDetails = async (req, res) => {
 			let data = [];
 			if (action == "user") {
 				for (let row of result) {
-					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage]);
+					data.push([row.name, row._id, row.defaultrole, row.rolename, row.firstname, row.lastname, row.email, row.profileimage, row.isadminuser]);
 				}
 			} else {
 				data = {
@@ -230,6 +230,7 @@ exports.getUserDetails = async (req, res) => {
 					rolename: result.rolename,
 					addrole: result.addroles,
 					type: result.auth.type,
+					isadminuser : result.isadminuser,
 					server: result.auth.server || '',
 				};
 				if (result.auth.user) data.ldapuser = result.auth.user;
@@ -254,7 +255,8 @@ exports.fetchLockedUsers = async (req, res) => {
 			result.forEach(function(e) {
 				lockedUsers.push({
 					username: e.name,
-					role: e.defaultrole
+					role: e.defaultrole,
+					rolename : e.rolename
 				});
 			});
 			return res.send(lockedUsers);

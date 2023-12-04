@@ -69,21 +69,19 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         let userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const localStorageDefaultProject = localStorage.getItem('DefaultProject');
         let selectProj = JSON.parse(localStorageDefaultProject);
-        console.log(selectProj)
         setSelectedProject(selectProj)
         let data = await api.importDefinition(valueOfImport)
-        if(data) {
-          console.log("inside handleImport")
+        if(data['APIS'] && data['CollectionName']) {
           setWSImportDefinitionDetails(data)
           setModuleName(data['CollectionName'])
-          console.log("response of handleImport")
-          console.log(data)
-          // setLoading(false);
           setLoading('Creating Mindmap')
           const moduleData = await handleModuleCreate(data)
           await handleScenarioCreate(data,moduleData)
-        } else {
-          console.error("Fail to launch WSDL_GO. ERROR::::", 'error');
+        }
+        else if (data === "unavailableLocalServer"){
+          displayError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT);
+        }else {
+          displayError('Error Occured While Loading WSDL Url')
         }
         setImportPop(false)
         setLoading(false);
@@ -100,7 +98,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
           <Fragment>
                 <div className='mnode__buttons'>
                     <label className='err-message'>{error}</label>
-                    <Button disabled={disableSubmit} onClick={()=>{handleImport()}} label='Import API'/>                
+                    <Button disabled={valueOfImport == "" || selectedProtocol == undefined} onClick={()=>{handleImport()}} label='Import API'/>                
                 </div>
           </Fragment>
         )

@@ -23,6 +23,7 @@ exports.connectAzure_ICE = function(req, res) {
         var icename = undefined
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         mySocket = myserver.allSocketsMap[clientName][icename];	
+        if(mySocket != undefined && mySocket.connected){
         if (req.body.action == 'loginToAzure') { //Login to Azure for creating issues
             var azureurl = req.body.url;
             var azureusername = req.body.username;
@@ -436,6 +437,9 @@ exports.connectAzure_ICE = function(req, res) {
                 res.send("Fail");
             }
         }
+    }else{
+        res.send("unavailableLocalServer");
+    }
     } catch (exception) {
         logger.error("Exception in the service connectAzure_ICE: %s", exception);
         res.send("Fail");

@@ -61,6 +61,8 @@ import { Tooltip } from 'primereact/tooltip';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
+import { Paginator } from "primereact/paginator";
+import useDebounce from "../../../customHooks/useDebounce";
 export var navigate
 
 
@@ -81,6 +83,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
   const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
+  const [firstPage, setFirstPage] = useState(1);
+  const [rowsPage, setRowsPage] = useState(10);
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
   const [modules, setModules] = useState("normalExecution");
@@ -137,6 +141,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserTxt, setBrowserTxt] = useState("");
   const [selectedNodeKeys, setSelectedNodeKeys] = useState({});
   const [fetechConfig, setFetechConfig] = useState([]);
+  const [configPages, setConfigPages] = useState(0);
   const [configItem, setConfigItem] = useState({});
   const [selectedSchedule, setSelectedSchedule] = useState({});
   const [scheduling, setScheduling] = useState(null);
@@ -233,6 +238,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     { label: "PowerShell - RestMethod", value: "powershell" },
     {label: "Shell - wget", value: "shell"}
   ]
+  const debouncedSearchValue = useDebounce(searchProfile, 500);
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -1000,7 +1006,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
-    executionData["browserType"] = browserTypeExe;
+    // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
@@ -1142,19 +1148,22 @@ const handleSubmit1 = async (SauceLabPayload) => {
     msg: "You do not have access for CICD."
   }
 
-  const tableUpdate = async () => {
+  const tableUpdate = async (getPageNo = 1, getSearch = "") => {
     const getState = [];
     setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
+      page: getPageNo,
+      searchKey: getSearch
     });
     setLoader(false);
-    setFetechConfig(configurationList);
-    configurationList.forEach((item, idx) => {
+    setFetechConfig(configurationList?.data);
+    setConfigPages(configurationList?.pagination?.totalcount);
+    configurationList?.data.forEach((item, idx) => {
       getState.push({
         sno: (
           <span className="sno_header" style={{marginLeft:"2rem",width:"1%"}}>
-            {idx + 1}
+            {idx + 1 + ((getPageNo -1) * 10)}
           </span>
         ),
         profileName: item.configurename,
@@ -1279,8 +1288,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
 
-  
-
+  useEffect(() => {
+    tableUpdate(1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
 
   const profieTooltip = (rowdata) => {
     return   <span
@@ -1734,7 +1745,7 @@ const showToast = (severity, detail) => {
         MY: {
           recurringValue:
             selectedMonthly?.key === "daymonth"
-              ? `0 0 ${scheduleOption?.monthday} */${scheduleOption?.monthweek} *`
+              ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
               : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
@@ -1939,7 +1950,11 @@ const showToast = (severity, detail) => {
     }   
   }
 
- 
+  const onPageChange = (e) => {
+      setFirstPage(e.first);
+      setRowsPage(e.rows);
+      tableUpdate(e.page + 1, debouncedSearchValue);
+  };
  
   const renderTable = () => {
     if (!!configList.length) {
@@ -1951,7 +1966,6 @@ const showToast = (severity, detail) => {
          <Tooltip target=" .cloud-test-provider " position="bottom" content="Cloud platform execution"/>
          <Tooltip target="#CICD_Disable_tooltip" position="bottom" content={cicdLicense.msg}/> 
          {loading ? <ScreenOverlay content={loading} /> : null}
-
           <DataTable
             showGridlines
             resizableColumns
@@ -1959,7 +1973,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            globalFilter={searchProfile}
+            // globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",
@@ -2012,6 +2026,7 @@ const showToast = (severity, detail) => {
               header={<span className="actions-header">Actions</span>}
             />
           </DataTable>
+          <Paginator first={firstPage} rows={rowsPage} totalRecords={configPages} rowsPerPageOptions={[10, 20, 30]} onPageChange={onPageChange} />
           <AvoModal
           visible={visible_saucelab}
           onhide={visible_saucelab}
@@ -2139,6 +2154,7 @@ Learn More '/>
             headerTxt={`Execute Now : ${fetechConfig[configItem]?.configurename}`}
             footerType="Execute"
             modalSytle={{ width: "50vw", background: "#FFFFFF", height: "85%" }}
+            isDisabled={(radioButton_grid === "Execute with Avo Assure Client" && !selectedICE)}
           />
           <Toast ref={timeinfo} />
           <Toast ref={scheduleinfo} />
@@ -2479,7 +2495,6 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -2489,12 +2504,13 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
+              {(!!configList.length  && activeIndex1 === 0)?  (
                 <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo?.rolename?.trim() === "Quality Engineer"}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
+              ) : null}
               </div>
-            ) : null}
           </div>
         </div>
         {activeIndex1 === 0 ? (

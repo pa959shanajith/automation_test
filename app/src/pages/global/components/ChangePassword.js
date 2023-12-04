@@ -115,70 +115,73 @@ const ChangePassword = (props) => {
                 <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Change Password" className="changePassword_dialog" visible={showDialog} style={{ width: '30vw' }} onHide={resetFields} footer={changePasswordFooter}>
                     <div className='pt-3'>
+                        <form autoComplete="off">
+                            {/* New Password Input Field */}
+                            <label className='input_label' htmlFor="newPassword">New Password <span className='text-red-500'>*</span></label>
+                            <div className="p-input-icon-right mb-1 mt-2">
+                                <Tooltip target='.eyeIcon1' content={showNewPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                <i
+                                    className={`eyeIcon1 cursor-pointer ${showNewPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
+                                    onClick={() => { setShowNewPassword(!showNewPassword) }}
+                                />
+                                <InputText
+                                    style={{ width: '25vw' }}
+                                    id="newPassword"
+                                    value={newpassword}
+                                    className={'input_field'}
+                                    onChange={newPasswordOnChangeHandler}
+                                    placeholder='Enter new password'
+                                    type={showNewPassword ? "text" : "password"}
+                                    autoComplete="off"
+                                />
+                            </div>
 
-                        {/* New Password Input Field */}
-                        <label className='input_label' htmlFor="newPassword">New Password <span className='text-red-500'>*</span></label>
-                        <div className="p-input-icon-right mb-1 mt-2">
-                            <Tooltip target='.eyeIcon1' content={showNewPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                            <i
-                                className={`eyeIcon1 cursor-pointer ${showNewPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
-                                onClick={() => { setShowNewPassword(!showNewPassword) }}
-                            />
-                            <InputText
-                                style={{ width: '25vw' }}
-                                id="newPassword"
-                                value={newpassword}
-                                className={'input_field'}
-                                onChange={newPasswordOnChangeHandler}
-                                placeholder='Enter new password'
-                                type={showNewPassword ? "text" : "password"}
-                            />
-                        </div>
+                            {/* checking password validation messages*/}
+                            <div className="password_check_messages">
+                                <div style={{ display: "flex" }}>
+                                    <i className={`mr-2 font-12 ${passwordLength ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                    <span>Must be 8-16 characters long</span>
+                                </div>
+                                <div style={{ display: "flex" }}>
+                                    <i className={`mr-2 font-12 ${digitPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                    <span>Must contain at least 1 Number</span>
+                                </div>
+                                <div style={{ display: "flex" }}>
+                                    <i className={`mr-2 font-12 ${lowerCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                    <span>Must contain at least 1 Lower case letter</span>
+                                </div>
+                                <div style={{ display: "flex" }}>
+                                    <i className={`mr-2 font-12 ${upperCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                    <span>Must contain at least 1 Upper case letter</span>
+                                </div>
+                                <div style={{ display: "flex" }}>
+                                    <i className={`mr-2 font-12 ${specialCharPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
+                                    <span>Must contain at least 1 Special character (&,%.etc)</span>
+                                </div>
+                            </div>
 
-                        {/* checking password validation messages*/}
-                        <div className="password_check_messages">
-                            <div style={{ display: "flex" }}>
-                                <i className={`mr-2 font-12 ${passwordLength ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must be 8-16 characters long</span>
+                            {/* Confirm New Password Input Field */}
+                            <label className='input_label' htmlFor="newPassword">Confirm Password <span className='text-red-500'>*</span></label>
+                            <div className="p-input-icon-right mt-2">
+                                <Tooltip target='.eyeIcon2' content={showConfirmPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                                <i
+                                    className={`eyeIcon2 cursor-pointer ${showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
+                                    onClick={() => { setShowConfirmPassword(!showConfirmPassword) }}
+                                />
+                                <InputText
+                                    style={{ width: '25vw' }}
+                                    autoComplete="off" 
+                                    id="confirmPassword"
+                                    onFocus={() => setConfirmPasswordFocus(true)}
+                                    className={`input_field ${confirmPasswordFocus && newpassword !== confirmNewpassword ? 'p-invalid' : 'input_field_success'}`}
+                                    value={confirmNewpassword}
+                                    onChange={confirmNewPasswordOnChangeHandler}
+                                    placeholder='Confirm new password'
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    disabled={!(passwordLength && lowerCasePresent && upperCasePresent && specialCharPresent && digitPresent)}
+                                />
                             </div>
-                            <div style={{ display: "flex" }}>
-                                <i className={`mr-2 font-12 ${digitPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must contain at least 1 Number</span>
-                            </div>
-                            <div style={{ display: "flex" }}>
-                                <i className={`mr-2 font-12 ${lowerCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must contain at least 1 Lower case letter</span>
-                            </div>
-                            <div style={{ display: "flex" }}>
-                                <i className={`mr-2 font-12 ${upperCasePresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must contain at least 1 Upper case letter</span>
-                            </div>
-                            <div style={{ display: "flex" }}>
-                                <i className={`mr-2 font-12 ${specialCharPresent ? "pi pi-check text-green-500" : "pi pi-times text-red-500"}`}></i>
-                                <span>Must contain at least 1 Special character (&,%.etc)</span>
-                            </div>
-                        </div>
-
-                        {/* Confirm New Password Input Field */}
-                        <label className='input_label' htmlFor="newPassword">Confirm Password <span className='text-red-500'>*</span></label>
-                        <div className="p-input-icon-right mt-2">
-                            <Tooltip target='.eyeIcon2' content={showConfirmPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
-                            <i
-                                className={`eyeIcon2 cursor-pointer ${showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
-                                onClick={() => { setShowConfirmPassword(!showConfirmPassword) }}
-                            />
-                            <InputText
-                                style={{ width: '25vw' }}
-                                id="confirmPassword"
-                                onFocus={() => setConfirmPasswordFocus(true)}
-                                className={`input_field ${confirmPasswordFocus && newpassword !== confirmNewpassword ? 'p-invalid' : 'input_field_success' }`}
-                                value={confirmNewpassword}
-                                onChange={confirmNewPasswordOnChangeHandler}
-                                placeholder='Confirm new password'
-                                type={showConfirmPassword ? "text" : "password"}
-                                disabled={!(passwordLength && lowerCasePresent && upperCasePresent && specialCharPresent && digitPresent)}
-                            />
-                        </div>
+                        </form>
                     </div>
                 </Dialog>
             </div>

@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { manageUserDetails } from '../api'
 import '../styles/EditProfile.scss';
+import  UserProfile  from './UserProfile';
 
 
 
@@ -19,7 +20,7 @@ const EditProfile = (props) => {
     const { showDialogBox, setShowDialogBox } = props;
     const [showDialog, setShowDialog] = useState(showDialogBox);
     const toastWrapperRef = useRef(null);
-
+    const [updateUserDetails, setUpdateUserDetails] = useState(false);
     const dispatch = useDispatch();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -112,11 +113,14 @@ const EditProfile = (props) => {
                 var data = await manageUserDetails("update", userObj);
                 setLoading(false);
                 if (data === 'success') {
+                    setUpdateUserDetails(true);
                     props.toastSuccess('Profile changed successfully');
                     localStorage.setItem("userInfo", JSON.stringify(userdetail))
                     dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, userimage: userObj.userimage }))
                 } else if (data === "exists") {
                     props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
+                } else if (data === "email exists") {
+                    props.toastWarn(MSG.CUSTOM("User with provided mail already exists",VARIANT.ERROR));
                 } else if (data === "fail") {
                     props.toastError(MSG.CUSTOM("Failed to update user.",VARIANT.ERROR));
                 }
@@ -177,7 +181,7 @@ const EditProfile = (props) => {
 
 
     return (
-        <>
+        <>  {updateUserDetails && <UserProfile/>}
             <div className='surface-card'>
                 <Toast ref={toastWrapperRef} position="bottom-center" />
                 <Dialog header="Profile Information" className="editProfile_dialog" visible={showDialog} style={{ width: '33vw' }} onHide={resetFields} footer={editProfileFooter}>
@@ -210,6 +214,7 @@ const EditProfile = (props) => {
                                     value={firstName}
                                     type="text"
                                     onChange={(event) => { setFirstName(event.target.value) }}
+                                    disabled={true}
                                 />
                             </div>
                             <div className='pt-2'>
@@ -220,6 +225,7 @@ const EditProfile = (props) => {
                                     value={lastName}
                                     type="text"
                                     onChange={(event) => { setLastName(event.target.value) }}
+                                    disabled={true}
                                 />
                             </div>
 
@@ -231,7 +237,9 @@ const EditProfile = (props) => {
                                     id="edit_input"
                                     value={email}
                                     type="email"
-                                    onChange={(event) => { setEmail(event.target.value) }} />
+                                    onChange={(event) => { setEmail(event.target.value) }}
+                                    disabled={true}
+                                    />
                             </div>
 
                             {/* PrimaryRole Input Field */}

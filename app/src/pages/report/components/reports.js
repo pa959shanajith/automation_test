@@ -18,6 +18,8 @@ import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { SelectButton } from 'primereact/selectbutton';
 import { testTypesOptions, viewByOptions } from '../../utility/mockData';
 import { useNavigate } from 'react-router-dom';
+import { Paginator } from 'primereact/paginator';
+import useDebounce from '../../../customHooks/useDebounce';
 export var navigate
 
 const reports = () => {
@@ -30,11 +32,15 @@ const reports = () => {
     const [selectedOption, setSelectedOption] = useState("");
     const [searchReportData, setSearchReportData] = useState("");
     const [configProjectId, setConfigProjectId] = useState("");
+    const [configPages, setConfigPages] = useState(0);
     const [projectList, setProjectList] = useState([]);
     const [show, setShow] = useState(false);
     const [viewBy, setViewBy] = useState(viewByOptions[0]?.value);
     const [testType, setTestType] = useState(testTypesOptions[0]?.value);
     const [project, setProject] = useState({});
+    const [firstPage, setFirstPage] = useState(0);
+    const [rowsPage, setRowsPage] = useState(10);
+    const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
     );
@@ -48,13 +54,12 @@ const reports = () => {
     ];
     const defaultSort = sort[0].name;
     const [selectedItem, setSelectedItem] = useState(defaultSort);
-    const filteredExecutionData = reportData.filter((data) =>
-      data.configurename.toLowerCase().includes(searchReportData.toLowerCase())
-    );
+    const filteredExecutionData = reportData.filter((data) => data);
     const [selectedProject, setSelectedProject] = useState(null);
 
     const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
     const initProj = selectProjects.projectId;
+    const debouncedSearchValue = useDebounce(searchReportData, 500);
     const handeSelectProject=(initProj)=>{
         dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType: project?.appType[project?.projectId.indexOf(initProj)] }));
         fetchReportData(initProj);
@@ -74,7 +79,7 @@ const reports = () => {
                     if(!initProj || !data.find((proj)=> proj.id === initProj)){
                         handeSelectProject(data[0]?.id || '');
                     }else{
-                        fetchReportData(initProj, selectProjects);
+                        fetchReportData(initProj);
                     }
                 }
             }catch(error){
@@ -83,22 +88,29 @@ const reports = () => {
         })();
     }, [viewBy, testType]);
 
-    const fetchReportData = async (initProj) => {
+    const fetchReportData = async (initProj, getPageNo = 1, getSearch = "") => {
         try {
           let executionProfileName = [];
           let accessibilityScreen;
           if (testType === "Functional Test" && viewBy === "Execution Profile") {
-            executionProfileName = await fetchConfigureList({
-              projectid: initProj,
+              const getExecutionProfileName = await fetchConfigureList({
+              projectid: initProj ? initProj : localStorageDefaultProject?.projectId,
               param: "reportData",
+              page: getPageNo,
+              searchKey: getSearch
             });
+            executionProfileName = getExecutionProfileName?.data;
+            setConfigPages(getExecutionProfileName?.pagination?.totalcount);
           } else if (testType === "Functional Test" && viewBy === "Test Suites") {
             executionProfileName = await getFunctionalReports(
               initProj,
               project?.releases[project?.projectId.indexOf(initProj)][0]?.name,
               project?.releases[project?.projectId.indexOf(initProj)][0]
-                ?.cycles[0]?._id
+                ?.cycles[0]?._id,
+              getPageNo,
+              getSearch
             );
+            setConfigPages(executionProfileName?.rows?.modules?.pagination?.totalcount);
           } else if (testType === "Accessibility Test") {
             accessibilityScreen = await getAccessibilityScreens(
               initProj,
@@ -122,11 +134,11 @@ const reports = () => {
             );
             setReportData(extractedExecutionProfileData);
           } else if (
-            !!executionProfileName?.rows?.modules.length &&
+            !!executionProfileName?.rows?.modules?.data.length &&
             testType === "Functional Test"
           ) {
             const extractedExecutionProfileData =
-              executionProfileName?.rows?.modules.map((obj) => ({
+              executionProfileName?.rows?.modules?.data.map((obj) => ({
                 configurename: obj?.name || "",
                 execDate: obj?.lastExecutedtime || "",
                 selectedModuleType: obj?.type || "",
@@ -202,6 +214,17 @@ const reports = () => {
       return <div><i className={option.icon}></i><span>{option.value}</span></div>;
     };
 
+    const onPageChange = (e) => {
+      setFirstPage(e.first);
+      setRowsPage(e.rows);
+      fetchReportData(initProj, e.page + 1, debouncedSearchValue);
+  };
+
+  useEffect(() => {
+    fetchReportData(initProj, 1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
+
     return (
       <div className="reports_container">
         <div className="grid options_box">
@@ -213,7 +236,7 @@ const reports = () => {
               <select
                 data-test="projectSelect"
                 className="projectSelectreport"
-                value={initProj}
+                value={initProj ? initProj : localStorageDefaultProject?.projectId}
                 onChange={(e) => {
                   handeSelectProject(e.target.value);
                 }}
@@ -255,6 +278,8 @@ const reports = () => {
                   itemTemplate={viewByTemplate}
                   onChange={(e) => {
                     setViewBy(e.value);
+                    setSearchReportData("");
+                    setFirstPage(1);
                   }}
                   options={viewByOptions}
                 />
@@ -459,6 +484,15 @@ const reports = () => {
             )}
             {show && <ReportTestTable />}
           </div>
+          {activeIndex !== "Accessibility Test" && (
+            <Paginator
+              first={firstPage}
+              rows={rowsPage}
+              totalRecords={configPages}
+              rowsPerPageOptions={[10, 20, 30]}
+              onPageChange={onPageChange}
+            />
+          )}
           <div>
             <Footer />
           </div>
