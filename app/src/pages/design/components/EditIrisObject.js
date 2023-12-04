@@ -121,16 +121,16 @@ const EditIrisObject = props => {
             >
                  <div className="ss__ei_body">
                         <div className="ss__ei_info_panel">
-                            <span data-test="objTypeHeading">Object Type:</span>
+                            <span data-test="objTypeHeading">Element Type:</span>
                             <span><select data-test="selectObjType" className="ss__ei_objType" value={selectedType} onChange={onSelectType}>
-                                <option className="ss__ei_options" disabled value={0}>Select Object Type</option>
+                                <option className="ss__ei_options" disabled value={0}>Select Element Type</option>
                                 { Object.keys(irisObjectTypes).map((key, i) => <option key={i} className="ss__ei_options" value={key}>
                                         {irisObjectTypes[key].name}
                                     </option>) }
                             </select></span>
                             { irisObjectTypes[selectedType] && irisObjectTypes[selectedType].states.length > 1 ?
                                 <> 
-                                <span data-test="objStatusHeading">Object Status:</span>
+                                <span data-test="objStatusHeading">Element Status:</span>
                                 <span>
                                     <select data-test="selectobjStatus" className="ss__ei_objType" value={selectedStatus} onChange={onSelectStatus}>
                                         <option className="ss__ei_options" value={"0"}>Unchecked</option>
@@ -139,11 +139,11 @@ const EditIrisObject = props => {
                                 </span>
                                 </>
                                 : null }
-                            <span data-test="objTag">Object Tag:</span>
+                            <span data-test="objTag">Element Tag:</span>
                             <span data-test="objTagValue">{props.cordData.objectDetails.xpath.split(";").pop()}</span>
                         </div>
                         <div className="ss__ei_img_panel">
-                            <span>Object Image</span>
+                            <span>Element Image</span>
                             <div className="ss__ei_img_box">
                                 <img    
                                     data-test="irirsImage" 
