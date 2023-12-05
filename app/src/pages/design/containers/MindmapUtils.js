@@ -929,19 +929,27 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         return !1;
     });
     if (dNodes[sid].type === 'scenarios') {
-        dNodes[0].children = dNodes[0].children.filter(child => child.name !== dNodes[sid].name);
+        dNodes[0].children = dNodes[0].children.filter(child=> child.id !== dNodes[sid].id)   
     } else if (dNodes[sid].type === 'screens') {
         for (var l = 0; l < dNodes[0].children.length; l++) {
             if (dNodes[0].children[l].name === p.name) {
-                dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child => child.id !== sid);
-                // break; // No need to continue looping once we find the parent
+                if(dNodes[sid].reuse !== true){
+                    dNodes[0].children[l].children = p.children
+                }else{
+                    dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child=>child.id !== sid)
+                }
             }
         }
     } else if (dNodes[sid].type === 'testcases') {
         for (var k = 0; k < dNodes[0].children.length; k++) {
             for (var m = 0; m < dNodes[0].children[k].children.length; m++) {
                 if (dNodes[0].children[k].children[m].name === p.name) {
-                    dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child => child.id !== sid);
+                    if(dNodes[sid].reuse !== true){
+                        dNodes[0].children[k].children[m].children = p.children
+                    }else{
+                        dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
+                    }
+                    
                      // No need to continue looping once we find the parent
                 }
             }

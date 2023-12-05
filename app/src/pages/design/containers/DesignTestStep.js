@@ -37,7 +37,7 @@ const DesignModal = (props) => {
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
-    const [overlay, setOverlay] = useState("");
+    const [overlay, setOverlay] = useState("Loading...");
     const [keywordList, setKeywordList] = useState(null);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
@@ -73,7 +73,18 @@ const DesignModal = (props) => {
     let runClickAway = true;
     
 
-let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON.parse(s))
+    let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON.parse(s)).sort((a, b) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+    });
+
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -221,7 +232,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
             setScreenLevelTastSteps(screenLevelTestCases)
         //eslint-disable-next-line
-    }, []);
+    }, [imported]);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
