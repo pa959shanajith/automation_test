@@ -426,7 +426,7 @@ const CreateProject = (props) => {
       }
 
       var projData = {
-        projectName: value,
+        projectName: value.trim(),
         type: selectedApp.code,
         assignedUsers: filteredUserDetails,
         domain: "banking",
@@ -460,7 +460,7 @@ const CreateProject = (props) => {
       }
     }
   };
-
+  
   /////////////////////////////////////// MANAGE PROJECT////////////////////////////////////////////////////////////////
  const handleUpdateProject = async () => {
 
@@ -471,7 +471,7 @@ const CreateProject = (props) => {
     }));
 
     var upadtedProjData = {
-      projectName: value,
+      projectName: value.trim(),
       type: selectedApp.code,
       assignedUsers: filteredUserDetails,
       domain: "banking",
@@ -482,8 +482,8 @@ const CreateProject = (props) => {
     const manageProject= await userUpdateProject_ICE(upadtedProjData)
 
     props.toastSuccess("Project Modified Successfully");
-     props.onHide();
-
+    props.onHide();
+    dispatch(loadUserInfoActions.updatedProject(true));
   }
 
   const dialogHeader = props.handleManageProject ? 'Manage Project' : 'Create Project';

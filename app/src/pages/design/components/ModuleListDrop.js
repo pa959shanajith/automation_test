@@ -26,6 +26,7 @@ import SaveMapButton from "./SaveMapButton";
 import { Tooltip } from 'primereact/tooltip';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { checkRole, roleIdentifiers } from "../components/UtilFunctions";
 
 
 const ModuleListDrop = (props) =>{
@@ -72,7 +73,7 @@ const ModuleListDrop = (props) =>{
     const isEnELoaded = useSelector(state=>state.design.isEnELoad);
     const [collapseWhole, setCollapseWhole] = useState(true);
     const [initialText, setInitialText] = useState(E2EName? false : true);
-
+    const prjList = useSelector(state=>state.design.projectList)
 
     ////  /////ModuleListSidePanel'S dependencies
     const [showInput, setShowInput] = useState(false);
@@ -118,6 +119,10 @@ const ModuleListDrop = (props) =>{
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
 
+    let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+    const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject)
+    if(!projectInfo) projectInfo = projectInfoFromRedux;
+
     const handleTooltipToggle = () => {
       const rect = imageRefadd.current.getBoundingClientRect();
       setCardPosition({ right: rect.right, left: rect.left, top: rect.top ,bottom:rect.bottom});
@@ -136,7 +141,7 @@ const ModuleListDrop = (props) =>{
         }}
         else{dispatch(savedList(true))}
         setWarning(false); 
-        if(dontShowFirstModules === true && currentId !== "")loadModule(currentId)
+        if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
      // eslint-disable-next-line react-hooks/exhaustive-deps
      }, [moduleLists, initProj])
      useEffect(()=> {
@@ -151,21 +156,13 @@ const ModuleListDrop = (props) =>{
      },[]);
 
      useEffect(()=>{
-        (async()=>{
-          var data=[]
-          const Projects = await getProjectList()
-          for(var i = 0; Projects.projectName.length>i; i++){
-              data.push({name:Projects.projectName[i], id:Projects.projectId[i]})
-            }
-            // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
-        //  const data =[ {
-        //     key: Projects.projectId,
-        //     value:Projects.projectNames
-        //   }]
-          setProjectList(data)
-          // console.log("data",data)
-          // console.log(" projects",projects)
-        })()
+        const arrayOfData =Object.entries(prjList)
+        const data = arrayOfData.map((e,i)=>{
+        return {
+               name: e[1]?.name,
+               id:e[1]?.id,
+            }})
+        setProjectList(data);
       },[showE2EPopup])
 
      useEffect (()=>{
@@ -865,8 +862,8 @@ setPreventDefaultModule(true);
         }
       localStorage.removeItem('OldModuleForReset')
       
-      }  
-      
+      }
+
     return(
         <Fragment>
           {showE2EPopup &&
@@ -1004,31 +1001,21 @@ setPreventDefaultModule(true);
                             </span>
                           </div>
                           <div className="ScenairoList">
-                            {/* {filterSceForRightBox.map((ScenarioSelected, ScenarioSelectedIndex) => {
-                              return (
-                                <div key={ScenarioSelectedIndex} className="EachScenarioNameBox" >
-                                  <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-                                    <h4>{ScenarioSelected.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{ScenarioSelected.modName})</h3></h5></div>
-                                    <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{ScenarioSelected.projName})</h3></h5></div>
-                                  </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(ScenarioSelectedIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
-                                </div>
-                              )
-                            })} */}
-                            <DataTable value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
-                              <Column rowReorder headerStyle={{display:'none'}}/>
-                              <Column field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
+                            <DataTable className='selectedScenarioList' value={filterSceForRightBox?filterSceForRightBox:[]} reorderableColumns reorderableRows onRowReorder={(e) => {setFilterSceForRightBox(e.value);setTransferBut(e.value)}}>
+                              <Column className ="rowOrders" rowReorder headerStyle={{display:'none'}}/>
+                              <Column className='rowOfScenarios' field="scenarioId" headerStyle={{display:'none'}} body={bodyScenarionTemp}/>
                             </DataTable>
                           </div>
                           </>
                             :
-                          <div className="initialText">
-                            <div className="initial1StText">
-                              <h3 className="textClass"> No Testcases Yet</h3>
-                            </div>
-                            <div className="initial2NdText">
-                              <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                              <h3 >Select Testcases</h3>
+                         <div className="initialText">
+                           <div className="initial1StText">
+                             <h3 className="textClass"> No Testcases Yet</h3>
+                           </div>
+                           <div className="initial2NdText">
+                             <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
+                             <h3 >Select Testcases</h3>
                             </div>
                           </div> 
                           }
@@ -1083,19 +1070,23 @@ setPreventDefaultModule(true);
                            <i className="pi pi-times"  onClick={click_X_Button}></i>
                        </div>)}
                      </div> */}
-                      {userInfo && userInfo.rolename !== "Quality Engineer" ? (
-                        <>
+                  {/* If projectLevelRole or userInfoRole is Equal to Quality Engineer then hide the import, create Test suite buttons*/}
+                  {
+                    (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? (
+                      null
+                    ) : <>
                       {/* <img className="pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={()=>setImportPop(true)}></img> */}
-                     {(props.appType ==="Webservice")?<><img  className="custom-target-iconws" src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>setWSImportPop(true)}/>
-                     <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
-                     {WSimportPop? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true}  importPop={WSimportPop}/>:null}</>
-                     : null}
-                     <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={()=>setImportPop(true)}></img>
-                     <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
-                     {importPop? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true}  importPop={importPop} toast={toast} />:null}
-                     <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
-                     <img  className={`testsuiteimg testsuiteimg__${(props.appType ==="Webservice")?"forWS" : "forNonWS" } custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules"  onClick={()=>{ CreateNew()}}  />
-                     </>) : null}
+                      {(props.appType === "Webservice") ? <><img className="custom-target-iconws" src="static/imgs/plusNew.png" alt="NewModules" onClick={() => setWSImportPop(true)} />
+                        <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
+                        {WSimportPop ? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true} importPop={WSimportPop} /> : null}</>
+                        : null}
+                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
+                      <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
+                      {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} /> : null}
+                      <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
+                      <img className={`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
+                    </>
+                  }
                    
                   
              </div>
@@ -1167,8 +1158,13 @@ setPreventDefaultModule(true);
                             <i className="pi pi-times"  onClick={click_X_ButtonE2E}></i>
                         </div>)}
                      </div > */}
-                  <img src="static/imgs/plusNew.png" onClick={() => {setE2EName('');setFilterSceForRightBox([]);setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true);setInitialText(true);setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
-                  <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
+                  {
+                    (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? null :
+                      <>
+                        <img src="static/imgs/plusNew.png" onClick={() => { setE2EName(''); setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                        <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
+                      </>
+                  }
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}
                 </div>
                 {/* <div className='searchBox pxBlack'>

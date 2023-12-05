@@ -39,4 +39,10 @@
     .edit__usericon, .delete__usericon{
         cursor: pointer;
     }
+
+    .edit__usericon__disabled{
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
 }

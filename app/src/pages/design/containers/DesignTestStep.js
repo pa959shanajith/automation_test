@@ -62,7 +62,7 @@ const DesignModal = (props) => {
     const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
     const [selectedTestCase, setSelectedTestCase] = useState(null);
     const [visible, setVisible] = useState(false);
-    const [edit, setEdit] = useState(false);
+    const [edit, setEdit] = useState(true);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
     const [showSM, setShowSM] = useState(false);
     const [showConfPaste, setShowConfPaste] = useState(false);
@@ -142,18 +142,20 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 setOverlay("Loading...")
             }
             for(var i = 0 ; i<parentScreen.length; i++){
-                fetchTestCases(i)
-                .then(data=>{
-                    if (data==="success")
-                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
-                    else 
-                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
-                    setImported(false)
-                    setStepSelect({edit: false, check: [], highlight: []});
-                    setChanged(false);
-                    headerCheckRef.current.indeterminate = false;
-                })
-                .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                if(parentScreen[i]._id === rowExpandedName.id){
+                    fetchTestCases(i)
+                    .then(data=>{
+                        if (data==="success")
+                            toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
+                        else 
+                            toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
+                        setImported(false)
+                        setStepSelect({edit: false, check: [], highlight: []});
+                        setChanged(false);
+                        headerCheckRef.current.indeterminate = false;
+                    })
+                    .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                }
             }
         }
         //eslint-disable-next-line
@@ -185,7 +187,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 .then(data => {
                     data !== "success" &&
                         toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:3000});
-                        setEdit(false);
+                        setEdit(true);
                     setStepSelect({ edit: false, check: [], highlight: [] });
                     headerCheckRef.current.indeterminate = false;
                     setDraggable(false);
@@ -219,7 +221,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
             setScreenLevelTastSteps(screenLevelTestCases)
         //eslint-disable-next-line
-    }, [imported]);
+    }, []);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -337,9 +339,9 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                     }
                                     setDraggable(false);
                                     screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
+                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     setTestCaseData([...testCaseData,testcaseArray]); 
                                     setPastedTC([]);
-                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                     resolve(msg);
                                 })
@@ -530,6 +532,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setDebugEnable(false);
+        setEdit(true)
     }
 
     const addRow = () => {
@@ -847,7 +850,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():""} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
@@ -1048,6 +1051,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setShowSM(true);
     }
     const deleteTestcase = () => {
+        setEdit(false)
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
@@ -1192,7 +1196,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     }
     const ConfPasteStep = () =>{
          return (
-            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
+            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={()=>setShowConfPaste(false)} footer={footerPasteStep}>
                 <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
             </Dialog>
         );

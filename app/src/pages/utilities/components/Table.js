@@ -134,7 +134,7 @@ const Table = props => {
                                 onAdd={onAdd}
                             />
                         </div>
-                        <div className="full_dt_row" style={{ display: 'flex' }}>
+                        <div style={{ display: 'flex' }}>
                             <Rows
                                 {...props}
                                 onScrollY={onScrollY}

@@ -120,8 +120,15 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   let addMore = useRef(false);
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  let AppTypeElementIdentifier;
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
+
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+    NameOfAppType = JSON.parse(localStorageDefaultProject);
+    AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
+}
 
 
   useEffect(() => {
@@ -576,7 +583,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
+                objectProperty: item?.tag?.includes("iris")? elementTypeProp(item.tag.split(";")[1]): item?.tag ? elementTypeProp(item.tag):"Element",
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
@@ -1150,7 +1157,7 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
-    {(selectedCapturedElement.length>0 && typesOfAppType==="Web") ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
+    {(selectedCapturedElement.length>0 && (NameOfAppType.appType=="Web" || AppTypeElementIdentifier=="Web")) ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
     <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
@@ -1647,10 +1654,7 @@ const footerSave = (
   };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-  if (localStorageDefaultProject) {
-      NameOfAppType = JSON.parse(localStorageDefaultProject);
-  }
+  
 
 
      const isWebApp = NameOfAppType.appType === "Web";
@@ -1735,6 +1739,13 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
   if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
   setCapturedDataToSave(localScrapeItems);
 }
+
+const elementValuetitle=(rowdata)=>{
+  return (
+    <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+  )
+ }
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1754,12 +1765,12 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
+                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
+                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
@@ -1785,12 +1796,12 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
-                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
+                  <img className='add_obj_upgrade' src="static/imgs/compare_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                  <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
+                  <img className='map_obj_upgrade' src="static/imgs/replace_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
                 </span>
@@ -1809,7 +1820,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
                 <span className="insprint_auto">
-                  <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
+                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                   <p className='text-600'>PDF Utility</p>
                 </span>
                 {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1829,7 +1840,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
                 <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
-                  <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
+                  <img className='map_obj' src="static/imgs/create_object_icon.svg"></img>
                   <p>Create Element</p>
                 </span>
                 {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -2096,7 +2107,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
               <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
               {/* <column ></column> */}
               <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
             </DataTable>
           </div>
         </Dialog>: null }</>}

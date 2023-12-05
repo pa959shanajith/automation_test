@@ -72,7 +72,8 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
             projectId: proj,
             projectName: prjList[proj]?.name,
-            appType: prjList[proj]?.apptypeName
+            appType: prjList[proj]?.apptypeName,
+            projectLevelRole: prjList[proj]?.projectLevelRole
           };
           
           localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));

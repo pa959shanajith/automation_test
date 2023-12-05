@@ -21,6 +21,7 @@ import { Dropdown } from 'primereact/dropdown';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
+import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -62,6 +63,7 @@ import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from "primereact/paginator";
+import useDebounce from "../../../customHooks/useDebounce";
 export var navigate
 
 
@@ -82,7 +84,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
   const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
-  const [firstPage, setFirstPage] = useState(0);
+  const [firstPage, setFirstPage] = useState(1);
   const [rowsPage, setRowsPage] = useState(10);
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
@@ -227,11 +229,26 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
+  const [selectedLanguage, setSelectedLanguage] = useState("curl");
+  const [selectBuildType, setSelectBuildType] = useState("HTTP");
+  const languages = [
+    { label: "cURL", value: "curl" },
+    { label: "HTTP", value: "http" },
+    { label: "Javascript", value: "javascript" },
+    { label: "Python", value: "python" },
+    { label: "PowerShell - RestMethod", value: "powershell" },
+    {label: "Shell - wget", value: "shell"}
+  ]
+  const debouncedSearchValue = useDebounce(searchProfile, 500);
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
   if (!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
 
   useEffect(() => {
     setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
@@ -375,7 +392,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
-        data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
+        data.push({ name: Projects.projectName[i], id: Projects.projectId[i], projectLevelRole: Projects.projectlevelrole[0][i]["assignedrole"] });
       }
       // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
       //  const data =[ {
@@ -390,11 +407,93 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
  const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
+      setSelectedLanguage("curl");
+      setSelectBuildType("HTTP");
+      setExecutionTypeInRequest("asynchronous");
     }
   };
 
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
+
+  const codeSnippets = {
+    curl: `curl --location "${url}" \n
+--header "Content-Type: application/json" \n
+--data "{
+    \"key\": \"${currentKey}\",
+    \"executionType\": \"${executionTypeInRequest}\"
+}"`,
+
+    http: `POST /execAutomation HTTP/1.1
+Host: ${url.slice(8, -15)}
+Content-Type: application/json
+Content-Length: 93
+
+{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}`,
+
+    javascript: `var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+});
+
+var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+};
+
+fetch("${url}", requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));`,
+
+    python: `import requests
+import json
+
+url = "${url}"
+
+payload = json.dumps({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+})
+headers = {
+    'Content-Type': 'application/json'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)`,
+
+    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Content-Type", "application/json")
+
+$body = @"
+{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}
+"@
+
+$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
+$response | ConvertTo-Json`,
+
+    shell: `wget --no-check-certificate --quiet
+  --method POST
+  --timeout=0
+  --header 'Content-Type: application/json'
+  --body-data '{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}'
+    '${url}'`,
+};
 
   const fetchData = async () => {
     setSmartMode("normal");
@@ -912,7 +1011,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
-    executionData["browserType"] = browserTypeExe;
+    // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
@@ -1054,12 +1153,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
     msg: "You do not have access for CICD."
   }
 
-  const tableUpdate = async (getPageNo = 1) => {
+  const tableUpdate = async (getPageNo = 1, getSearch = "") => {
     const getState = [];
     setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
-      page: getPageNo
+      page: getPageNo,
+      searchKey: getSearch
     });
     setLoader(false);
     setFetechConfig(configurationList?.data);
@@ -1193,8 +1293,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
 
-  
-
+  useEffect(() => {
+    tableUpdate(1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
 
   const profieTooltip = (rowdata) => {
     return   <span
@@ -1442,10 +1544,11 @@ const showToast = (severity, detail) => {
         ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
-        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
+        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)],
+        projectLevelRole: projectList.find((project)=>project.id === e.target.value)?.projectLevelRole
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
     }
     return (
       <nav>
@@ -1648,7 +1751,7 @@ const showToast = (severity, detail) => {
         MY: {
           recurringValue:
             selectedMonthly?.key === "daymonth"
-              ? `0 0 ${scheduleOption?.monthday} */${scheduleOption?.monthweek} *`
+              ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
               : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
@@ -1856,7 +1959,7 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
-      tableUpdate(e.page + 1);
+      tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
   const renderTable = () => {
@@ -1876,7 +1979,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            globalFilter={searchProfile}
+            // globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",
@@ -2183,95 +2286,141 @@ Learn More '/>
               <>
                 <ExecutionCard cardData={fetechConfig[configItem]} configData={getConfigData} />
 
-                <div className="input_CICD ">
-                 
-                  <div class="container_url">
-                    <label for="inputField" class="devopsUrl_label">
-                    DevOps Integration URL
-                    </label>
-                    <div className="url">
-                    <pre className="grid_download_dialog__content cicdpre">
-                      <code id="api-url" title={url}>
-                        {url}
-                      </code>
-                    </pre>
-
-                    <Button
-                      icon="pi pi-copy"
-                      className="copy_CICD"
-                      
-                      onClick={() => {
-                        copyConfigKey(url);
-                      }}
-                     
-                      
-                      // title={copyToolTip}
-                    />
-                    
-                    <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
-                   </div>
-                   </div>
-                  <div className="executiontype">
-                    <div className="lable_sync">
-                      <label
-                        className="Async_lable"
-                        id="async"
-                        htmlFor="synch"
-                        value="asynchronous"
-                      >
-                        Asynchronous
-                      </label>
-                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
-                      <InputSwitch
-                        className="inputSwitch_CICD"
-                        label=""
-                        inlineLabel={true}
-                        onChange={() =>
-                          executionTypeInRequest == "asynchronous"
-                            ? setExecutionTypeInRequest("synchronous")
-                            : setExecutionTypeInRequest("asynchronous")
-                        }
-                        checked={executionTypeInRequest === "synchronous"}
-                      />
-                      <label
-                        className="sync_label"
-                        id="sync"
-                        htmlFor="synch"
-                        value="synchronous"
-                      >
-                        Synchronous
-                      </label>
-                      <img className='info_btn_sync'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                <div className="buildtype_container">
+                  <div className="flex flex-wrap gap-3">
+                    <label className="buildtype_label">Execution Trigger Type:</label>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="HTTPrequest" className="ss__build_type_rad" type="radio" name="HTTP" value="HTTP" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === "HTTP"} />
+                      <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">HTTP request</label>
+                    </div>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="Code" className="ss__build_type_rad" type="radio" name="CODE" value="CODE" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === 'CODE'} />
+                      <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Code snippet</label>
                     </div>
                   </div>
-                  <div className="container_devopsLabel" title={str}>
-                    <span className="devops_label">DevOps Request Body : </span>
+                </div>
+
+                <div className="input_CICD ">
+                 
+                  { selectBuildType == "HTTP" ?
+                  <div>
+                    <div class="container_url">
+                      <label for="inputField" class="devopsUrl_label">
+                        DevOps Integration URL
+                      </label>
+                      <div className="url">
+                        <pre className="grid_download_dialog__content cicdpre">
+                          <code id="api-url" title={url}>
+                            {url}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_CICD"
+                        
+                          onClick={() => {
+                            copyConfigKey(url);
+                          }}
+                    
+                      
+                          // title={copyToolTip}
+                        />
+                    
+                        <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
+                      </div>
+                    </div>
+                    <div className="executiontype">
+                      <div className="lable_sync">
+                        <label
+                          className="Async_lable"
+                          id="async"
+                          htmlFor="synch"
+                          value="asynchronous"
+                        >
+                          Asynchronous
+                        </label>
+                        <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
+                        <InputSwitch
+                          className="inputSwitch_CICD"
+                          label=""
+                          inlineLabel={true}
+                          onChange={() =>
+                            executionTypeInRequest == "asynchronous"
+                              ? setExecutionTypeInRequest("synchronous")
+                              : setExecutionTypeInRequest("asynchronous")
+                          }
+                          checked={executionTypeInRequest === "synchronous"}
+                        />
+                        <label
+                          className="sync_label"
+                          id="sync"
+                          htmlFor="synch"
+                          value="synchronous"
+                        >
+                          Synchronous
+                        </label>
+                        <img className='info_btn_sync'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                      </div>
+                    </div>
+                    <div className="container_devopsLabel" title={str}>
+                      <span className="devops_label">DevOps Request Body</span>
+                      <div>
+                        <div className="key">
+                        <pre className="grid_download_dialog__content executiontypenamepre">
+                          <code
+                            className="executiontypecode"
+                            id="devops-key"
+                            title={str}
+                          >
+                            {str}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_devops"
+                          onClick={() => {
+                            copyConfigKey(str);
+                          }}
+                          // title={copyToolTip}
+                        />
+                        <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  :
+                  <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
+                    <label className="code_label">Select Language:</label>
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
                     <div>
                       <div className="key">
-                      <pre className="grid_download_dialog__content executiontypenamepre">
+                      <pre className="code_snippet__content code_snippet__pre">
                         <code
-                          className="executiontypecode"
-                          id="devops-key"
-                          title={str}
+                          className="code_snippet__code"
+                          id="code_snippet-key"
+                          title={codeSnippets[selectedLanguage]}
                         >
-                          {str}
+                          {codeSnippets[selectedLanguage]}
                         </code>
                       </pre>
 
                       <Button
                         icon="pi pi-copy"
-                        className="copy_devops"
+                        className="copy_code__snippet"
                         onClick={() => {
-                          copyConfigKey(str);
+                          copyConfigKey(codeSnippets[selectedLanguage]);
                         }}
                         // title={copyToolTip}
                       />
-                      <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                      <Tooltip target=".copy_code__snippet" position="right" content={copyToolTip}/>
                       </div>
                     </div>
-                  </div>
+                  </div> }
+
                 </div>
               </>
             }
@@ -2325,7 +2474,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
-            disabled={userInfo?.rolename?.trim()==="Quality Engineer"}
+            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2352,7 +2501,6 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -2362,12 +2510,13 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo?.rolename?.trim() === "Quality Engineer"}>
+              {(!!configList.length  && activeIndex1 === 0)?  (
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
+              ) : null}
               </div>
-            ) : null}
           </div>
         </div>
         {activeIndex1 === 0 ? (

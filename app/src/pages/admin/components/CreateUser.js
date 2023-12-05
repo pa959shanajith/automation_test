@@ -101,6 +101,7 @@ const CreateUser = (props) => {
             });
             if(role) setRoleDropdownValue(role);
             setAllRolesUpdate(allRolesList);
+            if (editUser) setAdminCheck(props.editUserData.isAdmin);
         }
     }, [allRoles.length > 0]);
 

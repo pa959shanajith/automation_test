@@ -40,7 +40,7 @@ const IceProvision = (props) => {
       else {
         data.sort();
         data.map(user => {
-          if (userName && user.includes(userName)) {
+          if (userName === user[0]) {
             setUserid(user)
           }
         })

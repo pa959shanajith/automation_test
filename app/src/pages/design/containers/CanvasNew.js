@@ -43,6 +43,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 import '../styles/ActionPanelObjects.scss'
+import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 
 /*Component Canvas
   use: return mindmap on a canvas
@@ -151,7 +152,8 @@ const CanvasNew = (props) => {
     const[mainScrapedData,setMainScrapedData]=useState(null)
     const[orderList,setOrderList]=useState(null)
     const[fetchingDetailsScreen,setFetchingDetailsScreen]=useState(null)
-    const[testSuiteInUse,setTestSuiteInUse]=useState(false)
+    const[testSuiteInUse,setTestSuiteInUse]=useState(false);
+    const[inputValValid, setInputValValid] = useState(false);
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let Proj = reduxDefaultselectedProject;
@@ -162,6 +164,10 @@ const CanvasNew = (props) => {
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
     
   useEffect(()=>{
     let browserName = (function (agent) {        
@@ -375,7 +381,7 @@ const CanvasNew = (props) => {
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+      { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -1077,7 +1083,7 @@ const CanvasNew = (props) => {
   
         
         const addRowTestStep = () => {
-          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep };
+          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep, isEditing:false};
           setAddTestStep([...addTestStep, newRowTestStep]);
           setinputValTestStep("");
           setShowInputTestStep(true);
@@ -1302,6 +1308,46 @@ const CanvasNew = (props) => {
     });
   };
 
+  
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    const specialCharRegex = /[!@#$%^&*()+{}|\[\]:;"'<>,.?/\\]/;
+
+    switch (name) {
+      case 'inputValScreen':
+        if (!specialCharRegex.test(value)) {
+          setinputValScreen(value);
+          setInputValValid(true);
+          // Additional logic for valid inputValScreen
+        } else {
+          setInputValValid(false);
+          // Handle invalid inputValScreen
+        }
+        break;
+      case 'inputValTestStep':
+        if (!specialCharRegex.test(value)) {
+          setinputValTestStep(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+        case 'inputValue':
+        if (!specialCharRegex.test(value)) {
+          setInputValue(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const columns = [
     // {
     //   field: "checkbox",
@@ -1317,7 +1363,7 @@ const CanvasNew = (props) => {
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            <InputText name="inputValue" className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={handleInputChange}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -1387,7 +1433,7 @@ const CanvasNew = (props) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
-            <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)}
+            <InputText name="inputValScreen" className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={handleInputChange}
             onBlur={() => {
               updateRowScreen(rowDataScreen, inputValScreen);
               setShowInputScreen(false);
@@ -1455,7 +1501,7 @@ const CanvasNew = (props) => {
         if (showInputTestStep && rowDataTestStep.id === addTestStep.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Test Step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)} onBlur={() => updateRowTestStep(rowDataTestStep, inputValTestStep)} />
-    <InputText className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)}
+    <InputText name="inputValTestStep" className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={handleInputChange}
     onBlur={() => {
       updateRowTestStep(rowDataTestStep, inputValTestStep);
       setShowInputTestStep(false);
