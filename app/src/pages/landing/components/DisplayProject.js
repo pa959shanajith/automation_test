@@ -9,6 +9,7 @@ import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
 import { getStep } from './VerticalComponentsSlice';
 import { loadUserInfoActions } from '../LandingSlice';
+import { Dialog } from "primereact/dialog";
 const moment = require('moment');
 
 
@@ -27,6 +28,9 @@ const DisplayProject = (props) => {
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
   
+  const webSocketRes = useSelector((state) => state.landing.webSocketRes);
+  const isShowSocket = useSelector((state) => state.landing.isShowSocket);
+
   const createdProject = useSelector((state) => state.landing.savedNewProject);
   const updatedProject = useSelector((state) => state.landing.updatedProject)
   const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow)
@@ -322,11 +326,29 @@ const DisplayProject = (props) => {
         return "";
     }
 }
+const onSocketHide = () => {
+  dispatch(loadUserInfoActions.setIsShowSocket(false));
+  dispatch(loadUserInfoActions.setWebSocketRes({}))
+}
+const renderDialogContent = () => {
+  return Object.keys(webSocketRes).map((key) => (
+    <div key={key}>
+      <strong>{key}:</strong> {JSON.stringify(webSocketRes[key])}
+    </div>
+  ));
+};
   //  const appName = convertIdIntoNameOfAppType();
   //  console.log(appName);
   //  console.log(convertIdIntoNameOfAppType);
   return (
     <>
+
+      <div>
+        <Dialog header="Response socket" visible={isShowSocket} onHide={onSocketHide}>
+          {renderDialogContent()}
+        </Dialog>
+      </div>
+          
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
         <div className="Project-search">
           <form autoComplete="off">

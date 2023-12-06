@@ -11,6 +11,7 @@ import { Buffer } from 'buffer';
 import { NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { Dialog } from "primereact/dialog";
 
 
 /*Component SocketFactory
@@ -28,6 +29,10 @@ const SocketFactory = () => {
     const history = useNavigate();
     const toast = useRef();
     let userInfo = useSelector((state) => state.landing.userinfo)
+
+    const webSocketRes = useSelector((state) => state.landing.webSocketRes);
+    const isShowSocket = useSelector((state) => state.landing.isShowSocket);
+    const [visibleNotification,setVisibleNotification] = useState(false);
 
     const displayExecutionPopup = (value) => {
         var val;
@@ -66,9 +71,44 @@ const SocketFactory = () => {
             socket.on('killSession', (by, reason) => {
                 return RedirectPage(history, { by: by, reason: reason })
             })
+            // socket.on('messageFromServer', (data) => {
+            //     console.log('Message from server:', data);
+            //   });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket])
+
+    useEffect(() => {
+        let conn_socket = socketIOClient(url,{ 
+            forceNew: true, reconnection: true,
+            reconnectionAttempts:Infinity,reconnectionDelay:1000,
+            reconnectionDelayMax:5000, query: { check: 'messageFromServer' } });
+        // console.log(conn_socket, ' conn_socket ');
+        // socketIOClient.connect()
+        conn_socket.on('messageFromServer', (data) => {
+            console.log('Message from server:', data);
+            dispatch(loadUserInfoActions.setWebSocketRes(data));
+            dispatch(loadUserInfoActions.setIsShowSocket(true));
+            // setVisibleNotification(true);
+            // Handle the emitted event from the server
+          });
+          
+        // Handle reconnection events
+        conn_socket.on('reconnect', (attemptNumber) => {
+            console.log('Reconnected after', attemptNumber, 'attempts');
+        });
+    
+        // Handle disconnection events
+        conn_socket.on('disconnect', (reason) => {
+            console.log('Disconnected:', reason);
+        });
+    
+        // Clean up on component unmount
+        return () => {
+            conn_socket.disconnect();
+        };
+  
+    },[])
 
     useEffect(() => {
         var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')
@@ -208,10 +248,25 @@ const SocketFactory = () => {
         else toastError(MSG.CUSTOM("Failed to execute.", VARIANT.ERROR));
     }
 
-
+    const onSocketHide = () => {
+        dispatch(loadUserInfoActions.setIsShowSocket(false));
+        dispatch(loadUserInfoActions.setWebSocketRes({}))
+      }
+    const renderDialogContent = () => {
+        return Object.keys(webSocketRes).map((key) => (
+            <div key={key}>
+                <strong>{key}:</strong> {JSON.stringify(webSocketRes[key])}
+            </div>
+        ));
+    };  
 
     return (
         <Fragment>
+            {/* <div>
+                <Dialog header="Response socket" visible={isShowSocket} onHide={onSocketHide}>
+                    {renderDialogContent()}
+                </Dialog>
+            </div> */}
             <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
             {userInfo.isTrial ? (
                 (

@@ -21,7 +21,9 @@ export const loadUserInfo = createSlice({
             'projectid': undefined,
             'testsuitename': undefined
         },
-        updatedProject: false
+        updatedProject: false,
+        webSocketRes : {},
+        isShowSocket:false
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -89,6 +91,12 @@ export const loadUserInfo = createSlice({
         },
         updatedProject: (state, action) => {
             state.updatedProject = action.payload;
+        },
+        setWebSocketRes: (state, action) => {
+            state.webSocketRes = action.payload
+        },
+        setIsShowSocket: (state, action) => {
+            state.isShowSocket = action.payload
         },
         // need it in future
         // ----------------------------------

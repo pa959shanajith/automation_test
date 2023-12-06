@@ -246,6 +246,7 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
         var designscreen = require('./server/controllers/designscreen');
 		var browserstack = require('./server/controllers/browserstack');
+		var ALM = require('./server/controllers/ALM');
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -270,6 +271,8 @@ if (cluster.isMaster) {
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/sap-calm-testautomation/api/v1/createtestcase', ALM.create_ALM_Testcase);
+		app.get('/testcases/:testcaseId',ALM.getALM_Testcases);
 		app.use(csrf({
 		cookie: true
 		}));
