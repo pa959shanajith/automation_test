@@ -478,6 +478,7 @@ class TestSuiteExecutor {
                                 logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
                                 logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
                                 const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+                                logger.info("DL------>reportid",reportid);
                                 if (resultData.userTerminated) result = "UserTerminate";
                                 if (execType == "API") result = [d2R, status, resultData.testStatus];
                                 if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
