@@ -272,7 +272,7 @@ if (cluster.isMaster) {
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.post('/sap-calm-testautomation/api/v1/createtestcase', ALM.create_ALM_Testcase);
-		app.get('/testcases/:testcaseId',ALM.getALM_Testcases);
+		// app.get('/sap-calm-testautomation/api/v1/testcases/:testcaseId',ALM.getALM_Testcases);
 		app.use(csrf({
 		cookie: true
 		}));
