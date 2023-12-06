@@ -53,7 +53,7 @@
     "uuid-random": "^1.0.6",
     "uuid-token-generator": "^1.0.0",
     "validator": "^9.2.0",
-    "winston": "^2.4.0",
+    "winston": "^3.11.0",
     "winston-daily-rotate-file": "^1.7.2",
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1",
