@@ -33,10 +33,15 @@ else{
 const logger = new (winston.Logger)({
   rewriters: [
             (level, msg, meta) => {
-                meta.username = null;
-                meta.userid = null;
-                meta.userip = null;
-                return meta;
+              try{
+                  if (meta!=undefined){
+                    meta.username = null;
+                    meta.userid = null;
+                    meta.userip = null;
+                    return meta;
+                  }
+              }
+              catch(e){}
             }
         ],
 
