@@ -270,7 +270,8 @@ class TestSuiteExecutor {
             "report": JSON.stringify(reportData),
             "modifiedby": userInfo.invokinguser,
             "modifiedbyrole": userInfo.invokinguserrole,
-            "query": "insertreportquery"
+            "query": "insertreportquery",
+            "host":userInfo.host
         };
         logger.info("DL------>inputs in insertReport", inputs);
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
@@ -434,7 +435,9 @@ class TestSuiteExecutor {
                                     const reportStatus = reportData.overallstatus.overallstatus;
                                     logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
                                     logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
-                                    const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
+                                    userInfoReport = userInfo;
+                                    userInfoReport.host = mySocket.request.headers.host;
+                                    const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfoReport, reportData);
                                     const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
                                         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
