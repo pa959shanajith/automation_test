@@ -106,7 +106,7 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
                 else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null)){
                     new_one = {
                         x: parseInt(dNodes[pi].x),
-                        y: parseInt(sections[node.type])-100
+                        y: parseInt(sections[node.type])
                     };
                 }
                 else{
