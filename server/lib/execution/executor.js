@@ -458,8 +458,8 @@ class TestSuiteExecutor {
                             try {
                                 let result = status;
                                 let report_result = {};
-                                mySocket.removeAllListeners('return_status_executeTestSuite');
-                                mySocket.removeAllListeners('result_executeTestSuite');
+                                // mySocket.removeAllListeners('return_status_executeTestSuite');
+                                // mySocket.removeAllListeners('result_executeTestSuite');
                                 report_result["status"] = status
                                 report_result["configurekey"] = execReq["configurekey"]
                                 report_result["configurename"] = execReq["configurename"]
