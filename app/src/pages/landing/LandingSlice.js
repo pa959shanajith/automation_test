@@ -21,6 +21,7 @@ export const loadUserInfo = createSlice({
             'projectid': undefined,
             'testsuitename': undefined
         },
+        updatedProject: false
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -85,6 +86,9 @@ export const loadUserInfo = createSlice({
             return {
                 ...state, notify: { data: arr, unread: val }
             }
+        },
+        updatedProject: (state, action) => {
+            state.updatedProject = action.payload;
         },
         // need it in future
         // ----------------------------------
