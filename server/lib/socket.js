@@ -94,7 +94,6 @@ io.on('connection', async socket => {
 					logger.info("DL------>host %s is connected in connection", host);
 					logger.info("DL------>clientName %s in connection", clientName);
 					logger.info("DL------>icename %s in connection", icename);
-					logger.info("DL------>username %s in connection", username);
 					logger.info("DL------>socketMap %s in connection", socketMap);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
