@@ -1997,7 +1997,7 @@ const elementValuetitle=(rowdata)=>{
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
         
-        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>

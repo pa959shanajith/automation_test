@@ -1339,7 +1339,7 @@ const showToast = (severity, detail) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: selectProjects.appType,
+            appType: localStorageDefaultProject.appType,
             domainName: "Banking",
             projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
