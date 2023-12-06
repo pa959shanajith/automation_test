@@ -154,7 +154,6 @@ const fetchData = async (inputs, url, from, all) => {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("DL------>avoreq in fetchData", this.avoreq);
 	logger.info("DL------>inputs in fetchData", inputs);
 	from = (from)? " from " + from : "";
 	const query = (inputs.query)? " - " + inputs.query:"";
