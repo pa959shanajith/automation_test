@@ -233,7 +233,6 @@ io.on('connection', async socket => {
 			queue.Execution_Queue.triggerExecution(dataToExecute);
 		}else{
 			logger.info("ICE: " + username + " disconnected, deleting callbacks")
-			logger.info("DL------>ICE: " + username + " disconnected, deleting callbacks")
 			delete queue.Execution_Queue.registred_ICE[username]
 			queue.Execution_Queue.ice_list[username]["connected"] = false
 		}
