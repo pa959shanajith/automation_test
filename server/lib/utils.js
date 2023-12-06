@@ -145,8 +145,10 @@ module.exports.setReq = async (req) =>
 const fetchData = async (inputs, url, from, all) => {
 	if(this.avoreq != null)
 	{
+		logger.info("DL------>avoreq in fetchData", this.avoreq);
 		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
 		else if(inputs.host == undefined) inputs.host = this.avoreq.headers.host;
+		else logger.info("DL------>host in fetchData", inputs.host);
 	}
 	let args = (inputs.headers)? inputs : {
 		data: inputs,
@@ -154,7 +156,7 @@ const fetchData = async (inputs, url, from, all) => {
 			"Content-Type": "application/json"
 		}
 	};
-	logger.info("DL------>inputs in fetchData", inputs);
+	// logger.info("DL------>inputs in fetchData", inputs);
 	from = (from)? " from " + from : "";
 	const query = (inputs.query)? " - " + inputs.query:"";
 	logger.info("Calling DAS Service: " + url + from + query);

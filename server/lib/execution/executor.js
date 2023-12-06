@@ -273,7 +273,7 @@ class TestSuiteExecutor {
             "query": "insertreportquery",
             "host":userInfo.host
         };
-        logger.info("DL------>inputs in insertReport", inputs);
+        // logger.info("DL------>inputs in insertReport", inputs);
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
         return result;
     };
@@ -287,7 +287,7 @@ class TestSuiteExecutor {
             "executionids": execIds,
             ...data
         };
-        logger.info("DL------>inputs in updateExecutionStatus", inputs);
+        // logger.info("DL------>inputs in updateExecutionStatus", inputs);
         const response = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", fnName);
         return response;
     };
@@ -362,8 +362,8 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    logger.info("DL------>result data in return_status_executeTestSuite", resultData);
-		            logger.info("DL------>clientName %s in return_status_executeTestSuite", clientName);
+                    // logger.info("DL------>result data in return_status_executeTestSuite", resultData);
+		            // logger.info("DL------>clientName %s in return_status_executeTestSuite", clientName);
                     if (status === "success") {
                         if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
                     } else if (status === "skipped") {
@@ -402,8 +402,8 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    logger.info("DL------>result data in result_executeTestSuite", resultData);
-		            logger.info("DL------>clientName %s in result_executeTestSuite", clientName);
+                    // logger.info("DL------>result data in result_executeTestSuite", resultData);
+		            // logger.info("DL------>clientName %s in result_executeTestSuite", clientName);
                         if (!status) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
@@ -433,8 +433,8 @@ class TestSuiteExecutor {
                                         d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
-                                    logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
-                                    logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
+                                    // logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
+                                    // logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
                                     userInfoReport = userInfo;
                                     userInfoReport.host = mySocket.request.headers.host;
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfoReport, reportData);

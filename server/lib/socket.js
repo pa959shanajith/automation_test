@@ -91,10 +91,10 @@ io.on('connection', async socket => {
 				if (result.node_check === "allow") {
 					host = JSON.parse(icesession).host;
 					clientName=utils.getClientName(host);
-					logger.info("DL------>host %s is connected in connection", host);
-					logger.info("DL------>clientName %s in connection", clientName);
-					logger.info("DL------>icename %s in connection", icename);
-					logger.info("DL------>socketMap %s in connection", socketMap);
+					// logger.info("DL------>host %s is connected in connection", host);
+					// logger.info("DL------>clientName %s in connection", clientName);
+					// logger.info("DL------>icename %s in connection", icename);
+					// logger.info("DL------>socketMap %s in connection", socketMap);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
@@ -126,11 +126,11 @@ io.on('connection', async socket => {
 		const icesession = socket.handshake.query.icesession;
 		address = socket.handshake.query.icename;
 		var clientName=utils.getClientName(socket.request.headers.host);
-		logger.info("DL------>address %s  in disconnection", address);
-		logger.info("DL------>clientName %s in disconnection", clientName);
-		logger.info("DL------>icesession in disconnection", icesession);
-		logger.info("DL------>socket.request in disconnection", socket.request);
-		logger.info("DL------>socket.request.headers.host in disconnection", socket.request.headers.host);
+		// logger.info("DL------>address %s  in disconnection", address);
+		// logger.info("DL------>clientName %s in disconnection", clientName);
+		// logger.info("DL------>icesession in disconnection", icesession);
+		// logger.info("DL------>socket.request in disconnection", socket.request);
+		// logger.info("DL------>socket.request.headers.host in disconnection", socket.request.headers.host);
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
 		try{
 		if (socket.request._query.check == "true") {
@@ -229,7 +229,7 @@ io.on('connection', async socket => {
 		var clientName= utils.getClientName(value.host);
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
-			logger.info("DL------>dataToExecute %s in ICE_status_change", dataToExecute);
+			// logger.info("DL------>dataToExecute %s in ICE_status_change", dataToExecute);
 			queue.Execution_Queue.triggerExecution(dataToExecute);
 		}else{
 			logger.info("ICE: " + username + " disconnected, deleting callbacks")
@@ -251,9 +251,9 @@ const registerICE = async (req, res) => {
 	var data = {};
 	try {
 		data = await utils.fetchData(inputs, "server/updateActiveIceSessions", "registerICE");
-		logger.info("DL------>data %s in register ICE", data);
-		logger.info("DL------>inputs in register ICE", inputs);
-		logger.info("DL------>icename %s in register ICE", icename);
+		// logger.info("DL------>data %s in register ICE", data);
+		// logger.info("DL------>inputs in register ICE", inputs);
+		// logger.info("DL------>icename %s in register ICE", icename);
 		if (data.node_check === "InvalidToken" || result.node_check === "InvalidICE") {
 			logger.error("%s is not authorized to connect", icename);
 		} else if(result.node_check === "validICE"){
