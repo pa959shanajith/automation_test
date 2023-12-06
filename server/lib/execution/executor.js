@@ -461,10 +461,10 @@ class TestSuiteExecutor {
                                 let report_result = {};
                                 const scenarioid = resultData.scenarioId;
                                 const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
                                 const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-                                logger.info("DL------>browserType",browserType);
                                 logger.info("DL------>reportData",reportData);
+                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+                                logger.info("DL------>browserType",browserType);
                                 reportData.overallstatus.browserType = browserType;
                                 mySocket.removeAllListeners('return_status_executeTestSuite');
                                 mySocket.removeAllListeners('result_executeTestSuite');
