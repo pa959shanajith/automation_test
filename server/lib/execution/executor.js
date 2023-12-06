@@ -456,16 +456,25 @@ class TestSuiteExecutor {
                             }
                         } else { // This block will trigger when resultData.status has "success or "Terminate"
                             try {
+                                logger.info("DL------>came inside else block");
                                 let result = status;
                                 let report_result = {};
-                                // mySocket.removeAllListeners('return_status_executeTestSuite');
-                                // mySocket.removeAllListeners('result_executeTestSuite');
+                                const scenarioid = resultData.scenarioId;
+                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
+                                const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
+                                reportData.overallstatus.browserType = browserType;
+                                mySocket.removeAllListeners('return_status_executeTestSuite');
+                                mySocket.removeAllListeners('result_executeTestSuite');
                                 report_result["status"] = status
                                 report_result["configurekey"] = execReq["configurekey"]
                                 report_result["configurename"] = execReq["configurename"]
                                 if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
                                 if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                                 report_result["testSuiteDetails"] = execReq["suitedetails"]
+                                const reportStatus = reportData.overallstatus.overallstatus;
+                                logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
+                                logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
+                                const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
                                 if (resultData.userTerminated) result = "UserTerminate";
                                 if (execType == "API") result = [d2R, status, resultData.testStatus];
                                 if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
