@@ -667,6 +667,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         //Adding the reportLink in the response
         response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         
+        // Adding the Running Status Link in the response 
+        response['runningStatusLink'] = req.protocol + "://" + (req.hostname) + "/runningStatus?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
             return response;
@@ -1044,10 +1046,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                     checkInCache = true
                 }
             }
-            console.log(checkInCache);
-            // if(!checkInCache) console.log('last--',resultData)
-            // console.log(resultData)
-            if(!checkInCache && dataFromIce.status == 'started') return {'status':'Terminated'};
+
             if(!checkInCache && 'reportData' in resultData && 'overallstatus' in resultData.reportData) {
                 resultData.reportData.overallstatus.overallstatus = 'Terminated';
             }
@@ -1174,6 +1173,7 @@ module.exports.Execution_Queue = class Execution_Queue {
     
     static runningStatus = async(req, res)=>{
         let fnName = 'runningStatus'
+        let response = {}
         try {
             //to add the key list if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -1188,23 +1188,24 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
-            const inp = {};
-            console.log(req.query)
-            let configureKey = req.query.configureKey,executionListId = req.query.executionListId;
+            let configureKey = req.query.configurekey,executionListId = req.query.executionListId;
 
             if(this.key_list[configureKey]) {
-                let cnt = 0,total = 0;
+                let cnt = 0,total = 0,ip = 0;
                 for(let executions of this.key_list[configureKey]) {
                         if(executions.length && executions[0]['executionListId'] == executionListId)
                             {
                                 total = executions.length;
                                 for(let modules of executions) {
                                     cnt+=(modules['status'] == 'COMPLETED');
+                                    ip+=(modules['status'] == 'IN_PROGRESS');
                                 }
                             }
                 }
-                if(total)
-                    res.send(`${cnt} out of ${total} modules completed`);
+                if(total){
+                    response['Completed'] = cnt;response['InProgress'] = ip;
+                    return response;
+                }
                 else {
                     // Generate Report
                     let inputs = {
@@ -1222,14 +1223,12 @@ module.exports.Execution_Queue = class Execution_Queue {
                     }
                     res.send(responseFromGetReportApi)
                 }
-
-
             } else {
                 res.send('Some Error Occured');
             }
 
         } catch (error) {
-            logger.error("Error occurred in devops/hooks/ParallelExecutions: "+error)
+            logger.error("Error occurred in runningStatus: "+error)
             return res.send("fail")
         }
     }
