@@ -362,7 +362,7 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    // logger.info("DL------>result data in return_status_executeTestSuite", resultData);
+                    logger.info("DL------>status in return_status_executeTestSuite", status);
 		            // logger.info("DL------>clientName %s in return_status_executeTestSuite", clientName);
                     if (status === "success") {
                         if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
@@ -402,7 +402,7 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    // logger.info("DL------>result data in result_executeTestSuite", resultData);
+                    logger.info("DL------>status in result_executeTestSuite", status);
 		            // logger.info("DL------>clientName %s in result_executeTestSuite", clientName);
                         if (!status) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
