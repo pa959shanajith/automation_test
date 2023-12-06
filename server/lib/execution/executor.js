@@ -273,7 +273,7 @@ class TestSuiteExecutor {
             "query": "insertreportquery",
             "host":userInfo.host
         };
-        // logger.info("DL------>inputs in insertReport", inputs);
+        logger.info("DL------>hosts in insertReport", inputs.host);
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
         return result;
     };
@@ -433,8 +433,8 @@ class TestSuiteExecutor {
                                         d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
-                                    // logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
-                                    // logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
+                                    logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
+                                    logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
                                     userInfoReport = userInfo;
                                     userInfoReport.host = mySocket.request.headers.host;
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfoReport, reportData);
