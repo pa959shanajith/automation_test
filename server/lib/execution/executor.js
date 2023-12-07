@@ -435,9 +435,7 @@ class TestSuiteExecutor {
                                     const reportStatus = reportData.overallstatus.overallstatus;
                                     logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
                                     logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
-                                    userInfoReport = userInfo;
-                                    userInfoReport.host = mySocket.request.headers.host;
-                                    const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfoReport, reportData);
+                                    const reportid = await _this.insertReport(executionid, scenarioid, browserType,userInfo, reportData);
                                     const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
                                         logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
