@@ -209,6 +209,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         text: 'Microsoft Edge'
     }
 ]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -927,7 +928,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
         }
       } else {
-        tableUpdate();
+        tableUpdate(currentPage);
         toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
       }
       setLoading(false);
@@ -1524,7 +1525,7 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
-      tableUpdate();
+      tableUpdate(currentPage);
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
@@ -1959,6 +1960,7 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
+      setCurrentPage(e.page+1);
       tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
