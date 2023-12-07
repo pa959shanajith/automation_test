@@ -273,7 +273,7 @@ class TestSuiteExecutor {
             "query": "insertreportquery",
             "host":userInfo.host
         };
-        logger.info("DL------>hosts in insertReport", inputs.host);
+        // logger.info("DL------>hosts in insertReport", inputs.host);
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
         return result;
     };
@@ -362,7 +362,7 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    logger.info("DL------>status in return_status_executeTestSuite", status);
+                    // logger.info("DL------>status in return_status_executeTestSuite", status);
 		            // logger.info("DL------>clientName %s in return_status_executeTestSuite", clientName);
                     if (status === "success") {
                         if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Inprogress", batchId);
@@ -404,7 +404,7 @@ class TestSuiteExecutor {
                     const status = resultData.status;
 		            // logger.info("DL------>clientName %s in result_executeTestSuite", clientName);
                         if (!status) { // This block is for report data
-                            logger.info("DL------>came inside if block to save reports");
+                            // logger.info("DL------>came inside if block to save reports");
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
                                 reports.saveAccessibilityReports(accessibility_reports);
@@ -433,8 +433,8 @@ class TestSuiteExecutor {
                                         d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
                                     }
                                     const reportStatus = reportData.overallstatus.overallstatus;
-                                    logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
-                                    logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
+                                    // logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
+                                    // logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
                                     const reportid = await _this.insertReport(executionid, scenarioid, browserType,userInfo, reportData);
                                     const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
                                     if (reportid == "fail") {
@@ -454,7 +454,7 @@ class TestSuiteExecutor {
                             }
                         } else { // This block will trigger when resultData.status has "success or "Terminate"
                             try {
-                                logger.info("DL------>came inside else block");
+                                // logger.info("DL------>came inside else block");
                                 let result = status;
                                 let report_result = {};
                                 mySocket.removeAllListeners('return_status_executeTestSuite');
