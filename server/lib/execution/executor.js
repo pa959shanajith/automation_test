@@ -465,7 +465,6 @@ class TestSuiteExecutor {
                                 if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
                                 if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                                 report_result["testSuiteDetails"] = execReq["suitedetails"]
-                                const reportStatus = reportData.overallstatus.overallstatus;
                                 if (resultData.userTerminated) result = "UserTerminate";
                                 if (execType == "API") result = [d2R, status, resultData.testStatus];
                                 if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
