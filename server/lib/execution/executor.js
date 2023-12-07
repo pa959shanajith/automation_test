@@ -459,13 +459,6 @@ class TestSuiteExecutor {
                                 logger.info("DL------>came inside else block");
                                 let result = status;
                                 let report_result = {};
-                                const scenarioid = resultData.scenarioId;
-                                const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-                                const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-                                logger.info("DL------>reportData",reportData);
-                                const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
-                                logger.info("DL------>browserType",browserType);
-                                reportData.overallstatus.browserType = browserType;
                                 mySocket.removeAllListeners('return_status_executeTestSuite');
                                 mySocket.removeAllListeners('result_executeTestSuite');
                                 report_result["status"] = status
@@ -475,10 +468,6 @@ class TestSuiteExecutor {
                                 if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                                 report_result["testSuiteDetails"] = execReq["suitedetails"]
                                 const reportStatus = reportData.overallstatus.overallstatus;
-                                logger.info("DL------>mySocket host before insertreport %s in result_executeTestSuite", mySocket.request.headers.host);
-                                logger.info("DL------>userInfo before insertreport %s in result_executeTestSuite", userInfo.host);
-                                const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                logger.info("DL------>reportid",reportid);
                                 if (resultData.userTerminated) result = "UserTerminate";
                                 if (execType == "API") result = [d2R, status, resultData.testStatus];
                                 if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
