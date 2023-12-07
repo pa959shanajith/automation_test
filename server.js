@@ -271,8 +271,16 @@ if (cluster.isMaster) {
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		// ALM API's
+		app.post('/sap-calm-testautomation/api/v1/scopechanged',ALM.Scope_Changed);
 		app.post('/sap-calm-testautomation/api/v1/createtestcase', ALM.create_ALM_Testcase);
-		// app.get('/sap-calm-testautomation/api/v1/testcases/:testcaseId',ALM.getALM_Testcases);
+		app.get('/sap-calm-testautomation/api/v1/testcases',ALM.getALM_Testcases);
+		app.get('/sap-calm-testautomation/api/v1/testdatavariants',ALM.getALM_Datavariants);
+		app.post('/sap-calm-testautomation/api/v1/testcases/execute',ALM.Execute_Testcase);
+		app.get('/sap-calm-testautomation/api/v1/job/status',ALM.Job_Status);
+		app.get('/sap-calm-testautomation/api/v1/testcases/executionhistory',ALM.Execution_History);
+		
+
 		app.use(csrf({
 		cookie: true
 		}));
