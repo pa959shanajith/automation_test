@@ -402,9 +402,9 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                    logger.info("DL------>status in result_executeTestSuite", status);
 		            // logger.info("DL------>clientName %s in result_executeTestSuite", clientName);
                         if (!status) { // This block is for report data
+                            logger.info("DL------>came inside if block to save reports");
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
                                 reports.saveAccessibilityReports(accessibility_reports);
