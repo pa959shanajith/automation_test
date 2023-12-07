@@ -149,7 +149,6 @@ const fetchData = async (inputs, url, from, all) => {
 		if(inputs.host) logger.info("DL------>host came with inputs", inputs.host);
 		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
 		else if(inputs.host == undefined) inputs.host = this.avoreq.headers.host;
-		else logger.info("DL------>host in fetchData", inputs.host);
 	}
 	let args = (inputs.headers)? inputs : {
 		data: inputs,
