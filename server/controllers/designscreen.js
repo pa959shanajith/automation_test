@@ -35,8 +35,6 @@ exports.initScraping_ICE = function (req, res) {
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
-		// logger.info("DL------>icename %s  in initScraping_ICE", icename);
-		// logger.info("DL------>mySocket %s in initScraping_ICE", mySocket);
 		if(mySocket != undefined && mySocket.connected) {	
 				var reqAction = "";
 				var reqBody = req.body.screenViewObject;
@@ -153,13 +151,11 @@ exports.initScraping_ICE = function (req, res) {
 					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": data};
 
 					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
-					// logger.info("DL------>dataToIce in initScraping_ICE", dataToIce);
 					mySocket.emit(dataToIce["emitAction"], dataToIce.data);
 				}
 				dataToIce.username = icename;
 				function scrape_listener(message) {
 					var data = message;
-					// logger.info("DL------>result data in initScraping_ICE", data);
 					//LB: make sure to send recieved data to corresponding user
 					mySocket.removeListener('scrape', scrape_listener);
 					value = data;
