@@ -145,8 +145,8 @@ module.exports.setReq = async (req) =>
 const fetchData = async (inputs, url, from, all) => {
 	if(this.avoreq != null)
 	{
-		// logger.info("DL------>avoreq in fetchData", this.avoreq.headers.host);
-		// if(inputs.host) logger.info("DL------>host came with inputs", inputs.host);
+		logger.info("DL------>avoreq in fetchData", this.avoreq.headers.host);
+		if(inputs.host) logger.info("DL------>host came with inputs", inputs.host);
 		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
 		else if(inputs.host == undefined) inputs.host = this.avoreq.headers.host;
 	}
