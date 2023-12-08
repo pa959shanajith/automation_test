@@ -401,11 +401,11 @@ export default function BasicDemo() {
         setIssueDropDown(null);
         setJiraDetails({ projects: [], issuetype: [] });
         setMappedProjects({});
+        setConfigValues({});
         setConfigureFeilds([]);
         setSelectedFiels([]);
         setSelectedFiels([]);
         setResponseFeilds({});
-        setConfigValues({});
         setSelectedRow([]);
         setLoginName("");
         setLoginKey("");
