@@ -12,6 +12,8 @@ const tokenAuth = require('../lib/tokenAuth')
 const constants = require('../lib/execution/executionConstants');
 const httpsServer = require('./../../server').httpsServer;
 const uiConfig = require('./../config/options');
+// const socket_io = require("../lib/socket")
+const net = require('net');
 const socket_io = require('socket.io')(httpsServer, {
 	cookie: false,
 	pingInterval: uiConfig.socketio.pingInterval,
@@ -141,7 +143,7 @@ exports.create_ALM_Testcase = async function (req, res) {
         console.log(req.query.scope);
         console.log(req.query.countryVersion);
         console.log(req.query.testCases);
-        console.log(req.query.language);
+        console.log(req.query.Language);
 
         // var inputs = {
         //     "query": "alm_get_testcases"
