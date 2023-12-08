@@ -921,7 +921,7 @@ exports.getDevopsReport_API = async (req) => {
         logger.info("Sending reports in the service %s", fnName);
         if (statusCode != "400") statusCode = '200';
         delete execResponse.error_message;
-        return finalReport;
+        return finalReport ? finalReport[0] : [];
     } catch (exception) {
         logger.error("Exception in the service %s - Error: %s", fnName, exception);
         return 'fail'

@@ -1203,7 +1203,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                             }
                 }
                 if(total){
-                    response['Completed'] = cnt;response['InProgress'] = ip;
+                    response['Completed'] = `${cnt} / ${total}` ;response['status'] = 'Inprogress';
                     return response;
                 }
                 else {
@@ -1213,13 +1213,15 @@ module.exports.Execution_Queue = class Execution_Queue {
                         'executionListId': executionListId
                     }
                     let executionIds = await utils.fetchData(inputs, "devops/getExecutionAndScenarioDetails", fnName)
-                    let responseFromGetReportApi = [];
+                    let responseFromGetReportApi = {};
+                    responseFromGetReportApi['Modules'] = [];
+                    responseFromGetReportApi['status'] = 'Completed';
                     for(let executions of executionIds) {
                         const data = await reportFunctions.getDevopsReport_API({
                             'body':executions,
                             'req': req
                         });
-                        responseFromGetReportApi.push(data);
+                        responseFromGetReportApi['Modules'].push(data);
                     }
                     res.send(responseFromGetReportApi)
                 }
