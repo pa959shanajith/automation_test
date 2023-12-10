@@ -1089,20 +1089,20 @@ const CanvasNew = (props) => {
           setShowInputTestStep(true);
         };
 
-        const updateRow = (rowData, updatedValue) => {
-            const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered:false } : row));
-            setAddScenario(updatedData);
-          };
-          const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
-            const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen, isHovered:false } : row));
-            setAddScreen(updatedDataScreen);
-          };
+  const updateRow = (rowData, updatedValue) => {
+    const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddScenario(updatedData);
+  };
+  const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
+    const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddScreen(updatedDataScreen);
+  };
     
           
-          const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
-            const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep ,  isHovered:false } : row));
-            setAddTestStep(updatedDataTestStep);
-          };
+  const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
+    const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddTestStep(updatedDataTestStep);
+  };
     
     
           const handleEdit = (rowData) => {
@@ -1173,52 +1173,68 @@ const CanvasNew = (props) => {
               })
             );
           };
-    
-          const handleSave = (rowData) => {
-            setAddScenario((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowData.id) {
-                  return { ...row, value: rowData.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRows((prevState) => ({
-              ...prevState,
-              [rowData.id]: false,
-            }));
-            // setShowInput(false); // Hide the input box after saving
-          };
-    
-          const handleSaveScreens = (rowDataScreen) => {
-            setAddScreen((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowDataScreen.id) {
-                  return { ...row, value: rowDataScreen.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRowsScreens((prevState) => ({
-              ...prevState,
-              [rowDataScreen.id]: false,
-            }));
-          };
-    
-          const handleSaveTestCases = (rowDataTestStep) => {
-            setAddTestStep((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowDataTestStep.id) {
-                  return { ...row, value: rowDataTestStep.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRowsTestCases((prevState) => ({
-              ...prevState,
-              [rowDataTestStep.id]: false,
-            }));
-          };
+  // To handle Multiple Test Cases
+  const handleSave = (rowData) => {
+    setAddScenario((prevData) =>
+      rowData?.value == "" ?
+        prevData.filter(row => row.id !== rowData.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowData.id) {
+            return { ...row, value: rowData.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+    (rowData?.value !== "") ?? setEditingRows((prevState) => ({
+      ...prevState,
+      [rowData.id]: false,
+    }));
+    // setShowInput(false); // Hide the input box after saving
+  };
+  // To handle Multiple Test Screens
+  const handleSaveScreens = (rowDataScreen) => {
+    setAddScreen((prevData) =>
+      rowDataScreen.value == "" ?
+        prevData.filter(row => row.id !== rowDataScreen.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowDataScreen.id) {
+            return { ...row, value: rowDataScreen.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+    (rowDataScreen?.value !== "") ?? setEditingRowsScreens((prevState) => ({
+      ...prevState,
+      [rowDataScreen.id]: false,
+    }));
+  };
+  // To handle Multiple Test Steps
+  const handleSaveTestCases = (rowDataTestStep) => {
+    setAddTestStep((prevData) =>
+      rowDataTestStep.value == "" ?
+        prevData.filter(row => row.id !== rowDataTestStep.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowDataTestStep.id) {
+            return { ...row, value: rowDataTestStep.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+
+    (rowDataTestStep.value !== "") ?? setEditingRowsTestCases((prevState) => ({
+      ...prevState,
+      [rowDataTestStep.id]: false,
+    }));
+  };
           
     
   const headerCheckboxClicked = (event) => {
@@ -1397,7 +1413,7 @@ const CanvasNew = (props) => {
         else {
           return(
             <div className='row_data'
-            onClick={() => setShowInput(rowData.id === addScenario.length)}
+            onClick={() => handleEdit(rowData)}
             onMouseEnter={(event) => handleRowHover(event,rowData)}
             onMouseLeave={() => handleRowHoverExit()}
           >
@@ -1466,7 +1482,7 @@ const CanvasNew = (props) => {
         else {
           return(
             <div className='row_data'
-            onClick={() => setShowInputScreen(rowDataScreen.id === addScreen.length)}
+            onClick={()=>handleEditScreens(rowDataScreen)}
             onMouseEnter={(event) => handleRowHover(event,rowDataScreen)}
             onMouseLeave={() => handleRowHoverExit()}
             
@@ -1534,7 +1550,7 @@ const CanvasNew = (props) => {
     else {
       return(
         <div className='row_data'
-        onClick={() => setShowInputTestStep(rowDataTestStep.id === addTestStep.length)}
+        onClick={() => handleEditTestCases(rowDataTestStep)}
         onMouseEnter={(event) => handleRowHover(event,rowDataTestStep)}
         onMouseLeave={() => handleRowHoverExit()}
       >

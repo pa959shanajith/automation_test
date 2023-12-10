@@ -1752,12 +1752,12 @@ const showToast = (severity, detail) => {
           recurringValue:
             selectedMonthly?.key === "daymonth"
               ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
-              : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
+              : `0 0 * */${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
             selectedMonthly?.key === "daymonth"
               ? `Occurs on ${scheduleOption?.monthday}th day of every ${scheduleOption?.monthweek} month`
-              : `Occurs on ${dropdownWeek?.name} ${dropdownDay?.name} of every ${scheduleOption?.everymonth} month`,
+              : `Occurs on ${dropdownWeek?.name.toLowerCase()} ${dropdownDay?.name.toLowerCase()} of every ${scheduleOption?.everymonth} month`,
         },
       };
       return pattrenObj[getKey];
