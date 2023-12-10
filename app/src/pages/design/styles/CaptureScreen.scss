@@ -125,7 +125,7 @@
 
 .card_modal {
   margin: 0 !important;
-
+  padding-bottom: 1rem !important;
 }
 
 
@@ -297,7 +297,7 @@
 .dailog_box {
   overflow: hidden;
   .p-dialog-content {
-    padding: 0 0 !important;
+    padding: 1rem !important;
     overflow: hidden;
     display: flex;
     flex-direction: column;

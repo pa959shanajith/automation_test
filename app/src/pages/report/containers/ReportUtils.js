@@ -380,8 +380,8 @@ function dateKeywords () {
 
 function variableKeywords () {
     return [
-        'createdynvariable ({varname})', 'displayvariablevalue', 'deletedynvariable', 
-        'createconstvariable(_varname_)', 'deleteconstvariable', 'copyvalue', 'modifyvalue'
+        'createdynvariable', 'displayvariablevalue', 'deletedynvariable', 
+        'createconstvariable', 'deleteconstvariable', 'copyvalue', 'modifyvalue'
     ]
 }
 
