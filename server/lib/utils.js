@@ -146,7 +146,7 @@ const fetchData = async (inputs, url, from, all) => {
 	if(inputs.host == undefined && this.avoreq != null)
 	{
 		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
-		else inputs.host = this.avoreq.headers.host;
+		else if(inputs.host == undefined) inputs.host = this.avoreq.headers.host;
 	}
 	let args = (inputs.headers)? inputs : {
 		data: inputs,
