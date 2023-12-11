@@ -71,44 +71,14 @@ const SocketFactory = () => {
             socket.on('killSession', (by, reason) => {
                 return RedirectPage(history, { by: by, reason: reason })
             })
-            // socket.on('messageFromServer', (data) => {
-            //     console.log('Message from server:', data);
-            //   });
+            // SAP ALM Socket connection
+            socket.on('messageFromServer', (data) => {
+                dispatch(loadUserInfoActions.setWebSocketRes(data));
+                dispatch(loadUserInfoActions.setIsShowSocket(true));
+              });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket])
-
-    useEffect(() => {
-        let conn_socket = socketIOClient(url,{ 
-            forceNew: true, reconnection: true,
-            reconnectionAttempts:Infinity,reconnectionDelay:1000,
-            reconnectionDelayMax:5000, query: { check: 'messageFromServer' } });
-        // console.log(conn_socket, ' conn_socket ');
-        // socketIOClient.connect()
-        conn_socket.on('messageFromServer', (data) => {
-            console.log('Message from server:', data);
-            dispatch(loadUserInfoActions.setWebSocketRes(data));
-            dispatch(loadUserInfoActions.setIsShowSocket(true));
-            // setVisibleNotification(true);
-            // Handle the emitted event from the server
-          });
-          
-        // Handle reconnection events
-        conn_socket.on('reconnect', (attemptNumber) => {
-            console.log('Reconnected after', attemptNumber, 'attempts');
-        });
-    
-        // Handle disconnection events
-        conn_socket.on('disconnect', (reason) => {
-            console.log('Disconnected:', reason);
-        });
-    
-        // Clean up on component unmount
-        return () => {
-            conn_socket.disconnect();
-        };
-  
-    },[])
 
     useEffect(() => {
         var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')

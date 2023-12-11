@@ -2,25 +2,8 @@ var validator = require('validator');
 var logger = require('../../logger');
 var async = require('async');
 var Client = require("node-rest-client").Client;
-var epurl = process.env.DAS_URL;
-var client = new Client();
 var utils = require('../lib/utils');
-var fs = require('fs');
-var options = require('../config/options');
-var path = require('path');
-const tokenAuth = require('../lib/tokenAuth')
-const constants = require('../lib/execution/executionConstants');
-const httpsServer = require('./../../server').httpsServer;
-const uiConfig = require('./../config/options');
-// const socket_io = require("../lib/socket")
-const net = require('net');
-const socket_io = require('socket.io')(httpsServer, {
-cookie: false,
-pingInterval: uiConfig.socketio.pingInterval,
-pingTimeout: uiConfig.socketio.pingTimeout,
-allowEIO3: true,
-maxHttpBufferSize: 1e8  // approx. 100 MB, default is 1 MB
-});
+const socket_io = require("../lib/socket")
 
 
 
