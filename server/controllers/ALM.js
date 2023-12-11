@@ -32,7 +32,7 @@ exports.create_ALM_Testcase = async function (req, res) {
         emit_data['testcaseId'] = result[0].rows || ''
         socket_io.emit('messageFromServer',req.body);
         logger.info("info : emitted socket connection with testcaseid and those details saved in db");
-        res.status(201).send({  "testCaseId": result[0].rows || '',"url": `${req.protocol}://${req.get('host')}/testcases/${result[0].rows}` });
+        res.status(201).send({  "testCaseId": result[0].rows || '',"url": `${req.protocol}://${req.get('host')}/sap-calm-testautomation/api/v1/testcases/${result[0].rows}` });
  
     } catch (error) {
         logger.error('Error:', error);
