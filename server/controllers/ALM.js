@@ -139,7 +139,7 @@ exports.create_ALM_Testcase = async function (req, res) {
             "testCaseId": "GUIDTC1",
             "variants": [
               {
-                "id": "VAR01",
+                "id": "DEFAULT_VARIANT",
                 "name": "Data Variant 1",
                 "description": "Simple data variant for simple scenario",
                 "language": "string",
