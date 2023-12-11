@@ -308,6 +308,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/', async (req, res, next) => {
+			logger.info("base url its reached");
 			if (!(req.url == '/' || req.url.startsWith("/?"))) return next();
 			return res.sendFile("index.html", { root: __dirname + "/public/" });
 		});
