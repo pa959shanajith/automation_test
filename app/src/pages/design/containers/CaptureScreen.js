@@ -1880,7 +1880,7 @@ const elementValuetitle=(rowdata)=>{
         :null}
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
+        <div className='card'>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
@@ -1895,13 +1895,13 @@ const elementValuetitle=(rowdata)=>{
             selectionMode={"single"}
             selection={selectedCapturedElement}
             onSelectionChange={onRowClick}
-            tableStyle={{ minWidth: '50rem' }}
             headerCheckboxToggleAllDisabled={false}
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
-            scrollable 
-            scrollHeight="400px"
             columnResizeMode="expand"
-            virtualScrollerOptions={{ itemSize: 20 }}
+            scrollable
+            scrollHeight="383px"
+            virtualScrollerOptions={{ itemSize: 46 }} 
+            tableStyle={{ minWidth: '50rem' }}
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
@@ -1997,7 +1997,7 @@ const elementValuetitle=(rowdata)=>{
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
         
-        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>

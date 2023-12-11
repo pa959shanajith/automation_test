@@ -1095,7 +1095,7 @@ export default function BasicDemo() {
         setVisible={setLogBug}
         onModalBtnClick={onLogBugBtnClick}
         content={
-          <div className="grid">
+          <div>
             <div className="flex  flex-row">
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
@@ -1124,7 +1124,8 @@ export default function BasicDemo() {
                 parentClass="flex flex-column"
               />
             </div>
-            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+            <style>{`.p-multiselect-panel .p-multiselect-header {display: none !important;}`}</style>
               <AvoMultiselect
                 multiSelectValue={configureFeilds}
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
@@ -1133,6 +1134,8 @@ export default function BasicDemo() {
                 labelTxt="Configure Fields"
                 placeholder="Select configure fields"
                 required={true}
+                className="w-full md:w-20rem flex flex-column"
+                showSelectAll={false}
               />
             </div>
           </div>

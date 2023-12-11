@@ -5,7 +5,7 @@ import PopupMsg, {setMsg} from './components/PopupMsg';
 import {Messages, VARIANT} from './components/Messages';
 import ModalContainer from './components/ModalContainer';
 import ChangePassword from './components/ChangePassword';
-import ScrollBar, { updateScrollBar } from './components/ScrollBar';
+import ScrollBar, { updateScrollBar,WrappedScrollBar } from './components/ScrollBar';
 import FooterTwo from './components/FooterTwo';
 import ResetSession from './components/ResetSession';
 import Thumbnail from './components/Thumbnail';
@@ -35,6 +35,7 @@ export {
         ValidationExpression,
         BrowserFp,
         updateScrollBar,
+        WrappedScrollBar,
         SelectRecipients,
         IntegrationDropDown, 
         LandingContainer,

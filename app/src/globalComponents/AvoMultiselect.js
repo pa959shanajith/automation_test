@@ -11,7 +11,8 @@ const AvoMultiselect = ({
   required,
   labelTxt,
   disabled,
-  labelForNotWebApp
+  labelForNotWebApp,
+  showSelectAll
 }) => {
   const [touched, setTouched] = useState(false);
   return (
@@ -38,6 +39,7 @@ const AvoMultiselect = ({
         onBlur={() => setTouched(true)}
         {...(required && { className: touched && !multiSelectValue ? "p-invalid" : "" })}
         disabled={disabled}
+        showSelectAll={showSelectAll}
       />
       {required && (
         <div className="validation_container">
