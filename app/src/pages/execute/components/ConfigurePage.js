@@ -22,6 +22,7 @@ import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
+import { InputText } from 'primereact/inputtext';
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -183,6 +184,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
+  const [runningStatusTimer, setRunningStatusTimer] = useState("");
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -2393,9 +2395,25 @@ Learn More '/>
                     </div>
                   </div>
                   :
-                  <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
+                  <div className="container_codesnippetlabel">
+                    <div>
+                        <label className="code_label">Set The Timer:</label>
+                        <InputText
+                          // data-test="password"
+                          value={runningStatusTimer}
+                          className={'w-full md:w-10rem'}
+                          style={{'margin': '0.5rem 0px 0.5rem 10.2rem', 'width': "10rem"}}
+                          onChange={(event) => { setRunningStatusTimer(event.target.value) }}
+                          keyfilter="int"
+                          placeholder='Seconds'
+                      />
+                    </div>
                     <label className="code_label">Select Language:</label>
-                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} 
+                    options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem" 
+                    style={{'margin': '0.5rem 0px 1rem 9.1rem', 'width': "10rem"}}
+                    />
+
                     <div>
                       <div className="key">
                       <pre className="code_snippet__content code_snippet__pre">

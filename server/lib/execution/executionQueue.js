@@ -1126,8 +1126,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         response['error'] = "None";
         try {
 
-            const configurekey = req?.query?.configurekey || req.body.configurekey;
-            const executionListId = req?.query?.executionListId || req.body.executionListId;
+            const configurekey = req.body.configurekey;
+            const executionListId = req.body.executionListId;
 
             //to add the key list if its empty,, from the cache
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
