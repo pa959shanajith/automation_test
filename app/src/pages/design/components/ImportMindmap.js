@@ -234,6 +234,14 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         moduleid:Array.isArray(data)?data[0]:data
                     }
                     var res = await getModules(req)
+                    var Screen = await getScreens(projectImportId) 
+                    if(Screen.error){displayError(Screen.error);ResetSession.end();return;}
+                    setTimeout(function() {
+                        dispatch(selectedModuleReducer(res))
+                    setImportPop(false)
+                    setOptions('importmodules')
+                    // setBlockui({show:false})
+                    }, 100);
                     if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
                     importData = res
                     setBlockui({show:false})

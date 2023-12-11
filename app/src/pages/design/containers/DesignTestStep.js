@@ -37,7 +37,7 @@ const DesignModal = (props) => {
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
-    const [overlay, setOverlay] = useState("");
+    const [overlay, setOverlay] = useState("Loading...");
     const [keywordList, setKeywordList] = useState(null);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
@@ -73,7 +73,19 @@ const DesignModal = (props) => {
     let runClickAway = true;
     
 
-let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON.parse(s))
+    // Function to remove duplicates based on a specified property (e.g., 'name')
+    const removeDuplicates = (arr, property) => {
+        const uniqueMap = new Map();
+        arr.forEach(obj => uniqueMap.set(obj[property], obj));
+        return Array.from(uniqueMap.values());
+    };
+
+    // Function to sort the array based on the 'index' property
+    const sortByIndex = (arr) => arr.slice().sort((a, b) => a.index - b.index);
+
+    // Combined function
+    const uniqueArray = (arr, property) => sortByIndex(removeDuplicates(arr, property));
+
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -221,7 +233,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 }
             setScreenLevelTastSteps(screenLevelTestCases)
         //eslint-disable-next-line
-    }, []);
+    }, [imported]);
 
     useEffect(() => {
         const scenarioId = props.fetchingDetails.parent.parent["_id"];
@@ -338,7 +350,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                         setOverlay("");
                                     }
                                     setDraggable(false);
-                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
+                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false, index:parentScreen[j].childIndex})
                                     setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     setTestCaseData([...testCaseData,testcaseArray]); 
                                     setPastedTC([]);
@@ -1351,7 +1363,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
-                    <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
+                    <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>

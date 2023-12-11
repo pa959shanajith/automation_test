@@ -42,7 +42,6 @@ class Cache {
 				clientName=host.split('.')[0]
 			}
 		}
-		// logger.info("DL------>data %s in cache getmap", host);
 		return (new Promise((rsv, rej) => this.client.hgetall(clientName, (err, data) => {
 			if (err) {
 				logger.error("Error occurred while fetching cached request data. Error:" + err);
@@ -84,9 +83,6 @@ class Cache {
 		}
 		data = JSON.stringify(data);
 		const args = (ttl)? [key, data, 'EX', ttl] : [key, data];
-		// logger.info("DL------>data %s in cache sethmap", data);
-		// logger.info("DL------>key %s in cache sethmap", key);
-		// logger.info("DL------>ttl %s in cache sethmap", ttl);
 		return (new Promise((rsv, rej) => this.client.hset(clientName,key,data, (err) => {
 			if (err) {
 				logger.error("Error occurred while caching request data. Error:" + err);
