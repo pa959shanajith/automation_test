@@ -711,3 +711,27 @@ export const getDetails_BROWSERSTACK = async() => {
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
     }
 }
+
+
+export const saveSAP_ALMDetails_ICE  = async(data) => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/saveSAP_ALMDetails_ICE", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data: data,
+        })
+        .then(res => {
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}

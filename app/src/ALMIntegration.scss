@@ -1,0 +1,23 @@
+.alm_integration_main_conatiner {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+    gap: 2rem;
+}
+
+.alm_details_container {
+    border: 1.5px solid lightgrey;
+    height: 100%;
+    width: 50%;
+    border-radius: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.map-btn{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

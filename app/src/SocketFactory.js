@@ -11,7 +11,7 @@ import { Buffer } from 'buffer';
 import { NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { Dialog } from "primereact/dialog";
+import AMLIntegration from './ALMIntegration';
 
 
 /*Component SocketFactory
@@ -221,22 +221,13 @@ const SocketFactory = () => {
     const onSocketHide = () => {
         dispatch(loadUserInfoActions.setIsShowSocket(false));
         dispatch(loadUserInfoActions.setWebSocketRes({}))
-      }
-    const renderDialogContent = () => {
-        return Object.keys(webSocketRes).map((key) => (
-            <div key={key}>
-                <strong>{key}:</strong> {JSON.stringify(webSocketRes[key])}
-            </div>
-        ));
-    };  
+    }
 
     return (
         <Fragment>
-            {/* <div>
-                <Dialog header="Response socket" visible={isShowSocket} onHide={onSocketHide}>
-                    {renderDialogContent()}
-                </Dialog>
-            </div> */}
+            {/* <div> */}
+                {/* <Dialog header="Response socket" style={{ height: "45rem", width: "60rem" }} visible={isShowSocket} onHide={onSocketHide} footer={almFooter}> */}
+            {<AMLIntegration almDialogVisible={isShowSocket} almDialogHide={onSocketHide} almTestcaseData = {webSocketRes}/>}
             <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
             {userInfo.isTrial ? (
                 (

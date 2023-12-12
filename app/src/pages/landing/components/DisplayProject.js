@@ -343,11 +343,11 @@ const renderDialogContent = () => {
   return (
     <>
 
-      <div>
+      {/* <div>
         <Dialog header="Response socket" visible={isShowSocket} onHide={onSocketHide}>
           {renderDialogContent()}
         </Dialog>
-      </div>
+      </div> */}
           
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
         <div className="Project-search">
