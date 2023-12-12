@@ -1,0 +1,123 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.report__scenarioRowContainer{
+    display: flex;
+    flex-direction: column;
+    background: $whiteColor;
+    border: 2px solid $pluginGray;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    &:hover{
+        background: $whisper;
+        border: 2px solid $whisper;
+    }
+}
+
+.report__scenarioRowContainer_Shimmer{
+    display: flex;
+    height: 40px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.report__scenarioRowHeader{
+    display: flex;
+    align-items: center;
+    font-family: Mulish;
+    font-weight: 600;
+    font-size: $avoFontLarge;
+    color: $greyishText;
+    position: relative;
+    
+    .report__funcRow {
+        width: 65%;
+        max-width: 65%;
+    }
+
+    .report__accRow{
+        width: 20%;
+        max-width: 20%;
+    }
+}
+
+.report__scenarioRowTitle{
+    margin-right: 5px;
+    width: 100%;
+    padding: 0 5px;
+    border-radius: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+
+    &:hover{
+        background: $borderThree;
+    }
+}
+
+.report__scenarioRowStatus{
+    display: flex;
+    justify-content: center;
+    text-transform: capitalize;
+    color:$whiteColor;
+    width: fit-content;
+    align-items: center;
+    border-radius: 5px;
+    padding: 0 5px;
+}
+
+.report__scenarioAgent{
+    font-family: Mulish;
+    font-weight: 600;
+    font-size: $avoFontNormal;
+    color: $tableHeaderSelected;
+}
+
+.report__scenarioRowHeaderContent{
+    display: flex;
+    flex-grow: 1;
+    align-items: center;    
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.report__scenarioRowSubContent{
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.report_StatusTerminate{
+    background: $redError;
+}
+
+.report_StatusFail{
+    background: $moderateFail;
+}
+
+.report_StatusIncomplete{
+    background: $incompleteStatus;
+    color: $black;
+}
+
+.report_StatusPass{
+    background: $seriousPass;
+}
+
+.report__scenarioRowUtilsOps{
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+.report__hoverUtils{
+    cursor: pointer;
+    margin: 0 10px;
+    height: 23px;
+}

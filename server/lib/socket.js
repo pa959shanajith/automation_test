@@ -81,7 +81,8 @@ io.on('connection', async socket => {
 		if (eulaFlag) {
 			const inputs = {
 				"icesession": icesession,
-				"query": 'connect'
+				"query": 'connect',
+				"host":socket.request.headers.host
 			};
 			const result = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
 			if (result == 'fail') {

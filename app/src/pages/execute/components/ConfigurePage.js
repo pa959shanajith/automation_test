@@ -1269,18 +1269,18 @@ const handleSubmit1 = async (SauceLabPayload) => {
               visible={visible}
               onHide={() => setVisible(false)}
             />
-             <img src="static/imgs/ic-edit.png"
-  style={{ height: "20px", width: "20px" }}
-className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
-/>
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
- <img
-
-src="static/imgs/ic-delete-bin.png"
-style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-             </div>
+            <img src="static/imgs/ic-edit.png"
+              style={{ height: "20px", width: "20px" }}
+              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              />
+              <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+               <img
+              
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
+          </div>
         ),
       });
     });
@@ -1436,7 +1436,7 @@ const showToast = (severity, detail) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: selectProjects.appType,
+            appType: localStorageDefaultProject.appType,
             domainName: "Banking",
             projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
@@ -2483,6 +2483,28 @@ Learn More '/>
       );
     }
   };
+
+  // Filter out TestSuites which has empty TestCases (Scenarios)
+  const filterOutEmptyTestSuites = (data) => {
+    let currentData = data;
+    let configureData = data?.configureData;
+    let filteredConfigureData = {};
+    let configureDataKeys = Object.keys(configureData);
+
+    if (configureDataKeys?.length) {
+      Object.values(configureData)?.map((configItem, index) => {
+        // check if an configItem is an array
+        if (Array.isArray(configItem)) {
+          // check if length of array is greater than 0
+          if (configItem?.length) {
+            const filterdItems = configItem?.filter(item => item?.scenarios?.length !== 0);
+            filteredConfigureData[Object.keys(configureData)[index]] = filterdItems;
+          }
+        }
+      })
+    }
+    return { ...currentData, configureData: filteredConfigureData }
+  };
   return (
     <>
       <div>
@@ -2533,7 +2555,7 @@ Learn More '/>
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup
-              configData={getConfigData}
+              configData={filterOutEmptyTestSuites(getConfigData)}
               xpanded={xpanded}
               setXpanded={setXpanded}
               tabIndex={tabIndex}

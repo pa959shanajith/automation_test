@@ -241,6 +241,9 @@
 
     .p-dialog-title {
         margin-left: 1.7% !important;
+        max-width: 20rem;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
 

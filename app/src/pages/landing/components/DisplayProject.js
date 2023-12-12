@@ -9,6 +9,7 @@ import { fetchProjects } from "../api"
 import { useSelector, useDispatch } from 'react-redux';
 import { getStep } from './VerticalComponentsSlice';
 import { loadUserInfoActions } from '../LandingSlice';
+import { convertIdIntoNameOfAppType } from "../../design/components/UtilFunctions";
 const moment = require('moment');
 
 
@@ -298,30 +299,7 @@ const DisplayProject = (props) => {
   //     getProjectLists.map((apptype)=> apptype.appType)
   // };
 
-  const convertIdIntoNameOfAppType = (apptypeID) => {
-    switch (apptypeID) {
-      case "5db0022cf87fdec084ae49b6":
-        return "Web";
-      case "5db0022cf87fdec084ae49b2":
-        return "MobileWeb";
-      case "5db0022cf87fdec084ae49af":
-        return "Desktop";
-      case "5db0022cf87fdec084ae49b7":
-        return "Webservice";
-      case "5db0022cf87fdec084ae49b4":
-        return "SAP";
-      case "5db0022cf87fdec084ae49b3":
-        return "OEBS";
-      case "5db0022cf87fdec084ae49b0":
-        return "Mainframe";
-      case "5db0022cf87fdec084ae49b1":
-        return "MobileApp";
-      case "5db0022cf87fdec084ae49b5":
-        return "System";
-      default:
-        return "";
-    }
-}
+ 
   //  const appName = convertIdIntoNameOfAppType();
   //  console.log(appName);
   //  console.log(convertIdIntoNameOfAppType);

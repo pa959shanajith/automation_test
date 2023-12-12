@@ -142,6 +142,7 @@ const Table = props => {
                                 updateHeaders={updateHeaders}
                                 updateCheckList={updateCheckList}
                                 updateTableData={updateTableData}
+                                setUpdateData={props.setDataValue}
                             />
                         </div>
                     </div>
@@ -235,6 +236,7 @@ const Rows = props => {
                         row={row}
                         rowIndex={rowIndex}
                         updateCheckList={props.updateCheckList}
+                        setUpdateData={props.setUpdateData}
                     />
                 )
             })}
@@ -295,9 +297,6 @@ const RowNumColumn = props => {
 const SubHeaderRow = props => {
 
     const addColRef = useRef();
-    useEffect(() => {
-        console.log("SubHeaderRow");
-    }, []);
 
     useEffect(() => {
         if (props.focus.type === "tableCol" && addColRef.current) {
@@ -354,9 +353,6 @@ const SubHeaderCell = props => {
     const [edit, setEdit] = useState(false);
     const colRef = useRef();
     const areaRef = useRef();
-    useEffect(() => {
-        console.log("Hello");
-    }, []);
 
     useEffect(() => {
         if (props.focus.type === "action" && props.focus.id === props.headerId && colRef.current) {
@@ -454,6 +450,7 @@ const Row = props => {
                                 props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
                                 props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)
                             }
+                            setUpdateData={props.setUpdateData}
                         />
                     )
                 })}
@@ -494,6 +491,7 @@ const DataCell = props => {
     const onBlur = e => {
         if (props.initialValue !== value)
             props.updateTableData(value, props.rowId, props.headerId)
+            props.setUpdateData(false);
         setEdit(false);
     }
 
