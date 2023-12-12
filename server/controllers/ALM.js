@@ -10,10 +10,13 @@ const socket_io = require("../lib/socket")
 exports.create_ALM_Testcase = async function (req, res) {
  
     logger.info("ALM create testcase service called");
+    console.log("ALM create testcase service called");
     try {
         logger.info("validating the request payload");
+        console.log(req.body);
          if ( !req.body.projectName || !req.body.project || !req.body.processGlobalId || !req.body.testCaseName || !req.body.testCaseDescription) {
-            return res.status(400).json({ error: 'Bad request: Missing required data' });
+          console.log( 'error: Bad request: Missing required data');  
+          return res.status(400).json({ error: 'Bad request: Missing required data' });
         }
         var inputs,emit_data; 
         inputs = emit_data = req.body;
@@ -25,12 +28,13 @@ exports.create_ALM_Testcase = async function (req, res) {
         const result = await utils.fetchData(inputs, "/ALM_createtestcase", "alm_create_testcase", true);
         if (result &&  result[1].statusCode !== 200) {
             logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            console.log(`request error :` ,result[1].statusMessage || 'Unknown error');
             return res.status(result[1].statusCode).json({
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
         emit_data['testcaseId'] = result[0].rows || ''
-        socket_io.emit('messageFromServer',req.body);
+        socket_io.emit('messageFromServer',emit_data);
         logger.info("info : emitted socket connection with testcaseid and those details saved in db");
         res.status(201).send({  "testCaseId": result[0].rows || '',"url": `${req.protocol}://${req.get('host')}/sap-calm-testautomation/api/v1/testcases/${result[0].rows}` });
  
@@ -397,5 +401,37 @@ exports.create_ALM_Testcase = async function (req, res) {
     } catch (error) {
         logger.error('Scope_Changed Error: ', error);
         res.status(500).json({ code:'500', error: 'error while processing' });
+    }
+  };
+
+  exports.saveSAP_ALMDetails_ICE = async (req, res) => {
+    
+    const fnName = "saveALM_MappedTestcase";
+    logger.info("Inside UI service: " + fnName);
+    try {
+      var mappedDetails = req.body.mappedDetails;
+      var flag = mappedDetails.length > 0;
+      if (!flag) return res.send('fail');
+      // for (let i=0; i<mappedDetails.length; i++) {
+      //   let itr = mappedDetails[i];
+        let inputs = {
+          "testscenarioid": mappedDetails[0].scenarioId[0],
+          'projectId': mappedDetails[0].projectId,			
+          'projectName': mappedDetails[0].projectName,
+          // 'itemCode': mappedDetails[0].testCode,
+          'itemType': mappedDetails[0].itemType,
+          'testCaseName': mappedDetails[0].testCaseName,
+          'testCaseDescription': mappedDetails[0].testCaseDescription,
+          "testcaseId":req.body.testcaseId,
+          "query": "saveALM_MappedTestcase"
+        };
+        const result = await utils.fetchData(inputs, "/saveALM_MappedTestcase", fnName);
+        if (result == "fail") flag = false;
+      // }
+      if (!flag) return res.send('fail');
+      res.send("success");
+    } catch (exception) {
+      logger.error("Error occurred in ALM/"+fnName+":", exception);
+      res.send("fail");
     }
   };

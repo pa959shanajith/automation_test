@@ -279,6 +279,7 @@ if (cluster.isMaster) {
 		app.post('/sap-calm-testautomation/api/v1/testcases/execute',ALM.Execute_Testcase);
 		app.get('/sap-calm-testautomation/api/v1/job/status',ALM.Job_Status);
 		app.get('/sap-calm-testautomation/api/v1/testcases/executionhistory',ALM.Execution_History);
+		app.post('/saveSAP_ALMDetails_ICE', ALM.saveSAP_ALMDetails_ICE);
 		
 
 		app.use(csrf({
