@@ -642,7 +642,7 @@ exports.excelToMindmap = function (req, res){
 				if(i== 0 && !["testsuite","module"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
 				if(i== 1 && !["testcase","scenario"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
 				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
-				if(i== 3 && !["teststep","script"].includes(e.toLowerCase())){return res.status(200).send("fail");}
+				if(i== 3 && !["teststeps","script"].includes(e.toLowerCase())){return res.status(200).send("fail");}
 				
 				if (i==4){return res.status(200).send("fail");}
 			});
@@ -944,7 +944,7 @@ exports.exportToExcel = async (req, res) =>{
 				.style(style);
 
 		ws.cell(1, 4)
-				.string('Teststep')
+				.string('Teststeps')
 				.style(style);
 		var min_mm_idx =1
 		var min_scen_idx = 1;
@@ -1577,7 +1577,7 @@ exports.singleExcelToMindmap = function (req, res) {
                 if (i == 0 && (["testsuite","module"].includes(e.toLowerCase()))) {modIdx = i}
                 if(i== 1 && (["testcase","scenario"].includes(e.toLowerCase()))) {scoIdx = i}
                 if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-                if(i== 3 && (["teststep","script"].includes(e.toLowerCase()))) { sctIdx = i}
+                if(i== 3 && (["teststeps","script"].includes(e.toLowerCase()))) { sctIdx = i}
             });
             if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
                 err = true;
