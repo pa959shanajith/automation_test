@@ -90,8 +90,6 @@ io.on('connection', async socket => {
 			} else {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
-					host = JSON.parse(icesession).host;
-					clientName=utils.getClientName(host);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
