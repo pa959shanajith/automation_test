@@ -143,10 +143,10 @@ module.exports.setReq = async (req) =>
 
 
 const fetchData = async (inputs, url, from, all) => {
-	if(inputs.host == undefined && this.avoreq != null)
+	if(this.avoreq != null && inputs.host == undefined)
 	{
 		if(Array.isArray(inputs)) inputs.push({"host":this.avoreq.headers.host});
-		else if(inputs.host != this.avoreq.headers.host && inputs.host == undefined) inputs.host = this.avoreq.headers.host;
+		else inputs.host = this.avoreq.headers.host;
 	}
 	let args = (inputs.headers)? inputs : {
 		data: inputs,
