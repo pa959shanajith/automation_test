@@ -2583,7 +2583,7 @@ const LaunchApplication = props => {
                         </select>
                       </div>
                       {CheckingMobileClient_ICEResponse &&
-                        <span>Required packages for mobile testing in Avo Assure client folder are missing.<a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                        <span>Required packages for mobile testing in Avo Assure client folder are missing.<a href="https://downloads.avoassure.ai/driver/AvoAssure_AndroidMobileDependencies.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
                       }
                     </div>
                   </>
