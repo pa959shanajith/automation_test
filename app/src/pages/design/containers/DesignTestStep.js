@@ -753,6 +753,14 @@ const DesignModal = (props) => {
             </div>
         </>
     );
+    const bodyHeaderName = (row)=>{
+        return(
+            <>
+            <span className='rowNameTrim'>{row.name}</span>
+            <Tooltip target=".rowNameTrim " position="bottom" content={row.name}/>
+            </>
+        )
+    }
     const bodyHeader = (rowData)=>{
         const onInputChange = (event) => {
             let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
@@ -1368,7 +1376,7 @@ const DesignModal = (props) => {
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
                         <Column expander={allowExpansion} style={{ width: '5rem',background: 'white',paddingLeft:'0.5rem' }} />
-                        <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
+                        <Column body={bodyHeaderName} style={{background: 'white',paddingLeft:'0.5rem' }}/>
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
                 </div>

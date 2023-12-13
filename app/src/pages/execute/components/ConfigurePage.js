@@ -821,74 +821,72 @@ else{
 };
 
 const handleSubmit1 = async (SauceLabPayload) => {
-  // close the existing dialog
-  // open the new dialog
   setLoading("Fetching details..");
-  const data1 = await getDetails_SAUCELABS()
-  if (data1.error) { setMsg(data1.error); return; }
-      if (data1 !== "empty") {
-        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-        let data = await saveSauceLabData({
-          "SauceLabPayload" : {
-            ...data1,
-            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
-          }
+
+  try {
+    const data1 = await getDetails_SAUCELABS();
+
+    if (data1.error) {
+      setMsg(data1.error);
+      return;
+    }
+
+    if (data1 !== "empty") {
+      data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails');
+
+      let data = await saveSauceLabData({
+        "SauceLabPayload": {
+          ...data1,
+          "query": showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails'
+        }
+      });
+
+      if (data && data.os_names && data.browser) {
+        const arrayOS = data.os_names.map((element, index) => {
+          return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+          };
         });
-        if (data && data.os_names && data.browser) {
-          // Data exists and has the expected properties
-          
-          const arrayOS = data.os_names.map((element, index) => {
-            return {
-              key: element,
-              text: element,
-              title: element,
-              index: index
-            };
-          });
-          setOsNames(arrayOS);
-          setBrowserDetails(data);
-          setLoading(false)
-          setDisplayBasic4('displayBasic4');
-      }
-      else if (data && data.emulator && data.real_devices && data.stored_files){
-          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-          //     return {
-          //         key: element,
-          //         text: element,
-          //         title: element,
-          //         index: index
-          //     }
-          // })
-          // setPlatforms(arrayPlatforms);
-    
-          setMobileDetails(data);
-          setDisplayBasic4(true);
-          setLoading(false);
-        }
-         else {
-          
-          // Data is empty or doesn't have expected properties
-          if (data == "unavailableLocalServer"){
-              toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-                life: 5000
-              });
-          }else{
-            toast.current.show({
-              severity: 'error',
-              summary: 'error',
-              detail: "Error while fetching the data from Saucelabs",
-              life: 5000
-            });
-          } 
-          setLoading(false); 
-        }
+        setOsNames(arrayOS);
+        setBrowserDetails(data);
+        setLoading(false);
+        setDisplayBasic4('displayBasic4');
+      } else if (data && data.emulator && data.real_devices && data.stored_files) {
+        setMobileDetails(data);
+        setDisplayBasic4(true);
+        setLoading(false);
       } else {
-        setMsg("No data stored in settings"); return;
+        // Data is empty or doesn't have expected properties
+        console.log(data)
+        if (data === "unavailableLocalServer") {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+            life: 5000
+          });
+        }
+        setLoading(false);
       }
+    } else {
+      toast.current.show({
+        severity:'info',
+        summary: 'Info',
+        detail: "No data stored in settings",
+        life: 5000
+      });
+      return;
+    }
+  } catch (error) {
+    console.error("Error during handleSubmit1:", error);
+    setMsg("An error occurred while fetching details");
+  } finally {
+    setLoading(false);
   }
+};
 
 
            
@@ -1269,18 +1267,18 @@ const handleSubmit1 = async (SauceLabPayload) => {
               visible={visible}
               onHide={() => setVisible(false)}
             />
-             <img src="static/imgs/ic-edit.png"
-  style={{ height: "20px", width: "20px" }}
-className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
-/>
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
- <img
-
-src="static/imgs/ic-delete-bin.png"
-style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-             </div>
+            <img src="static/imgs/ic-edit.png"
+              style={{ height: "20px", width: "20px" }}
+              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              />
+              <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+               <img
+              
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
+          </div>
         ),
       });
     });
@@ -2483,6 +2481,28 @@ Learn More '/>
       );
     }
   };
+
+  // Filter out TestSuites which has empty TestCases (Scenarios)
+  const filterOutEmptyTestSuites = (data) => {
+    let currentData = data;
+    let configureData = data?.configureData;
+    let filteredConfigureData = {};
+    let configureDataKeys = Object.keys(configureData);
+
+    if (configureDataKeys?.length) {
+      Object.values(configureData)?.map((configItem, index) => {
+        // check if an configItem is an array
+        if (Array.isArray(configItem)) {
+          // check if length of array is greater than 0
+          if (configItem?.length) {
+            const filterdItems = configItem?.filter(item => item?.scenarios?.length !== 0);
+            filteredConfigureData[Object.keys(configureData)[index]] = filterdItems;
+          }
+        }
+      })
+    }
+    return { ...currentData, configureData: filteredConfigureData }
+  };
   return (
     <>
       <div>
@@ -2533,7 +2553,7 @@ Learn More '/>
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup
-              configData={getConfigData}
+              configData={filterOutEmptyTestSuites(getConfigData)}
               xpanded={xpanded}
               setXpanded={setXpanded}
               tabIndex={tabIndex}

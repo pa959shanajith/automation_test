@@ -7,7 +7,7 @@ import ExecutionsContainer from './ExecutionsContainer';
 // import { SearchDropdown, TextField } from '@avo/designcomponents';
 import { fetchReportMeta, fetchOpenModuleData, getOpenfetchScenarioInfoDevOps, publicViewReport, getPublicFunctionalReportsDevOps} from '../api';
 import { prepareOptionLists, prepareModuleList, getFunctionalBarChartValues, prepareExecutionCard, prepareBatchExecutionCard, prepareLogData } from '../containers/ReportUtils';
-import "../styles/functionalTesting.scss";
+import "../styles/FunctionalTesting.scss";
 import {hideOverlay} from '../reportSlice';
 import { InputText } from 'primereact/inputtext';
 

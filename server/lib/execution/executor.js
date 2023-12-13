@@ -270,7 +270,8 @@ class TestSuiteExecutor {
             "report": JSON.stringify(reportData),
             "modifiedby": userInfo.invokinguser,
             "modifiedbyrole": userInfo.invokinguserrole,
-            "query": "insertreportquery"
+            "query": "insertreportquery",
+            "host":userInfo.host
         };
         const result = utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "insertReport");
         return result;
