@@ -203,7 +203,7 @@ exports.create_ALM_Testcase = async function (req, res) {
       );
       var send_res = {'data':[
         {
-          "testCaseId": "GUIDTC1",
+          "testCaseId": req.body.testcases[0].testCaseId,
           "testDataVariantId": "VAR01",
           "jobUrl": "https://<test_automation_tool_URL/jobmonitor/<jobID>",
           "jobId": "JOB123",
@@ -217,21 +217,14 @@ exports.create_ALM_Testcase = async function (req, res) {
           }
         }
       ]}
-        // var inputs = {
-        //     "query": "alm_get_testcases"
-        // }
-        // inputs['query'] = "alm_create_testcase";
-        // logger.info("making an call to DAS to save the request details to db");
-        // const result = await utils.fetchData(inputs, "/ALM_createtestcase", "alm_create_testcase", true);
-        // if (result &&  result[1].statusCode !== 200) {
-        //     logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
-        //     return res.status(result[1].statusCode).json({
-        //         error: result[1].statusMessage || 'Unknown error',
-        //     });
-        // }
-        // emit_data['testcaseId'] = result[0].rows || ''
-        // socket_io.emit('messageFromServer',req.body);
-        logger.info("info : Execute_Testcase api called");
+      var inputs = {
+        "testcaseId":req.body.testcases[0].testCaseId,
+        "query":"getALM_Profile"
+      }
+      const getProfile = await utils.fetchData(inputs, "/getALM_TestProfile", "getALM_Profile", true);
+      console.log(getProfile, ' its from getProfile');
+
+      socket_io.emit("triggerExecution",getProfile[0].rows.Profile);
         logger.info("send response : "+send_res);
         res.status(202).send(send_res);
  

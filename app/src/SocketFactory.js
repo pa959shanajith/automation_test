@@ -12,7 +12,7 @@ import { NavLink } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import AMLIntegration from './ALMIntegration';
-
+import {ExecuteTestSuite_ICE} from './pages/execute/api';
 
 /*Component SocketFactory
   use: creates/updates socket connection
@@ -76,6 +76,11 @@ const SocketFactory = () => {
                 dispatch(loadUserInfoActions.setWebSocketRes(data));
                 dispatch(loadUserInfoActions.setIsShowSocket(true));
               });
+            socket.on('triggerExecution', (data) => {
+                console.log('socket data', data);
+                const exec_data =  ExecuteTestSuite_ICE(data);
+                console.log('execution started ',exec_data);
+              });  
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket])
