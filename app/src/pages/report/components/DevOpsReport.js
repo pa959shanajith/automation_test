@@ -48,7 +48,7 @@ const DevOpsReport = props => {
 
     
     const onWebClick = ({reportid, testscenarioid}) => async() => {
-        const win = window.open("/reports/executionReport", "_blank"); 
+        const win = window.open("/executionReport", "_blank"); 
         win.focus();
         localStorage['executionReportId'] = reportid;
         localStorage['logData'] = JSON.stringify(logData[testscenarioid]);
