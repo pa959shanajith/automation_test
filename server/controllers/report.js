@@ -1404,6 +1404,16 @@ exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
                 'suiteid': req.query.testsuiteid
             }
         }
+        else if ("testsuiteid" in req.body) {
+            inputs = {
+                'suiteid': req.body.testsuiteid
+            }
+        }
+        else if ("batchname" in req.body) {
+            inputs = {
+                'batchname': req.body.batchname
+            }
+        }
         else{
             inputs = ("batchname" in req.query)?{"batchname": req.query.batchname}:{"suiteid": req.query.testsuiteid}
         }
@@ -1444,7 +1454,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         var report = [];
         let inputs = {
             "query": "executiondetails",
-            "executionid": executionid,
+            "executionid": executionid[0],
         };
         const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
         if (result == "fail") return res.send("fail");

@@ -20,6 +20,7 @@ import { testTypesOptions, viewByOptions } from '../../utility/mockData';
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from 'primereact/paginator';
 import useDebounce from '../../../customHooks/useDebounce';
+import { convertIdIntoNameOfAppType } from '../../design/components/UtilFunctions';
 export var navigate
 
 const reports = () => {
@@ -70,7 +71,7 @@ const reports = () => {
 
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-        dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType: project?.appType[project?.projectId.indexOf(initProj)] }));
+        dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectId: initProj, appType:convertIdIntoNameOfAppType( project?.appType[project?.projectId.indexOf(initProj)]) }));
         fetchReportData(initProj);
     };
     useEffect(() => {

@@ -205,9 +205,11 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
       }
       if (requestData.value.agents.length < 1) {
         toastError(MSG.CUSTOM("Please select atleast one Agent", VARIANT.ERROR));
+        setLoading(false);
       }
       else {
         const storeConfig = await saveAvoGrid(requestData);
+        setLoading(false);
         if (storeConfig !== "success") {
           if (storeConfig.error && storeConfig.error.CONTENT) {
             toastError(MSG.CUSTOM(storeConfig.error.CONTENT, VARIANT.ERROR));

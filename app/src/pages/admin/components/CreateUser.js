@@ -15,6 +15,7 @@ import { TabMenu } from 'primereact/tabmenu';
 import TokenManagement from '../containers/TokenMangement';
 import { Checkbox } from 'primereact/checkbox';
 import IceProvision from '../containers/IceProvision';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
 import UserList from '../components/UserList';
 import { Tooltip } from 'primereact/tooltip';
 
@@ -82,6 +83,11 @@ const CreateUser = (props) => {
     }, [currentTab === "users"]);
 
 
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo ;
+
     useEffect(() => {
         let allRolesList = [];
         if (allRoles.length) {
@@ -101,7 +107,7 @@ const CreateUser = (props) => {
             });
             if(role) setRoleDropdownValue(role);
             setAllRolesUpdate(allRolesList);
-            if (editUser) setAdminCheck(props.editUserData.isAdmin);
+            if (editUser) setAdminCheck(props?.editUserData?.isAdmin);
         }
     }, [allRoles.length > 0]);
 
@@ -158,6 +164,9 @@ const CreateUser = (props) => {
             server: server,
             isadminuser: adminCheck // if user is Quality Manager, she/he has the Admin rights and it is optional
         };
+
+        const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, addRole: userObj.addRole};
+
         if (uType === "ldap") userObj.ldapUser = ldap.user;
         setLoading(bAction.slice(0, -1) + "ing User...");
 
@@ -167,6 +176,8 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
+                    localStorage.setItem("userInfo", JSON.stringify(userdetail))
+                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, addRole: userObj.addRole}))
                     props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
                         setSelectedTab("avoAzzureClient") }
