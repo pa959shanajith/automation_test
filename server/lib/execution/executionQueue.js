@@ -665,7 +665,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         // let execution_Queue = await cache.get('execution_list');
 
         //Adding the reportLink in the response
-        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
+        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
