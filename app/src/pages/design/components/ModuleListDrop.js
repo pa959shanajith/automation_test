@@ -32,6 +32,7 @@ import { checkRole, roleIdentifiers } from "../components/UtilFunctions";
 const ModuleListDrop = (props) =>{
     const dispatch = useDispatch()
     const toast = useRef()
+    const [isEdit, setIsEdit] = useState(false);
     const [E2EName,setE2EName] = useState('')
     const moduleLists = useSelector(state=>state.design.moduleList)
     const proj = useSelector(state=>state.design.selectedProj)
@@ -524,7 +525,9 @@ const ModuleListDrop = (props) =>{
         setInitialText(false)
         
         if(moduleSelect.type=== "endtoend"){
-           setE2EName(moduleSelect.name)}
+           setE2EName(moduleSelect.name);
+           setIsEdit(true);
+          }
            const editE2EData  = moduleSelect.children.map((item)=>{
             return{
                 scenarioID: item._id,
@@ -636,9 +639,9 @@ const ModuleListDrop = (props) =>{
                     {
                         "id": 0,
                         "childIndex": 0,
-                        "_id": E2EName? moduleSelect._id : null,
+                        "_id": isEdit? moduleSelect._id : null,
                         "oid": null,
-                        "name": E2EName? E2EName : inputE2EData,
+                        "name": isEdit? E2EName : inputE2EData,
                         "type": "endtoend",
                         "pid": null,
                         "pid_c": null,
@@ -646,7 +649,7 @@ const ModuleListDrop = (props) =>{
                         "renamed": false,
                         "orig_name": null,
                         "taskexists": null,
-                        "state": E2EName? "saved" : "created",
+                        "state": isEdit? "saved" : "created",
                         "cidxch": null
                     }
                 ],
@@ -787,7 +790,7 @@ setPreventDefaultModule(true);
             const footerContent = (
               <div>
                   <Button label="Cancel"  onClick={() => setShowE2EPopup(false)} className="p-button-text" />
-                  <Button label="Save" disabled={(E2EName? !E2EName.length>0 : !inputE2EData.length > 0) || !transferBut.length > 0}  onClick={() => {setShowE2EPopup(false); dataOnSaveButton() }} autoFocus />
+                  <Button label="Save" disabled={(isEdit? !E2EName.length>0 : !inputE2EData.length > 0) || !transferBut.length > 0}  onClick={() => {setShowE2EPopup(false); dataOnSaveButton() }} autoFocus />
                   {/* <SaveMapButton  isEnE={true}   /> */}
               </div>
             );
@@ -810,7 +813,7 @@ setPreventDefaultModule(true);
                 setSplCharCheck(true)
               } else {
                 setSplCharCheck(false)
-                if(E2EName){
+                if(E2EName||isEdit){
                   setE2EName(value)}
                   else
                   {setInputE2EData(value)}
@@ -884,11 +887,11 @@ setPreventDefaultModule(true);
                         htmlFor="username"
                         labelTxt="Name"
                         required={true}
-                        placeholder= {E2EName? E2EName:"Enter End to End Flow Name"}   
+                        placeholder= {isEdit? E2EName:"Enter End to End Flow Name"}   
                         customClass="inputRow_for_E2E_popUp"
                         inputType="lablelRowReqInfo"
-                        inputTxt={E2EName? E2EName:inputE2EData} 
-                        setInputTxt={E2EName? (setE2EName && handleSplCharE2EName):(setInputE2EData && handleSplCharE2EName) }
+                        inputTxt={isEdit? E2EName:inputE2EData} 
+                        setInputTxt={isEdit? (setE2EName && handleSplCharE2EName):(setInputE2EData && handleSplCharE2EName) }
                         charCheck={SplCharCheck}
                       />
                     </div>
@@ -1161,7 +1164,7 @@ setPreventDefaultModule(true);
                   {
                     (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? null :
                       <>
-                        <img src="static/imgs/plusNew.png" onClick={() => { setE2EName(''); setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                        <img src="static/imgs/plusNew.png" onClick={() => { setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
                         <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                       </>
                   }
