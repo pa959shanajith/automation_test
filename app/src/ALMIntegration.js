@@ -100,6 +100,7 @@ const AMLIntegration = props => {
             console.log("success");
         }
         props.almDialogHide();
+        setSelectedCategories("");
     }
     const almFooter = () => (
         <>
