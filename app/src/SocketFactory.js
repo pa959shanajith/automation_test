@@ -32,7 +32,6 @@ const SocketFactory = () => {
 
     const webSocketRes = useSelector((state) => state.landing.webSocketRes);
     const isShowSocket = useSelector((state) => state.landing.isShowSocket);
-    const [visibleNotification,setVisibleNotification] = useState(false);
 
     const displayExecutionPopup = (value) => {
         var val;
@@ -230,9 +229,13 @@ const SocketFactory = () => {
 
     return (
         <Fragment>
-            {/* <div> */}
-                {/* <Dialog header="Response socket" style={{ height: "45rem", width: "60rem" }} visible={isShowSocket} onHide={onSocketHide} footer={almFooter}> */}
-            {<AMLIntegration almDialogVisible={isShowSocket} almDialogHide={onSocketHide} almTestcaseData = {webSocketRes}/>}
+            {<AMLIntegration
+                almDialogVisible={isShowSocket}
+                almDialogHide={onSocketHide}
+                almTestcaseData={webSocketRes} 
+                toastSuccess={toastSuccess}
+                toastError={toastError}
+                />}
             <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
             {userInfo.isTrial ? (
                 (
