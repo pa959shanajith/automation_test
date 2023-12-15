@@ -16,10 +16,6 @@ const AvoInput = ({
   charCheck = false
 }) => {
   const [touched, setTouched] = useState(false);
-  const toastRef = useRef(null);
-  const showToastMessage = () => {
-    toastRef.current.show({ severity: 'warn', summary: 'Warning', detail: 'Only letters, numbers, and underscores are allowed.' });
-  };
   const inputJsx = (
     <div className={`input_container ${customClass}`}>
       {(labelTxt || infoIcon || required) && (
@@ -48,7 +44,6 @@ const AvoInput = ({
             } else {
             const enteredChar = e.target.value.slice(-1); 
             if (charCheck && !/^[a-zA-Z0-9_]+$/.test(enteredChar)) {
-              showToastMessage();
               return;
             }
           }
@@ -77,7 +72,6 @@ const AvoInput = ({
 
   return (
     <div className="avo_input">
-      <Toast ref={toastRef} />
       {icon ? (
         <span className="p-input-icon-left">
           <i className={icon} />
