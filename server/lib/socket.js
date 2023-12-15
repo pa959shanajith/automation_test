@@ -95,7 +95,7 @@ io.on('connection', async socket => {
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
 					if(!userICEMap[clientName][result.username]) userICEMap[clientName][result.username] = []
 					iceUserMap[icename] = result.username;
-					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username].push(icename);
+					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username][0] = icename;
 					initListeners(socket);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
