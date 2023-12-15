@@ -217,7 +217,7 @@ const CreateGrid = ({ currentGrid, setCurrentGrid, setLoading, toastError, toast
             toastError(MSG.CUSTOM("Something Went Wrong", VARIANT.ERROR));
           }
         } else {
-          {requestData?.action === "create" ? toastSuccess("Grid Created Successfully", "SUCCESS") : toastSuccess("Grid Updated Successfully", "SUCCESS")}
+          toastSuccess(`Grid ${requestData?.action === "create" ? "Created" : "Updated"} Successfully`, "SUCCESS");
           setCurrentGrid(false);
         }
       }

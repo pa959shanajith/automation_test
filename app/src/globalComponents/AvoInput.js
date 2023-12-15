@@ -1,5 +1,6 @@
 import { InputText } from "primereact/inputtext";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Toast } from 'primereact/toast';
 import "./AvoInput.scss";
 
 const AvoInput = ({
@@ -15,6 +16,10 @@ const AvoInput = ({
   charCheck = false
 }) => {
   const [touched, setTouched] = useState(false);
+  const toastRef = useRef(null);
+  const showToastMessage = () => {
+    toastRef.current.show({ severity: 'warn', summary: 'Warning', detail: 'Only letters, numbers, and underscores are allowed.' });
+  };
   const inputJsx = (
     <div className={`input_container ${customClass}`}>
       {(labelTxt || infoIcon || required) && (
@@ -37,7 +42,18 @@ const AvoInput = ({
           {...(htmlFor && { id: htmlFor })}
           placeholder={placeholder}
           value={inputTxt}
-          onInput={(e) => setInputTxt(e.target.value)}
+          onInput={(e) => {
+            if (e.target.value === '') {
+              setInputTxt('');
+            } else {
+            const enteredChar = e.target.value.slice(-1); 
+            if (charCheck && !/^[a-zA-Z0-9_]+$/.test(enteredChar)) {
+              showToastMessage();
+              return;
+            }
+          }
+            setInputTxt(e.target.value);
+          }}
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />
@@ -61,6 +77,7 @@ const AvoInput = ({
 
   return (
     <div className="avo_input">
+      <Toast ref={toastRef} />
       {icon ? (
         <span className="p-input-icon-left">
           <i className={icon} />
