@@ -165,7 +165,7 @@ const CreateUser = (props) => {
             isadminuser: adminCheck // if user is Quality Manager, she/he has the Admin rights and it is optional
         };
 
-        const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, addRole: userObj.addRole};
+        const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role};
 
         if (uType === "ldap") userObj.ldapUser = ldap.user;
         setLoading(bAction.slice(0, -1) + "ing User...");
@@ -176,8 +176,10 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
+                    if(userInfo && userInfo.user_id === userObj.userid){
                     localStorage.setItem("userInfo", JSON.stringify(userdetail))
-                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, addRole: userObj.addRole}))
+                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role, }))
+                    }
                     props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
                         setSelectedTab("avoAzzureClient") }
