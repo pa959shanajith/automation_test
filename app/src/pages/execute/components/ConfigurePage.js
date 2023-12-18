@@ -554,15 +554,46 @@ catch {
 	  Write-Host "Some error occurred"
 }`,
 
-    shell: `wget --no-check-certificate --quiet
-  --method POST
-  --timeout=0
-  --header 'Content-Type: application/json'
-  --body-data '{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
+    shell: `#!/bin/bash
+# Disable SSL/TLS validation (for testing purposes only)
+export CURL_CA_BUNDLE=""
+export PYTHONHTTPSVERIFY=0
+
+# Define URL, headers, and body
+url="${url}"
+headers="--header=Content-Type:application/json"
+body='{
+  "key": "${currentKey}",
+  "executionType": "${executionTypeInRequest}"
 }'
-    '${url}'`,
+# Make the POST request with wget
+response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
+echo "$response"
+  
+# Check if the request was successful
+status=$(echo "$response" | jq -r '.status')
+  
+if [ "$status" != "fail" ]; then
+  runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+
+  # Check the execution status in a loop
+  while true; do
+    statusResponse=$(wget --quiet -O - "$runningStatusLink")
+    runningStatus=$(echo "$statusResponse" | jq -r '.status')
+    complete=$(echo "$statusResponse" | jq -r '.Completed')
+
+    echo "Executing... $complete"
+
+    if [ "$runningStatus" == "Completed" ]; then
+      summaryReport=$(echo "$statusResponse" | jq -c '.')
+      echo "$summaryReport"
+      break
+    fi
+    sleep ${runningStatusTimer}
+  done
+else
+  echo "Some error occurred"
+fi`,
 };
 
   const fetchData = async () => {
