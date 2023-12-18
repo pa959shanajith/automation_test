@@ -510,57 +510,57 @@ except Exception as e:
 `,
 
     powershell: `# Disable SSL/TLS validation (for testing purposes only)
-    [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
         
-    # Define headers and body
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-    $headers.Add("Content-Type", "application/json")
+# Define headers and body
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Content-Type", "application/json")
     
-    $body = @"
-    {
-        "key": "${currentKey}",
-        "executionType": "${executionTypeInRequest}"
-    }
-    "@
+$body = @"
+{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}
+"@
     
-    try {
-        $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-        $response | ConvertTo-Json -Depth 10
-        $status = $response.status
+try {
+    $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json -Depth 10
+    $status = $response.status
     
-        # Check if status is pass or fail
-        if ($status -ne "fail") {
-            $runningStatusLink = $response.runningStatusLink
+    # Check if status is pass or fail
+    if ($status -ne "fail") {
+        $runningStatusLink = $response.runningStatusLink
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+        $runningStatus = $statusResponse.status
+        $complete = $statusResponse.Completed
+        
+        while ($runningStatus -eq "Inprogress") {
+            Write-Host "Executing... $complete"
+    
             $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
             $runningStatus = $statusResponse.status
-            $complete = $statusResponse.Completed
-        
-            while ($runningStatus -eq "Inprogress") {
-                Write-Host "Executing... $complete"
-    
-                $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
-                $runningStatus = $statusResponse.status
-                if ($statusResponse.PSObject.Properties["Completed"]) {
-                    $complete = $statusResponse.Completed
-                }
-                else {
-                    $complete = ""
-                }
-                Start-Sleep -Seconds ${runningStatusTimer}
+            if ($statusResponse.PSObject.Properties["Completed"]) {
+                $complete = $statusResponse.Completed
             }
-    
-            if ( $runningStatus -eq "Completed") {
-                $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
-                Write-Host $summaryReport
+            else {
+                $complete = ""
             }
-        } 
-        else {
-            Write-Host "Some error occurred"
+            Start-Sleep -Seconds ${runningStatusTimer}
         }
-    }
-    catch {
+    
+        if ( $runningStatus -eq "Completed") {
+            $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
+            Write-Host $summaryReport
+        }
+    } 
+    else {
         Write-Host "Some error occurred"
-    }`,
+    }
+}
+catch {
+    Write-Host "Some error occurred"
+}`,
 
     shell: `#!/bin/bash
 # Disable SSL/TLS validation (for testing purposes only)
