@@ -22,6 +22,7 @@ import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
+import { InputText } from 'primereact/inputtext';
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -183,6 +184,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
+  const [runningStatusTimer, setRunningStatusTimer] = useState("");
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -457,6 +459,10 @@ fetch("${url}", requestOptions)
 
     python: `import requests
 import json
+import time
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 url = "${url}"
 
@@ -468,11 +474,43 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+try:
+    response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+    response = response.json()
+    pretty_json = json.dumps(response, indent=4)
+    print(pretty_json)
+    status = response["status"]
 
-print(response.text)`,
+    if status == "pass":
+        running_status_link = response["runningStatusLink"]
+        status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+        status_response = status_response.json()
+        running_status = status_response["status"]
+        completed = status_response["completed"]
 
-    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+        while running_status == "Inprogress":
+            print(f"Executing... {complete}")
+
+            status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+            status_response = status_response.json()
+            running_status = status_response["status"]
+            completed = status_response["completed"]
+            time.sleep(${runningStatusTimer})
+
+        if running_status == "Completed":
+            pretty_json = json.dumps(status_response, indent=4)
+            print(pretty_json)
+    else:
+        print("Some error occurred")
+except Exception as e:
+    print("Some error occurred")
+`,
+
+    powershell: `# Disable SSL/TLS validation (for testing purposes only)
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+
+# Define headers and body
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Content-Type", "application/json")
 
 $body = @"
@@ -482,18 +520,80 @@ $body = @"
 }
 "@
 
-$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-$response | ConvertTo-Json`,
+try {
+          $response = Invoke-RestMethod 'https://localhost:8443/execAutomation' -Method 'POST' -Headers $headers -Body $body
+	  $response | ConvertTo-Json -Depth 10
+	  $status = $response.status
 
-    shell: `wget --no-check-certificate --quiet
-  --method POST
-  --timeout=0
-  --header 'Content-Type: application/json'
-  --body-data '{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
+          # Check if status is pass or fail
+	  if ($status -ne "fail") {
+		    $runningStatusLink = $response.runningStatusLink
+		    $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+		    $runningStatus = $statusResponse.status
+            $complete = $statusResponse.Completed
+		
+		    while ($runningStatus -eq "Inprogress") {
+                Write-Host "Executing... $complete"
+
+			      $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+			      $runningStatus = $statusResponse.status
+            $complete = $statusResponse.Completed
+			      Start-Sleep -Seconds ${runningStatusTimer}
+		    }
+
+        if ( $runningStatus -eq "Completed") {
+                $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
+                Write-Host $summaryReport
+        }
+	  } 
+    else {
+		    Write-Host "Some error occurred"
+	  }
+}
+catch {
+	  Write-Host "Some error occurred"
+}`,
+
+    shell: `#!/bin/bash
+# Disable SSL/TLS validation (for testing purposes only)
+export CURL_CA_BUNDLE=""
+export PYTHONHTTPSVERIFY=0
+
+# Define URL, headers, and body
+url="${url}"
+headers="--header=Content-Type:application/json"
+body='{
+  "key": "${currentKey}",
+  "executionType": "${executionTypeInRequest}"
 }'
-    '${url}'`,
+# Make the POST request with wget
+response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
+echo "$response"
+  
+# Check if the request was successful
+status=$(echo "$response" | jq -r '.status')
+  
+if [ "$status" != "fail" ]; then
+  runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+
+  # Check the execution status in a loop
+  while true; do
+    statusResponse=$(wget --quiet -O - "$runningStatusLink")
+    runningStatus=$(echo "$statusResponse" | jq -r '.status')
+    complete=$(echo "$statusResponse" | jq -r '.Completed')
+
+    echo "Executing... $complete"
+
+    if [ "$runningStatus" == "Completed" ]; then
+      summaryReport=$(echo "$statusResponse" | jq -c '.')
+      echo "$summaryReport"
+      break
+    fi
+    sleep ${runningStatusTimer}
+  done
+else
+  echo "Some error occurred"
+fi`,
 };
 
   const fetchData = async () => {
@@ -2393,9 +2493,25 @@ Learn More '/>
                     </div>
                   </div>
                   :
-                  <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
+                  <div className="container_codesnippetlabel">
+                    <div>
+                        <label className="code_label">Set The Timer:</label>
+                        <InputText
+                          // data-test="password"
+                          value={runningStatusTimer}
+                          className={'w-full md:w-10rem'}
+                          style={{'margin': '0.5rem 0px 0.5rem 10.2rem', 'width': "10rem"}}
+                          onChange={(event) => { setRunningStatusTimer(event.target.value) }}
+                          keyfilter="int"
+                          placeholder='Seconds'
+                      />
+                    </div>
                     <label className="code_label">Select Language:</label>
-                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} 
+                    options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem" 
+                    style={{'margin': '0.5rem 0px 1rem 9.1rem', 'width': "10rem"}}
+                    />
+
                     <div>
                       <div className="key">
                       <pre className="code_snippet__content code_snippet__pre">
