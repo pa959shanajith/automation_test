@@ -459,6 +459,10 @@ fetch("${url}", requestOptions)
 
     python: `import requests
 import json
+import time
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 url = "${url}"
 
@@ -470,11 +474,43 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+try:
+    response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+    response = response.json()
+    pretty_json = json.dumps(response, indent=4)
+    print(pretty_json)
+    status = response["status"]
 
-print(response.text)`,
+    if status == "pass":
+        running_status_link = response["runningStatusLink"]
+        status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+        status_response = status_response.json()
+        running_status = status_response["status"]
+        completed = status_response["completed"]
 
-    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+        while running_status == "Inprogress":
+            print(f"Executing... {complete}")
+
+            status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+            status_response = status_response.json()
+            running_status = status_response["status"]
+            completed = status_response["completed"]
+            time.sleep(${runningStatusTimer})
+
+        if running_status == "Completed":
+            pretty_json = json.dumps(status_response, indent=4)
+            print(pretty_json)
+    else:
+        print("Some error occurred")
+except Exception as e:
+    print("Some error occurred")
+`,
+
+    powershell: `# Disable SSL/TLS validation (for testing purposes only)
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+
+# Define headers and body
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Content-Type", "application/json")
 
 $body = @"
@@ -484,8 +520,39 @@ $body = @"
 }
 "@
 
-$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-$response | ConvertTo-Json`,
+try {
+          $response = Invoke-RestMethod 'https://localhost:8443/execAutomation' -Method 'POST' -Headers $headers -Body $body
+	  $response | ConvertTo-Json -Depth 10
+	  $status = $response.status
+
+          # Check if status is pass or fail
+	  if ($status -ne "fail") {
+		    $runningStatusLink = $response.runningStatusLink
+		    $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+		    $runningStatus = $statusResponse.status
+            $complete = $statusResponse.Completed
+		
+		    while ($runningStatus -eq "Inprogress") {
+                Write-Host "Executing... $complete"
+
+			      $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+			      $runningStatus = $statusResponse.status
+            $complete = $statusResponse.Completed
+			      Start-Sleep -Seconds ${runningStatusTimer}
+		    }
+
+        if ( $runningStatus -eq "Completed") {
+                $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
+                Write-Host $summaryReport
+        }
+	  } 
+    else {
+		    Write-Host "Some error occurred"
+	  }
+}
+catch {
+	  Write-Host "Some error occurred"
+}`,
 
     shell: `wget --no-check-certificate --quiet
   --method POST
