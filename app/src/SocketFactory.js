@@ -1,7 +1,7 @@
 import React, { useEffect, useState, Fragment, useRef } from 'react';
 import socketIOClient from "socket.io-client";
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ModalContainer, VARIANT, RedirectPage, Messages as MSG, setMsg } from './pages/global';
 import { v4 as uuid } from 'uuid';
 import { loadUserInfoActions } from './pages/landing/LandingSlice';
@@ -28,7 +28,8 @@ const SocketFactory = () => {
     const dispatch = useDispatch();
     const history = useNavigate();
     const toast = useRef();
-    let userInfo = useSelector((state) => state.landing.userinfo)
+    let userInfo = useSelector((state) => state.landing.userinfo);
+    const location = useLocation();
 
     const webSocketRes = useSelector((state) => state.landing.webSocketRes);
     const isShowSocket = useSelector((state) => state.landing.isShowSocket);
@@ -229,7 +230,7 @@ const SocketFactory = () => {
 
     return (
         <Fragment>
-            {<AMLIntegration
+            { ['/landing', '/design', '/execute', '/reports', '/utility', '/admin'].includes(location.pathname) && <AMLIntegration
                 almDialogVisible={isShowSocket}
                 almDialogHide={onSocketHide}
                 almTestcaseData={webSocketRes} 
