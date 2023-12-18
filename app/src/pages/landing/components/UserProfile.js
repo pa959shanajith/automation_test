@@ -142,7 +142,7 @@ const UserDemo = (props) => {
             separator: true
         },
         {
-            label: 'Edit Profile',
+            label: 'Profile',
             icon: 'pi pi-fw pi-pencil',
             command: () => {
                 EditProfileDialog();

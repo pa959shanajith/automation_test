@@ -81,7 +81,8 @@ io.on('connection', async socket => {
 		if (eulaFlag) {
 			const inputs = {
 				"icesession": icesession,
-				"query": 'connect'
+				"query": 'connect',
+				"host":socket.request.headers.host
 			};
 			const result = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
 			if (result == 'fail') {
@@ -89,14 +90,12 @@ io.on('connection', async socket => {
 			} else {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
-					host = JSON.parse(icesession).host;
-					clientName=utils.getClientName(host);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
 					if(!userICEMap[clientName][result.username]) userICEMap[clientName][result.username] = []
 					iceUserMap[icename] = result.username;
-					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username].push(icename);
+					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username][0] = icename;
 					initListeners(socket);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);

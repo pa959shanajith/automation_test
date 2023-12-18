@@ -665,7 +665,7 @@ module.exports.Execution_Queue = class Execution_Queue {
         // let execution_Queue = await cache.get('execution_list');
 
         //Adding the reportLink in the response
-        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
+        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         
         // Adding the Running Status Link in the response 
         response['runningStatusLink'] = req.protocol + "://" + (req.hostname) + "/runningStatus?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId

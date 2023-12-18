@@ -211,9 +211,20 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         text: 'Microsoft Edge'
     }
 ]);
-  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+  else projectInfo = projectInfo;
+
   const [radioButton_grid, setRadioButton_grid] = useState(
-   selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
+    projectInfo?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
   const [defaultValues2, setDefaultValues2] = useState({});
@@ -230,7 +241,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
@@ -243,26 +253,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   ]
   const debouncedSearchValue = useDebounce(searchProfile, 500);
 
-  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  if (!userInfo) userInfo = userInfoFromRedux;
-  else userInfo = userInfo;
-
-  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
-  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
-  if (!projectInfo) projectInfo = projectInfoFromRedux;
-
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
-  }, [selectProjects]);
+    setConfigProjectId(projectInfo?.projectId)
+  }, [projectInfo]);
 
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
-    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setShowSauceLabs(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
+    setShowBrowserstack(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
-  }, [selectProjects.projectId, selectProjects.appType]);
+  }, [projectInfo?.projectId, projectInfo?.appType]);
 
  const displayError = (error) => {
     setLoading(false)
@@ -391,7 +392,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
-      // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
+      // dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i], projectLevelRole: Projects.projectlevelrole[0][i]["assignedrole"] });
@@ -404,7 +405,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
-  }, [selectProjects]);
+  }, []);
 
  const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
@@ -823,74 +824,72 @@ else{
 };
 
 const handleSubmit1 = async (SauceLabPayload) => {
-  // close the existing dialog
-  // open the new dialog
   setLoading("Fetching details..");
-  const data1 = await getDetails_SAUCELABS()
-  if (data1.error) { setMsg(data1.error); return; }
-      if (data1 !== "empty") {
-        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-        let data = await saveSauceLabData({
-          "SauceLabPayload" : {
-            ...data1,
-            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
-          }
+
+  try {
+    const data1 = await getDetails_SAUCELABS();
+
+    if (data1.error) {
+      setMsg(data1.error);
+      return;
+    }
+
+    if (data1 !== "empty") {
+      data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails');
+
+      let data = await saveSauceLabData({
+        "SauceLabPayload": {
+          ...data1,
+          "query": showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails'
+        }
+      });
+
+      if (data && data.os_names && data.browser) {
+        const arrayOS = data.os_names.map((element, index) => {
+          return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+          };
         });
-        if (data && data.os_names && data.browser) {
-          // Data exists and has the expected properties
-          
-          const arrayOS = data.os_names.map((element, index) => {
-            return {
-              key: element,
-              text: element,
-              title: element,
-              index: index
-            };
-          });
-          setOsNames(arrayOS);
-          setBrowserDetails(data);
-          setLoading(false)
-          setDisplayBasic4('displayBasic4');
-      }
-      else if (data && data.emulator && data.real_devices && data.stored_files){
-          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-          //     return {
-          //         key: element,
-          //         text: element,
-          //         title: element,
-          //         index: index
-          //     }
-          // })
-          // setPlatforms(arrayPlatforms);
-    
-          setMobileDetails(data);
-          setDisplayBasic4(true);
-          setLoading(false);
-        }
-         else {
-          
-          // Data is empty or doesn't have expected properties
-          if (data == "unavailableLocalServer"){
-              toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-                life: 5000
-              });
-          }else{
-            toast.current.show({
-              severity: 'error',
-              summary: 'error',
-              detail: "Error while fetching the data from Saucelabs",
-              life: 5000
-            });
-          } 
-          setLoading(false); 
-        }
+        setOsNames(arrayOS);
+        setBrowserDetails(data);
+        setLoading(false);
+        setDisplayBasic4('displayBasic4');
+      } else if (data && data.emulator && data.real_devices && data.stored_files) {
+        setMobileDetails(data);
+        setDisplayBasic4(true);
+        setLoading(false);
       } else {
-        setMsg("No data stored in settings"); return;
+        // Data is empty or doesn't have expected properties
+        console.log(data)
+        if (data === "unavailableLocalServer") {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+            life: 5000
+          });
+        }
+        setLoading(false);
       }
+    } else {
+      toast.current.show({
+        severity:'info',
+        summary: 'Info',
+        detail: "No data stored in settings",
+        life: 5000
+      });
+      return;
+    }
+  } catch (error) {
+    console.error("Error during handleSubmit1:", error);
+    setMsg("An error occurred while fetching details");
+  } finally {
+    setLoading(false);
   }
+};
 
 
            
@@ -929,7 +928,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
         }
       } else {
-        tableUpdate();
+        tableUpdate(currentPage);
         toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
       }
       setLoading(false);
@@ -968,7 +967,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   />,
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
-  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
+  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={projectInfo?.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
   displayBasic4={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
       onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
@@ -990,7 +989,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
@@ -1007,7 +1006,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       executionData["browserType"]=browserTypeExe;
   }
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
+    const modul_Info = parseLogicExecute(eachData, currentTask, projectInfo?.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
@@ -1243,7 +1242,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >
               Schedule
             </Button>
-            <span id={cicdLicense.value || selectProjects.appType!=="Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
+            <span id={cicdLicense.value || projectInfo?.appType !== "Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
             <Button
               className="CICD"
               size="small"
@@ -1252,14 +1251,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-              disabled={selectProjects.appType!=="Web" || cicdLicense.value}
+                disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
               CI/CD
             </Button>
             </span>
             <div className="cloud-test-provider" >
               <Dropdown
-                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={projectInfo.appType === "Desktop" || projectInfo.appType === "Mainframe" || projectInfo.appType === "OEBS" || projectInfo.appType === "SAP"} />
             </div> 
           
           </div>
@@ -1271,18 +1270,18 @@ const handleSubmit1 = async (SauceLabPayload) => {
               visible={visible}
               onHide={() => setVisible(false)}
             />
-             <img src="static/imgs/ic-edit.png"
-  style={{ height: "20px", width: "20px" }}
-className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
-/>
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
- <img
-
-src="static/imgs/ic-delete-bin.png"
-style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-             </div>
+            <img src="static/imgs/ic-edit.png"
+              style={{ height: "20px", width: "20px" }}
+              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              />
+              <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+               <img
+              
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
+          </div>
         ),
       });
     });
@@ -1438,7 +1437,7 @@ const showToast = (severity, detail) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: selectProjects.appType,
+            appType: projectInfo?.appType,
             domainName: "Banking",
             projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
@@ -1526,7 +1525,7 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
-      tableUpdate();
+      tableUpdate(currentPage);
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
@@ -1543,14 +1542,14 @@ const showToast = (severity, detail) => {
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...localStorageDefaultProject, // Parse existing data from localStorage
+        ...projectInfo, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
         appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)],
         projectLevelRole: projectList.find((project)=>project.id === e.target.value)?.projectLevelRole
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
     }
     return (
       <nav>
@@ -1754,12 +1753,12 @@ const showToast = (severity, detail) => {
           recurringValue:
             selectedMonthly?.key === "daymonth"
               ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
-              : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
+              : `0 0 * */${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
             selectedMonthly?.key === "daymonth"
               ? `Occurs on ${scheduleOption?.monthday}th day of every ${scheduleOption?.monthweek} month`
-              : `Occurs on ${dropdownWeek?.name} ${dropdownDay?.name} of every ${scheduleOption?.everymonth} month`,
+              : `Occurs on ${dropdownWeek?.name.toLowerCase()} ${dropdownDay?.name.toLowerCase()} of every ${scheduleOption?.everymonth} month`,
         },
       };
       return pattrenObj[getKey];
@@ -1961,6 +1960,7 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
+      setCurrentPage(e.page+1);
       tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
@@ -2079,7 +2079,7 @@ const showToast = (severity, detail) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  disabled={selectProjects.appType!=="Web"}
+                  disabled={projectInfo?.appType !== "Web"}
                   checked={ radioButton_grid === "Execute with Avo Assure Agent/ Grid"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
@@ -2105,7 +2105,7 @@ Learn More '/>
                         setExecutingOn("ICE");
                       }}
                       checked={
-                        radioButton_grid === "Execute with Avo Assure Client" || selectProjects.appType!=="Web"
+                        radioButton_grid === "Execute with Avo Assure Client" || projectInfo?.appType!=="Web"
                       }
                     />
                   </div>
@@ -2501,6 +2501,28 @@ Learn More '/>
       );
     }
   };
+
+  // Filter out TestSuites which has empty TestCases (Scenarios)
+  const filterOutEmptyTestSuites = (data) => {
+    let currentData = data;
+    let configureData = data?.configureData;
+    let filteredConfigureData = {};
+    let configureDataKeys = Object.keys(configureData);
+
+    if (configureDataKeys?.length) {
+      Object.values(configureData)?.map((configItem, index) => {
+        // check if an configItem is an array
+        if (Array.isArray(configItem)) {
+          // check if length of array is greater than 0
+          if (configItem?.length) {
+            const filterdItems = configItem?.filter(item => item?.scenarios?.length !== 0);
+            filteredConfigureData[Object.keys(configureData)[index]] = filterdItems;
+          }
+        }
+      })
+    }
+    return { ...currentData, configureData: filteredConfigureData }
+  };
   return (
     <>
       <div>
@@ -2551,7 +2573,7 @@ Learn More '/>
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup
-              configData={getConfigData}
+              configData={filterOutEmptyTestSuites(getConfigData)}
               xpanded={xpanded}
               setXpanded={setXpanded}
               tabIndex={tabIndex}
@@ -2589,7 +2611,7 @@ Learn More '/>
               typeOfExecution={typeOfExecution}
               checkedExecution={checkedExecution}
               setCheckedExecution={setCheckedExecution}
-              typesOfAppType={typesOfAppType ? typesOfAppType : localStorageDefaultProject?.appType }
+              typesOfAppType={typesOfAppType ? typesOfAppType : projectInfo?.appType }
             />
           }
           headerTxt="Execution Configuration set up"

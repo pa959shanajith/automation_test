@@ -748,3 +748,10 @@ margin-left: 0.3rem;
 position: relative;
 bottom: 0.19rem;
 }
+.rowNameTrim{
+    display: block;
+    white-space: nowrap;         /* Prevents the text from wrapping */
+    overflow: hidden;            /* Hides the content that overflows */
+    text-overflow: ellipsis;     /* Displays an ellipsis (...) to indicate overflow */
+    width: 150px; 
+}

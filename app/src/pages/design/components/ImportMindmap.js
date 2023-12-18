@@ -3,7 +3,7 @@ import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gi
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import {setImportData,dontShowFirstModule,selectedModuleReducer} from '../designSlice';
+import {setImportData,dontShowFirstModule,selectedModuleReducer, SetCurrentId} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
@@ -70,6 +70,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     const [VersionItemValue, setVersionItemValue] = useState(null)
     const [ImportValue, setImportValue] = useState(null)
     const [projectImportId, setProjectImportId] = useState(null);
+    const prjList = useSelector(state=>state.design.projectList)
     const upload = (e) => {
         let  project = "";
         if(importType === 'zip'){
@@ -234,6 +235,14 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         moduleid:Array.isArray(data)?data[0]:data
                     }
                     var res = await getModules(req)
+                    var Screen = await getScreens(projectImportId) 
+                    if(Screen.error){displayError(Screen.error);ResetSession.end();return;}
+                    setTimeout(function() {
+                        dispatch(selectedModuleReducer(res))
+                    setImportPop(false)
+                    setOptions('importmodules')
+                    // setBlockui({show:false})
+                    }, 100);
                     if(res.error){displayError(res.error.CONTENT);ResetSession.end();return;}
                     importData = res
                     setBlockui({show:false})
@@ -337,7 +346,8 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                             setBlockui:setBlockui,
                             setOptions:setOptions,
                             setImportPop:setImportPop,
-                        changeImportType:changeImportType
+                        changeImportType:changeImportType,
+                            prjList:prjList
                         
                         })
 
@@ -797,7 +807,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitVerRef,sheetRe
 // imports all the data to mindmapCanvas by setting moduleData based on type
 // createnew should be true for all import except mm because nodes will be not created it will be revoked from saved data
 
-const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
+const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType,prjList}) =>{
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
     // setBlockui({content:'Importing ...',show:true})
@@ -827,12 +837,24 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     //     var data = getJsonPd(res.data)
     //     mindmapData = {createnew:true,importData:{createdby:'file',data:data}}
     // }
+        const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+        const defaultProjectData = {
+            ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+            projectId: importProj,
+            projectName: prjList[importProj]?.name,
+            appType: prjList[importProj]?.apptypeName,
+            projectLevelRole: prjList[importProj]?.projectLevelRole
+          };
+          
+        localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
+        
         var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(importProj)
         if(screendata.error){displayError(screendata.error);return;}
         setTimeout(function() {
             dispatch(dontShowFirstModule(true))
+            dispatch(SetCurrentId(""))
             dispatch(setImportData({
                 selectProj : importProj,
                 selectModule : mindmapData,

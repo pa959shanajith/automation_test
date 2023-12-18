@@ -271,6 +271,10 @@ if (cluster.isMaster) {
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/devopsReports/getReportsData_ICE', report.getReportsData_ICE);
+        app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
+		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
+        app.get('/devopsReports/viewReport', report.viewReport);
 		app.use(csrf({
 		cookie: true
 		}));
@@ -318,7 +322,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Engineer,Test Lead and Test Manager can access
-		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin)$/, function(req, res) {
+		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin|devOpsReport)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead", "Quality Engineer"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
