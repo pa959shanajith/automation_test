@@ -2513,9 +2513,10 @@ const LaunchApplication = props => {
       setOS("android")
       setError(false);
       getDeviceSerialNumber_ICE().then(data => {
-            if(data !== "fail") {setSerialNumber(data);}
+            if(data !== "fail") {
+            if(!data.includes("Error")) setSerialNumber(data);}
             else props.toastError(error)
-      }).catch(error => {
+                  }).catch(error => {
           props.toastError(error)
       })
     }
