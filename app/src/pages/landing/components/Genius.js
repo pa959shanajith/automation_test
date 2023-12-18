@@ -695,8 +695,8 @@ const toastSuccess = (successMessage) => {
       
      
       const newModule={
-        key:modulesdata[modulesdata.length-1]._id,
-        text:modulesdata[modulesdata.length-1].name
+        key:modulesdata[0]._id,
+        text:modulesdata[0].name
       }
       setSelectedModule(newModule)
       setDisplayCreateModule(false);
