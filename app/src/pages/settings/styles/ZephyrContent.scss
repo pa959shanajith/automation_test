@@ -42,12 +42,6 @@
     float: right;
 }
 
-.login-cls {
-    font-size: 23px;
-    font-weight: 600;
-    position: absolute;
-    bottom: 20rem;
-}
 
 .input-cls,
 .passwrd-cls,
@@ -208,27 +202,7 @@
 
 
 
-.card__login__jira {
 
-    position: absolute;
-    height: 20rem;
-    width: 31rem;
-    bottom: 7rem;
-    left: 20rem;
-    box-shadow: none !important;
-
-
-
-    .p-card-body {
-
-        width: 33rem;
-
-    }
-
-
-
-
-}
 
 
 
@@ -246,23 +220,6 @@
 
 
 
-.login_container_integrations {
-
-    display: flex;
-
-    flex-direction: row;
-
-    position: relative;
-
-    top: 3rem;
-
-    .p-component {
-
-        box-shadow: none !important;
-
-    }
-
-}
 
 .manage_integrations {
     .p-dialog-content {
