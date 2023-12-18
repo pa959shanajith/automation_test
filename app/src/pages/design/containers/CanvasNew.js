@@ -116,12 +116,12 @@ const CanvasNew = (props) => {
     const [addScenario , setAddScenario] = useState([]);
     const [inputValue, setInputValue] = useState("");
     const [inputValScreen , setinputValScreen]= useState("");
-    const [showInput, setShowInput] = useState(false);
+    const [showInput, setShowInput] = useState(true);
     const [addScreen , setAddScreen] = useState([]);
-    const[ showInputScreen , setShowInputScreen]= useState(false);
+    const[ showInputScreen , setShowInputScreen]= useState(true);
     const [addTestStep , setAddTestStep] = useState([]);
     const [inputValTestStep , setinputValTestStep]= useState("");
-    const[ showInputTestStep , setShowInputTestStep]= useState(false);
+    const[ showInputTestStep , setShowInputTestStep]= useState(true);
     const [selectedRowsScenario, setSelectedRowsScenario] = useState([]);
     const [selectedRowsScreen, setSelectedRowsScreen] = useState([]);
     const [selectedRowsTeststep, setSelectedRowsTeststep] = useState([]);
@@ -369,7 +369,7 @@ const CanvasNew = (props) => {
     
     const menuItemsModule = [
         { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([]);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
@@ -377,7 +377,7 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScenario = [
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([{ id:  1, value : inputValScreen , isEditing:false}]);setShowInputScreen(true);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
@@ -389,7 +389,7 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScreen = !testSuiteInUse?[
         { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([{id:1, value : inputValTestStep, isEditing:false}]);setShowInputTestStep(true);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
@@ -1383,11 +1383,13 @@ const CanvasNew = (props) => {
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
+              setInputValue("sample Testcase");
             }}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 updateRow(rowData, inputValue);
                 setShowInput(false);
+                setInputValue("sample Testcase");
               }
             }}
             />
@@ -1453,11 +1455,13 @@ const CanvasNew = (props) => {
             onBlur={() => {
               updateRowScreen(rowDataScreen, inputValScreen);
               setShowInputScreen(false);
+              setinputValScreen("sample Screen ");
             }}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 updateRowScreen(rowDataScreen, inputValScreen);
                 setShowInputScreen(false);
+                setinputValScreen("sample Screen ");
               }
             }}
             />
@@ -1521,11 +1525,13 @@ const CanvasNew = (props) => {
     onBlur={() => {
       updateRowTestStep(rowDataTestStep, inputValTestStep);
       setShowInputTestStep(false);
+      setinputValTestStep("sample teststeps");
     }}
-    onKeyPress={(e) => {
+    onKeyUpCapture={(e) => {
       if (e.key === 'Enter') {
         updateRowTestStep(rowDataTestStep, inputValTestStep);
         setShowInputTestStep(false);
+        setinputValTestStep("sample teststeps");
       }
     }}
     />
@@ -1538,7 +1544,7 @@ const CanvasNew = (props) => {
           value={rowDataTestStep.value}
           onChange={(e) => handleRowInputChangeTestCases(rowDataTestStep.id, e.target.value)}
           onBlur={() => handleSaveTestCases(rowDataTestStep)}
-          onKeyPress={(e) => {
+          onKeyUpCapture={(e) => {
             if (e.key === "Enter") {
               e.target.blur();
               handleSaveTestCases(rowDataTestStep);
@@ -1571,18 +1577,18 @@ const CanvasNew = (props) => {
   
   const footerContentScenario = (
     <div>
-        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);}} className="add_scenario_btn" /> 
+        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
     </div> 
 );
 
 const footerContentScreen =(
     <div>
-              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);}} className="add_scenario_btn" /> 
+              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);setinputValScreen("");setAddScreen([{ id: 1, value: inputValScreen, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValScreen ) ?  false: true} /> 
           </div>
     )
     const footerContentTeststep =(
       <div>
-                <Button label="Add Test Step"  onClick={() => {setVisibleTestStep(false);createMultipleNode(box.split("node_")[1],addTestStep);}} className="add_scenario_btn" /> 
+                <Button label="Add Test Step"  onClick={() => {setVisibleTestStep(false);createMultipleNode(box.split("node_")[1],addTestStep);setinputValTestStep("");setAddTestStep([{ id: 1, value: inputValTestStep, isEditing: false }]);}} className="add_scenario_btn"disabled={ (inputValTestStep ) ?  false: true}  /> 
             </div>
       )
        // functions for impact analysis 
