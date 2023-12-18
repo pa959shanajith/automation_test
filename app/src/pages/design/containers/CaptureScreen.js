@@ -2577,7 +2577,7 @@ const LaunchApplication = props => {
                         <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
                         <select data-test="andriodSerialNumber" className='versionSelect' placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
                           <option value="" disabled>Select Mobile Serial Number</option>
-                          {serialNumbers.map((serialNumber) => (
+                          {serialNumbers?.map((serialNumber) => (
                             <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
                           ))}
                         </select>
