@@ -2528,7 +2528,13 @@ const LaunchApplication = props => {
           }})
       }
     }
-
+    const handleCheckingMobileClient_ICE_MW = ()=>{
+        checkingMobileClient_ICE().then(data=>{
+          console.log("dataOfcheckingMobileClient_ICE",data)
+          if(data === false){
+            setcheckingMobileClient_ICEResponse(true)
+          }})
+    }
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
            <div className="flex flex-wrap gap-3">
@@ -2647,9 +2653,14 @@ const LaunchApplication = props => {
     }
 
     const mobileWeb = {
-        'content': <div className="ss__mblweb_inputs">    
-            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler} name="mobWebInput1" /> 
-            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
+        'content': <div className="ss__mblweb_inputs mbl_dialog">    
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum}  onChange={(e) => { slNumHandler(e); handleCheckingMobileClient_ICE_MW();}} name="mobWebInput1"  /> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" /> 
+            <div>
+                  {CheckingMobileClient_ICEResponse &&
+                    <span  className='lable_mw'>Required packages for mobile testing in Avo Assure client folder are missing.If it is android <a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> or if it is ios <a href="https://downloads.avoassure.ai/driver/AvoAssure_iOSMobileDependencies.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                  }
+                </div>
         </div>,
 
         'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,
