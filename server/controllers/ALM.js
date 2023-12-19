@@ -10,7 +10,7 @@ const socket_io = require("../lib/socket")
 exports.create_ALM_Testcase = async function (req, res) {
  
     logger.info("ALM create testcase service called");
-    console.log("ALM create testcase service called");
+    console.log(`${req.ip}`," ALM create testcase service called");
     try {
         logger.info("validating the request payload");
         console.log(req.body);
