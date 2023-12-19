@@ -19,6 +19,8 @@ import { Messages as MSG } from '../../global/components/Messages';
 import { RedirectPage, ScreenOverlay,ResetSession,setMsg, VARIANT} from '../../global';
 import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR} from "../api"
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import { InputSwitch } from "primereact/inputswitch";
+import { Accordion, AccordionTab } from 'primereact/accordion';
 
 
 
@@ -42,6 +44,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     const [isEmpty, setIsEmpty] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [disableLoginBtn, setDisableLoginBtn] = useState(false);
+    const [almCheck, setAlmCheck] = useState(false);
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -417,9 +420,52 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     <ProgressSpinner className="modal-spinner" style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>
                 }  */}
-                {selectedscreen?.code === 'GIT' ? <GitConfig toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/> : <>
+
+                    {selectedscreen?.code === 'GIT' ? <GitConfig toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} /> : selectedscreen?.code === 'ALM' ?
+                            <div className="flex flex-column">
+                                <span style={{fontSize:'20px'}}>View Mapping</span>
+                                <Card className="">
+                                    <div className="flex justify-content-flex-start toggle_btn">
+                                        <span>Jira Testcase to Avo Assure Testcase</span>
+                                        <InputSwitch checked={almCheck} onChange={(e) => setAlmCheck(e.value)} />
+                                        <span>Avo Assure Testcase to Jira Testcase</span>
+                                    </div>
+
+                                    {setAlmCheck ? (<div className="accordion_testcase">
+                                        <Accordion multiple activeIndex={0} >
+                                            {/* {rows.map((item) => (
+                                                <AccordionTab header={<span>{item.scenarioNames[0]} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)} /></span>}>
+                                                    <span>{item.itemSummary}</span>
+                                                </AccordionTab>))} */}
+                                                <AccordionTab header={<span>{"testcase1"} <i className="pi pi-times cross_icon"
+                                                //   onClick={() => handleUnSyncmappedData(item)} 
+                                                /></span>}>
+                                                    <span>{"item.itemSummary"}</span>
+                                                </AccordionTab>
+                                        </Accordion>
+                                    </div>
+
+                                    ) : (
+
+                                        <div className="accordion_testcase">
+                                            <Accordion multiple activeIndex={0}>
+                                                {/* {rows.map((item) => (
+                                                    <AccordionTab header={<span>{item.itemSummary} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)} /></span>}>
+                                                        <span>{item.scenarioNames[0]}</span>
+                                                    </AccordionTab>))} */}
+                                                    <AccordionTab header={<span>{"scenarioss11"} <i className="pi pi-times cross_icon"
+                                                    //   onClick={() => handleUnSyncmappedData(item)} 
+                                                    /></span>}>
+                                                        <span>{"testcase"}</span>
+                                                    </AccordionTab>
+                                            </Accordion>
+                                        </div>
+                                    )}
+                                </Card>
+                            </div>
+                        : <>
                         {selectedscreen && authType === "basic"}
-                        <p style={{ marginBottom: '0.5rem', marginTop: '0.5rem' }} className="login-cls">Login </p>
+                        <p className="login-cls">Login </p>
                         {selectedscreen?.name === 'Zephyr' && (
                             <div className="apptype__token">
                                 <span>Application Type:</span>

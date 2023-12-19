@@ -71,10 +71,10 @@ const CreateLanding = (props) => {
     }
 
     const selectServerHandler = (event) => {
-        setServerName(event.target.value.name);
+        setServerName(event?.value?._id);
         dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
         dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-        props.ldapSwitchFetch({ userConf_ldap_fetch: "import" });
+        props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName : event?.target?.value?.name});
     }
 
     //checked users 
@@ -343,98 +343,3 @@ const CreateLanding = (props) => {
     )
 }
 export default CreateLanding;
-//---------------------- need it for reference, once the LDAP will completely then will delete this commented lines-----------------------------
-                    // <Fragment>
-                    //     <div data-test="userLDAPFetch" className="userLDAPFetch adminControl-create">
-                    //         <div className="Create-outer Create-outer-cust">
-                    //             <label className="adminFormRadio">
-                    //                 <RadioButton
-                    //                     data-test="ldapRadioMap"
-                    //                     checked={ldap.fetch === "map"}
-                    //                     value="map"
-                    //                     name="ldapFetch"
-                    //                     disabled={server === ''}
-                    //                     onChange={() => { dispatch(AdminActions.UPDATE_LDAP_FETCH("map")); props.ldapSwitchFetch({ userConf_ldap_fetch: "map" }); }}
-                    //                 />
-                    //                 <span className="ml-2 mr-6">Map New User</span></label>
-
-                    //             {/* <label htmlFor='ldapFetch' className="adminFormRadio">Map New User </label>
-                    //             <InputText data-test="ldapRadioMap"
-                    //                 checked={ldap.fetch === "map"}
-                    //                 type="radio" value="map"
-                    //                 onChange={() => { dispatch(AdminActions.UPDATE_LDAP_FETCH("map")); props.ldapSwitchFetch({ userConf_ldap_fetch: "map" }); }}
-                    //                 name="ldapFetch"
-                    //                 id='ldapFetch'
-                    //                 disabled={server === ''}
-                    //             /> */}
-
-                    //             <label htmlFor='' className="adminFormRadio">Import User</label>
-                    //             <RadioButton
-                    //                 data-test="ldapRadioImport"
-                    //                 checked={ldap.fetch === "import"}
-                    //                 type="radio" value="import"
-                    //                 onChange={() => {
-                    //                     dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-                    //                     props.ldapSwitchFetch({ userConf_ldap_fetch: "import" });
-                    //                 }}
-                    //                 name="ldapFetch"
-                    //                 disabled={server === ''}
-                    //             />
-
-                    //         </div>
-                    //         {/* {(ldap.fetch !== 'import') ?
-                    //             <div className="userForm-create">
-                    //                 <InputText
-                    //                     data-test="userDomainName"
-                    //                     autoComplete="off"
-                    //                     id="ldapDirectory"
-                    //                     name="ldapDirectory"
-                    //                     value={ldap.user}
-                    //                     onChange={(event) => { dispatch(AdminActions.UPDATE_LDAP_USER(event.target.value)) }}
-                    //                     // className={props.ldapDirectoryAddClass ? ((props.ldapDirectoryAddClass === "selectErrorBorder") ? "middle__input__border-create form-control__conv-create form-control-custom-create create selectErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create create inputErrorBorder") : "middle__input__border-create form-control__conv-create form-control-custom-create create"} 
-                    //                     placeholder="User Domain Name"
-                    //                 />
-                    //                 <Button
-                    //                     label="Fetch"
-                    //                     data-test="fetchButtonLdap"
-                    //                     title="Fetch"
-                    //                     disabled={server === ''}
-                    //                     onClick={() => { props.ldapGetUser(); }}
-                    //                 ></Button>
-                    //             </div>
-                    //             : null
-                    //         } */}
-                    //         {(ldap.fetch === 'import') ?
-                    //             <div className="dropdown dropdown-scroll userForm-create" >
-                    //                 <InputText
-                    //                     data-test="userListInput"
-                    //                     value={ldapUserFilter}
-                    //                     onChange={(event) => { dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(event.target.value)); props.searchFunctionLdap(event.target.value); }}
-                    //                     onClick={() => { props.click({ query: 'retaintype' }); props.setShowDropdown(!props.showDropdown); }}
-                    //                     // className={props.ldapDirectoryAddClass ? ((props.ldapDirectoryAddClass === "selectErrorBorder") ? "btn btn-users dropdown-toggle selectErrorBorder search-cust c__search-dropdown" : "btn btn-users dropdown-toggle inputErrorBorder  search-cust c__search-dropdown") : "btn btn-users dropdown-toggle search-cust c__search-dropdown"}
-                    //                     type="text"
-                    //                     autoComplete="off"
-                    //                     id="ldapDirectory"
-                    //                     data-toggle="dropdown"
-                    //                     placeholder="Search User.."
-                    //                 ></InputText>
-                    //                 {(props.showDropdown && ldapAllUserList !== []) ?
-                    //                     <ul ref={node} className=" dropdown-menu-edit dropdown-menu-users-ldap create-user__dropdown ldapDirectory-cust" role="menu" aria-labelledby="ldapDirectory" >
-                    //                         {props.ldapUserList.map((luser, index) => (
-                    //                             <li index={index}
-                    //                                 role="presentation"
-                    //                                 onClick={() => {
-                    //                                     props.setShowDropdown(!props.showDropdown);
-                    //                                     dispatch(AdminActions.UPDATE_LDAP_USER(luser.value));
-                    //                                     dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(luser.html));
-                    //                                     props.ldapGetUser({ luser: luser.value });
-                    //                                 }}
-                    //                                 value={luser.value}
-                    //                                 className="ldap-user__li">{luser.html}</li>
-                    //                         ))}
-                    //                     </ul>
-                    //                     : null}
-                    //             </div>
-                    //             : null}
-                    //     </div>
-                    // </Fragment>

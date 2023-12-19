@@ -857,7 +857,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         <>
             <div className="card flex justify-content-center">
                 <Dialog className="manage_integrations" header={Index === 1 && selectedscreen.name ? `Manage Integration` : `Manage Integration: ${selectedscreen.name} Integration`} visible={visible} style={{ width: '70vw', height: '45vw' }} onHide={handleCloseManageIntegrations} footer={!showLoginCard ? footerIntegrations() : ""}>
-                    <div className="card">
+                    <div>
                         {showLoginCard  ? <TabMenu model={integrationItems} activeIndex={Index}  onTabChange={handleTabIndexChange} /> : ""}
                         {Index === 1 && <CloudSettings createSaucelabs={createSaucelabs} setCreateSaucelabs={setCreateSaucelabs} SaucelabsURL={SaucelabsURL} setSaucelabsURL={setSaucelabsURL} SaucelabsUsername={SaucelabsUsername} setSaucelabsUsername={setSaucelabsUsername} SaucelabsAPI={SaucelabsAPI} setSaucelabsAPI={setSaucelabsAPI} />}
                     </div>
@@ -865,9 +865,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                             header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
                         
                     {showLoginCard && Index === 0 ? (
-                        <>
+                        <div className="flex flex-row">
                             {IntergrationLogin}
-                        </>
+                        </div>
                     ) : selectedscreen.name === "Jira" && Index===0 ?
                             (
                                 <div>
