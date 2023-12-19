@@ -178,7 +178,7 @@ const CreateUser = (props) => {
                 if (data === "success") {
                     if(userInfo && userInfo.user_id === userObj.userid){
                     localStorage.setItem("userInfo", JSON.stringify(userdetail))
-                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role, }))
+                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role }))
                     }
                     props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
