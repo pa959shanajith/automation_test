@@ -352,6 +352,7 @@ const ConfigureSetup = ({
               customClass="inputRow"
               setInputTxt={setConfigTxt}
               inputType="lablelRowReqInfo"
+              charCheck={true}
             />
           </div>
         </div>

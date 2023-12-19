@@ -406,9 +406,9 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
         continueSave = false;
         setShowPop({
           'type': 'modal',
-          'title': 'Save Scrape data',
+          'title': 'Save Capture data',
           'content': <div className="ss__dup_labels">
-            Please rename/delete duplicate scraped objects
+            Please rename/delete duplicate Captured objects
             <br /><br />
             Object characterstics are same for:
             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
@@ -423,9 +423,9 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       else if (dXpath) {
         continueSave = false;
         setShowConfirmPop({
-          'title': 'Save Scrape data',
+          'title': 'Save Capture data',
           'content': <div className="ss__dup_labels">
-            Object characteristics are same for the below list of objects:
+            Object Characteristics are same for the below list of objects:
             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
             <div className="ss__dup_scroll">
               {dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
