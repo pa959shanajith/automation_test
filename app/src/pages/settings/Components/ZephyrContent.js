@@ -315,14 +315,17 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const handleUnSync = async (node,parentNode) => {
         let unSyncObj = [];
         if (Object.keys(node).length) {
-            let findMappedId = rows.filter((item) => item.scenarioId.includes(parentNode.props.parent.key)).filter((item) => item.testid.includes(node.key))
+                        let findMappedId = rows.filter((item) => item.scenarioId.includes(parentNode.props.parent.key)).filter((item) => item.testid.includes(node.key))
             // let findMappedId = findScnArray.filter((item) => item.testid.includes(node.key))
             if (findMappedId && findMappedId.length) {
                 unSyncObj.push({
                     'mapid': findMappedId[0].mapId,
-                    'testCaseNames': [].concat(node.label),
-                    'testid': [].concat(node.key)
+                    [parentNode.props.parent.children &&  parentNode.props.parent.children.length === 1 ? "testscenarioid" : 'testCaseNames']: parentNode.props.parent.children &&  parentNode.props.parent.children.length === 1 ? [].concat(parentNode.props.parent.key) : [].concat(node.label),
+                    // 'testid': [].concat(node.key)
                 })
+                if(parentNode.props.parent.children &&  parentNode.props.parent.children.length > 1){
+                    unSyncObj[0].testid = [].concat(node.key) || []
+                }
                 let args = Object.values(unSyncObj);
                 args['screenType'] = 'Zephyr'
                 const saveUnsync = await api.saveUnsyncDetails(args);
@@ -348,7 +351,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
 
             }
             const removeTestCase = completeTreeData.map((scenario) => {
-                if (scenario.children && scenario.children.length > 0) {
+                if (scenario.key === parentNode.props.parent.key && scenario.children && scenario.children.length > 0) {
                     const filteredChildren = scenario.children.filter((child) => child.key !== node.key);
                     return {
                         ...scenario,
@@ -372,29 +375,36 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
         }
     }
 
-    const handleUnSyncmappedData = async(items, testname)=>{
+    const handleUnSyncmappedData = async(items, testname,currentTestId,currentScnId)=>{
         let unSyncObj = [];
+        let scnLength = items.scenarioId.length || 0;
+        let testcaseLen = items.testid.length || 0;
         if (Object.keys(items).length) {
-            let filteredItem=rows.filter((item) => {return item.scenarioId.some((scenarioId) => item.scenarioId.includes(scenarioId));})
-            // item.scenarioId.includes(items.scenarioId))
-            let newfilter=filteredItem.filter((item) => item.testCaseNames.includes(testname))
-            let unsyncedTestcaseName;
-            let unsyncedTestId;
-            for(let singleFilteredItem of newfilter) {
-                for(let singleTestCaseIndex in singleFilteredItem.testCaseNames) {
-                    if(singleFilteredItem.testCaseNames[singleTestCaseIndex] === testname) {
-                        unsyncedTestcaseName = singleFilteredItem.testCaseNames[singleTestCaseIndex];
-                        unsyncedTestId = singleFilteredItem.testid[singleTestCaseIndex];
-                    }
-                }
-            }
-            // let findMappedId = findScnArray.filter((item) => item.testid.includes(node.key))
-            if (newfilter && newfilter.length) {
+            // let filteredItem=rows.filter((item) => {return item.scenarioId.some((scenarioId) => item.scenarioId.includes(scenarioId));})
+            // // item.scenarioId.includes(items.scenarioId))
+            // let newfilter=filteredItem.filter((item) => item.testCaseNames.includes(testname))
+            // let unsyncedTestcaseName;
+            // let unsyncedTestId;
+            // for(let singleFilteredItem of newfilter) {
+            //     for(let singleTestCaseIndex in singleFilteredItem.testCaseNames) {
+            //         if(singleFilteredItem.testCaseNames[singleTestCaseIndex] === testname) {
+            //             unsyncedTestcaseName = singleFilteredItem.testCaseNames[singleTestCaseIndex];
+            //             unsyncedTestId = singleFilteredItem.testid[singleTestCaseIndex];
+            //         }
+            //     }
+            // }
+            let findMappedObj = rows.filter((eachObj) => eachObj.scenarioId.includes(currentScnId) && eachObj.testid.includes(currentTestId))
+            if (findMappedObj && findMappedObj.length) {
                 unSyncObj.push({
-                    'mapid': newfilter[0].mapId,
-                    'testCaseNames': [unsyncedTestcaseName],
-                    'testid': [unsyncedTestId]
+                    'mapid': findMappedObj[0].mapId
                 })
+                    if(scnLength === 1 && testcaseLen > 1){
+                        unSyncObj[0].testCaseNames = [].concat(testname);
+                        unSyncObj[0].testid = [].concat(currentTestId);
+                    }
+                    else if((scnLength > 1 && testcaseLen === 1) || (scnLength === 1 && testcaseLen === 1)){
+                        unSyncObj[0].testscenarioid = [].concat(currentScnId);
+                    }
                 let args = Object.values(unSyncObj);
                 args['screenType'] = 'Zephyr'
                 const saveUnsync = await api.saveUnsyncDetails(args);
@@ -417,11 +427,11 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                     // callViewMappedFiles()
                     setToast("success", "Success", 'Unsynced');
                 }
-
+                callViewMappedFiles();
             }
             const removeTestCase = completeTreeData.map((scenario) => {
                 if (scenario.children && scenario.children.length > 0) {
-                    const filteredChildren = scenario.children.filter((child) => child.key !== unsyncedTestId);
+                    const filteredChildren = scenario.children.filter((child) => child.key !== currentTestId);
                     return {
                         ...scenario,
                         children: filteredChildren
@@ -434,15 +444,15 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
 
             // let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
             // console.log(unsyncMap, 'its unsyncMap');
-            let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== unsyncedTestId);
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== currentTestId);
             setTreeData(removeTestCase.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
-            // let filteredRows=rows.filter(element=>element.testid.some((testids) =>testids===unsyncedTestId))
+            // let filteredRows=rows.filter(element=>element.testid.some((testids) =>testids===currentTestId))
             let filteredRows=[];
             for(let singleRow of rows) {
                 const testCaseIdData = [];
                 const testCaseNamesData = [];
                 for(let testidIdx in singleRow.testid) {
-                    if(singleRow.testid[testidIdx] !== unsyncedTestId) {
+                    if(singleRow.testid[testidIdx] !== currentTestId) {
                         testCaseIdData.push(singleRow.testid[testidIdx]);
                         testCaseNamesData.push(singleRow.testCaseNames[testidIdx]);
                     }
@@ -1375,7 +1385,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                             {item.testCaseNames.map((testCaseName, index) => (
                                                                 <div className='accordion__tab__expand'>
                                                                 <span key={index}>{testCaseName}</span>
-                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName,item.testid[index],item.scenarioId[scenarioIndex])}/>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1396,7 +1406,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                                     {item.scenarioNames.map((scenarioName, scenarioIndex) => (
                                                                         <div className='accordion__tab__expand'>
                                                                         <span key={scenarioIndex}>{scenarioName} </span>
-                                                                        <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                        <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName,item.testid[index],item.scenarioId[scenarioIndex])}/>
                                                                         </div>
                                                                     ))}
                                                                 </div>
