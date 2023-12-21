@@ -3,7 +3,7 @@ import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gi
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import {setImportData,dontShowFirstModule,selectedModuleReducer, SetCurrentId} from '../designSlice';
+import {setImportData,dontShowFirstModule,selectedModuleReducer, SetCurrentId, moduleList} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
@@ -232,13 +232,13 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:projectImportId,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(data)?data[0]:data
+                        moduleid:null
                     }
                     var res = await getModules(req)
                     var Screen = await getScreens(projectImportId) 
                     if(Screen.error){displayError(Screen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(res))
+                        dispatch(moduleList(res))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
@@ -265,13 +265,13 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:mindmapData[0] !== undefined?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid !== undefined?mindmapData.projectid:mindmapData.projid,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(res)?res[0]:res
+                        moduleid:null
                     }
                     res = await getModules(req)
                     var zipScreen = await getScreens(req.projectid) 
                     if(zipScreen.error){displayError(zipScreen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(res))
+                        dispatch(moduleList(res))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
@@ -296,12 +296,12 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:importproj,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(importexcel)?importexcel[0]:importexcel})
+                        moduleid:null})
                         if(excelModule.error){displayError(excelModule.error);ResetSession.end();return;}
                         var excelScreen = await getScreens(importproj) 
                         if(excelScreen.error){displayError(excelScreen.error);ResetSession.end();return;}
                         setTimeout(function() {
-                            dispatch(selectedModuleReducer(excelModule))
+                            dispatch(moduleList(excelModule))
                         setImportPop(false)
                         setOptions('importmodules')
                         // setBlockui({show:false})
@@ -320,12 +320,12 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     projectid:projectId,
                     version:0,
                     cycId: null,
-                    moduleid:Array.isArray(res)?res[0]:res})
+                    moduleid:null})
                     if(dataModule.error){displayError(dataModule.error);ResetSession.end();return;}
                     var datascreen = await getScreens(projectId) 
                     if(datascreen.error){displayError(datascreen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(dataModule))
+                        dispatch(moduleList(dataModule))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
