@@ -152,7 +152,17 @@ export default function BasicDemo() {
   useEffect(() => {
   let parent = [];
   let child = [];
-  const getFiltered = Array.isArray(reportData?.rows) ? reportData?.rows.filter((el) => (el?.StepDescription.toLowerCase().includes(searchTest.toLowerCase()) || !el.hasOwnProperty("Step") || el?.Step.toLowerCase().includes(searchTest.toLowerCase()))) : [];
+  let getFiltered = [];
+  let stepFiltered = [];
+
+    getFiltered = Array.isArray(reportData?.rows) ? reportData?.rows.filter((el) => (el?.StepDescription.toLowerCase().includes(searchTest.toLowerCase()) || !el.hasOwnProperty("Step") || el?.Step.toLowerCase().includes(searchTest.toLowerCase()))) : [];
+    stepFiltered = (Array.isArray(getFiltered) && !!getFiltered.length) ? (getFiltered.filter((e) => (e?.StepDescription.toLowerCase().includes(searchTest.toLowerCase()) || (e?.Step ? e?.Step.toLowerCase().includes(searchTest.toLowerCase()) : false) ))) : [];
+    
+    if(!!selectedFilter.length){
+      getFiltered = Array.isArray(getFiltered) ? getFiltered.filter((el) => (selectedFilter.some(item => !el.hasOwnProperty("status") || item?.name.toLowerCase() === el?.status.toLowerCase()))) : [];
+      stepFiltered = (Array.isArray(getFiltered) && !!getFiltered.length) ? (getFiltered.filter((e) => ((e?.status ? selectedFilter.some(item => item?.name.toLowerCase() === e?.status.toLowerCase()) : false) ))) : [];
+    }
+
     if (getFiltered && Array.isArray(getFiltered)) {
       for (const obj of getFiltered) {
         if (obj.hasOwnProperty("Step") && obj?.Step !== "Terminated") {
@@ -172,8 +182,8 @@ export default function BasicDemo() {
       // Handle the case when reportData or reportData.rows is not as expected.
       // console.error("reportData.rows is not defined or not an array.");
     }
-    setReportViewData(parent);
-  }, [reportData, searchTest]);
+    setReportViewData(!!stepFiltered.length ? parent : []);
+  }, [reportData, searchTest, selectedFilter]);
 
   const handdleExpend = (e) => {
     setExpandedKeys(e.value);
@@ -391,11 +401,11 @@ export default function BasicDemo() {
         setIssueDropDown(null);
         setJiraDetails({ projects: [], issuetype: [] });
         setMappedProjects({});
+        setConfigValues({});
         setConfigureFeilds([]);
         setSelectedFiels([]);
         setSelectedFiels([]);
         setResponseFeilds({});
-        setConfigValues({});
         setSelectedRow([]);
         setLoginName("");
         setLoginKey("");
@@ -583,7 +593,7 @@ export default function BasicDemo() {
         },
         children: [],
       };
-      data[i].children?.filter(el => !!selectedFilter.length ? selectedFilter.map((el) => el.name).includes(el.status): el).forEach((child) => {
+      data[i].children?.forEach((child) => {
         const modifiedChild = { ...child }; // Create a new object with the same properties as child
         if (modifiedChild?.EllapsedTime) {
           modifiedChild.EllapsedTime = modifiedChild.EllapsedTime.split(":")
@@ -951,7 +961,7 @@ export default function BasicDemo() {
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
-            header="No. Defect ID"
+            header="Defect"
             body={defectIDForJiraAndAzure}
             style={{ padding: "0rem", textAlign: "center" }}
           />
@@ -1085,7 +1095,7 @@ export default function BasicDemo() {
         setVisible={setLogBug}
         onModalBtnClick={onLogBugBtnClick}
         content={
-          <div className="grid">
+          <div>
             <div className="flex  flex-row">
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
@@ -1114,7 +1124,8 @@ export default function BasicDemo() {
                 parentClass="flex flex-column"
               />
             </div>
-            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+            <style>{`.p-multiselect-panel .p-multiselect-header {display: none !important;}`}</style>
               <AvoMultiselect
                 multiSelectValue={configureFeilds}
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
@@ -1123,6 +1134,8 @@ export default function BasicDemo() {
                 labelTxt="Configure Fields"
                 placeholder="Select configure fields"
                 required={true}
+                className="w-full md:w-20rem flex flex-column"
+                showSelectAll={false}
               />
             </div>
           </div>

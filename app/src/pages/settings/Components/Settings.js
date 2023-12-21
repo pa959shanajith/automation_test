@@ -68,7 +68,7 @@ const Settings =() =>{
             <div className="card_container">
               <div className="flex flex-column" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
-                  <p className="sentence-cls" style={{ fontSize: '14px' }}> Can change the name of the project, can manage roles of the people, can add or remove users from the project</p>
+                  <p className="sentence-cls" style={{ fontSize: '14px' }}> Can manage roles of the people, can add or remove users from the project</p>
                 </span>
                 <Button className="manageProj_btn" size="small" label='Manage Project' disabled={!isQualityManager} onClick={ManageProj} ></Button>
               </div>
@@ -98,9 +98,9 @@ const Settings =() =>{
             <div className="card_container">
               <div className="flex flex-column" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
-                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}> Can change the name of the project, can manage roles of the people, can add or remove users from the project</p>
+                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}> Efficiently Organize and Control System Configurations</p>
                 </span>
-                <Button className="manageProj_btn" size="small" label='Manage Configuration' disabled='true' ></Button>
+                <Button className="manageProj_btn" size="small" label='Manage Configurations' disabled='true' ></Button>
               </div>
               <div className='image-settings'>
                 <img src="static/imgs/configaration-icon.png" alt="configuration" style={{ width: '50px', height: '50px' }} />
@@ -112,7 +112,7 @@ const Settings =() =>{
             <div className="card_container">
               <div className="flex flex-column" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
-                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}>Can change the name of the project, can manage roles of the people, can add or remove users from the project</p>
+                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}>Effortlessly Control and Customize Email Alerts for timely updates</p>
                 </span>
                 <Button className="manageProj_btn" size="small" label='Manage Email Notifications' disabled='true'></Button>
               </div>

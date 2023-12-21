@@ -38,6 +38,7 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [currProjId,setCurrProjId] = useState("");
     const [exportProject,setExportProject] = useState(true)
     const [exportFile,setExportFile] = useState(false);
+    const [exportFileData, setExportFileData] = useState(true)
     const userInfo = useSelector(state=>state.landing.userinfo);   
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
@@ -120,8 +121,8 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     return(
         <Fragment>
             <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
-            <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{width:'50vw'}} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton}/>} >
-                    <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}  gitComMsgRef ={gitComMsgRef}
+            <Dialog className='exportDialog' header='Export MindMap' onHide={()=>{setExportBox(false);setExpType(null) ;setCurrProjId(null);setError(false);setExportProject(true);setExportFile(false) }}  visible={exportBox} style={{width:'50vw'}} footer={<Footer clickExport={clickExport}  expType ={expType} expTypes ={expTypes} setExpType={setExpType} clickExportProj={clickExportProj} error={error} exportProject={exportProject}  projectList={projectList} selectedProj={selectedProj} enableExportMindmapButton={enableExportMindmapButton} exportFileData={exportFileData}/>} >
+                    <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} exportFileData={exportFileData} setExportFileData={setExportFileData} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}  gitComMsgRef ={gitComMsgRef}
             setExportVer={setExportVer} />
             </Dialog>
             <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)}   title= "export">
@@ -157,7 +158,7 @@ const validate = (arr) => {
 
 
 
-const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,getExportFile,showMessage,enableExport,gitComMsgRef,setExportVer}) =>{
+const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef,gitBranchRef,gitVerRef,gitPathRef,projectList,expType,setExpType,setError,selectedProj,setCurrProjId,exportProject,setExportProject,exportFile,setExportFile,setExportFileData,getExportFile,showMessage,enableExport,gitComMsgRef,setExportVer}) =>{
     const [selectedExport, setSelectedExport] = useState(null);
     const [projectValue, setProjectValue] = useState(null);
     const changeExport = (e) => {
@@ -169,6 +170,7 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
     }
     const changeExportFile=async(e) =>{
         setExpType(e.target.value);
+        setExportFileData(false);
         setSelectedExport(e.value)
         if (e.target.value == "git"){
             const res= await checkExportVer({"exportname":"exportname","query":"exportgit","projectId":selectedProj})
@@ -339,11 +341,11 @@ const Container = ({isEndtoEnd,ftypeRef,selectedModulelist,isAssign,gitconfigRef
         </div>
     )
 }
-const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton}) => {
+const Footer = ({clickExport,clickExportProj,error,exportProject,enableExportMindmapButton,exportFileData}) => {
     return ((exportProject)? <div>
        {error && <span style={{color:"red", position: 'absolute',left: '3rem'}}>Please select a project which has no test suite</span>}
        <Button disabled={ error} onClick={clickExportProj} label='Export Project' />
-       </div>:(!exportProject && enableExportMindmapButton)? <div><Button onClick={clickExport} label ='Export'/> </div>:null
+       </div>:(!exportProject && enableExportMindmapButton)? <div><Button onClick={clickExport} disabled={exportFileData} label ='Export'/> </div>:null
       )} 
        
 

@@ -440,6 +440,11 @@ exports.deleteExecutionListId = async(req,res) => {
 	return res.send(result);
 }
 
+exports.runningStatus = async(req,res) => {
+	let result = await queue.Execution_Queue.runningStatus(req, res);
+	return res.send(result);
+}
+
 // TODO:
 exports.getScheduledDetailsOnDate_ICE = async (req, res) => {
 	logger.info("Inside UI service getScheduledDetailsOnDate_ICE");

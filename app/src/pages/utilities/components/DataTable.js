@@ -14,6 +14,7 @@ const DataTable = props => {
     const [currScreen, setCurrScreen] = useState(props.currScreen);
     const [showModal,setModal] = useState(false);
     const [overlay, setOverlay] = useState('');
+    const [dataValue,setDataValue] = useState(true);
 
     useEffect(()=>{
         setCurrScreen(props.currScreen)
@@ -42,7 +43,7 @@ const DataTable = props => {
         { showModal && <Modal/>}
         { overlay && <ScreenOverlay content={overlay} /> }
         <div className="page-taskName" >
-            <span className="taskname" data-test="dt__pageTitle">
+            <span className="page-taskName-encryption" data-test="dt__pageTitle">
                 {currScreen} Data Table
             </span>
         </div>
@@ -50,7 +51,7 @@ const DataTable = props => {
         { 
             currScreen === "Create" 
             ? <CreateScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} />
-            : <EditScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            : <EditScreen setModal={setModal} setDataValue={setDataValue} dataValue={dataValue} setOverlay={setOverlay} setScreenType={props.setScreenType} />
         }
     </>;
 }
@@ -135,14 +136,14 @@ const EditScreen = props => {
                 checkList={checkList} headerCounter={headerCounter} dnd={dnd} setDnd={setDnd}
                 setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
             />
-            <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} />
+            <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} dataValue={props.dataValue} setDataValue={props.setDataValue}/>
             </div>
-            <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} setTableName={setTableName} { ...props } />
-            <div className="dt__table_container full__dt">
+            <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} setTableName={setTableName} { ...props } setDataValue={props.setDataValue}/>
+            <div>
                 { 
                     data.length > 0 && 
                     <Table 
-                        { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
+                        { ...props } data={data} setData={setData} dataValue={props.dataValue} setDataValue={props.setDataValue} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
                         setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter}
                         focus={focus} setFocus={setFocus}
                     /> 
@@ -159,8 +160,6 @@ const TableName = ({tableName, setTableName, error}) => {
     return (
         <div className="dt__tableName">
             Data Table Name:
-            {/* <input className={error?"dt__tableNameError":""} onChange={onChange} value={tableName} placeholder="Enter Data Table Name" />
-             */}
             <InputText
                 className={error ? 'dt__tableNameError' : ''}
                 onChange={onChange}

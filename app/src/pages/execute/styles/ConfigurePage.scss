@@ -747,7 +747,7 @@
 }
 
 .container_devopsLabel {
-  margin-top: 5rem; /* Adjust this value to create space above the container */
+  margin-top: 7rem; /* Adjust this value to create space above the container */
 }
 
 .container_devopsLabel .devops_label {
@@ -755,6 +755,10 @@
   margin-top: -4.5rem;
   line-height: 3rem;
   margin-left: 3rem;
+  margin-bottom: 1rem;
+  font:$f6_semibold;
+  color: var(--surface-900);
+  
 }
 
 .dialog_CICD {
@@ -1108,7 +1112,9 @@
 .container_url .devopsUrl_label {
   margin-bottom: 1rem;
   margin-left: 3rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
+  font:$f6_semibold;
+  color: var(--surface-900);
 }
 
 .container_url .inputtext_CICD {
@@ -1136,7 +1142,6 @@
   margin-left: 44px;
   // margin-right: 11.5rem;
   width: 78vh;
-
 }
 .executiontypenamepre {
   width: 78vh;
@@ -1725,6 +1730,97 @@ bottom: 21%;
 .os_name{
   margin-top: 1rem;
   margin-bottom: 0.4rem;
+}
+
+.language-dropdown {
+  margin: 0.5rem 0 2rem 6.5rem;
+
+  .p-dropdown-label {
+    font-size: 14px;
+    color: var(--surface-900);
+  }
+}
+
+.container_codesnippetlabel {
+  margin-top: 1rem; /* Adjust this value to create space above the container */
+}
+
+.container_codesnippetlabel .codesnippet_label {
+  display: block;
+  margin-top: -4.5rem;
+  line-height: 3rem;
+  margin-left: 3rem;
+  font-size: 18px;
+}
+
+.code_snippet__content {
+  padding: 1rem;
+  border-color: #000000;
+  border-top: 20px solid #d3d3d3;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  background-color: #b8d8ff;
+  margin-left: 44px;
+  // margin-right: 11.5rem;
+  width: 78vh;
+}
+
+.code_snippet__pre {
+  width: 78vh;
+  margin-left: 45px;
+}
+
+.copy_code__snippet {
+  color: #000000;
+  background-color: transparent;
+  border: none;
+  left: 2rem;
+  display: flex;
+  top: 2rem;
+  display: flex;
+ text-align: center;
+}
+
+.buildtype_container {
+  margin-left: 3rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.code_label {
+  font:$f6_semibold;
+  color: var(--surface-900);
+  margin-left: 3rem;
+}
+
+.buildtype_label {
+  font:$f6_semibold;
+  color: var(--surface-900);
+}
+
+.ss__build_type_rad {
+  margin-right: 1rem;
+  margin-left: 5rem;
+}
+
+.ss__build_type_label{
+  font:$f6_regular;
+  color: var(--surface-900);
+}
+
+.code_snippet__code {
+  font:$f6_regular;
+  color: var(--surface-900);
+}
+
+#api-url {
+  font:$f6_regular;
+  color: var(--surface-900);
+}
+
+.executiontypecode {
+  font:$f6_regular;
+  color: var(--surface-900);
 }
   
 

@@ -168,6 +168,7 @@ const GridBrowser = ({
               required={typesOfAppType !== 'Web'? false:true}
               disabled={(typesOfAppType !== 'Web')}
               labelForNotWebApp = {typesOfAppType !== 'Web'? true:false}
+              showSelectAll={true}
             />
           </div>
           <div>

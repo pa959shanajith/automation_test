@@ -320,10 +320,10 @@ const CloudSettings = () => {
         event.preventDefault();
         let isValid = true;
         if (!validate(BrowserstackUsername, 'NAME', setIsValidUsername)) {
-            isValid = true;
+            isValid = false;
         }
-        if (!validate(BrowserstackAPI, 'URL', setIsValidAPI)) {
-            isValid = true;
+        if (!validate(BrowserstackAPI, 'API', setIsValidAPI)) {
+            isValid = false;
         }
         if (!isValid){
             toast.current.show({

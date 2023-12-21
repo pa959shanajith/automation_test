@@ -1,16 +1,4 @@
 @import "../../global/styles/ColorVariables.scss";
-.UtlmiddleContent{
-    // display: flex;
-    // flex-direction: column;
-    // flex: 0 1 100%;
-    // min-width: 0;
-    // padding: 20px;
-    // margin: 0 5px;
-    // position: relative;
-    // left: 18rem;
-    // background-color: $whiteColor;
-
-}
 .middleContent::-webkit-scrollbar {
     display: none;
 }
@@ -19,19 +7,9 @@
     scrollbar-width: none;  /* Firefox */
   }
 
-// .page-taskName{
-//     float: left;
-//     width: 100%;
-//     margin-bottom: 10px;
-// }
-
-.taskname{
+.page-taskName-encryption{
     display: inline-block;
-    // background: $primaryColorDarkest;
-    // font-size: 18px;
     font:$f4_semibold;
-    // color: $whiteColor;
-    // font-family: $avoSecondaryFont;
     padding: 2px 14px 1px;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -41,13 +19,11 @@
     padding: 3px;
     padding-top: 0px;
     height: 24px;
-    // border: 1px solid $borderFive !important;
     width: 23%;
     margin-top: 6px;
     border-radius: 5px;
     outline: none !important;
     margin: 6px 10px 9px 10px;
-    // color: $primaryText
     
 }
 .options{
@@ -59,36 +35,16 @@
     float: right;
     position: relative;
     right: 22rem;
-    /* top: 8px; */
     display: flex;
     gap: 1rem;
 }
 .btn-utl{
-    // color: $whiteColor;
-    // border: 0;
-    // border-radius: 20px;
-    // padding: 2px 25px;
-    // font-size: 17px;
-    // background: $primaryColor;
-    // font-family: $avoSecondaryFont;
-    // outline: 0;
     height: 28px;
     font: $f6_regular !important;
-    // margin-right: 10px;
-    // margin-bottom: 25px;
 }
 .btn-reset{
-    // color: $whiteColor;
-    // border: 0;
-    // border-radius: 20px;
-    // padding: 2px 25px;
-    // font-size: 17px;
-    // background: $primaryColor;
-    // font-family: $avoSecondaryFont;
-    // outline: 0;
     height: 28px;
     font: $f6_regular !important;
-    // margin-bottom: 25px;
 }
 .ult_content_conatiner{
     height: 90%;
@@ -99,11 +55,7 @@
     width: 100%;
     resize: none;
     padding: 10px;
-    // border: 1px solid $borderFive !important;
     margin-bottom: 10px;
-}
-.emptycall{
-    // border: 2px solid $red !important;
 }
 .textarea{
     border: none;
@@ -128,7 +80,6 @@
     border-radius: 1em;
     display: block;
     float: left;
-    // background: $whisper;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -154,7 +105,6 @@
 .pairwise{
     flex-grow: 1;
     text-align: center;
-    // border-right: 1px solid $borderTwo;
     position: relative;
     min-width: 50%;
     cursor: pointer;
@@ -170,7 +120,6 @@
     span{
         margin-right: 5px;
         font-size: 14px;
-        // font-family: $avoFont;
         margin: 2px;
     }
     span:last-of-type{
@@ -190,7 +139,6 @@
         margin-right: 0px;
     }
     input {
-        // border: 1px solid $borderGray !important;
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
         outline: none;
@@ -199,26 +147,19 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        // font-family: $avoFont;
         text-align: center;
     }
     
 }
 .btn-create{
-    // background: $primaryColor;
-    // color: $whiteColor;
     outline: 0;
     border-radius: 20px;
     padding: 0px 12px;
     font-size: 13px;
-    // font-family: $avoFont ;
     margin-right: 7px;
-    // font-family: $avoSecondaryFont;
     border: 0;
     width: 63.25px;
     height: 21px !important;
-   
-    
 }
 .middle_holder{
     display: flex;
@@ -227,12 +168,6 @@
     position: relative;
     width: 92%;
 }
-// .pairwise_array{
-//     // overflow: scroll;
-//     height: 90%;
-//     width : 100%;
-//     position: relative;
-// }
 .factor__row{
     white-space: nowrap;
     position: relative;
@@ -241,7 +176,6 @@
 }
 .factor__row > input[type="text"] {
     margin-right: 10px;
-    // border: 1px solid $borderGray !important;
     border-radius: 4px;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     outline: none;
@@ -250,7 +184,6 @@
     padding: 3px;
     margin: 0px 6px;
     font-size: 14px;
-    // font-family: $avoFont;
     text-align: center;
 }
 .factor__row > input[type="text"]:first-child{
@@ -283,7 +216,6 @@
     }
 }
 #EmptyCall{
-        // border: 1px solid $red !important;
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
         outline: none;
@@ -292,11 +224,9 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        // font-family: $avoFont;
         text-align: center;
 }
 #EmptyCall1{
-        // border: 1px solid $red !important;
         border-radius: 4px;
         box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
         outline: none;
@@ -305,6 +235,5 @@
         padding: 3px;
         margin: 0px 6px;
         font-size: 14px;
-        // font-family: $avoFont;
         text-align: center;
 }

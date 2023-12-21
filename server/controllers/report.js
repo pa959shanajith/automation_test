@@ -232,6 +232,7 @@ exports.connectJira_ICE = function(req, res) {
             "action": req.body.action,
             "inputs": inputs
         };
+        if (mySocket != undefined && mySocket.connected){
         if (req.body.action == 'loginToJira') { //Login to Jira for creating issues
             var jiraurl = req.body.url;
             var jirausername = req.body.username;
@@ -246,7 +247,7 @@ exports.connectJira_ICE = function(req, res) {
                 try {
                     logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
                     logger.debug("ICE Socket requesting Address: %s", icename);
-                        if(mySocket != undefined) {
+                        if(mySocket != undefined && mySocket.connected) {
                             logger.info("Sending socket request for jira_login to cachedb");
                             mySocket.emit("jiralogin", req.body.action, inputs, dataToIce.project_selected, dataToIce.itemType);
                             var count = 0;
@@ -476,7 +477,9 @@ exports.connectJira_ICE = function(req, res) {
                 } else {
                     logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
                     res.send("Fail");
-                }}
+                }}} else{
+                    res.send("unavailableLocalServer");
+                }
     } catch (exception) {
         logger.error("Exception in the service connectJira_ICE: %s", exception);
         res.send("Fail");
@@ -863,9 +866,9 @@ exports.getDevopsReport_API = async (req) => {
     var statusCode = '500';
     logger.info("Inside UI service: " + fnName);
     try {
-        const execData = req.body.execution_data || {};
-		var executionId = execData.executionId || "";
-		var scenarioIds = execData.scenarioIds;
+        // const execData = req.body.execution_data || {};
+		var executionId = req.body._id || "";
+		var scenarioIds = req.body.scenariodetails;
 		var finalReport = [];
 		var tempModDict = {};
 		// const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
@@ -918,7 +921,7 @@ exports.getDevopsReport_API = async (req) => {
         logger.info("Sending reports in the service %s", fnName);
         if (statusCode != "400") statusCode = '200';
         delete execResponse.error_message;
-        return finalReport;
+        return finalReport ? finalReport[0] : [];
     } catch (exception) {
         logger.error("Exception in the service %s - Error: %s", fnName, exception);
         return 'fail'
@@ -1369,7 +1372,10 @@ exports.getReportsData_ICE = async (req, res) => {
             logger.info("Inside UI service: " + fnName + " - allmodules");
             let inputs = {
                 "query": "getAlltestSuites",
-                "id": reportInputData.cycleId
+                "id": reportInputData.cycleId,
+                "page": reportInputData.page,
+                "searchKey": reportInputData.searchKey,
+
             };
             if(reportInputData['configurekey'] && reportInputData['cycleId'] == ''){
                 inputs = {
@@ -1396,6 +1402,16 @@ exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
             inputs = {
                 'configurekey': req.query.configurekey,
                 'suiteid': req.query.testsuiteid
+            }
+        }
+        else if ("testsuiteid" in req.body) {
+            inputs = {
+                'suiteid': req.body.testsuiteid
+            }
+        }
+        else if ("batchname" in req.body) {
+            inputs = {
+                'batchname': req.body.batchname
             }
         }
         else{
@@ -1438,7 +1454,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         var report = [];
         let inputs = {
             "query": "executiondetails",
-            "executionid": executionid,
+            "executionid": executionid[0],
         };
         const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
         if (result == "fail") return res.send("fail");

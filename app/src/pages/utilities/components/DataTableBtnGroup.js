@@ -384,7 +384,7 @@ const EditScreenActionButtons = props => {
         <div className="dt__taskBtns">
             <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Export" label='Export' onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} ></Button>
             <Button className="dt__taskBtn dt__btn" title="Delete" label='Delete' onClick={confirmDelete} disabled={!props.tableName}></Button>
-            <Button className="dt__taskBtn dt__btn" title="Update"  label='Update' onClick={updateTable} disabled={!props.tableName}></Button>
+            <Button className="dt__taskBtn dt__btn" title="Update"  label='Update' onClick={updateTable} disabled={props.dataValue}></Button>
         </div>
         </>
     );
@@ -421,6 +421,7 @@ const SearchDataTable = props => {
         props.setOverlay('Fetching Data Table...')
         const resp = await utilApi.fetchDataTable(selectedTableName);
         props.setOverlay('');
+        props.setDataValue(true);
 
         if (resp.error) toastError(resp.error);
         else {

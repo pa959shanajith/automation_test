@@ -21,6 +21,8 @@ import { Dropdown } from 'primereact/dropdown';
 import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
+import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
+import { InputText } from 'primereact/inputtext';
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -62,6 +64,7 @@ import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from "primereact/paginator";
+import useDebounce from "../../../customHooks/useDebounce";
 export var navigate
 
 
@@ -82,7 +85,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [saucelabsExecutionEnv, setSaucelabExecutionEnv] = useState(null);
   const [browserstackExecutionEnv, setBrowserstackExecutionEnv] = useState(null)
   const [selectedProject, setSelectedProject] = useState("");
-  const [firstPage, setFirstPage] = useState(0);
+  const [firstPage, setFirstPage] = useState(1);
   const [rowsPage, setRowsPage] = useState(10);
   const [configList, setConfigList] = useState([]);
   const [projectList, setProjectList] = useState([]);
@@ -181,6 +184,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
+  const [runningStatusTimer, setRunningStatusTimer] = useState("");
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -207,9 +211,20 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         text: 'Microsoft Edge'
     }
 ]);
-  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+  else projectInfo = projectInfo;
+
   const [radioButton_grid, setRadioButton_grid] = useState(
-   selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
+    projectInfo?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
   const [defaultValues2, setDefaultValues2] = useState({});
@@ -226,24 +241,29 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
-
-  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  if (!userInfo) userInfo = userInfoFromRedux;
-  else userInfo = userInfo;
+  const [selectedLanguage, setSelectedLanguage] = useState("curl");
+  const [selectBuildType, setSelectBuildType] = useState("HTTP");
+  const languages = [
+    { label: "cURL", value: "curl" },
+    { label: "HTTP", value: "http" },
+    { label: "Javascript", value: "javascript" },
+    { label: "Python", value: "python" },
+    { label: "PowerShell - RestMethod", value: "powershell" },
+    {label: "Shell - wget", value: "shell"}
+  ]
+  const debouncedSearchValue = useDebounce(searchProfile, 500);
 
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
-  }, [selectProjects]);
+    setConfigProjectId(projectInfo?.projectId)
+  }, [projectInfo]);
 
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
-    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setShowSauceLabs(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
+    setShowBrowserstack(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
-  }, [selectProjects.projectId, selectProjects.appType]);
+  }, [projectInfo?.projectId, projectInfo?.appType]);
 
  const displayError = (error) => {
     setLoading(false)
@@ -372,10 +392,10 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
-      // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
+      // dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
-        data.push({ name: Projects.projectName[i], id: Projects.projectId[i] });
+        data.push({ name: Projects.projectName[i], id: Projects.projectId[i], projectLevelRole: Projects.projectlevelrole[0][i]["assignedrole"] });
       }
       // data.push({...data, name:Projects.projectName[i], id:Projects.projectId[i]})
       //  const data =[ {
@@ -385,16 +405,204 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
-  }, [selectProjects]);
+  }, []);
 
  const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
       setVisible_CICD(false);
+      setSelectedLanguage("curl");
+      setSelectBuildType("HTTP");
+      setExecutionTypeInRequest("asynchronous");
     }
   };
 
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
+
+  const codeSnippets = {
+    curl: `curl --location "${url}" \n
+--header "Content-Type: application/json" \n
+--data "{
+    \"key\": \"${currentKey}\",
+    \"executionType\": \"${executionTypeInRequest}\"
+}"`,
+
+    http: `POST /execAutomation HTTP/1.1
+Host: ${url.slice(8, -15)}
+Content-Type: application/json
+Content-Length: 93
+
+{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}`,
+
+    javascript: `var myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+
+var raw = JSON.stringify({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+});
+
+var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+};
+
+fetch("${url}", requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));`,
+
+    python: `import requests
+import json
+import time
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+url = "${url}"
+
+payload = json.dumps({
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+})
+headers = {
+    'Content-Type': 'application/json'
+}
+
+try:
+    response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+    response = response.json()
+    pretty_json = json.dumps(response, indent=4)
+    print(pretty_json)
+    status = response["status"]
+
+    if status == "pass":
+        running_status_link = response["runningStatusLink"]
+        status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+        status_response = status_response.json()
+        running_status = status_response["status"]
+        completed = status_response["Completed"]
+
+        while running_status == "Inprogress":
+            print(f"Executing... {completed}")
+
+            status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+            status_response = status_response.json()
+            running_status = status_response["status"]
+            if "Completed" in status_response:
+                completed = status_response["Completed"]
+            else:
+                completed = ""
+            time.sleep(${runningStatusTimer})
+
+        if running_status == "Completed":
+            pretty_json = json.dumps(status_response, indent=4)
+            print(pretty_json)
+    else:
+        print("Some error occurred")
+except Exception as e:
+    print("Some error occurred")
+`,
+
+    powershell: `# Disable SSL/TLS validation (for testing purposes only)
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+        
+# Define headers and body
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+$headers.Add("Content-Type", "application/json")
+    
+$body = @"
+{
+    "key": "${currentKey}",
+    "executionType": "${executionTypeInRequest}"
+}
+"@
+    
+try {
+    $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
+    $response | ConvertTo-Json -Depth 10
+    $status = $response.status
+    
+    # Check if status is pass or fail
+    if ($status -ne "fail") {
+        $runningStatusLink = $response.runningStatusLink
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+        $runningStatus = $statusResponse.status
+        $complete = $statusResponse.Completed
+        
+        while ($runningStatus -eq "Inprogress") {
+            Write-Host "Executing... $complete"
+    
+            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+            $runningStatus = $statusResponse.status
+            if ($statusResponse.PSObject.Properties["Completed"]) {
+                $complete = $statusResponse.Completed
+            }
+            else {
+                $complete = ""
+            }
+            Start-Sleep -Seconds ${runningStatusTimer}
+        }
+    
+        if ( $runningStatus -eq "Completed") {
+            $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
+            Write-Host $summaryReport
+        }
+    } 
+    else {
+        Write-Host "Some error occurred"
+    }
+}
+catch {
+    Write-Host "Some error occurred"
+}`,
+
+    shell: `#!/bin/bash
+# Disable SSL/TLS validation (for testing purposes only)
+export CURL_CA_BUNDLE=""
+export PYTHONHTTPSVERIFY=0
+
+# Define URL, headers, and body
+url="${url}"
+headers="--header=Content-Type:application/json"
+body='{
+  "key": "${currentKey}",
+  "executionType": "${executionTypeInRequest}"
+}'
+# Make the POST request with wget
+response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
+echo "$response"
+  
+# Check if the request was successful
+status=$(echo "$response" | jq -r '.status')
+  
+if [ "$status" != "fail" ]; then
+  runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+
+  # Check the execution status in a loop
+  while true; do
+    statusResponse=$(wget --quiet --method=POST $headers -O - "$runningStatusLink")
+    runningStatus=$(echo "$statusResponse" | jq -r '.status')
+    complete=$(echo "$statusResponse" | jq -r '.Completed')
+
+    echo "Executing... $complete"
+
+    if [ "$runningStatus" == "Completed" ]; then
+      summaryReport=$(echo "$statusResponse" | jq -c '.')
+      echo "$summaryReport"
+      break
+    fi
+    sleep ${runningStatusTimer}
+  done
+else
+  echo "Some error occurred"
+fi`,
+};
 
   const fetchData = async () => {
     setSmartMode("normal");
@@ -722,74 +930,72 @@ else{
 };
 
 const handleSubmit1 = async (SauceLabPayload) => {
-  // close the existing dialog
-  // open the new dialog
   setLoading("Fetching details..");
-  const data1 = await getDetails_SAUCELABS()
-  if (data1.error) { setMsg(data1.error); return; }
-      if (data1 !== "empty") {
-        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-        let data = await saveSauceLabData({
-          "SauceLabPayload" : {
-            ...data1,
-            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
-          }
+
+  try {
+    const data1 = await getDetails_SAUCELABS();
+
+    if (data1.error) {
+      setMsg(data1.error);
+      return;
+    }
+
+    if (data1 !== "empty") {
+      data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails');
+
+      let data = await saveSauceLabData({
+        "SauceLabPayload": {
+          ...data1,
+          "query": showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails'
+        }
+      });
+
+      if (data && data.os_names && data.browser) {
+        const arrayOS = data.os_names.map((element, index) => {
+          return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+          };
         });
-        if (data && data.os_names && data.browser) {
-          // Data exists and has the expected properties
-          
-          const arrayOS = data.os_names.map((element, index) => {
-            return {
-              key: element,
-              text: element,
-              title: element,
-              index: index
-            };
-          });
-          setOsNames(arrayOS);
-          setBrowserDetails(data);
-          setLoading(false)
-          setDisplayBasic4('displayBasic4');
-      }
-      else if (data && data.emulator && data.real_devices && data.stored_files){
-          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-          //     return {
-          //         key: element,
-          //         text: element,
-          //         title: element,
-          //         index: index
-          //     }
-          // })
-          // setPlatforms(arrayPlatforms);
-    
-          setMobileDetails(data);
-          setDisplayBasic4(true);
-          setLoading(false);
-        }
-         else {
-          
-          // Data is empty or doesn't have expected properties
-          if (data == "unavailableLocalServer"){
-              toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-                life: 5000
-              });
-          }else{
-            toast.current.show({
-              severity: 'error',
-              summary: 'error',
-              detail: "Error while fetching the data from Saucelabs",
-              life: 5000
-            });
-          } 
-          setLoading(false); 
-        }
+        setOsNames(arrayOS);
+        setBrowserDetails(data);
+        setLoading(false);
+        setDisplayBasic4('displayBasic4');
+      } else if (data && data.emulator && data.real_devices && data.stored_files) {
+        setMobileDetails(data);
+        setDisplayBasic4(true);
+        setLoading(false);
       } else {
-        setMsg("No data stored in settings"); return;
+        // Data is empty or doesn't have expected properties
+        console.log(data)
+        if (data === "unavailableLocalServer") {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+            life: 5000
+          });
+        }
+        setLoading(false);
       }
+    } else {
+      toast.current.show({
+        severity:'info',
+        summary: 'Info',
+        detail: "No data stored in settings",
+        life: 5000
+      });
+      return;
+    }
+  } catch (error) {
+    console.error("Error during handleSubmit1:", error);
+    setMsg("An error occurred while fetching details");
+  } finally {
+    setLoading(false);
   }
+};
 
 
            
@@ -828,7 +1034,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
         }
       } else {
-        tableUpdate();
+        tableUpdate(currentPage);
         toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
       }
       setLoading(false);
@@ -867,7 +1073,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   />,
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
-  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
+  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={projectInfo?.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
   displayBasic4={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
       onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
@@ -889,7 +1095,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
@@ -906,13 +1112,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
       executionData["browserType"]=browserTypeExe;
   }
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
+    const modul_Info = parseLogicExecute(eachData, currentTask, projectInfo?.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
     // executionData["executionEnv"] = execEnv;
-    executionData["browserType"] = browserTypeExe;
+    // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
     executionData["configurename"] = currentName;
@@ -1054,12 +1260,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
     msg: "You do not have access for CICD."
   }
 
-  const tableUpdate = async (getPageNo = 1) => {
+  const tableUpdate = async (getPageNo = 1, getSearch = "") => {
     const getState = [];
     setLoader(true);
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
-      page: getPageNo
+      page: getPageNo,
+      searchKey: getSearch
     });
     setLoader(false);
     setFetechConfig(configurationList?.data);
@@ -1141,7 +1348,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >
               Schedule
             </Button>
-            <span id={cicdLicense.value || selectProjects.appType!=="Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
+            <span id={cicdLicense.value || projectInfo?.appType !== "Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
             <Button
               className="CICD"
               size="small"
@@ -1150,14 +1357,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
               }}
-              disabled={selectProjects.appType!=="Web" || cicdLicense.value}
+                disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
               CI/CD
             </Button>
             </span>
             <div className="cloud-test-provider" >
               <Dropdown
-                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={projectInfo.appType === "Desktop" || projectInfo.appType === "Mainframe" || projectInfo.appType === "OEBS" || projectInfo.appType === "SAP"} />
             </div> 
           
           </div>
@@ -1169,18 +1376,18 @@ const handleSubmit1 = async (SauceLabPayload) => {
               visible={visible}
               onHide={() => setVisible(false)}
             />
-             <img src="static/imgs/ic-edit.png"
-  style={{ height: "20px", width: "20px" }}
-className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
-/>
-<Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
- <img
-
-src="static/imgs/ic-delete-bin.png"
-style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
-<Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
-             </div>
+            <img src="static/imgs/ic-edit.png"
+              style={{ height: "20px", width: "20px" }}
+              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              />
+              <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
+               <img
+              
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
+          </div>
         ),
       });
     });
@@ -1193,8 +1400,10 @@ className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, 
     }
   }, [configProjectId]);
 
-  
-
+  useEffect(() => {
+    tableUpdate(1, debouncedSearchValue);
+    setFirstPage(1);
+  }, [debouncedSearchValue]);
 
   const profieTooltip = (rowdata) => {
     return   <span
@@ -1334,7 +1543,7 @@ const showToast = (severity, detail) => {
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: selectProjects.appType,
+            appType: projectInfo?.appType,
             domainName: "Banking",
             projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
@@ -1422,7 +1631,7 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
-      tableUpdate();
+      tableUpdate(currentPage);
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
@@ -1439,13 +1648,14 @@ const showToast = (severity, detail) => {
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...localStorageDefaultProject, // Parse existing data from localStorage
+        ...projectInfo, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
-        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)]
+        appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)],
+        projectLevelRole: projectList.find((project)=>project.id === e.target.value)?.projectLevelRole
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: projectList.find((project)=>project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)] }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
     }
     return (
       <nav>
@@ -1648,13 +1858,13 @@ const showToast = (severity, detail) => {
         MY: {
           recurringValue:
             selectedMonthly?.key === "daymonth"
-              ? `0 0 ${scheduleOption?.monthday} */${scheduleOption?.monthweek} *`
-              : `0 0 * * /${scheduleOption?.everymonth} ${dropdownDay?.key}`,
+              ? `0 0 ${scheduleOption?.monthweek} */${scheduleOption?.monthday} *`
+              : `0 0 * */${scheduleOption?.everymonth} ${dropdownDay?.key}`,
           recurringString: "Every Month",
           recurringStringOnHover:
             selectedMonthly?.key === "daymonth"
               ? `Occurs on ${scheduleOption?.monthday}th day of every ${scheduleOption?.monthweek} month`
-              : `Occurs on ${dropdownWeek?.name} ${dropdownDay?.name} of every ${scheduleOption?.everymonth} month`,
+              : `Occurs on ${dropdownWeek?.name.toLowerCase()} ${dropdownDay?.name.toLowerCase()} of every ${scheduleOption?.everymonth} month`,
         },
       };
       return pattrenObj[getKey];
@@ -1856,7 +2066,8 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
-      tableUpdate(e.page + 1);
+      setCurrentPage(e.page+1);
+      tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
   const renderTable = () => {
@@ -1876,7 +2087,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            globalFilter={searchProfile}
+            // globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",
@@ -1974,7 +2185,7 @@ const showToast = (severity, detail) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  disabled={selectProjects.appType!=="Web"}
+                  disabled={projectInfo?.appType !== "Web"}
                   checked={ radioButton_grid === "Execute with Avo Assure Agent/ Grid"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
@@ -2000,7 +2211,7 @@ Learn More '/>
                         setExecutingOn("ICE");
                       }}
                       checked={
-                        radioButton_grid === "Execute with Avo Assure Client" || selectProjects.appType!=="Web"
+                        radioButton_grid === "Execute with Avo Assure Client" || projectInfo?.appType!=="Web"
                       }
                     />
                   </div>
@@ -2183,95 +2394,157 @@ Learn More '/>
               <>
                 <ExecutionCard cardData={fetechConfig[configItem]} configData={getConfigData} />
 
-                <div className="input_CICD ">
-                 
-                  <div class="container_url">
-                    <label for="inputField" class="devopsUrl_label">
-                    DevOps Integration URL
-                    </label>
-                    <div className="url">
-                    <pre className="grid_download_dialog__content cicdpre">
-                      <code id="api-url" title={url}>
-                        {url}
-                      </code>
-                    </pre>
-
-                    <Button
-                      icon="pi pi-copy"
-                      className="copy_CICD"
-                      
-                      onClick={() => {
-                        copyConfigKey(url);
-                      }}
-                     
-                      
-                      // title={copyToolTip}
-                    />
-                    
-                    <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
-                   </div>
-                   </div>
-                  <div className="executiontype">
-                    <div className="lable_sync">
-                      <label
-                        className="Async_lable"
-                        id="async"
-                        htmlFor="synch"
-                        value="asynchronous"
-                      >
-                        Asynchronous
-                      </label>
-                      <img className='info__btn_async'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
-                      <InputSwitch
-                        className="inputSwitch_CICD"
-                        label=""
-                        inlineLabel={true}
-                        onChange={() =>
-                          executionTypeInRequest == "asynchronous"
-                            ? setExecutionTypeInRequest("synchronous")
-                            : setExecutionTypeInRequest("asynchronous")
-                        }
-                        checked={executionTypeInRequest === "synchronous"}
-                      />
-                      <label
-                        className="sync_label"
-                        id="sync"
-                        htmlFor="synch"
-                        value="synchronous"
-                      >
-                        Synchronous
-                      </label>
-                      <img className='info_btn_sync'src="static/imgs/info.png" ></img>
-                      <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                <div className="buildtype_container">
+                  <div className="flex flex-wrap gap-3">
+                    <label className="buildtype_label">Execution Trigger Type:</label>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="HTTPrequest" className="ss__build_type_rad" type="radio" name="HTTP" value="HTTP" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === "HTTP"} />
+                      <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">HTTP request</label>
+                    </div>
+                    <div className="flex align-items-center">
+                      <RadioButton data-test="Code" className="ss__build_type_rad" type="radio" name="CODE" value="CODE" onChange={(e) => setSelectBuildType(e.value)} checked={selectBuildType === 'CODE'} />
+                      <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Code snippet</label>
                     </div>
                   </div>
-                  <div className="container_devopsLabel" title={str}>
-                    <span className="devops_label">DevOps Request Body : </span>
+                </div>
+
+                <div className="input_CICD ">
+                 
+                  { selectBuildType == "HTTP" ?
+                  <div>
+                    <div class="container_url">
+                      <label for="inputField" class="devopsUrl_label">
+                        DevOps Integration URL
+                      </label>
+                      <div className="url">
+                        <pre className="grid_download_dialog__content cicdpre">
+                          <code id="api-url" title={url}>
+                            {url}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_CICD"
+                        
+                          onClick={() => {
+                            copyConfigKey(url);
+                          }}
+                    
+                      
+                          // title={copyToolTip}
+                        />
+                    
+                        <Tooltip target=".copy_CICD" position="right" content={copyToolTip}/>
+                      </div>
+                    </div>
+                    <div className="executiontype">
+                      <div className="lable_sync">
+                        <label
+                          className="Async_lable"
+                          id="async"
+                          htmlFor="synch"
+                          value="asynchronous"
+                        >
+                          Asynchronous
+                        </label>
+                        <img className='info__btn_async'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info__btn_async" position="bottom" content=" Execution responses are generated simultaneously during the execution."/>
+                        <InputSwitch
+                          className="inputSwitch_CICD"
+                          label=""
+                          inlineLabel={true}
+                          onChange={() =>
+                            executionTypeInRequest == "asynchronous"
+                              ? setExecutionTypeInRequest("synchronous")
+                              : setExecutionTypeInRequest("asynchronous")
+                          }
+                          checked={executionTypeInRequest === "synchronous"}
+                        />
+                        <label
+                          className="sync_label"
+                          id="sync"
+                          htmlFor="synch"
+                          value="synchronous"
+                        >
+                          Synchronous
+                        </label>
+                        <img className='info_btn_sync'src="static/imgs/info.png" ></img>
+                        <Tooltip target=".info_btn_sync" position="bottom" content=" Execution responses are generated after the end of execution."/>
+                      </div>
+                    </div>
+                    <div className="container_devopsLabel" title={str}>
+                      <span className="devops_label">DevOps Request Body</span>
+                      <div>
+                        <div className="key">
+                        <pre className="grid_download_dialog__content executiontypenamepre">
+                          <code
+                            className="executiontypecode"
+                            id="devops-key"
+                            title={str}
+                          >
+                            {str}
+                          </code>
+                        </pre>
+
+                        <Button
+                          icon="pi pi-copy"
+                          className="copy_devops"
+                          onClick={() => {
+                            copyConfigKey(str);
+                          }}
+                          // title={copyToolTip}
+                        />
+                        <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  :
+                  <div className="container_codesnippetlabel">
+                    <div>
+                        <label className="code_label">Set The Timer:</label>
+                        <InputText
+                          // data-test="password"
+                          value={runningStatusTimer}
+                          className={'w-full md:w-10rem'}
+                          style={{'margin': '0.5rem 0px 0.5rem 10.2rem', 'width': "10rem"}}
+                          onChange={(event) => { setRunningStatusTimer(event.target.value) }}
+                          keyfilter="int"
+                          placeholder='Seconds'
+                      />
+                    </div>
+                    <label className="code_label">Select Language:</label>
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} 
+                    options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem" 
+                    style={{'margin': '0.5rem 0px 1rem 9.1rem', 'width': "10rem"}}
+                    />
+
                     <div>
                       <div className="key">
-                      <pre className="grid_download_dialog__content executiontypenamepre">
+                      <pre className="code_snippet__content code_snippet__pre">
                         <code
-                          className="executiontypecode"
-                          id="devops-key"
-                          title={str}
+                          className="code_snippet__code"
+                          id="code_snippet-key"
+                          title={codeSnippets[selectedLanguage]}
                         >
-                          {str}
+                          {codeSnippets[selectedLanguage]}
                         </code>
                       </pre>
 
                       <Button
                         icon="pi pi-copy"
-                        className="copy_devops"
+                        className="copy_code__snippet"
                         onClick={() => {
-                          copyConfigKey(str);
+                          copyConfigKey(codeSnippets[selectedLanguage]);
                         }}
                         // title={copyToolTip}
                       />
-                      <Tooltip target=".copy_devops" position="right" content={copyToolTip}/>
+                      <Tooltip target=".copy_code__snippet" position="right" content={copyToolTip}/>
                       </div>
                     </div>
-                  </div>
+                  </div> }
+
                 </div>
               </>
             }
@@ -2325,7 +2598,7 @@ Learn More '/>
           <Button
             className="configure_button"
             onClick={() => configModal("CancelSave")}
-            disabled={userInfo?.rolename?.trim()==="Quality Engineer"}
+            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2333,6 +2606,28 @@ Learn More '/>
         </Panel>
       );
     }
+  };
+
+  // Filter out TestSuites which has empty TestCases (Scenarios)
+  const filterOutEmptyTestSuites = (data) => {
+    let currentData = data;
+    let configureData = data?.configureData;
+    let filteredConfigureData = {};
+    let configureDataKeys = Object.keys(configureData);
+
+    if (configureDataKeys?.length) {
+      Object.values(configureData)?.map((configItem, index) => {
+        // check if an configItem is an array
+        if (Array.isArray(configItem)) {
+          // check if length of array is greater than 0
+          if (configItem?.length) {
+            const filterdItems = configItem?.filter(item => item?.scenarios?.length !== 0);
+            filteredConfigureData[Object.keys(configureData)[index]] = filterdItems;
+          }
+        }
+      })
+    }
+    return { ...currentData, configureData: filteredConfigureData }
   };
   return (
     <>
@@ -2352,7 +2647,6 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-            {(!!configList.length  && activeIndex1 === 0)?  (
               <div className="flex flex-row justify-content-between align-items-center">
                 <AvoInput
                   icon="pi pi-search"
@@ -2362,12 +2656,13 @@ Learn More '/>
                   setInputTxt={setSearchProfile}
                   inputType="searchIcon"
                 />
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={userInfo?.rolename?.trim() === "Quality Engineer"}>
+              {(!!configList.length  && activeIndex1 === 0)?  (
+                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>
+              ) : null}
               </div>
-            ) : null}
           </div>
         </div>
         {activeIndex1 === 0 ? (
@@ -2384,7 +2679,7 @@ Learn More '/>
           onModalBtnClick={onModalBtnClick}
           content={
             <ConfigureSetup
-              configData={getConfigData}
+              configData={filterOutEmptyTestSuites(getConfigData)}
               xpanded={xpanded}
               setXpanded={setXpanded}
               tabIndex={tabIndex}
@@ -2422,7 +2717,7 @@ Learn More '/>
               typeOfExecution={typeOfExecution}
               checkedExecution={checkedExecution}
               setCheckedExecution={setCheckedExecution}
-              typesOfAppType={typesOfAppType ? typesOfAppType : localStorageDefaultProject?.appType }
+              typesOfAppType={typesOfAppType ? typesOfAppType : projectInfo?.appType }
             />
           }
           headerTxt="Execution Configuration set up"

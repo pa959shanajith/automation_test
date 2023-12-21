@@ -406,9 +406,9 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
         continueSave = false;
         setShowPop({
           'type': 'modal',
-          'title': 'Save Scrape data',
+          'title': 'Save Capture data',
           'content': <div className="ss__dup_labels">
-            Please rename/delete duplicate scraped objects
+            Please rename/delete duplicate Captured objects
             <br /><br />
             Object characterstics are same for:
             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
@@ -423,9 +423,9 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       else if (dXpath) {
         continueSave = false;
         setShowConfirmPop({
-          'title': 'Save Scrape data',
+          'title': 'Save Capture data',
           'content': <div className="ss__dup_labels">
-            Object characteristics are same for the below list of objects:
+            Object Characteristics are same for the below list of objects:
             {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
             <div className="ss__dup_scroll">
               {dCusts2.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
@@ -583,7 +583,7 @@ const elementTypeProp =(elementProperty) =>{
               {
                 
                 selectall: item.custname,
-                objectProperty: item.tag.includes("iris")? elementTypeProp(item.tag.split(";")[1]): elementTypeProp(item.tag),
+                objectProperty: item?.tag?.includes("iris")? elementTypeProp(item.tag.split(";")[1]): item?.tag ? elementTypeProp(item.tag):"Element",
                 screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId?(event) => {
                   setScreenshotY(event.clientY);
                   setScreenshotData({
@@ -1739,6 +1739,13 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
   if(!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
   setCapturedDataToSave(localScrapeItems);
 }
+
+const elementValuetitle=(rowdata)=>{
+  return (
+    <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+  )
+ }
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1758,12 +1765,12 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
                 <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                  <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
+                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
                 <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                  <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
+                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
                   <p>Map Element</p>
@@ -1789,12 +1796,12 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
-                  <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
+                  <img className='add_obj_upgrade' src="static/imgs/compare_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
                   <p>Compare Element</p>
                 </span>
                 <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                  <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
+                  <img className='map_obj_upgrade' src="static/imgs/replace_object_icon.svg" ></img>
                   {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
                   <p>Replace Element</p>
                 </span>
@@ -1813,7 +1820,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
                 <span className="insprint_auto">
-                  <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
+                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                   <p className='text-600'>PDF Utility</p>
                 </span>
                 {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1833,7 +1840,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
                 <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
                 <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
                 <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
-                  <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
+                  <img className='map_obj' src="static/imgs/create_object_icon.svg"></img>
                   <p>Create Element</p>
                 </span>
                 {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
@@ -1873,7 +1880,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
         :null}
 
 
-        <div className="card-table" style={{ width: '100%', display: "flex",justifyContent:'center'}}>
+        <div className='card'>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
             size="small"
@@ -1888,13 +1895,13 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
             selectionMode={"single"}
             selection={selectedCapturedElement}
             onSelectionChange={onRowClick}
-            tableStyle={{ minWidth: '50rem' }}
             headerCheckboxToggleAllDisabled={false}
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
-            scrollable 
-            scrollHeight="400px"
             columnResizeMode="expand"
-            virtualScrollerOptions={{ itemSize: 20 }}
+            scrollable
+            scrollHeight="383px"
+            virtualScrollerOptions={{ itemSize: 46 }} 
+            tableStyle={{ minWidth: '50rem' }}
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
@@ -1990,7 +1997,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
         
-        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
           <span className='compare__btn'>
             <p className='compare__text'>List of Browsers</p>
@@ -2100,7 +2107,7 @@ const modifyScrapeItem = (value, newProperties, customFlag) => {
               <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
               {/* <column ></column> */}
               <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
             </DataTable>
           </div>
         </Dialog>: null }</>}
@@ -2506,9 +2513,10 @@ const LaunchApplication = props => {
       setOS("android")
       setError(false);
       getDeviceSerialNumber_ICE().then(data => {
-            if(data !== "fail") {setSerialNumber(data);}
+            if(data !== "fail") {
+            if(!data.includes("Error")) setSerialNumber(data);}
             else props.toastError(error)
-      }).catch(error => {
+                  }).catch(error => {
           props.toastError(error)
       })
     }
@@ -2570,13 +2578,13 @@ const LaunchApplication = props => {
                         <InputText data-test="andriodAppPath" placeholder="Enter Application Path" value={appPath} onChange={appPathHandler} name="appPath_a" />
                         <select data-test="andriodSerialNumber" className='versionSelect' placeholder="Enter mobile serial number" value={sNum} onChange={sNumHandler} name="serNum_a" >
                           <option value="" disabled>Select Mobile Serial Number</option>
-                          {serialNumbers.map((serialNumber) => (
+                          {serialNumbers?.map((serialNumber) => (
                             <option key={serialNumber} value={serialNumber}>{serialNumber}</option>
                           ))}
                         </select>
                       </div>
                       {CheckingMobileClient_ICEResponse &&
-                        <span>Required packages for mobile testing in Avo Assure client folder are missing.<a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                        <span>Required packages for mobile testing in Avo Assure client folder are missing.<a href="https://downloads.avoassure.ai/driver/AvoAssure_AndroidMobileDependencies.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
                       }
                     </div>
                   </>

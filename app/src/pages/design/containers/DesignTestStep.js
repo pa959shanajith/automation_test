@@ -37,7 +37,7 @@ const DesignModal = (props) => {
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
-    const [overlay, setOverlay] = useState("");
+    const [overlay, setOverlay] = useState("Loading...");
     const [keywordList, setKeywordList] = useState(null);
     const [testCaseData, setTestCaseData] = useState([]);
     const [testScriptData, setTestScriptData] = useState(null);
@@ -62,7 +62,7 @@ const DesignModal = (props) => {
     const [rowExpandedName,setRowExpandedName] = useState({name:'',id:''});
     const [selectedTestCase, setSelectedTestCase] = useState(null);
     const [visible, setVisible] = useState(false);
-    const [edit, setEdit] = useState(false);
+    const [edit, setEdit] = useState(true);
     const [showDetailDlg, setShowDetailDlg] = useState(false);
     const [showSM, setShowSM] = useState(false);
     const [showConfPaste, setShowConfPaste] = useState(false);
@@ -73,7 +73,19 @@ const DesignModal = (props) => {
     let runClickAway = true;
     
 
-let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON.parse(s))
+    // Function to remove duplicates based on a specified property (e.g., 'name')
+    const removeDuplicates = (arr, property) => {
+        const uniqueMap = new Map();
+        arr.forEach(obj => uniqueMap.set(obj[property], obj));
+        return Array.from(uniqueMap.values());
+    };
+
+    // Function to sort the array based on the 'index' property
+    const sortByIndex = (arr) => arr.slice().sort((a, b) => a.index - b.index);
+
+    // Combined function
+    const uniqueArray = (arr, property) => sortByIndex(removeDuplicates(arr, property));
+
     const emptyRowData = {
         "objectName": "",
         "custname": "",
@@ -142,18 +154,20 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 setOverlay("Loading...")
             }
             for(var i = 0 ; i<parentScreen.length; i++){
-                fetchTestCases(i)
-                .then(data=>{
-                    if (data==="success")
-                        toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
-                    else 
-                        toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
-                    setImported(false)
-                    setStepSelect({edit: false, check: [], highlight: []});
-                    setChanged(false);
-                    headerCheckRef.current.indeterminate = false;
-                })
-                .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                if(parentScreen[i]._id === rowExpandedName.id){
+                    fetchTestCases(i)
+                    .then(data=>{
+                        if (data==="success")
+                            toast.current.show({severity:'success', summary:'Success', detail:MSG.DESIGN.SUCC_TC_IMPORT.CONTENT, life:2000})
+                        else 
+                            toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT , life:3000})
+                        setImported(false)
+                        setStepSelect({edit: false, check: [], highlight: []});
+                        setChanged(false);
+                        headerCheckRef.current.indeterminate = false;
+                    })
+                    .catch(error=>console.error("Error: Fetch Test Steps Failed ::::", error));
+                }
             }
         }
         //eslint-disable-next-line
@@ -185,7 +199,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                 .then(data => {
                     data !== "success" &&
                         toast.current.show({severity:'warn',summary:'Warning', detail:MSG.DESIGN.WARN_DELETED_TC_FOUND.CONTENT,life:3000});
-                        setEdit(false);
+                        setEdit(true);
                     setStepSelect({ edit: false, check: [], highlight: [] });
                     headerCheckRef.current.indeterminate = false;
                     setDraggable(false);
@@ -336,10 +350,10 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                                         setOverlay("");
                                     }
                                     setDraggable(false);
-                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false})
+                                    screenLevelTestCases.push({name:parentScreen[j].name,testCases:testcaseArray.length?testcaseArray:[emptyRowData],id:parentScreen[j]._id, reused: data.testcase.length>0?true:false, index:parentScreen[j].childIndex})
+                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     setTestCaseData([...testCaseData,testcaseArray]); 
                                     setPastedTC([]);
-                                    setObjNameList(getObjNameList(props.appType, scriptData.view));
                                     let msg = deleteObjectFlag ? "deleteObjs" : "success"
                                     resolve(msg);
                                 })
@@ -530,6 +544,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         headerCheckRef.current.indeterminate = false;
         setHeaderCheck(false);
         setDebugEnable(false);
+        setEdit(true)
     }
 
     const addRow = () => {
@@ -738,6 +753,14 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
             </div>
         </>
     );
+    const bodyHeaderName = (row)=>{
+        return(
+            <>
+            <span className='rowNameTrim'>{row.name}</span>
+            <Tooltip target=".rowNameTrim " position="bottom" content={row.name}/>
+            </>
+        )
+    }
     const bodyHeader = (rowData)=>{
         const onInputChange = (event) => {
             let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
@@ -847,7 +870,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
                     <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():""} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
@@ -1048,6 +1071,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         setShowSM(true);
     }
     const deleteTestcase = () => {
+        setEdit(false)
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
@@ -1192,7 +1216,7 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
     }
     const ConfPasteStep = () =>{
          return (
-            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={setShowConfPaste(false)} footer={footerPasteStep}>
+            <Dialog visible={showConfPaste} header="Paste Test Step" onHide={()=>setShowConfPaste(false)} footer={footerPasteStep}>
                 <div>Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?</div>
             </Dialog>
         );
@@ -1347,12 +1371,12 @@ let uniqueArray = a => [...new Set(a.map(o => JSON.stringify(o)))].map(s => JSON
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
-                    <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
+                    <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
                         <Column expander={allowExpansion} style={{ width: '5rem',background: 'white',paddingLeft:'0.5rem' }} />
-                        <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
+                        <Column body={bodyHeaderName} style={{background: 'white',paddingLeft:'0.5rem' }}/>
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
                 </div>

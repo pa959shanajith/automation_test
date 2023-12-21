@@ -55,12 +55,12 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     if (dNodes[pi].children.length > 0) { // new node has siblings
         index = dNodes[pi].children.length - 1;
         if (layout_vertical){
-            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+            if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null) && (dNodes[pi].state!=="created")){
                 new_one = {
                     x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type] - 100
                 };// Go beside last sibling node
-            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null)){
+            }else if ((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?.parent?._id !== null) && (dNodes[pi].state!=="created")){
                 new_one = {
                     x: parseInt(dNodes[pi].children[index].x) + 100,
                     y: sections[node.type] - 90
@@ -90,10 +90,31 @@ const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
             index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
             if (layout_vertical) {
-                new_one = {
-                    x: parseInt(dNodes[pi].x),
-                    y: parseInt(sections[node.type])
-                }; // go directly below parent
+                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                    if(dNodes[pi].childIndex === 1){
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])
+                        };
+                    }else{
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])-100
+                        };
+                    }
+                }
+                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null)){
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                }
+                else{
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                } // go directly below parent
             } else {
                 new_one = {
                     x: parseInt(sections[node.type]),
@@ -908,19 +929,27 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         return !1;
     });
     if (dNodes[sid].type === 'scenarios') {
-        dNodes[0].children = dNodes[0].children.filter(child => child.name !== dNodes[sid].name);
+        dNodes[0].children = dNodes[0].children.filter(child=> child.id !== dNodes[sid].id)   
     } else if (dNodes[sid].type === 'screens') {
         for (var l = 0; l < dNodes[0].children.length; l++) {
             if (dNodes[0].children[l].name === p.name) {
-                dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child => child.id !== sid);
-                // break; // No need to continue looping once we find the parent
+                if(dNodes[sid].reuse !== true){
+                    dNodes[0].children[l].children = p.children
+                }else{
+                    dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child=>child.id !== sid)
+                }
             }
         }
     } else if (dNodes[sid].type === 'testcases') {
         for (var k = 0; k < dNodes[0].children.length; k++) {
             for (var m = 0; m < dNodes[0].children[k].children.length; m++) {
                 if (dNodes[0].children[k].children[m].name === p.name) {
-                    dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child => child.id !== sid);
+                    if(dNodes[sid].reuse !== true){
+                        dNodes[0].children[k].children[m].children = p.children
+                    }else{
+                        dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
+                    }
+                    
                      // No need to continue looping once we find the parent
                 }
             }
@@ -1173,7 +1202,8 @@ export const parseProjList = (res) =>{
             'apptypeName':res.appTypeName[i],
             'id': res.projectId[i],
             'releases':res.releases[i],
-            'domains':res.domains[i]
+            'domains':res.domains[i],
+            'projectLevelRole':res.projectlevelrole[0][i]["assignedrole"]
         };
     });
     return proj

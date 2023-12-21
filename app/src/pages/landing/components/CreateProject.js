@@ -460,7 +460,7 @@ const CreateProject = (props) => {
       }
     }
   };
-
+  
   /////////////////////////////////////// MANAGE PROJECT////////////////////////////////////////////////////////////////
  const handleUpdateProject = async () => {
 
@@ -482,8 +482,8 @@ const CreateProject = (props) => {
     const manageProject= await userUpdateProject_ICE(upadtedProjData)
 
     props.toastSuccess("Project Modified Successfully");
-     props.onHide();
-
+    props.onHide();
+    dispatch(loadUserInfoActions.updatedProject(true));
   }
 
   const dialogHeader = props.handleManageProject ? 'Manage Project' : 'Create Project';
@@ -530,7 +530,7 @@ const CreateProject = (props) => {
             <div className='dropdown-1'>
               <h5 className='application__name' disabled={isDisabledAppType}  style={{opacity:!isDisabledAppType ? 1 : 0.5,  cursor:isDisabledAppType ? 'not-allowed ' : 'pointer'}}>Application Type <span className="imp-cls"> * </span></h5>
               <Dropdown value={selectedApp} onChange={(e) =>handleAppTypeChange(e)} options={apps} disabled={isDisabledAppType}  style={{opacity:!isDisabledAppType ? 1 : 0.6, background:!isDisabledAppType ? '' :'lightgray',color:'black' , cursor:!isDisabledAppType ?'pointer' : 'not-allowed' ,}} optionLabel="name"
-                placeholder="Select an Application Type" itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " optionDisabled={(option) => option.disabled} />
+                placeholder={selectedApp?.name ? selectedApp.name : "Select an Application Type"} itemTemplate={optionTemplate} className="w-full md:w-28rem app-dropdown vertical-align-middle text-400 " optionDisabled={(option) => option.disabled} />
             </div>
           </div>
 

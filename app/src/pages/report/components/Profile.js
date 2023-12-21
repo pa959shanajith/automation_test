@@ -68,7 +68,7 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Execution ${ind + 1}`,
+            name: `Execution ${executionProfiles.length - (ind)}`,
             dateTime: el.startDate,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
@@ -87,7 +87,7 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Execution ${ind + 1}`,
+            name: `Execution ${executionProfiles.length - (ind)}`,
             dateTime: el?.starttime,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(

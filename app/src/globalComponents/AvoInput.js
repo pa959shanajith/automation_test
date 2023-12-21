@@ -1,5 +1,6 @@
 import { InputText } from "primereact/inputtext";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { Toast } from 'primereact/toast';
 import "./AvoInput.scss";
 
 const AvoInput = ({
@@ -37,7 +38,17 @@ const AvoInput = ({
           {...(htmlFor && { id: htmlFor })}
           placeholder={placeholder}
           value={inputTxt}
-          onInput={(e) => setInputTxt(e.target.value)}
+          onInput={(e) => {
+            if (e.target.value === '') {
+              setInputTxt('');
+            } else {
+            const enteredChar = e.target.value.slice(-1); 
+            if (charCheck && !/^[a-zA-Z0-9_]+$/.test(enteredChar)) {
+              return;
+            }
+          }
+            setInputTxt(e.target.value);
+          }}
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />

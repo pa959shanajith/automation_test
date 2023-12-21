@@ -43,6 +43,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 import '../styles/ActionPanelObjects.scss'
+import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 
 /*Component Canvas
   use: return mindmap on a canvas
@@ -115,12 +116,12 @@ const CanvasNew = (props) => {
     const [addScenario , setAddScenario] = useState([]);
     const [inputValue, setInputValue] = useState("");
     const [inputValScreen , setinputValScreen]= useState("");
-    const [showInput, setShowInput] = useState(false);
+    const [showInput, setShowInput] = useState(true);
     const [addScreen , setAddScreen] = useState([]);
-    const[ showInputScreen , setShowInputScreen]= useState(false);
+    const[ showInputScreen , setShowInputScreen]= useState(true);
     const [addTestStep , setAddTestStep] = useState([]);
     const [inputValTestStep , setinputValTestStep]= useState("");
-    const[ showInputTestStep , setShowInputTestStep]= useState(false);
+    const[ showInputTestStep , setShowInputTestStep]= useState(true);
     const [selectedRowsScenario, setSelectedRowsScenario] = useState([]);
     const [selectedRowsScreen, setSelectedRowsScreen] = useState([]);
     const [selectedRowsTeststep, setSelectedRowsTeststep] = useState([]);
@@ -151,7 +152,8 @@ const CanvasNew = (props) => {
     const[mainScrapedData,setMainScrapedData]=useState(null)
     const[orderList,setOrderList]=useState(null)
     const[fetchingDetailsScreen,setFetchingDetailsScreen]=useState(null)
-    const[testSuiteInUse,setTestSuiteInUse]=useState(false)
+    const[testSuiteInUse,setTestSuiteInUse]=useState(false);
+    const[inputValValid, setInputValValid] = useState(false);
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let Proj = reduxDefaultselectedProject;
@@ -162,6 +164,10 @@ const CanvasNew = (props) => {
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
     
   useEffect(()=>{
     let browserName = (function (agent) {        
@@ -363,7 +369,7 @@ const CanvasNew = (props) => {
     
     const menuItemsModule = [
         { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([]);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
@@ -371,11 +377,11 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScenario = [
         { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([{ id:  1, value : inputValScreen , isEditing:false}]);setShowInputScreen(true);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-        { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+      { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -383,7 +389,7 @@ const CanvasNew = (props) => {
     ];
     const menuItemsScreen = !testSuiteInUse?[
         { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([{id:1, value : inputValTestStep, isEditing:false}]);setShowInputTestStep(true);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
@@ -506,7 +512,7 @@ const CanvasNew = (props) => {
       else if (type=='screens'){
               if (reu){
                   reusedNode(dNodes,sid,type);
-                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
+                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Testcase.\n \n Are you sure you want to Delete permenantly?");
                   setSelectedDelNode(id);
                   setReuseDelConfirm(true);
                   return;
@@ -1077,26 +1083,26 @@ const CanvasNew = (props) => {
   
         
         const addRowTestStep = () => {
-          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep };
+          const newRowTestStep = { id: addTestStep.length + 1, value : inputValTestStep, isEditing:false};
           setAddTestStep([...addTestStep, newRowTestStep]);
           setinputValTestStep("");
           setShowInputTestStep(true);
         };
 
-        const updateRow = (rowData, updatedValue) => {
-            const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered:false } : row));
-            setAddScenario(updatedData);
-          };
-          const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
-            const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen, isHovered:false } : row));
-            setAddScreen(updatedDataScreen);
-          };
+  const updateRow = (rowData, updatedValue) => {
+    const updatedData = addScenario.map((row) => (row.id === rowData.id ? { ...row, value: updatedValue, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddScenario(updatedData);
+  };
+  const updateRowScreen = (rowDataScreen, updatedValueScreen) => {
+    const updatedDataScreen = addScreen.map((row) => (row.id === rowDataScreen.id ? { ...row, value: updatedValueScreen, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddScreen(updatedDataScreen);
+  };
     
           
-          const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
-            const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep ,  isHovered:false } : row));
-            setAddTestStep(updatedDataTestStep);
-          };
+  const updateRowTestStep = (rowDataTestStep, updatedValueTestStep) => {
+    const updatedDataTestStep = addTestStep.map((row) => (row.id === rowDataTestStep.id ? { ...row, value: updatedValueTestStep, isHovered: false } : row)).filter((row) => row.value !== "");
+    setAddTestStep(updatedDataTestStep);
+  };
     
     
           const handleEdit = (rowData) => {
@@ -1167,52 +1173,68 @@ const CanvasNew = (props) => {
               })
             );
           };
-    
-          const handleSave = (rowData) => {
-            setAddScenario((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowData.id) {
-                  return { ...row, value: rowData.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRows((prevState) => ({
-              ...prevState,
-              [rowData.id]: false,
-            }));
-            // setShowInput(false); // Hide the input box after saving
-          };
-    
-          const handleSaveScreens = (rowDataScreen) => {
-            setAddScreen((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowDataScreen.id) {
-                  return { ...row, value: rowDataScreen.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRowsScreens((prevState) => ({
-              ...prevState,
-              [rowDataScreen.id]: false,
-            }));
-          };
-    
-          const handleSaveTestCases = (rowDataTestStep) => {
-            setAddTestStep((prevData) =>
-              prevData.map((row) => {
-                if (row.id === rowDataTestStep.id) {
-                  return { ...row, value: rowDataTestStep.value, isEditing: false };
-                }
-                return row;
-              })
-            );
-            setEditingRowsTestCases((prevState) => ({
-              ...prevState,
-              [rowDataTestStep.id]: false,
-            }));
-          };
+  // To handle Multiple Test Cases
+  const handleSave = (rowData) => {
+    setAddScenario((prevData) =>
+      rowData?.value == "" ?
+        prevData.filter(row => row.id !== rowData.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowData.id) {
+            return { ...row, value: rowData.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+    (rowData?.value !== "") ?? setEditingRows((prevState) => ({
+      ...prevState,
+      [rowData.id]: false,
+    }));
+    // setShowInput(false); // Hide the input box after saving
+  };
+  // To handle Multiple Test Screens
+  const handleSaveScreens = (rowDataScreen) => {
+    setAddScreen((prevData) =>
+      rowDataScreen.value == "" ?
+        prevData.filter(row => row.id !== rowDataScreen.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowDataScreen.id) {
+            return { ...row, value: rowDataScreen.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+    (rowDataScreen?.value !== "") ?? setEditingRowsScreens((prevState) => ({
+      ...prevState,
+      [rowDataScreen.id]: false,
+    }));
+  };
+  // To handle Multiple Test Steps
+  const handleSaveTestCases = (rowDataTestStep) => {
+    setAddTestStep((prevData) =>
+      rowDataTestStep.value == "" ?
+        prevData.filter(row => row.id !== rowDataTestStep.id).map((row, index) => ({
+          ...row,
+          id: index + 1,
+        })) :
+        prevData.map((row) => {
+          if (row.id === rowDataTestStep.id) {
+            return { ...row, value: rowDataTestStep.value, isEditing: false };
+          }
+          return row;
+        })
+    );
+
+    (rowDataTestStep.value !== "") ?? setEditingRowsTestCases((prevState) => ({
+      ...prevState,
+      [rowDataTestStep.id]: false,
+    }));
+  };
           
     
   const headerCheckboxClicked = (event) => {
@@ -1302,6 +1324,46 @@ const CanvasNew = (props) => {
     });
   };
 
+  
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    const specialCharRegex = /[!@#$%^&*()+{}|\[\]:;"'<>,.?/\\]/;
+
+    switch (name) {
+      case 'inputValScreen':
+        if (!specialCharRegex.test(value)) {
+          setinputValScreen(value);
+          setInputValValid(true);
+          // Additional logic for valid inputValScreen
+        } else {
+          setInputValValid(false);
+          // Handle invalid inputValScreen
+        }
+        break;
+      case 'inputValTestStep':
+        if (!specialCharRegex.test(value)) {
+          setinputValTestStep(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+        case 'inputValue':
+        if (!specialCharRegex.test(value)) {
+          setInputValue(value);
+          setInputValValid(true);
+        } else {
+          setInputValValid(false);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
   const columns = [
     // {
     //   field: "checkbox",
@@ -1317,15 +1379,17 @@ const CanvasNew = (props) => {
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={(e) => setInputValue(e.target.value)}
+            <InputText name="inputValue" className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={handleInputChange}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
+              setInputValue("sample Testcase");
             }}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 updateRow(rowData, inputValue);
                 setShowInput(false);
+                setInputValue("sample Testcase");
               }
             }}
             />
@@ -1351,7 +1415,7 @@ const CanvasNew = (props) => {
         else {
           return(
             <div className='row_data'
-            onClick={() => setShowInput(rowData.id === addScenario.length)}
+            onClick={() => handleEdit(rowData)}
             onMouseEnter={(event) => handleRowHover(event,rowData)}
             onMouseLeave={() => handleRowHoverExit()}
           >
@@ -1387,15 +1451,17 @@ const CanvasNew = (props) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
-            <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)}
+            <InputText name="inputValScreen" className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={handleInputChange}
             onBlur={() => {
               updateRowScreen(rowDataScreen, inputValScreen);
               setShowInputScreen(false);
+              setinputValScreen("sample Screen ");
             }}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 updateRowScreen(rowDataScreen, inputValScreen);
                 setShowInputScreen(false);
+                setinputValScreen("sample Screen ");
               }
             }}
             />
@@ -1420,7 +1486,7 @@ const CanvasNew = (props) => {
         else {
           return(
             <div className='row_data'
-            onClick={() => setShowInputScreen(rowDataScreen.id === addScreen.length)}
+            onClick={()=>handleEditScreens(rowDataScreen)}
             onMouseEnter={(event) => handleRowHover(event,rowDataScreen)}
             onMouseLeave={() => handleRowHoverExit()}
             
@@ -1455,15 +1521,17 @@ const CanvasNew = (props) => {
         if (showInputTestStep && rowDataTestStep.id === addTestStep.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Test Step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)} onBlur={() => updateRowTestStep(rowDataTestStep, inputValTestStep)} />
-    <InputText className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={(e) => setinputValTestStep(e.target.value)}
+    <InputText name="inputValTestStep" className='scenario_inp' placeholder='Add Test step Name' value={inputValTestStep} onChange={handleInputChange}
     onBlur={() => {
       updateRowTestStep(rowDataTestStep, inputValTestStep);
       setShowInputTestStep(false);
+      setinputValTestStep("sample teststeps");
     }}
-    onKeyPress={(e) => {
+    onKeyUpCapture={(e) => {
       if (e.key === 'Enter') {
         updateRowTestStep(rowDataTestStep, inputValTestStep);
         setShowInputTestStep(false);
+        setinputValTestStep("sample teststeps");
       }
     }}
     />
@@ -1476,7 +1544,7 @@ const CanvasNew = (props) => {
           value={rowDataTestStep.value}
           onChange={(e) => handleRowInputChangeTestCases(rowDataTestStep.id, e.target.value)}
           onBlur={() => handleSaveTestCases(rowDataTestStep)}
-          onKeyPress={(e) => {
+          onKeyUpCapture={(e) => {
             if (e.key === "Enter") {
               e.target.blur();
               handleSaveTestCases(rowDataTestStep);
@@ -1488,7 +1556,7 @@ const CanvasNew = (props) => {
     else {
       return(
         <div className='row_data'
-        onClick={() => setShowInputTestStep(rowDataTestStep.id === addTestStep.length)}
+        onClick={() => handleEditTestCases(rowDataTestStep)}
         onMouseEnter={(event) => handleRowHover(event,rowDataTestStep)}
         onMouseLeave={() => handleRowHoverExit()}
       >
@@ -1509,18 +1577,18 @@ const CanvasNew = (props) => {
   
   const footerContentScenario = (
     <div>
-        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);}} className="add_scenario_btn" /> 
+        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
     </div> 
 );
 
 const footerContentScreen =(
     <div>
-              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);}} className="add_scenario_btn" /> 
+              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);setinputValScreen("");setAddScreen([{ id: 1, value: inputValScreen, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValScreen ) ?  false: true} /> 
           </div>
     )
     const footerContentTeststep =(
       <div>
-                <Button label="Add Test Step"  onClick={() => {setVisibleTestStep(false);createMultipleNode(box.split("node_")[1],addTestStep);}} className="add_scenario_btn" /> 
+                <Button label="Add Test Step"  onClick={() => {setVisibleTestStep(false);createMultipleNode(box.split("node_")[1],addTestStep);setinputValTestStep("");setAddTestStep([{ id: 1, value: inputValTestStep, isEditing: false }]);}} className="add_scenario_btn"disabled={ (inputValTestStep ) ?  false: true}  /> 
             </div>
       )
        // functions for impact analysis 

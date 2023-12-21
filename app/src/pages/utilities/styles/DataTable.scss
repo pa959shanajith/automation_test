@@ -57,6 +57,10 @@
     }
 }
 
+.dt__tableNameError{
+    border: 2px solid $redError !important;
+}
+
 .dt__faBtn{
     height: 37px;
     width: 50px;
@@ -139,4 +143,7 @@
 .selected-btn {
   background: #0003 !important;
   border-radius: 5px !important;
+}
+.dt__table_container{
+    overflow: auto;
 }

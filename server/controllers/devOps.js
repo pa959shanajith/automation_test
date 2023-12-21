@@ -209,6 +209,7 @@ exports.getConfigureList = async (req, res) => {
 			projectid: req.body.projectid,
 			param:req.body.param,
 			page:req.body.page,
+			searchKey:req.body.searchKey
 		}
 		const list = await utils.fetchData(input, "devops/getConfigureList", "getConfigureList");
 		res.send(list);

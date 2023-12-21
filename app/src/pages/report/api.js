@@ -15,7 +15,8 @@ export const fetchConfigureList = async(props) => {
                 action: "configurelist",
                 'projectid': props.projectid,
                 'param':props.param,
-                page: props.page
+                page: props.page,
+                searchKey: props.searchKey
             }
         });
         if(res.status === 401){
@@ -33,7 +34,7 @@ export const fetchConfigureList = async(props) => {
     }
 }
 
-export const getFunctionalReports = async(projId, relName, cycId) => {
+export const getFunctionalReports = async(projId, relName, cycId, pageNo, searchKey) => {
     try{
         const res = await axios(url+'/getReportsData_ICE', {
             method: 'POST',
@@ -47,6 +48,8 @@ export const getFunctionalReports = async(projId, relName, cycId) => {
                     cycleId: cycId,
                     configurekey: projId,
                     type:"allmodules",
+                    page: pageNo,
+                    searchKey: searchKey
                 }
             },
             credentials: 'include'
@@ -641,5 +644,155 @@ export const viewAzureMappedList_ICE = async(userID, scenario) => {
     }catch(err){
         console.error(err)
         return {error:MSG.AZURE.ERR_AZURE_LOGIN}
+    }
+}
+
+export const publicViewReport = async (reportid, reportType="json", screenshotFlag) => { 
+    try{
+        const res = await axios(url+'/devopsReports/viewReport', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
+            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error: MSG.REPORT.ERR_FETCH_REPORT }
+    }
+    catch(err){
+        console.error(err)
+        return { error: MSG.REPORT.ERR_FETCH_REPORT }
+    }
+}
+
+export const getFunctionalReportsDevops = async(configurekey, executionListId) => {
+    try{
+        const res = await axios(url+'/devopsReports/getReportsData_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                reportsInputData:{
+                    'configurekey': configurekey,
+                    'executionListId': executionListId,
+                    "type":"allmodules",
+                }
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
+    }
+}
+
+//component fetchModuleData
+//data :  {"param":"getSuiteDetailsInExecution_ICE","testsuiteid":"5df71837d9be728cf8e7ff81"}
+export const fetchOpenModuleData = async(arg) => {
+    try{
+        const res = await axios(url+'/devopsReports/getSuiteDetailsInExecution_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                // "param": "getSuiteDetailsInExecution_ICE",
+                ...arg
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_SUITE_DETAILS}
+    }
+}
+
+export const getOpenfetchScenarioInfoDevOps = async(executionIds) => {
+    try{
+        const res = await axios(url+'/devopsReports/reportStatusScenarios_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                // "param": "reportStatusScenarios_ICE",
+                "executionId":[executionIds]
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_STATUS}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT_STATUS}
+    }
+}
+
+export const getPublicFunctionalReportsDevOps = async(projId, relName, cycId) => {
+    try{
+        const res = await axios(url+'/devopsReports/getReportsData_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                // "param":"getReportsData_ICE",
+                reportsInputData:{
+                    "projectId": projId,
+                    "releaseName": relName,
+                    "cycleId": cycId,
+                    "configurekey": projId,
+                    "type":"allmodules",
+                }
+            },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.REPORT.ERR_FETCH_REPORT}
     }
 }

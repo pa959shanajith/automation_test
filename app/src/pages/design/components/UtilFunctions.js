@@ -619,3 +619,52 @@ const replaceHtmlEntites = selectedText => {
 		return translate[entity];
 	}) );
 }
+
+const roles = {
+    "Quality Lead": "5db0022cf87fdec084ae49aa",
+    "Quality Manager": "5db0022cf87fdec084ae49ab",
+    "Quality Engineer": "5db0022cf87fdec084ae49ac"
+};
+
+export const roleIdentifiers = {
+    QALead: "Quality Lead",
+    QAManager: "Quality Manager",
+    QAEngineer: "Quality Engineer"
+};
+
+// Function to Check roleId belongs to QA Manager, QA Lead, QA Engineer
+export const checkRole = (roleName, roleId) => {
+    const roleIds = roles[roleName];
+    if ([String(roleId)].includes(roleIds)) {
+        return true;
+    }
+    return false;
+};
+
+export const getRoleId = (roleName) =>{
+    return roles[roleName];
+}
+ export const convertIdIntoNameOfAppType = (apptypeID) => {
+    switch (apptypeID) {
+      case "5db0022cf87fdec084ae49b6":
+        return "Web";
+      case "5db0022cf87fdec084ae49b2":
+        return "MobileWeb";
+      case "5db0022cf87fdec084ae49af":
+        return "Desktop";
+      case "5db0022cf87fdec084ae49b7":
+        return "Webservice";
+      case "5db0022cf87fdec084ae49b4":
+        return "SAP";
+      case "5db0022cf87fdec084ae49b3":
+        return "OEBS";
+      case "5db0022cf87fdec084ae49b0":
+        return "Mainframe";
+      case "5db0022cf87fdec084ae49b1":
+        return "MobileApp";
+      case "5db0022cf87fdec084ae49b5":
+        return "System";
+      default:
+        return "";
+    }
+}
