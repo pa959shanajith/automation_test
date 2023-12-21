@@ -238,6 +238,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [emailNotificationSender, setEmailNotificationSender] = useState(null);
   const [batchInfo, setBatchInfo] = useState([]);
   const [profileName, setProfileName] = useState(null);
+  const [configbtnsave,setConfigbtnsave]=useState(null);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -1479,6 +1480,7 @@ const showToast = (severity, detail) => {
   };
 
   const onModalBtnClick = (getBtnType) => {
+    setConfigbtnsave(getBtnType)
     if (getBtnType === "Save" || getBtnType === "Update") {
       const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
         ac[cv.key] = ac[cv.key] || [];
@@ -1631,7 +1633,14 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
+      const pagecount=Math.floor(configPages/10);
+      if(configbtnsave=="Save"){
+        const first = (pagecount)*10;
+        onPageChange({first,rows:10,page:pagecount})
+      }
+      else{
       tableUpdate(currentPage);
+      }
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
