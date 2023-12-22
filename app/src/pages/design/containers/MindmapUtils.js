@@ -944,17 +944,11 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
         for (var k = 0; k < dNodes[0].children.length; k++) {
             for (var m = 0; m < dNodes[0].children[k].children.length; m++) {
                 if (dNodes[0].children[k].children[m].name === p.name) {
-                    if(dNodes[sid].reuse !== true){
-                        dNodes[0].children[k].children[m].children = p.children
-                    }else{
-                        dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
-                    }
-                    
-                     // No need to continue looping once we find the parent
+                    dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
                 }
             }
         }
-    }    
+    }       
     if (p["_id"]== null && p["state"]=="created" && p["type"]=="endtoend") {deletedNodes=[]}
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
