@@ -5,6 +5,8 @@ const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
+const validator = require('validator');
+
 //SOCKET CONNECTION USING SOCKET.IO
 const io = require('socket.io')(httpsServer, {
 	cookie: false,
