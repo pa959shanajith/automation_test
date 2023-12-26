@@ -611,8 +611,12 @@ const DesignModal = (props) => {
 
         let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
         if (dependencyTestCaseFlag){
-            testCaseIDsList.push(findTestCaseId.id);
-            testcaseID = testCaseIDsList
+            for(let p = 0; p<testcaseList.length;p++){
+                if(testcaseList[p].checked === true && testcaseList[p].disableAndBlock === false){
+                    testcaseID.push(testcaseList[p].testCaseID)
+                }
+            }
+            testcaseID.push(findTestCaseId.id);
         } 
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
@@ -684,6 +688,9 @@ const DesignModal = (props) => {
             
         if (testCase) {
             if (event.checked) {
+                // Update the specific testCase object's checked property to true
+                testCase.checked = true;
+                setTestcaseList([...testcaseList]); // Update the state with the modified list
                 setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
                 handleAdd(testCase);
             } else {
@@ -1072,6 +1079,7 @@ const DesignModal = (props) => {
     }
     const deleteTestcase = () => {
         setEdit(false)
+        setStepSelect({edit: false, check: [], highlight: []});
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
