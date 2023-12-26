@@ -639,10 +639,11 @@ exports.excelToMindmap = function (req, res){
 			var cSheetRow = cSheet.split('\n');
 			excelrows=[]
 			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()!="module") {return res.status(200).send("fail");}
-				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(200).send("fail");}
+				if(i== 0 && !["testsuite","module"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
+				if(i== 1 && !["testcase","scenario"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
 				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
-				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
+				if(i== 3 && !["teststeps","script"].includes(e.toLowerCase())){return res.status(200).send("fail");}
+				
 				if (i==4){return res.status(200).send("fail");}
 			});
 			for (let i = 0; i < cSheetRow.length; i++) {
@@ -931,11 +932,11 @@ exports.exportToExcel = async (req, res) =>{
 				});
 
 		ws.cell(1, 1)
-				.string('Module')
+				.string('Testsuite')
 				.style(style);
 
 		ws.cell(1, 2)
-				.string('Scenario')
+				.string('Testcase')
 				.style(style);
 
 		ws.cell(1, 3)
@@ -943,7 +944,7 @@ exports.exportToExcel = async (req, res) =>{
 				.style(style);
 
 		ws.cell(1, 4)
-				.string('Script')
+				.string('Teststeps')
 				.style(style);
 		var min_mm_idx =1
 		var min_scen_idx = 1;
@@ -1573,10 +1574,10 @@ exports.singleExcelToMindmap = function (req, res) {
             var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
             var uniqueIndex = 0;
             cSheetRow[0].split(',').forEach(function (e, i) {
-                if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-                if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+                if (i == 0 && (["testsuite","module"].includes(e.toLowerCase()))) {modIdx = i}
+                if(i== 1 && (["testcase","scenario"].includes(e.toLowerCase()))) {scoIdx = i}
                 if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-                if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+                if(i== 3 && (["teststeps","script"].includes(e.toLowerCase()))) { sctIdx = i}
             });
             if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
                 err = true;
