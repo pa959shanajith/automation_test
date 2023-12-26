@@ -2530,7 +2530,6 @@ const LaunchApplication = props => {
     }
     const handleCheckingMobileClient_ICE_MW = ()=>{
         checkingMobileClient_ICE().then(data=>{
-          console.log("dataOfcheckingMobileClient_ICE",data)
           if(data === false){
             setcheckingMobileClient_ICEResponse(true)
           }})
