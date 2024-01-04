@@ -1,0 +1,108 @@
+name: Test-WebServerPipeline
+trigger: none
+resources:
+  pipelines:
+  - pipeline: Test-WebServerPipeline
+    source: Test-LinuxDASPipeline
+    trigger: true
+steps:
+- task: DownloadBuildArtifacts@1
+  inputs:
+    buildType: 'specific'
+    project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
+    pipeline: '173'
+    buildVersionToDownload: 'latest'
+    downloadType: 'single'
+    artifactName: 'BranchName'
+    downloadPath: '$(System.ArtifactsDirectory)'
+
+- checkout: git://$(System.TeamProject)/WebServer
+  persistCredentials: true
+  clean: true
+  path: s/itdm
+- task: CmdLine@2
+  inputs:
+    script: |
+      BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
+      echo "Branch Name is:$BranchName"
+      echo $(Build.SourceBranch)
+      cd s/itdm
+      git checkout $BranchName
+      ls
+
+- script: 'rm -rf node nodejs node-v12.18.2-linux-x64* node-v12.18.2-linux-arm64* node-v18.17.1-linux-x64* node-v18.17.1-linux-arm64*   node-v18.15.0-linux-arm64* app/node* node_modules npm app/node_modules app/npm webserver webserver.zip wkhtmltox*'
+  displayName: 'remove unwanted files'
+
+- script: |
+   wget https://nodejs.org/dist/v12.18.2/node-v12.18.2-linux-x64.tar.gz;
+   tar xvfz node-v12.18.2-linux-x64.tar.gz;
+   mkdir nodejs;
+   cp -r node-v12.18.2-linux-x64/* nodejs/;
+   cp ./nodejs/bin/node ./node;
+   
+   
+   mkdir -p app/nodejs
+   wget https://nodejs.org/dist/v18.17.1/node-v18.17.1-linux-x64.tar.gz
+   tar xvfz node-v18.17.1-linux-x64.tar.gz
+   cp -r node-v18.17.1-linux-x64/* app/nodejs/;
+   cd app
+   cp ./nodejs/bin/node ./node;
+   echo "inside app"
+   ls
+   cd ..
+   echo "inside server"
+   echo "placing wkhtmltox"
+   wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz;
+   tar -xvf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz;
+   ls
+   
+  displayName: 'download and place node(X86) '
+
+- script: |
+   echo "server before"
+   ls
+   ./node ./nodejs/bin/npm install --scripts-prepend-node-path
+   ln -s node_modules/npm/bin/npm npm
+   echo "server after"
+   ls
+   echo "server node_modules"
+   ls node_modules
+  displayName: 'server part'
+
+- script: |
+   echo "inside server"
+   ls
+   cd app
+   echo "inside app"
+   echo $(pwd)
+   ./node ./nodejs/bin/npm install --scripts-prepend-node-path
+   ln -s node_modules/npm/bin/npm npm
+   echo "creating app build"
+   export REACT_APP_VERSION=$(version).$(minor_version_no).$(PATCH_VERSION)
+   echo $PATCH_VERSION
+   echo $REACT_APP_VERSION
+   echo $REACT_APP_VERSION > version.txt
+   cp version.txt ../
+   ./npm run buildlinux --scripts-prepend-node-path
+   echo "node modules and npm created"
+   ls
+  displayName: 'get inside app and install nodemodules, build app folder'
+
+- script: |
+   echo "-------------------"
+   ls
+   mkdir webserver
+   cp -r assets .env logger.js logs nginx.conf node nodejs node_modules package.json package-lock.json public server server.js templates wkhtmltox version.txt webserver
+   echo "files in webserver folder"
+   ls webserver
+   echo "inside wkhtmltox folder"
+   ls webserver/wkhtmltox/bin
+   zip -y -r webserver.zip webserver
+   cp webserver.zip $(Build.ArtifactStagingDirectory)
+  displayName: 'creating folder with required files'
+
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish Pipeline Artifact'
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/webserver.zip'
+
