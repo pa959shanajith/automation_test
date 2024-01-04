@@ -1356,6 +1356,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
+                setRunningStatusTimer("")
               }}
                 disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
