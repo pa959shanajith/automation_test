@@ -200,6 +200,113 @@ exports.manageUserDetails = async (req, res) => {
 	}
 };
 
+exports.createMulitpleLdapUsers = async (req, res) => {
+    const fnName = "createMulitpleLdapUsers";
+    logger.info("Inside UI Service: " + fnName);
+    try {
+        let flag = ['2','0','0','0','0','0','0','0','0'];
+        let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+        const action = req.body.action;
+        const validUsers = {
+            'users': [],
+            'action': 'createMulitpleLdapUsers'
+        }
+        for(let ldapuser of req.body.user) {
+            const reqData = ldapuser;
+            const internalUser = reqData.type == "inhouse";
+ 
+            let inputs = {
+                action: action,
+                createdby: req.session.userid,
+                createdbyrole: req.session.activeRoleId,
+                userimage: reqData.userimage || '',
+                isadminuser : reqData.isadminuser,
+                name: (reqData.username || "").trim(),
+                auth: {
+                    type: reqData.type,
+                    password: reqData.password || ""
+                },
+            };
+            const username = inputs.name;
+            let input_pass = {
+                username
+            };
+   
+            if (!validator.isLength(inputs.name,1,100) || regEx.test(reqData.username)) {
+                logger.error("Error occurred in admin/"+fnName+": Invalid User name.");
+                flag[2]='1';
+            }
+            if (action != "create") {
+                inputs.userid = (reqData.userid || "").trim();
+            }
+            if (action != "delete") {
+                if (inputs.auth.password != '') {
+                    const salt = bcrypt.genSaltSync(10);
+                    inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
+                }
+                // else delete inputs.auth.password;
+                inputs.firstname = (reqData.firstname || "").trim();
+                inputs.lastname = (reqData.lastname || "").trim();
+                inputs.email = (reqData.email || "").trim();
+                inputs.defaultrole = (reqData.role || "").trim();
+   
+                if (!validator.isLength(inputs.firstname,1,100) || regEx.test(reqData.firstname)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid First name.");
+                    flag[3]='1';
+                }
+                if (!validator.isLength(inputs.lastname,1,100) || regEx.test(reqData.lastname)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid Last name.");
+                    flag[4]='1';
+                }
+                if (!validator.isLength(inputs.email,1,100) || !regEx_email.test(reqData.email)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid Email Address.");
+                    flag[6]='1';
+                }
+                if (!internalUser) {
+                    inputs.auth.server = reqData.server;
+                    if (!inputs.auth.server || validator.isEmpty(inputs.auth.server)) {
+                        logger.error("Error occurred in admin/"+fnName+": Invalid Authentication Server.");
+                        flag[7]='1';
+                    }
+                    if (inputs.auth.type == "ldap") {
+                        inputs.auth.user = reqData.ldapUser;
+                        if (validator.isEmpty(inputs.auth.user)) {
+                            logger.error("Error occurred in admin/"+fnName+": Invalid User Domain Name.");
+                            flag[8]='1';
+                        }
+                    }
+                }
+            }
+            flag = flag.join('');
+            if (flag == "200000000") {
+                // return res.send(flag);
+                validUsers['users'].push(inputs)
+            }
+        }
+ 
+        const result = await utils.fetchData(validUsers, "admin/manageUserDetails", fnName);
+        if (result == "fail" || result == "forbidden") res.status(500).send("fail");
+        // else if (action==="create"){
+        //  if(result["userData"]){
+        //      res.send(result["status"]);        
+        //      let uData = result["userData"];
+        //      try{
+        //          // notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+        //          // notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+        //      }catch(error) {
+        //          logger.error("Error occurred in admin/"+fnName,error);
+        //      }
+        //  }else{
+        //      res.send(result)
+        //  }
+        // }
+        else res.send(result);
+    } catch (exception) {
+        logger.error("Error occurred in admin/"+fnName, exception);
+        res.status(500).send("fail");
+    }
+};
+
 // Fetch Users or a specific user details
 exports.getUserDetails = async (req, res) => {
 	logger.info("Inside UI Service: getUserDetails");
