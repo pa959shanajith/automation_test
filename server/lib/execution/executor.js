@@ -398,7 +398,8 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                        if (!status) { // This block is for report data
+                    const iceExecReq=resultData.execReq;
+                        if (!status && !iceExecReq) { // This block is for report data
                             if ("accessibility_reports" in resultData) {
                                 const accessibility_reports = resultData.accessibility_reports
                                 reports.saveAccessibilityReports(accessibility_reports);
@@ -444,12 +445,11 @@ class TestSuiteExecutor {
                                 if (reportType != "accessiblityTestingOnly") notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, profileName: execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
                                 await this.updateExecutionStatus([executionid], { status: "fail" });
                             }
-                        } else { // This block will trigger when resultData.status has "success or "Terminate"
+                        } else if(!iceExecReq) { // This block will trigger when resultData.status has "success or "Terminate"
                             try {
                                 let result = status;
                                 let report_result = {};
                                 mySocket.removeAllListeners('return_status_executeTestSuite');
-                                mySocket.removeAllListeners('result_executeTestSuite');
                                 report_result["status"] = status
                                 report_result["configurekey"] = execReq["configurekey"]
                                 report_result["configurename"] = execReq["configurename"]
@@ -719,3 +719,8 @@ module.exports.setExecStatus = async (dataFromIce) => {
     }
     return await testSuiteExecutor.setExecStatus(dataFromIce);
 };
+
+if (!testSuiteExecutor){
+    testSuiteExecutor =  new TestSuiteExecutor();
+}
+module.exports.insertReport= testSuiteExecutor.insertReport;
