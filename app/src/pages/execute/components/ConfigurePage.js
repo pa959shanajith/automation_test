@@ -484,7 +484,7 @@ try:
 
     if status == "pass":
         running_status_link = response["runningStatusLink"]
-        status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+        status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
         status_response = status_response.json()
         running_status = status_response["status"]
         completed = status_response["Completed"]
@@ -492,7 +492,7 @@ try:
         while running_status == "Inprogress":
             print(f"Executing... {completed}")
 
-            status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+            status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
             status_response = status_response.json()
             running_status = status_response["status"]
             if "Completed" in status_response:
@@ -526,20 +526,20 @@ $body = @"
     
 try {
     $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-    $response | ConvertTo-Json -Depth 10
+    ($response | ConvertTo-Json) -replace '\\\\u0026', '&'
     $status = $response.status
     
     # Check if status is pass or fail
     if ($status -ne "fail") {
         $runningStatusLink = $response.runningStatusLink
-        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
         $runningStatus = $statusResponse.status
         $complete = $statusResponse.Completed
         
         while ($runningStatus -eq "Inprogress") {
             Write-Host "Executing... $complete"
     
-            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
             $runningStatus = $statusResponse.status
             if ($statusResponse.PSObject.Properties["Completed"]) {
                 $complete = $statusResponse.Completed
@@ -587,7 +587,7 @@ if [ "$status" != "fail" ]; then
 
   # Check the execution status in a loop
   while true; do
-    statusResponse=$(wget --quiet --method=POST $headers -O - "$runningStatusLink")
+    statusResponse=$(wget --quiet --method=GET $headers -O - "$runningStatusLink")
     runningStatus=$(echo "$statusResponse" | jq -r '.status')
     complete=$(echo "$statusResponse" | jq -r '.Completed')
 
@@ -1357,6 +1357,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
+                setRunningStatusTimer("")
               }}
                 disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
