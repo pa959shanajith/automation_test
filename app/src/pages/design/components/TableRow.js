@@ -370,7 +370,7 @@ const TableRow = (props) => {
                     //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                     //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                     // </select>
-                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
+                    <Select  value={objetListOption} onChange={onObjSelect} onMenuClose={submitData} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
                         <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
