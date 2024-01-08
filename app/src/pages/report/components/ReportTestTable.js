@@ -994,6 +994,8 @@ export default function BasicDemo() {
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
+          scrollable
+          scrollHeight="325px"
           // globalFilter={searchTest}
           header={getTableHeader}
           className="ruleMap_table"

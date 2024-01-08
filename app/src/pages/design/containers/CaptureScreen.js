@@ -1654,7 +1654,7 @@ const footerSave = (
   };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
-  
+  const AddElement = capturedDataToSave.every(item => item.isCustom === true);
 
 
      const isWebApp = NameOfAppType.appType === "Web";
@@ -1769,7 +1769,7 @@ const elementValuetitle=(rowdata)=>{
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
+                <span className={`insprint_auto ${!isWebApp || AddElement ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
                   <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 

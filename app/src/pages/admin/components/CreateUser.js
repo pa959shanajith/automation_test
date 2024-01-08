@@ -46,6 +46,7 @@ const CreateUser = (props) => {
     const [ldapUserList, setLdapUserList] = useState([])
     const [ldapUserListInitial, setLdapUserListInitial] = useState([])
     const [loading, setLoading] = useState(false)
+    const [updatedInfo, setUpdatedInfo] = useState(true);
     const type = useSelector(state => state.admin.type);
     const addRole = useSelector(state => state.admin.addRole);
     const allRoles = useSelector(state => state.admin.allRoles);
@@ -519,16 +520,23 @@ const CreateUser = (props) => {
     const passwordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const confirmPasswordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const emailChange = (value) => {
         value = ValidationExpression(value, "email")
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(value))
+        {(email === value || value === props?.editUserData?.email) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
+    }
+
+    const roleChange = (value) =>{
+        {(role === value || value === props?.editUserData?.roleId) ?  setUpdatedInfo(true) : setUpdatedInfo(false)} 
     }
 
     const createUserDialogHide = () => {
@@ -575,7 +583,7 @@ const CreateUser = (props) => {
             onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
-            disabled={nocreate}
+            disabled={editUser ? updatedInfo : false}
             size="small"
             >
             {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
@@ -605,7 +613,7 @@ const CreateUser = (props) => {
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
                         ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
                         showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} primaryRoles={allRolesUpdate}
-                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList}/>
+                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList} updatedInfo={updatedInfo} setUpdatedInfo={setUpdatedInfo} editUserData={props.editUserData} setEditUserData={props.setEditUserData}/>
 
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
@@ -674,7 +682,7 @@ const CreateUser = (props) => {
                                     optionLabel="name"
                                     className= {`w-full md:w-20rem p-inputtext-sm ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
-                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)); roleChange(event.target.value)}}
                                     // disabled={editUser}
                                 />
                             </div>
