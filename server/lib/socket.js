@@ -146,13 +146,7 @@ io.on('connection', async socket => {
 			if (socketMap[clientName][address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
-				delete socketMap[address];
-				if(address in iceUserMap){
-					let user = iceUserMap[address];
-					let index = userICEMap[user].indexOf(address);
-					userICEMap[user].splice(index,1);
-					delete iceUserMap[address];
-				}
+				delete socketMap[clientName][address];
 				module.exports.allSocketsMap = socketMap;
 				logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 				logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
