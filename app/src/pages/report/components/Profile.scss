@@ -194,3 +194,28 @@
         }
     }
 }
+.statusBadge{
+    .p-badge.p-badge-success {
+        background: white !important;
+        color: #10e91091 !important;
+        border: 1px solid #5cff5c !important;
+    }
+    .p-badge.p-badge-danger {
+        background: white;
+        color: #ee1c0d91;
+        border: 1px solid #ff5c5c;
+    }
+    .p-badge.p-badge-warning {
+        background: white;
+        color: #f55b1491;
+        border: 1px solid #f88149;
+    }
+    .p-badge.p-badge-info {
+        background: white;
+        color: #10dbe991;
+        border: 1px solid #5cdeff;
+    }
+}
+.executionNo{
+    font-size: small;
+}

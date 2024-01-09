@@ -54,6 +54,7 @@
     .normalModHeadLine {
         font-size: 16px;
         font: $f6_bold;
+        width: 6rem;
         // margin-left: 11px;
         width: 6rem;
     }
@@ -148,7 +149,7 @@
     }
 
     .NorModuleList {
-        max-height: 84.6%;
+        max-height: 84%;
         // border: 1px solid black;
         overflow-y: auto;
     }

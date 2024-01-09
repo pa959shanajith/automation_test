@@ -9,8 +9,8 @@ import PropTypes from 'prop-types';
 import Legends from './Legends';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Divider } from 'primereact/divider';
-import { screenData, moduleList, selectedModuleReducer, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule } from '../designSlice'
-
+import { screenData, moduleList, selectedModuleReducer, selectedProj,selectedModulelist, selectBoxState, selectNodes, copyNodes,dontShowFirstModule,TypeOfViewMap } from '../designSlice'
+import { RadioButton } from "primereact/radiobutton";
 
 
 
@@ -37,12 +37,13 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
     const moduleListed = useSelector(state=>state.design.moduleList)
     const selectedModuled = useSelector(state=>state.design.selectedModule)    
     const selectedModulelisted = useSelector(state=>state.design.selectedModulelist)
+    const handleTypeOfViewMap = useSelector(state=>state.design.typeOfViewMap)
     const [modlist,setModList] = useState(moduleListed)
     const [exportBox,setExportBox] = useState(false);
     const initEnEProj = useSelector(state=>state.design.initEnEProj)
     const [isCreateE2E, setIsCreateE2E] = useState(false)
     const isEnELoad = useSelector(state=>state.design.isEnELoad);
-    const [checked, setChecked] = useState(false);
+    // const [radioButClicked, setRadioButClicked] = useState('journeyView');
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -58,6 +59,10 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
         setIsCreateE2E(initEnEProj && initEnEProj.isE2ECreate?true:false);
         
       },[initEnEProj]);
+    //   useEffect(() => {
+    //     dispatch(TypeOfViewMap(radioButClicked))
+    //     console.log("handleTypeOfViewMap",handleTypeOfViewMap)
+    //   },);
     
     const selectProj = async(proj) => {
         setBlockui({show:true,content:'Loading Modules ...'})
@@ -238,19 +243,40 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
                     <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
                     <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
                 </span> */}
-                <div data-test="headerMenu" className='toolbar__header-menus'>
-                    <img className='am' src='static/imgs/minus-icon.svg' alt='minus'/>
-                    <div  style={{position:'relative', top:'0.4rem',fontSize:'12px'}} >40%</div>
-                    <img  className='am' src='static/imgs/add.svg' alt='add'/>
-                    <img className='line' src='static/imgs/line.svg' alt='line'/>
-                    <div className="flex justify-content-center gap-2 text-500">
+                    <div data-test="headerMenu" className='toolbar__header-menus'>
+                        <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
+                        <div >40%</div>
+                        <img className='am' src='static/imgs/add.svg' alt='add' />
+                    {/* <img className='line' src='static/imgs/line.svg' alt='line'/> */}
+                    {/* <div className="flex justify-content-center gap-2 text-500">
                         <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
                         <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
                         <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
-                    </div>
+                    </div> */}
                     <img className='line' src='static/imgs/line.svg' alt='line'/>
                 </div>
-                <img  className='line' src='static/imgs/line.svg' alt='line'/>
+                 {/* Radio buttons for map views */}
+                 <div className="card flex justify-content-center">
+                            <div className="flex flex-wrap gap-1.5">
+                                <div className="flex align-items-center">
+                                    <RadioButton inputId="journeyView"  value="journeyView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'journeyView'} />
+                                    <label htmlFor="journeyView" className="ml-2 mr-2">Journey View</label>
+                                </div>
+                                <div className="flex align-items-center">
+                                    <RadioButton inputId="tableView"  value="tableView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'tableView'} />
+                                    <label htmlFor="tableView" className="ml-2 mr-2">Table View</label>
+                                </div>
+                                <div className="flex align-items-center">
+                                    <RadioButton inputId="folderView"  value="folderView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'folderView'} />
+                                    <label htmlFor="folderView" className="ml-2 mr-2">Folder View</label>
+                                </div>
+                                <div className="flex align-items-center">
+                                    <RadioButton inputId="mindMapView"  value="mindMapView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'mindMapView'} />
+                                    <label htmlFor="mindMapView" className="ml-2 mr-2">Tree View</label>
+                                </div>
+            </div>
+        </div>
+                {/* <img  className='line' src='static/imgs/line.svg' alt='line'/> */}
                 {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
             </div>
         </div>
