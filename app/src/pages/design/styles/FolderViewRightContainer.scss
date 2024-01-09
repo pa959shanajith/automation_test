@@ -1,0 +1,176 @@
+.folderViewRightMaincontainer {
+    width: 76.9%;
+
+    .card {
+        height: 85vh;
+        width: 77vw;
+
+        .p-component {
+            height: 99.9%;
+
+            .p-card-body {
+                padding: 0rem;
+                height: 100%;
+            }
+
+            .p-card-content {
+                padding: 0rem;
+                width: 100%;
+                height: 100%;
+
+                .BreadOfRightSide {
+                    .p-breadcrumb {
+                        padding: 0.6rem;
+
+                        .p-breadcrumb-list {
+                            .p-menuitem {
+                                .p-menuitem-link {
+                                    .p-menuitem-text {
+                                        align-items: center;
+                                        display: flex;
+
+                                        img {
+                                            width: 20px;
+                                            height: 20px;
+                                        }
+
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+                }
+
+                .childOfSuites {
+                    // border: 2px solid lavender;
+                    // align-items: center;
+                    // display: flex;
+                    // height: 100px;
+                    // width: 100%;
+                    // justify-content: center;
+                    // font-size: 1rem;
+                    // z-index: 5;
+                    // position: relative;
+                    height: 35rem;
+                    width: 74rem;
+                    display: flex;
+                    flex-wrap: wrap;
+                    overflow-y: auto;
+
+                    .testCaseList {
+                        width: 14rem;
+                        // border: 1px solid black;
+                        height: 11rem;
+                        align-items: center;
+                        display: flex;
+                        flex-direction: column;
+
+                        .inputOfStepGrp {
+                            width: 13rem;
+                            height: 2.5rem;
+                        }
+
+                        .inputOfCase {
+                            width: 13rem;
+                            height: 2.5rem;
+                        }
+
+                        .testCaseImg {
+                            width: 6rem;
+                            height: 6rem;
+                            z-index: 1;
+                            position: sticky;
+                        }
+
+                        .testCaseTxt {
+                            padding-bottom: 2rem;
+                            z-index: 30;
+                            position: relative;
+                            bottom: 1.2rem;
+                        }
+
+                    }
+                }
+
+                .tabOfCaptureAndDesign {
+                    .breadAndTabViews {
+                        .BreadOfRightSide {
+                            .brdcmb {
+                                width: 24rem;
+                                height: 2rem;
+                            }
+                        }
+
+                        .tabViews {
+                            .p-tabview-nav-container {
+                                // .p-tabview-nav-content{
+
+                                .p-tabview-nav {
+                                    height: 2rem;
+                                    align-items: center;
+                                    justify-content: center;
+                                    padding-right: 37rem;
+
+                                    .p-tabview-ink-bar {
+                                        width: 148px;
+                                        left: 262.463px;
+                                    }
+
+                                    .p-tabview-nav-link {
+                                        padding: 8px;
+                                    }
+                                }
+                            }
+
+                            .p-tabview-panels {
+                                position: relative;
+                                right: 23rem;
+                                width: 72rem;
+
+                            }
+
+
+
+                        }
+
+                    }
+
+
+                }
+
+                .centerField {
+                    align-items: center;
+                    display: flex;
+                    height: 94%;
+                    width: 100%;
+                    justify-content: space-around;
+
+                    .centerButtons {
+                        width: 30rem;
+                        height: 6rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+
+                        .ButOfCapture {
+                            width: 14rem;
+                            height: 5rem;
+                            background-color: var(--purple-200);
+                        }
+
+                        .ButOfDesign {
+                            width: 14rem;
+                            height: 5rem;
+                            background-color: var(--purple-200);
+                        }
+                    }
+
+                }
+            }
+        }
+
+
+    }
+}

@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import '../styles/Legends.scss'
+import { useSelector } from 'react-redux';
 
 /*Component Legends
   use: returns static legends at the bottom of the screen
@@ -7,10 +8,11 @@ import '../styles/Legends.scss'
 */
 
 const Legends = ({isEnE}) => {
+    const typeOfView = useSelector(state=>state.design.typeOfViewMap)
     return(
         <svg className="ct-legendBox legendBoxAlignment">
-            <g  transform="translate(10,10)">
-                {!isEnE?
+            <g  transform="translate(-634,15)">
+                {!isEnE?typeOfView === 'mindMapView'?
                 <Fragment>
                     <g data-test="modules">
                         <circle className="ct-modules" cx="667" cy="0" r="10"></circle>
@@ -18,7 +20,7 @@ const Legends = ({isEnE}) => {
                     </g>
                     <g data-test="scenarios">
                     <circle className="ct-scenarios" cx="746" cy="0" r="10"></circle>
-                    <text className="ct-nodeLabel" x="759" y="3">Testcase</text>
+                    <text className="ct-nodeLabel" x="759" y="3">TestCase</text>
                 </g>
                     <g data-test="screens">
                         <circle className="ct-screens" cx="823" cy="0" r="10"></circle>
@@ -28,6 +30,19 @@ const Legends = ({isEnE}) => {
                         <circle className="ct-testcases" cx="893" cy="0" r="10"></circle>
                         <text className="ct-nodeLabel" x="909" y="3">Test Steps</text>
                     </g>
+                </Fragment>:<Fragment>
+                <g data-test="modules">
+                        <circle className="ct-modules" cx="667" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="681" y="3">Test Suite</text>
+                    </g>
+                    <g data-test="scenarios">
+                    <circle className="ct-scenarios" cx="746" cy="0" r="10"></circle>
+                    <text className="ct-nodeLabel" x="759" y="3">TestCase</text>
+                </g>
+                    <g data-test="screens">
+                        <circle className="ct-screens" cx="823" cy="0" r="10"></circle>
+                        <text className="ct-nodeLabel" x="839" y="3">Test Steps Groups</text>
+                    </g>
                 </Fragment>
                 :(<>
                     <g data-test="endtoend">
@@ -36,7 +51,7 @@ const Legends = ({isEnE}) => {
                     </g>
                     <g data-test="scenarios">
                         <circle className="ct-scenarios" cx="789" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="804" y="3">Testcase</text>
+                        <text className="ct-nodeLabel" x="804" y="3">TestCase</text>
                     </g>
                 </> )}
             </g>

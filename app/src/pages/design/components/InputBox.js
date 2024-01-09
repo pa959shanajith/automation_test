@@ -135,6 +135,30 @@ const InputBox = (props) => {
                     }
                 }
             }
+            if (dNodes[pi].type === 'teststepsgroups') {
+                updateData(dNodes[0])
+                function updateData(node) {
+                    node.children.forEach(child => {
+                        if (child.id === dNodes[pi].id) {
+                            child.name = dNodes[pi].name + "-teststeps";
+                            child.parent.name = dNodes[pi].name + "-screen";
+                            
+                            // Use map on child.parent.children to update specific child
+                            child.parent.children = child.parent.children.map(subChild => {
+                                if (subChild.childIndex === dNodes[pi].childIndex) {
+                                    subChild.name = dNodes[pi].name + "-teststeps";
+                                }else if(subChild.id === dNodes[pi].id){
+                                    subChild.name = dNodes[pi].name + "-teststeps";
+                                }
+                                return subChild;
+                            });
+                        } else {
+                            node.children.forEach(subChild => updateData(subChild));
+                        }
+                    });
+                    return node;
+                }
+            }
             if(dNodes[pi].type === 'screens'){
                 for (var k = 0; dNodes[0].children.length>k; k++){
                     for (var m =0 ; dNodes[0].children[k].children.length>m; m++){

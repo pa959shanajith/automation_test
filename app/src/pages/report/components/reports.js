@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { Paginator } from 'primereact/paginator';
 import useDebounce from '../../../customHooks/useDebounce';
 import { convertIdIntoNameOfAppType } from '../../design/components/UtilFunctions';
+import { Divider } from 'primereact/divider';
 export var navigate
 
 const reports = () => {
@@ -298,6 +299,7 @@ const reports = () => {
             ) : null}
           </div>
         </div>
+        <Divider type="solid" />
         <div className="flex justify-content-center ml-4 mr-4 mt-5 mb-3 search_container">
           <div className="p-input-icon-left">
             <i className="pi pi-search" />
@@ -365,9 +367,9 @@ const reports = () => {
                                               ? "static/imgs/E2EModuleSideIcon.png"
                                               : "static/imgs/moduleIcon.png"
                                           }
-                                          className="exe_type_icon"
+                                          className="exe_type_icon" alt='icon'
                                         />
-                                        <span
+                                        {/* <span
                                           style={{
                                             display: "inline-block",
                                             marginLeft: "0.4rem",
@@ -378,7 +380,7 @@ const reports = () => {
                                           data.selectedModuleType === "endtoend"
                                             ? "End to End"
                                             : "Test Suite"}
-                                        </span>
+                                        </span> */}
                                       </span>
                                     </div>
                                     <div className="col-12 exe_namebox">
@@ -496,13 +498,14 @@ const reports = () => {
             {show && <ReportTestTable />}
           </div>
           {activeIndex !== "Accessibility Test" && (
-            <Paginator
+            <div  className='resportPagination'><Paginator
               first={firstPage}
               rows={rowsPage}
               totalRecords={configPages}
               rowsPerPageOptions={[10, 20, 30]}
               onPageChange={onPageChange}
-            />
+              className='resportPagination'
+            /></div>
           )}
           <div>
             <Footer />

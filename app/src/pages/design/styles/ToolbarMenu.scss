@@ -6,6 +6,8 @@
     // padding: 0 10px;
     font-family: $avoFont;
     // padding-top: 5px;
+    width: 49%;
+    display: flex;
 }
 .projectLabel{
     display: inline-block;
@@ -26,9 +28,12 @@
 }
 .toolbar__header-menus{
     display: flex;
-    height: 0vh;
-    white-space: nowrap;
-    padding: 4px 7px 0 7px;
+    // height: 0vh;
+    // white-space: nowrap;
+    // padding: 4px 7px 0 7px;
+    align-items: center;
+
+
     .p-inputswitch{
         bottom: 0.2rem;
     }
@@ -39,13 +44,12 @@
 .line{
     height: 2rem;
     position: relative;
-    bottom: 0.3rem;
     margin-right: 1rem;
 }
 .am{
     height: 3rem;
-    position: relative;
-    bottom: 0.6rem;
+    // position: relative;
+    // bottom: 0.6rem;
 }
   
 // .toolbar__header-menus i{

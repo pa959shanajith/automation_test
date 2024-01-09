@@ -4,6 +4,7 @@ import {saveMindmap,getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import * as d3 from 'd3';
 import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId } from '../designSlice';
 import '../styles/SaveMapButton.scss'
+import {restructureData} from '../containers/MindmapUtilsForOthersView';
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
 
 /*Component SaveMapButton
@@ -23,6 +24,7 @@ const SaveMapButton = (props) => {
     const moduledata = useSelector(state=>state.design.moduleList)
     const verticalLayout= props.verticalLayout
     const savedList = useSelector(state=>state.design.savedList)
+    const typeOfView = useSelector(state=>state.design.typeOfViewMap)
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if(!userInfo) userInfo = userInfoFromRedux; 
@@ -32,7 +34,7 @@ const SaveMapButton = (props) => {
           // eslint-disable-next-line react-hooks/exhaustive-deps
     },[props.createnew])
     const clickSave = ()=>{
-        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList,props.toast,userInfo)
+        saveNode(props.setBlockui,props.dNodes,projId,props.cycId,deletedNoded,unassignTask,dispatch,props.isEnE,props.isAssign,projectList,initEnEProj? initEnEProj.proj:initEnEProj,moduledata,verticalLayout,props.setDelSnrWarnPop,props.createnew,savedList,props.toast,userInfo,typeOfView,props.dNodesFolder)
     }
     return(
         <svg data-test="saveSVG" className={"ct-actionBox"+(props.disabled?" disableButton":"")} id="ct-save" onClick={clickSave}>
@@ -46,7 +48,7 @@ const SaveMapButton = (props) => {
 
      
 //mindmap save funtion
-const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast,userInfo)=>{
+const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,dispatch,isEnE,isAssign,projectList,initEnEProj,moduledata,verticalLayout,setDelSnrWarnPop,createnew,savedList,toast,userInfo,typeOfView,dNodesFolder)=>{
     var tab = "endToend"
     var selectedProject;
     var error = !1
@@ -68,6 +70,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     d3.select('#copyImg').classed('active-map',false)
     d3.selectAll('.ct-node').classed('node-selected',false)   
     if (d3.select('#ct-save').classed('disableButton')) return;
+    if (typeOfView !== "folderView"){
     var namelist = dNodes.map((e)=>{
         if(e._id && e.type === 'screens' && e.state !== "deleted")return e.name;
         return undefined;
@@ -80,9 +83,17 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     if(!duplicateNode){
         toast.current.show({severity:'warn', summary:'Warning', detail:MSG.MINDMAP.WARN_DUPLICATE_SCREEN_NAME.CONTENT, life:1000})
         return;
-    }
+    }}
     setBlockui({show:true,content:'Saving flow! Please wait...'})
-    dNodes.forEach((e, i)=>{
+    var data1;
+    if( typeOfView !== "folderView"){
+        data1 = restructureData(dNodes[0])
+    }
+    // else if(typeOfView === "folderView"){
+    //     dNodes[0]= dNodesFolder;
+    // }
+    
+    else if (typeOfView === "mindMapView") {dNodes.forEach((e, i)=>{
         if (i === 0) return;
         temp_data[i] = {
             idx: i,
@@ -140,8 +151,20 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
             }
         }
         counter[key] = counter[key] + 1;
-    })
-    treeIterator(mapData, dNodes[0], error);
+    })}
+
+    // typeOfView !== "mindMapView"?treeIterator(mapData, props.dNodesFolder,error):treeIterator(mapData, dNodes[0], error);
+    switch (typeOfView) {
+        case "journeyView":
+            treeIterator(mapData, data1, error)
+            break;
+        case "folderView":
+            treeIterator(mapData, dNodesFolder, error)
+            break;
+        default:
+            treeIterator(mapData, dNodes[0], error)
+    }
+    // console.log("mapdata",mapData)
     var data = {
         write: flag,
         map: mapData,
@@ -205,7 +228,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     dispatch(saveMindMap({screendata,moduledata,moduleselected}))
     // if(!savedList){ dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})}
     setBlockui({show:false});
-    if(createnew!=='autosave'){isAssign?toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT, life:2000}):toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,life:2000})}
+    // if(createnew!=='autosave'){isAssign?toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT, life:2000}):toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,life:2000})}
     if(result.scenarioInfo){
         dispatch(toDeleteScenarios(result.scenarioInfo))
         setDelSnrWarnPop(true);
@@ -248,7 +271,7 @@ const treeIterator = (c, d, e) =>{
             state: (d.state) ? d.state : "created",
             cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
         };
-        if (d.type === 'testcases') obj.screenname = d.parent.name; // **Impact check**
+        if (d.type === 'testcases') obj.screenname = d?.parent?.name; // **Impact check**
         c.push(obj);
     }
     if (d.children && d.children.length > 0) d.children.forEach(function(t) {

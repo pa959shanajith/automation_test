@@ -43,6 +43,7 @@ const ModuleListDrop = (props) =>{
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
     const currentId = useSelector(state=>state.design.currentid)
+    const typeOfView = useSelector(state=>state.design.TypeOfViewMap)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)

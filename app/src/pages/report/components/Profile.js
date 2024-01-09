@@ -14,6 +14,7 @@ import { Button } from "primereact/button";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
 import { FooterTwo } from "../../global";
+import { Divider } from "primereact/divider";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
@@ -68,7 +69,7 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Execution ${executionProfiles.length - (ind)}`,
+            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
             dateTime: el.startDate,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
@@ -87,7 +88,7 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Execution ${executionProfiles.length - (ind)}`,
+            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
             dateTime: el?.starttime,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
@@ -357,7 +358,7 @@ const Profile = () => {
               key: i,
               testSuite: el?.modulename,
               testSuiteBar: (
-                <Tree value={[nestedtreeArr]} className="modules_tree" />
+                <Tree value={[nestedtreeArr]} showGridlines className="modules_tree" />
               ),
               id: el?._id,
             };
@@ -779,10 +780,11 @@ const Profile = () => {
       Fail: "danger",
     };
     return (
+      <div className="statusBadge">
       <Badge
         value={rowData?.status}
         severity={statusSeverity[rowData?.status]}
-      ></Badge>
+      ></Badge></div>
     );
   };
 
@@ -979,6 +981,9 @@ const Profile = () => {
         value={[treeArr]}
         onExpand={(e) => onTestSuiteClick(e)}
         className="modules_tree"
+        showGridlines
+        resizableColumns
+        outlined
       />
     );
   };
