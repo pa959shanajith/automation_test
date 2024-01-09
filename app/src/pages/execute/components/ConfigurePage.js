@@ -1961,7 +1961,15 @@ const showToast = (severity, detail) => {
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              scheduleThrough: showIcePopup ? "client" : (
+                fetechConfig[configItem]?.executionRequest?.avoagents[0]  
+                    ? (Object.values(fetechConfig[configItem].executionRequest.avoagents)[0])
+                    : getConfigData?.avoAgentAndGrid?.avogrids?.length > 0
+                      ? (getConfigData?.avoAgentAndGrid?.avogrids?.filter((item) => item?._id === fetechConfig[configItem]?.executionRequest?.avogridId)[0]?.name)
+                      : "Any Agent" 
+                         
+              ),
+              // scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
               testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
