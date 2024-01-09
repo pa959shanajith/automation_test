@@ -14,7 +14,7 @@ import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
 import { getProjectIDs } from "../api"
 import { selectedProj } from '../../design/designSlice';
-import { showGenuis } from '../../global/globalSlice';
+import { showGenuis, geniusMigrate } from '../../global/globalSlice';
 import { getModules,updateTestSuiteInUseBy } from '../../design/api'
 
 
@@ -123,11 +123,13 @@ const VerticalSteps = (props) => {
             }
 
   };
-  const openGen=()=>{
-    dispatch(showGenuis({showGenuisWindow:true,geniusWindowProps:{}
-            })
-            )
-  } 
+  const openGen = () => {
+    dispatch(geniusMigrate(false))
+    dispatch(showGenuis({
+      showGenuisWindow: true, geniusWindowProps: {}
+    })
+    );
+  };
 
 
   return (

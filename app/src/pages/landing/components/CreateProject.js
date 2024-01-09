@@ -11,6 +11,7 @@ import { Avatar } from 'primereact/avatar';
 import { getUserDetails, userCreateProject_ICE ,getUsers_ICE , userUpdateProject_ICE} from '../api';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
+import { migrateProject } from "../../global/globalSlice";
 
 const CreateProject = (props) => {
   const [value, setValue] = useState('');
@@ -451,6 +452,7 @@ const CreateProject = (props) => {
       setIsInvalidProject(false)
       props.toastSuccess("Project Created Successfully");
       dispatch(loadUserInfoActions.savedNewProject(true));
+      dispatch(migrateProject(value.trim()));
       props.onHide();
       setRefreshData(!refreshData);
     } catch (error){

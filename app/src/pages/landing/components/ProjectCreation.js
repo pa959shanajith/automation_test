@@ -5,13 +5,14 @@ import '../styles/ProjectCreation.scss';
 import { useNavigate, Link } from 'react-router-dom';
 import CreateProject from './CreateProject';
 import VerticalSteps from './VerticalSteps';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
-
+import { geniusMigrate, showGenuis, showSmallPopup, migrateProject } from '../../global/globalSlice';
 
 
 
 const ProjectCreation = (props) => {
+  const dispatch=useDispatch();
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [handleManageProject, setHandleManageProject] = useState(false)
@@ -32,6 +33,11 @@ const ProjectCreation = (props) => {
 
   const handleCloseDialog = () => {
     setVisible(false);
+  };
+  const handleMigration = () => {
+    dispatch(geniusMigrate(true))
+    dispatch(showGenuis({ showGenuisWindow: true, geniusWindowProps: {} }))
+    dispatch(migrateProject(""))
   };
 
   return (
@@ -61,6 +67,11 @@ const ProjectCreation = (props) => {
           </div>
           <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
         </Card>) : null}
+        {
+          userInfo && userInfo.rolename === "Quality Manager" && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
+            <Button className="CreateProj_btn" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
+          </Card>
+        }
       </div>
     </>
 
