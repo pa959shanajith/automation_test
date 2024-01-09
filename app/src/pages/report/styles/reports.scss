@@ -282,11 +282,11 @@
                 margin: 0;
                 .count_exe {
                     position: absolute;
-                    border: 1px solid #1947dd;
+                    border: 1px solid #605BFF;
                     padding: 0.1rem 0.5rem;
                     border-radius: 50%;
                     margin: -1rem 0.4rem;
-                    background: #385dd5;
+                    background: #605BFF;
                     color: #fff;
                 };
             }
@@ -503,20 +503,27 @@
         margin-left: 0.7rem;
     }
 }
-.resportPagination{
+.reportPagination{
     .p-paginator {
         background: #fff;
         border: 2px outset #e9ecef !important;
         border-radius: 10px;
-        color: #4338ca;
+        color: #605BFF;
         width: fit-content;
         padding: 0.5rem 1rem !important;
         position: relative;
         left: 38rem;
     }
     .p-paginator .p-paginator-pages .p-paginator-page.p-highlight{
-        background: #385dd5;
-        border-color: #1947dd;
+        background: #605BFF;
+        border-color: #605BFF;
         color: #fff;
     }
+}
+.view_img{
+    position: relative;
+    top: 0.1rem;
+    right: 0.2rem;
+    height: 16px;
+    width: 16px;
 }
