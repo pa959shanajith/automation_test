@@ -46,7 +46,7 @@ const reports = () => {
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
     );
-    const customDropdownIcon = classNames("pi", "pi-sort-amount-down");
+    const customDropdownIcon = classNames("pi", "pi-sort-alt");
 
     const [reportData, setReportData] = useState([]);
     const sort = [
@@ -223,7 +223,7 @@ const reports = () => {
     }
 
     const viewByTemplate = (option) => {
-      return <div><i className={option.icon}></i><span>{option.value}</span></div>;
+      return <div><img className='view_img' src={option.icon === "Test_suites"?"static/imgs/"+option.icon+".png":"static/imgs/"+option.icon+".svg"} alt={option.icon}/><span>{option.value}</span></div>;
     };
 
     const onPageChange = (e) => {
@@ -277,6 +277,7 @@ const reports = () => {
                   handleTest(e.value);
                   setTestType(e.value);
                 }}
+                style={{background:'#605BFF'}}
                 options={testTypesOptions}
               />
             </div>
@@ -293,6 +294,7 @@ const reports = () => {
                     setSearchReportData("");
                     setFirstPage(1);
                   }}
+                  style={{background:'#605BFF'}}
                   options={viewByOptions}
                 />
               </div>
@@ -415,13 +417,14 @@ const reports = () => {
                                       className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end"
                                       style={{ position: "relative" }}
                                     >
-                                      <i
-                                        className="pi pi-cog"
+                                      <img
+                                        src='static/imgs/Execution_number_icon.svg'
+                                        alt='Execution_number_icon'
                                         style={{
                                           fontSize: "2rem",
                                           marginRight: "1.2rem",
                                         }}
-                                      ></i>
+                                      />
                                       <span className="count_exe">
                                         {data?.noOfExecution
                                           ? data?.noOfExecution
@@ -498,13 +501,12 @@ const reports = () => {
             {show && <ReportTestTable />}
           </div>
           {activeIndex !== "Accessibility Test" && (
-            <div  className='resportPagination'><Paginator
+            <div  className='reportPagination'><Paginator
               first={firstPage}
               rows={rowsPage}
               totalRecords={configPages}
               rowsPerPageOptions={[10, 20, 30]}
               onPageChange={onPageChange}
-              className='resportPagination'
             /></div>
           )}
           <div>
