@@ -182,7 +182,7 @@
     width: 300px;
   border: 2px solid rgb(95, 51, 143);
   border-radius: 13px;
-  font-size: 1px;
+  font-size: 16px;
   /* background: #e0d7ee; */
   height: 2.6rem;
   /* text-align: center; */
@@ -229,3 +229,23 @@
   .p-dropdown-panel .p-dropdown-items .p-dropdown-item{
     padding: 0.75rem 1.25rem !important;
   }
+    .migrate-help-btn {
+      padding: 0 !important;
+      color: #6c757d !important;
+    }
+  
+    .migrate-help-ol {
+      margin-left: 15px;
+    }
+  
+    .migrate-sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
+      height: 100%;
+    }
+  
+    .migrate-sidebar-icon {
+      width: 100%;
+    }

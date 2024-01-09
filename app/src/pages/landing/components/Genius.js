@@ -21,8 +21,8 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Toast } from 'primereact/toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectedModuleReducer } from '../../design/designSlice';
-import { showGenuis, showSmallPopup } from '../../global/globalSlice';
-
+import { showGenuis, showSmallPopup, allProjectsList } from '../../global/globalSlice';
+import CreateProject from './CreateProject';
 
 
 let port = null;
@@ -33,7 +33,30 @@ let editorExtensionId = "bcdklcknooclndglabfjppeeomefcjof";
 const Genius = (props) => {
   const history = useNavigate()
   const toast = useRef();
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
   const [selectedProject, setSelectedProject] = useState(null);
+  useEffect(() => {
+    (async () => {
+      setSelectedProject({
+        key: projectInfoFromRedux.projectId,
+        text: projectInfoFromRedux.projectName
+      });
+      setProjModules(null);
+      setModScenarios(null);
+      setAppType({
+        key: allProjectsData.length ?? allProjectsData[selectedProject.key].apptype,
+        text: allProjectsData.length ?? allProjectsData[selectedProject.key].apptypeName
+      })
+      // get All Projects
+      const response = await getProjectList();
+      // format Projects data
+      const data = parseProjList(response)
+      dispatch(allProjectsList(data))
+    })()
+  }, [projectInfoFromRedux]);
+  const geniusMigrate=useSelector((state) => state.progressbar.geniusMigrate);
+  const allProjectsData = useSelector((state) => state.progressbar.allProjectsList);
+  const migrateProject = useSelector((state) => state.progressbar.migrateProject);
   const [selectedModule, setSelectedModule] = useState(null);
   const [selectedScenario, setSelectedScenario] = useState(null);
   const [allProjects, setAllProjects] = useState({})
@@ -65,10 +88,16 @@ const Genius = (props) => {
   const[BrowserName,setBrowserName]=useState(null)
   const[screenNamesList,setScreenNameList]=useState(null)
   const[errorMessage,setErrorMessage]=useState(false)
-  const userInfo = useSelector((state) => state.landing.userinfo);
+  const [visibleProjectPopUp, setVisibleProjectPopup] = useState(false);
+  const [handleManageProject, setHandleManageProject] = useState(false)
   const savedRef = useRef(false);
   const finalDataRef = useRef([])
   const dispatch = useDispatch();
+  // get UserInfo
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
   
   const userRole = useSelector(state=>state.login.SR);
   const [selectedCity, setSelectedCity] = useState(null);
@@ -195,65 +224,81 @@ const Genius = (props) => {
       count ++;
       
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
-      const completeScenraio=moduledata.children.filter((scenario,idx)=>{
-        return scenario.name==selectedScenario.text
-      })
-      if(completeScenraio[0].children.length!==data.data.screens.length && count!==1){
-        let screenDetails=data.data.screens
-       
-        let deletedScreen=completeScenraio[0].children.filter((screen,idx)=>{
-         let {name }=screen;
-       
-        let deletedScreen= screenDetails.find(screen => screen.name === name)
-        if(deletedScreen===undefined){
-          return screen
-        }
-      })
-      let deletedScrnIds=deletedScreen.map((screen,idx)=>{
-        return screen._id
+      if(!geniusMigrate){
+        const completeScenraio=moduledata.children.filter((scenario,idx)=>{
+          return scenario.name==selectedScenario.text
+        })
+        if(completeScenraio[0].children.length!==data.data.screens.length && count!==1){
+          let screenDetails=data.data.screens
+        
+          let deletedScreen=completeScenraio[0].children.filter((screen,idx)=>{
+          let {name }=screen;
+        
+          let deletedScreen= screenDetails.find(screen => screen.name === name)
+          if(deletedScreen===undefined){
+            return screen
+          }
+        })
+        let deletedScrnIds=deletedScreen.map((screen,idx)=>{
+          return screen._id
+        })
+        
+      let deletedTestcaseIds=deletedScreen.map((screen,idx)=>{
+        return screen.children[0]._id
       })
       
-     let deletedTestcaseIds=deletedScreen.map((screen,idx)=>{
-      return screen.children[0]._id
-     })
     
-   
-     
-      await deleteScenario({scenarioIds:[],screenIds:deletedScrnIds,testcaseIds:deletedTestcaseIds})
-      }
-      let testcaseids=[]
-      let scrnids
-      if(count===1){
-        const currentScnToDelete=completeScenraio.filter(scn=>scn.name===selectedScenario.text)
-       scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
-        
-         return {_id:screen._id,screenReused:screen.reuse}
-       })
-const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
-  screen.children.map((testcase,id)=>{
-  testcaseids.push(testcase._id)
- })
-})
-for(let i =0;i<scrnids.length;i++){
+      
+        await deleteScenario({scenarioIds:[],screenIds:deletedScrnIds,testcaseIds:deletedTestcaseIds})
+        }
+        let testcaseids=[]
+        let scrnids
+        if(count===1){
+          const currentScnToDelete=completeScenraio.filter(scn=>scn.name===selectedScenario.text)
+        scrnids=currentScnToDelete[0].children.map((screen,idx)=>{
+          
+          return {_id:screen._id,screenReused:screen.reuse}
+        })
+  const testCaseIds=currentScnToDelete[0].children.map((screen,idx)=>{
+    screen.children.map((testcase,id)=>{
+    testcaseids.push(testcase._id)
+  })
+  })
+  for(let i =0;i<scrnids.length;i++){
 
-  if(!scrnids[i].screenReused)
-  await deleteScenario({scenarioIds:[],screenIds:[scrnids[i]._id],testcaseIds:[testcaseids[i]]})
-  else scrnreused.push(scrnids[i])
+    if(!scrnids[i].screenReused)
+    await deleteScenario({scenarioIds:[],screenIds:[scrnids[i]._id],testcaseIds:[testcaseids[i]]})
+    else scrnreused.push(scrnids[i])
 
+        }
       }
-    }
-    else{
-     scrnreused=[]
-    }
+      else{
+      scrnreused=[]
+      }
+      }
           
       var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
       const completeScenraioDetials=moduledata.children
+      const scenarios = moduledata.children;
       try {
-        const scenarioData = getExcludedMindmapInternals(modScenarios, selectedScenario.key);
+        const scenarioData = !geniusMigrate ? getExcludedMindmapInternals(modScenarios, selectedScenario.key) : [];
         
-        
-        const isAlreadySaved=data.alreadySaved
-        const res = await landingApi.getGeniusData(data, scenarioData,isAlreadySaved,completeScenraioDetials,scrnreused);
+        let migrationData = {};
+        const isAlreadySaved=data?.data?.alreadySaved
+        // For Non Avo To Avo Migration
+        if (geniusMigrate) {
+          const scenariosCreated = [];
+          const scenarioArr = data?.data?.scenario;
+          // generate test cases via api for migration
+          await handleScenarioCreateForMigration(scenarios, scenarioArr, scenariosCreated);
+
+          migrationData["isMigrated"] = geniusMigrate; // will be true for migration genius
+          migrationData["scenariosCreated"] = scenariosCreated[0];
+        } else {
+          migrationData["isMigrated"] = geniusMigrate; // will be false for normal genius
+        }
+        // call get Genius Data Api
+        await landingApi.getGeniusData(data, scenarioData, isAlreadySaved, completeScenraioDetials, scrnreused, migrationData);
         savedRef.current = true;
         
         if (port) port.postMessage({
@@ -428,7 +473,7 @@ for(let i =0;i<scrnids.length;i++){
         key:selectedProjectDetails.projectId,
         text:selectedProjectDetails.projectName
       }
-      setSelectedProject(props.selectedProject?props.selectedProject:projId?projId:null)
+      setSelectedProject(projId ? projId : null)
       res = await DesignApi.getUserDetails("user");
       if (res === "Invalid Session") return RedirectPage(history);
       if (res.error) {
@@ -523,24 +568,26 @@ for(let i =0;i<scrnids.length;i++){
 
   }
   }
-  const createPort = (keywordData, idx = 0) => {
+  const createPort = (keywordData, isMigrated, idx = 0) => {
     if (window.chrome.runtime) {
       if (port) {
         try {
           
           ResetSession.start();
-          setLoading("Genius Initiated...");
+          geniusMigrate ? setLoading("Migration In Progress...") : setLoading("Genius Initiated...");
           sendMessageToPort({
             "open": true,
             "project": selectedProject,
             "module": selectedModule,
-            "scenario": selectedScenario,
+            "scenario": isMigrated ? "" : selectedScenario,
             "navurl": (navURL.startsWith("http") || navURL.startsWith("https")) ? navURL : "https://" + navURL,
             "browser": selectedBrowser,
             "siteURL": window.location.origin,
             "keywordData": keywordData,
             "appType": appType ? appType.text : "",
-            "screenNames":screenNamesList
+            "screenNames":screenNamesList,
+            // migration check
+            "migration": isMigrated
           });
          
         }
@@ -650,7 +697,7 @@ const toastSuccess = (successMessage) => {
      toastError(MSG.CUSTOM("Module name cannot contain special characters", "error"))
       return;
     }
-    else if (projModules.filter((mod) => mod.name === moduleName).length > 0) {
+    else if (projModules?.filter((mod) => mod.name === moduleName).length > 0) {
      toastError(MSG.CUSTOM("Module already exists", "error"));
       return;
     }
@@ -700,6 +747,7 @@ const toastSuccess = (successMessage) => {
       }
       setSelectedModule(newModule)
       setDisplayCreateModule(false);
+      setModuleName("")
     } catch (err) {
       console.log(err);
     }
@@ -841,6 +889,101 @@ const toastSuccess = (successMessage) => {
       console.log(err);
     }
   }
+  const handleScenarioCreateForMigration = async (scenarios, scenarioArr, scenariosCreated) => {
+    let indexCounter = 1;
+    const getMindmapInternals = () => {
+      let tempArr = [];
+      let scenarioPID = indexCounter;
+      let screenPID = indexCounter;
+      scenarios.forEach((scenario, idx) => {
+        scenarioPID = indexCounter;
+        tempArr.push(templateObjectFunc(scenario.projectID, indexCounter++, scenario.childIndex, scenario._id, scenario.name, "scenarios", 0));
+        if (scenario.children && scenario.children.length > 0) {
+          scenario.children.forEach((screen, idx_scr) => {
+            screenPID = indexCounter;
+            tempArr.push(templateObjectFunc(screen.projectID, indexCounter++, screen.childIndex, screen._id, screen.name, "screens", scenarioPID))
+            if (screen.children && screen.children.length > 0) {
+              screen.children.forEach((tc, idx_tc) => {
+                tempArr.push(templateObjectFunc(tc.projectID, indexCounter++, tc.childIndex, tc._id, tc.name, "testcases", screenPID))
+              })
+            }
+          })
+        }
+      });
+
+      return tempArr;
+    }
+    let newlycreatedscneario = []
+    for (let i = 0; i < scenarioArr.length; i++) {
+      let scenarioname = scenarioArr[i].length > 1 ? scenarioArr[i][1].name.slice(6) : scenarioArr[i][0].name.slice(6)
+      const newTestCaseName = `Testcase${scenarioname}`;
+      newlycreatedscneario.push({
+        "id": scenarios.length + i + 1,
+        "childIndex": scenarios.length + i + 1,
+        "_id": null,
+        "oid": null,
+        "name": newTestCaseName,
+        "type": "scenarios",
+        "pid": 0,
+        "task": null,
+        "renamed": false,
+        "orig_name": null,
+        "taskexists": null,
+        "state": "created",
+        "cidxch": "true",
+        "projectID": selectedProject ? selectedProject.key : null,
+      })
+    }
+    const scenario_data = {
+      "write": 10,
+      "map": [
+        {
+          "projectID": selectedProject ? selectedProject.key : null,
+          "id": 0,
+          "childIndex": 0,
+          "_id": selectedModule ? selectedModule.key : null,
+          "oid": null,
+          "name": selectedModule ? selectedModule.text : null,
+          "type": "modules",
+          "pid": null,
+          "pid_c": null,
+          "task": null,
+          "renamed": false,
+          "orig_name": null,
+          "taskexists": null,
+          "state": "saved",
+          "cidxch": null
+        },
+        ...getMindmapInternals(),
+        ...newlycreatedscneario
+      ],
+      "deletednode": [],
+      "unassignTask": [],
+      "prjId": selectedProject ? selectedProject.key : null,
+      "createdthrough": "Web"
+    }
+    try {
+      const response = await saveMindmap(scenario_data);
+      if (response === "Invalid Session") return RedirectPage(history);
+      if (response.error) { displayError(response.error); return }
+      toastSuccess(MSG.CUSTOM("Scenario Created Successfully", "success"));
+      var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
+      if (moduledata === "Invalid Session") return RedirectPage(history);
+      if (moduledata.error) { displayError(moduledata.error); return; }
+      setModScenarios(moduledata.children);
+      let newlyAddedScenarios = moduledata.children.slice(-(scenarioArr.length))
+      let newSce = newlyAddedScenarios.map(scenario => ({ key: scenario._id, text: scenario.name }))
+      scenariosCreated.push(newSce)
+      return {
+        moduledata,
+        newSce
+      }
+      // setSelectedScenario(newSce)
+      // setDisplayCreateScenario(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const resetGeniusFields = () => {
    setVisibleReset(true)
@@ -856,6 +999,9 @@ const toastSuccess = (successMessage) => {
     }
     setSelectedBrowser("chrome");
   }
+  const handleCloseDialog = () => {
+    setVisibleProjectPopup(false);
+  };
   
   return (
     <div className="plugin-bg-container">
@@ -928,6 +1074,16 @@ const toastSuccess = (successMessage) => {
           </div>
         </div>
       </Dialog> */}
+      {displayCreateProject &&
+          <CreateProject
+            visible={visibleProjectPopUp}
+            onHide={handleCloseDialog}
+            setHandleManageProject={setHandleManageProject}
+            handleManageProject={handleManageProject}
+            toastSuccess={toastSuccess}
+            toastError={toastError}
+          />
+        }
       <Dialog header={'Create Test Suite'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '30vh',width: '25vw'}} onHide={() => { setModuleName(""); setDisplayCreateModule(false); }}>
         <div style={{padding:'1.5rem'}}>
           <div className='dialog__child'>
@@ -971,30 +1127,41 @@ const toastSuccess = (successMessage) => {
         <div className="breadcrumbs__container">
           <ol className="breadcrumbs__elements" style={{ listStyle: "none", display: "flex", gap: "2rem", flex: 1 }}>
             <li className="breadcrumbs__element__inner" data-value="">
-              <span className="containerSpan"><span className="styledSpan">Project Details</span></span>
+                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Create Project' : 'Project Details'}</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Record Testcase</span></span>
+                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Create Testsuite' : 'Record Testcase'}</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-              <span className="containerSpan"><span className="styledSpan">Preview Testcase</span></span>
+                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Start Migration' : 'Preview Testcase'}</span></span>
             </li>
           </ol>
         </div>
        
-        <div style={{
-          display: "flex",
-          flexDirection: 'row',
-          margin: 10,
-          marginLeft: "1.5rem",
-          marginTop:'53px',
-          gap: 50
+          <div style={geniusMigrate ?
+            {
+              display: "flex",
+              flexDirection: 'column',
+              margin: 10,
+              marginLeft: "1.5rem",
+              marginTop: '1px',
+              gap: 13,
+              alignItems: 'center'
+            } : {
+              display: "flex",
+              flexDirection: 'row',
+              margin: 10,
+              marginLeft: "1.5rem",
+              marginTop: '53px',
+              gap: 50
         }}>
           <div style={{ position: "relative" ,display:'flex',flexDirection:'column'}}>
-            <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
+          <div style={geniusMigrate?{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)',width:'300px'}:{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
             <div> <label className="label_genius"  htmlFor="project">Project</label></div>
-            {userRole==="Test Manager" && <div style={{ display:'flex',justifyContent:'end',color: "#5F338F", cursor: "pointer" }} onClick={async () => {
+            {userInfo?.rolename==="Quality Manager" && <div style={{ display:'flex',justifyContent:'end',color: "#5F338F", cursor: "pointer" }} onClick={async () => {
               setDisplayCreateProject(true)
+              setVisibleProjectPopup(true)
+              setSelectedModule(null)
             }}>Create Project</div>}
             </div>
            
@@ -1019,32 +1186,40 @@ const toastSuccess = (successMessage) => {
               disabled={(BrowserName=="Chrome"||BrowserName=="Edge ( chromium based)")?(props.selectedProject)? true:false:true }
               selectedKey={selectedProject ? selectedProject.key : null}
             /> */}
-            
-             <Dropdown 
-             
-             value={selectedProject ? selectedProject : null}
-             options={
-              Object.values(allProjects).filter(proj=>proj.apptypeName==="Web").map((proj) => {
-                return {
-                  key: proj.id,
-                  text: proj.name
-                }
-              })
-            }
-            onChange={(e) => {
-              setSelectedProject(e.value)
-              setScenarioName('')
-              setModuleName('')  
-                            }} 
-             optionLabel="text"
-             placeholder="Select" 
-             className="md:w-18.75rem genius_dropdown" 
-             disabled={(BrowserName=="Chrome"||BrowserName=="Edge ( chromium based)")?(props.selectedProject)? true:false:true }/>
+              {
+                geniusMigrate ? <InputText
+                  required
+                  placeholder={`Create Project`}
+                  value={migrateProject}
+                  disabled={true}
+                  width="300px"
+                /> :
+                  <Dropdown
+
+                    value={selectedProject ? selectedProject : null}
+                    options={
+                      Object.values(allProjectsData).filter(proj => proj.apptypeName === "Web").map((proj) => {
+                        return {
+                          key: proj.id,
+                          text: proj.name
+                        }
+                      })
+                    }
+                    onChange={(e) => {
+                      setSelectedProject(e.value)
+                      setScenarioName('')
+                      setModuleName('')
+                    }}
+                    optionLabel="text"
+                    placeholder="Select"
+                    className="md:w-18.75rem genius_dropdown"
+                    disabled={(BrowserName == "Chrome" || BrowserName == "Edge ( chromium based)") ? (props.selectedProject) ? true : false : true} />
+              }
           </div>
           
 
           <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
-          <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
+          <div style={geniusMigrate?{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)',width:'300px'}:{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
             <div> <label className="label_genius"  htmlFor="project">Test Suite</label></div>
             {userInfo.rolename=="Quality Engineer"?<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Test Suite</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
@@ -1068,29 +1243,35 @@ const toastSuccess = (successMessage) => {
               required
             /> */}
   
-            <Dropdown 
-            
-             value={selectedModule ? selectedModule : null}
-             options={projModules.map((mod) => {
-              return {
-                key: mod._id,
-                text: mod.name
-              }
-            })}
-            onChange={(e) => {
-             
-              setSelectedModule(e.value)
-              
-            }}
-             optionLabel="text"
-             placeholder="Select" 
-             className="md:w-18.75rem genius_dropdown" 
-             disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
-             />
+              {geniusMigrate ? <InputText
+                required
+                placeholder={`Create Test Suite`}
+                value={(selectedModule && selectedModule?.text) ? selectedModule?.text : ""}
+                disabled={true}
+                width="300px"
+              /> : <Dropdown
+
+                value={selectedModule ? selectedModule : null}
+                options={projModules?.map((mod) => {
+                  return {
+                    key: mod._id,
+                    text: mod.name
+                  }
+                })}
+                onChange={(e) => {
+
+                  setSelectedModule(e.value)
+
+                }}
+                optionLabel="text"
+                placeholder="Select"
+                className="md:w-18.75rem genius_dropdown"
+                disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
+              />}
           </div>
 
-          <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
-          <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
+          {!geniusMigrate && <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
+          < div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
             <div> <label className="label_genius"  htmlFor="project">Testcase</label></div>
             {userInfo.rolename=="Quality Engineer"?<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Testcase</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
@@ -1120,7 +1301,7 @@ const toastSuccess = (successMessage) => {
              <Dropdown 
              
              value={selectedScenario ? selectedScenario : null}
-             options={modScenarios.map((scenario) => {
+             options={modScenarios?.map((scenario) => {
               return {
                 key: scenario._id,
                 text: scenario.name
@@ -1136,19 +1317,28 @@ const toastSuccess = (successMessage) => {
              optionLabel="text"
              placeholder="Select" 
              className="md:w-18.75rem genius_dropdown" 
-             disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
+             disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
              />
-          </div>
+          </div>}
 
         </div>
 
-        <div style={{
-          display: "flex",
-          flexDirection: 'row',
-          margin: "42px 14px 1rem 10px",
-          marginLeft: "1.5rem",
-          gap: 50
-        }}>
+          <div style={geniusMigrate ?
+            {
+              display: "flex",
+              flexDirection: 'column',
+              margin: 10,
+              marginLeft: "1.5rem",
+              marginTop: '1px',
+              gap: 13,
+              alignItems: 'center'
+            } : {
+              display: "flex",
+              flexDirection: 'row',
+              margin: "42px 14px 1rem 10px",
+              marginLeft: "1.5rem",
+              gap: 50
+            }}>
           <div>
             {/* <NormalDropDown
               label="Application Type"
@@ -1172,25 +1362,35 @@ const toastSuccess = (successMessage) => {
             /> */}
             
             <label htmlFor="project" className='label_genius'>Application Type</label>
-           <Dropdown 
-             value={appType ? appType : null}
-             options={[
-              selectedProject && allProjects[selectedProject.key] ?
-                {
-                  key: allProjects[selectedProject.key].apptype,
-                  text: allProjects[selectedProject.key].apptypeName
-                }
-                : {}
-            ]}
-            placeholder="Select Application Type"
-            onChange={(e, item) => {
-              setAppType(item)
-            }}
-             optionLabel="text"
-             className="md:w-18.75rem genius_dropdown" 
-             disabled={!(selectedProject && selectedProject.key) || props.selectedProject}
-             
-             />
+              {
+                geniusMigrate ? <InputText
+                  required
+                  placeholder={`Application Type`}
+                  value={'Web'}
+                  onChange={(e) => { setAppType('Web') }}
+                  disabled={true}
+                  className="md:w-18.75rem genius_dropdown flex-row"
+                /> :
+                  <Dropdown
+                    value={geniusMigrate ? { key: "5db0022cf87fdec084ae49b6", text: 'Web' } : (appType ? appType : null)}
+                    options={[
+                      selectedProject && allProjectsData[selectedProject.key] ?
+                        {
+                          key: allProjectsData[selectedProject.key].apptype,
+                          text: allProjectsData[selectedProject.key].apptypeName
+                        }
+                        : {}
+                    ]}
+                    placeholder="Select Application Type"
+                    onChange={(e, item) => {
+                      setAppType(item)
+                    }}
+                    optionLabel="text"
+                    className="md:w-18.75rem genius_dropdown"
+                    disabled={!(selectedProject && selectedProject.key) || props.selectedProject || geniusMigrate}
+
+                  />
+              }
 
           </div>
           <div style={{display:'flex',flexDirection:'column'}}>
@@ -1205,8 +1405,8 @@ const toastSuccess = (successMessage) => {
               type="url"
               disabled={userInfo.isTrial?true:false}
             /> */}
-            <label htmlFor="url" className='label_genius'>Application URL</label>
-            <InputText 
+            {!geniusMigrate &&<label htmlFor="url" className='label_genius'>Application URL</label>}
+            {!geniusMigrate && <InputText 
             id="username" 
             value={navURL} 
             onChange={(e) => { setNavURL(e.target.value) }}
@@ -1214,7 +1414,7 @@ const toastSuccess = (successMessage) => {
             disabled={userInfo.isTrial?true:false}
             className='input_url'
 
-            />
+            />}
           </div>
          
         </div>
@@ -1231,7 +1431,7 @@ const toastSuccess = (successMessage) => {
        className="w-full md:w-14rem" 
        /> */}
        </div>
-        <div className="genius__footer" style={{position: 'absolute',bottom: '10px',left: '-1rem'}}>
+          <div className="genius__footer" style={geniusMigrate ? { position: 'absolute', bottom: '10px', left: '0.5rem' } : { position: 'absolute', bottom: '10px', left: '-1rem' }}>
              
            { (BrowserName=="Edge ( chromium based)" ||BrowserName=="Chrome")?<div style={{marginLeft:'1rem',fontFamily:"Mulish", fontWeight:"600" }}><span style={{ margin: "1.5rem 1rem 1rem 1rem"}}>
         
@@ -1241,30 +1441,30 @@ const toastSuccess = (successMessage) => {
       
         </span>
           </div>:null}
-            <div className="genius__actionButtons" style={{ display: "flex", justifyContent: "space-between", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
+            <div className="genius__actionButtons" style={geniusMigrate ? { display: "flex", justifyContent: "space-around", alignItems: "center" } : { display: "flex", justifyContent: "flex-end", margin: "2rem 1rem 1rem 1rem", alignItems: "center" }}>
             {/* <div onClick={() => { window.localStorage['navigateScreen'] = "plugin"; history.replace('/plugin'); }} className="exit-action" style={{ color: "#5F338F", textDecoration: "none", fontSize: "1.2rem", cursor: "pointer" }}>EXIT</div> */}
-            <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>All the fields are Mandatory.</div>
+            {/* <div className="reminder__container" style={{ display: "flex", margin: "0px 1rem" }}><span className='asterisk' style={{ color: "red" }}>*</span>All the fields are Mandatory.</div> */}
             <div className="actionButton__inner" style={{ display: "flex", gap: 10 }}>
-              {props.selectedProject?null:<button className="reset-action__exit" style={{ border: "none", color: "#605BFF", borderRadius: "4px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>}
-              <button className="reset-action__next"
-                disabled={!(selectedProject && selectedModule && selectedScenario && navURL && (appType ? appType.text : ""))}
-                style={{ color: "white", borderRadius: "4px", width:'5rem',padding: "8px 25px", background: "#605BFF",border:'none' }} onClick={(e) => {
-                  // let eURL = `electron-fiddle://project=${JSON.stringify(selectedProject)}&module=${JSON.stringify(selectedModule)}&scenario=${JSON.stringify(selectedScenario)}&navurl=${navURL}&browser=${selectedBrowser}`
-                  // window.location.href = eURL;
-                  DesignApi.getKeywordDetails_ICE(appType.text)
-                    .then(keywordData => {
-                      if (keywordData === "Invalid Session") return RedirectPage(history);
-                      createPort(keywordData);
-                    
-                    })
-                  
-                    .catch((err) => { console.log("error"); setLoading(false); })
-                }
-                }>
-                Next
-              </button>
+                {(props.selectedProject || geniusMigrate) ? null : <button className="reset-action__exit" style={{ border: "none", color: "#605BFF", borderRadius: "4px", padding: "8px 25px", background: "white" }} onClick={resetGeniusFields}>Reset</button>}
+                <button className={geniusMigrate ? "reset-action__next" : "reset-action__next genius_migrate"}
+                  disabled={!((selectedProject || migrateProject) && selectedModule && (appType ? appType.text : "") && (geniusMigrate ? true : (selectedScenario && navURL)))}
+                  style={geniusMigrate?{ color: "white", borderRadius: "4px", width:'9rem',padding: "8px 25px", background: "#605BFF",border:'none' }:{ color: "white", borderRadius: "4px", width:'5rem',padding: "8px 25px", background: "#605BFF",border:'none' }} onClick={(e) => {
+                    // let eURL = `electron-fiddle://project=${JSON.stringify(selectedProject)}&module=${JSON.stringify(selectedModule)}&scenario=${JSON.stringify(selectedScenario)}&navurl=${navURL}&browser=${selectedBrowser}`
+                    // window.location.href = eURL;
+                    DesignApi.getKeywordDetails_ICE(appType.text)
+                      .then(keywordData => {
+                        if (keywordData === "Invalid Session") return RedirectPage(history);
+                        createPort(keywordData, geniusMigrate);
+
+                      })
+
+                      .catch((err) => { console.log("error"); setLoading(false); })
+                  }
+                  }>
+                  {geniusMigrate ? 'Start Migration' : 'Next'}
+                </button>
+              </div>
             </div>
-          </div>
         </div>
       </div>
       {/* <FooterOne /> */}
