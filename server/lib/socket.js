@@ -113,7 +113,7 @@ io.on('connection', async socket => {
 		}
 	}
 
-	httpsServer.setTimeout();
+	// httpsServer.setTimeout();
 
 	socket.on('getconstants', async () => socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes, pingTimer, objectPredictionPath));
 
@@ -213,6 +213,7 @@ io.on('connection', async socket => {
 	socket.on('ICE_status_change', async value => {
 		let queue = require("./execution/executionQueue")
 		var clientName= utils.getClientName(value.host);
+		username = value.icename ? 	value.icename : username;
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 			queue.Execution_Queue.triggerExecution(dataToExecute);
@@ -223,8 +224,28 @@ io.on('connection', async socket => {
 		}
 		if(iceIPMap[clientName] == undefined) iceIPMap[clientName] = {};
 		iceIPMap[clientName][username] = value.hostip;
+		if(socketMap[clientName][username] != socket){
+			socketMap[clientName][username] = socket;
+		}
 		cache.sethmap(username,value)
 	});
+
+	socket.on("result_executeTestSuite", async (message)=>{
+		let socketUtils = require("./socketUtils")
+		let executor = require("./execution/executor");
+		const data = message;
+		const resultData = data;
+		const execReq=resultData.execReq;
+		const execType = resultData.execType;
+		const userInfo=execReq?resultData.execReq.userInfo:undefined;
+		const invokinguser =userInfo? userInfo.invokingusername:undefined;
+		const host = invokinguser ?userInfo.host:{};
+		var clientName=utils.getClientName(host);
+		const notifySocMap = socketMapNotify[clientName];
+		const resSent = true;
+		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent);
+	});
+
 });
 //SOCKET CONNECTION USING SOCKET.IO
 
