@@ -24,7 +24,7 @@ module.exports.result_executeTestSuite = async(resultData,status,execReq,execTyp
                     if (execType == "API") {
                         if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
                         if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
-                        d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
+                        d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Execu.ted" });
                     }
                     if (Object.keys(reportData.overallstatus).length !== 0) {
                         const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
@@ -57,6 +57,7 @@ module.exports.result_executeTestSuite = async(resultData,status,execReq,execTyp
                     let result = status;
                     let report_result = {};
                     mySocket.removeAllListeners('return_status_executeTestSuite');
+                    mySocket.removeAllListeners('result_executeTestSuite');
                     report_result["status"] = status
                     report_result["configurekey"] = execReq["configurekey"]
                     report_result["configurename"] = execReq["configurename"]

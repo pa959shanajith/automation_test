@@ -213,16 +213,20 @@ io.on('connection', async socket => {
 	socket.on('ICE_status_change', async value => {
 		let queue = require("./execution/executionQueue")
 		var clientName= utils.getClientName(value.host);
+		const icename = value.icename
 		if (value.connected){
-			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
+			const dataToExecute = JSON.stringify({"username" : icename,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 			queue.Execution_Queue.triggerExecution(dataToExecute);
 		}else{
-			logger.info("ICE: " + username + " disconnected, deleting callbacks")
-			delete queue.Execution_Queue.registred_ICE[username]
-			queue.Execution_Queue.ice_list[username]["connected"] = false
+			logger.info("ICE: " + icename + " disconnected, deleting callbacks")
+			delete queue.Execution_Queue.registred_ICE[icename]
+			queue.Execution_Queue.ice_list[icename]["connected"] = false
 		}
 		if(iceIPMap[clientName] == undefined) iceIPMap[clientName] = {};
-		iceIPMap[clientName][username] = value.hostip;
+		iceIPMap[clientName][icename] = value.hostip;
+		if(socketMap[clientName][icename] != socket){
+			socketMap[clientName][icename] = socket;
+		}
 		cache.sethmap(username,value)
 	});
 
