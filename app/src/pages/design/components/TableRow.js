@@ -199,7 +199,7 @@ const TableRow = (props) => {
     };
     const submitData = () =>{
         props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
-        props.setStepSelect(oldState=>({...oldState, highlight: []}));
+        // props.setStepSelect(oldState=>({...oldState, highlight: []}));
     }
     const submitChanges = event => {
         if (event.keyCode === 13){
