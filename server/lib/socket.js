@@ -235,7 +235,6 @@ io.on('connection', async socket => {
 		let executor = require("./execution/executor");
 		const data = message;
 		const resultData = data;
-		const status = resultData.status;
 		const execReq=resultData.execReq;
 		const execType = resultData.execType;
 		const userInfo=execReq?resultData.execReq.userInfo:undefined;
@@ -243,7 +242,8 @@ io.on('connection', async socket => {
 		const host = invokinguser ?userInfo.host:{};
 		var clientName=utils.getClientName(host);
 		const notifySocMap = socketMapNotify[clientName];
-		if(execReq) socketUtils.result_executeTestSuite(resultData,status,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap);
+		const resSent = true;
+		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent);
 	});
 
 });

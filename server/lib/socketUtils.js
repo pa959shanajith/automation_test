@@ -1,7 +1,8 @@
 const mySocket = require('./socket')
+var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
 
-module.exports.result_executeTestSuite = async(resultData,status,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap)=>
+module.exports.result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
 {
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
@@ -68,16 +69,11 @@ module.exports.result_executeTestSuite = async(resultData,status,execReq,execTyp
                     if (execType == "API") result = [d2R, status, resultData.testStatus];
                     if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
                         notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
-                        rsv(constants.DO_NOT_PROCESS);
                     } else if (resSent) {
                         queue.Execution_Queue.add_pending_notification("", report_result, username);
-                        rsv(constants.DO_NOT_PROCESS);
-                    } else {
-                        rsv(result);
                     }
                 } catch (ex) {
                     logger.error("Exception while returning execution status from function " + fnName + ": %s", ex);
-                    rej("fail");
                 }
             }
    

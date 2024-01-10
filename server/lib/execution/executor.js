@@ -347,6 +347,7 @@ class TestSuiteExecutor {
             var socket = require('../socket');
             var mySocket;
             var clientName=utils.getClientName(host);
+            execReq.userInfo = userInfo;
             mySocket = socket.allSocketsMap[clientName][icename];	
             logger.info("Sending request to ICE for executeTestSuite");
             mySocket.emit("executeTestSuite", execReq);
@@ -400,7 +401,7 @@ class TestSuiteExecutor {
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
                     const iceExecReq=resultData.execReq;
-                    if(!iceExecReq) socketUtils.result_executeTestSuite(resultData,status,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap);
+                    if(!iceExecReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent);
                 });
             
             
