@@ -291,12 +291,12 @@ export const fetchAvoAgentAndAvoGridList = async(props) => {
     }
 }
 
-export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused, migrationData) => {
+export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused) => {
     try{
         const res = await axios(url+'/getGeniusData', {
             method: 'POST',
             credentials: 'include',
-            data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused, migrationData}
+            data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused}
         });
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
@@ -311,5 +311,123 @@ export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenrai
         return {error:MSG.PLUGIN.ERR_SAVING_GENIUS_DATA}
     }
   }
+
+  export const profileLevel_ExecutionStatus = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/profileLevel_ExecutionStatus", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'profileLevel_ExecutionStatus', 'allflag': true, ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data: res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export const moduleLevel_ExecutionStatus = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/moduleLevel_ExecutionStatus", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'moduleLevel_ExecutionStatus', 'allflag': true, ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export const rasa_prompt_model = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/rasa_prompt_model", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'rasa_prompt_model', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+export const defect_analysis = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/defect_analysis", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'defect_analysis', 'allflag': true, ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+export const teststepLevel_ExecutionStatus = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+"/teststepLevel_ExecutionStatus", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'teststepLevel_ExecutionStatus', 'allflag': true, ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
 
 

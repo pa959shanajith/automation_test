@@ -157,8 +157,17 @@
 .right_card_container{
     display: flex;
     flex-direction: column;
-    width: 50%;
+    width: 100%;
     height: 84%;
+}
+.right_card_container11{
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    height: 84%;
+    position: relative;
+    left: 18rem;
+    bottom: 9rem;
 }
 .analysis_small_card{
     height: -webkit-fill-available;
@@ -353,3 +362,103 @@
 //         }
 //     }
 // }
+
+.question_ip{
+    .p-inputtext {
+        width: 50rem;
+        margin-top: 1rem;
+    }
+}
+.radio_btn{
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 2rem;
+    margin-left: 23rem;
+    margin-top: 1rem;
+}
+.date_div{
+    display: flex;
+    gap: 1rem !important;
+    margin-left: 1rem;
+    flex-direction: column;
+    margin-top: 1rem;
+}
+.date-div11{
+    display: flex;
+    gap: 1rem !important;
+    margin-left: 1rem;
+    flex-direction: column;
+    margin-top: 1rem !important;
+}
+.chart_dropdown{
+  .p-dropdown{
+    height: 3rem !important;
+  }
+}
+.date-div,.date-div11{
+    .p-calendar {
+      width:14rem !important;
+      margin-left: 0.2rem !important;
+    }
+
+}
+.chart-div{
+    bottom: 14rem;
+    left: 7rem;
+    position: relative;
+}
+
+.profile_drop{
+    display: flex;
+    flex-direction: column;
+    .p-dropdown{
+        width: 14rem !important;
+        height: 2.7rem !important;
+    }
+}
+.back-btn{
+    position: relative;
+    top: 9rem;
+    left: 3rem;
+}
+
+///Demo
+
+.question_div{
+    .p-inputtext{
+        width: 72%;
+        margin-left: 1rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+}
+.question_btn{
+    .p-button{
+    position: relative;
+    left: 60rem;
+    bottom: 4rem;
+    }
+}
+
+
+//  @media screen and (max-width: 768px) {
+//         .question_div .p-inputtext {
+//             width: 72%;
+//             margin-left: 1rem;
+//             margin-top: 1rem;
+//             margin-bottom: 1rem;
+//         }
+      
+//         .question_btn .p-button {
+//             position: relative;
+//             left: 60rem; /* This seems like a large value, make sure it suits your layout */
+//             bottom: 4rem; /* This seems like a large value, make sure it suits your layout */
+//         }
+//     }
+.datatable{
+    .p-datatable{
+        margin-top: -3rem !important;
+    }
+}
+

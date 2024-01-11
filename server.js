@@ -248,6 +248,10 @@ if (cluster.isMaster) {
 		var browserstack = require('./server/controllers/browserstack');
 
 		// No CSRF token
+		app.post('/moduleLevel_ExecutionStatus',report.moduleLevel_ExecutionStatus);
+		app.post('/teststepLevel_ExecutionStatus',report.teststepLevel_ExecutionStatus);
+		app.post('/defect_analysis',report.defect_analysis);
+		app.post('/rasa_prompt_model',report.rasa_prompt_model);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
