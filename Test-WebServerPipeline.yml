@@ -3,14 +3,14 @@ trigger: none
 resources:
   pipelines:
   - pipeline: Test-WebServerPipeline
-    source: Test-LinuxDASPipeline
+    source: Test-Parent-Pipeline
     trigger: true
 steps:
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
     project: 'c5d3a8af-ebac-4015-ad8b-72c66fcf8fbd'
-    pipeline: '173'
+    pipeline: '182'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
     artifactName: 'BranchName'
@@ -19,14 +19,14 @@ steps:
 - checkout: git://$(System.TeamProject)/WebServer
   persistCredentials: true
   clean: true
-  path: s/itdm
+  path: s/avoassure
 - task: CmdLine@2
   inputs:
     script: |
       BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
       echo "Branch Name is:$BranchName"
       echo $(Build.SourceBranch)
-      cd s/itdm
+      cd s/avoassure
       git checkout $BranchName
       ls
 
