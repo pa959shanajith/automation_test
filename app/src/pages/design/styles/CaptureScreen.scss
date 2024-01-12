@@ -665,11 +665,12 @@
 .upgrade__block {
   border-right: 1px solid #E2E2ED;
   cursor: pointer;
+  width: 17rem;
 
   .insprint__text {
     position: relative;
     top: 0rem;
-    left: 4rem;
+    left: 3rem;
     font-size: 16px;
     font-family: "Open sans";
     font-weight: bold;
@@ -684,7 +685,7 @@
     font-family: 'Open Sans';
     font-weight: 500;
     font-size: 14px;
-    padding: 0 0.8rem;
+    padding: 0 0.5rem;
     top: 1rem;
     cursor: pointer;
   }
@@ -698,7 +699,7 @@
     bottom: 21%;
     cursor: pointer;
     height: 11%;
-    left: 4%;
+    // left: 4%;
     position: relative;
     width: 4%;
   }
@@ -761,7 +762,7 @@
 
   .add_obj {
     position: relative;
-    right: 1rem;
+    right: 0rem;
   }
   .add_obj_import{
     position: relative;
@@ -770,7 +771,7 @@
   }
   .add_obj_export{
     position: relative;
-    right: 1rem;
+    right: 0rem;
     top: 0.3rem;
   }
 
@@ -782,17 +783,19 @@
 
 .utility__block {
   border-right: 2px solid #E2E2ED;
-  cursor: not-allowed;
+  cursor: pointer;
   opacity: 0.4;
 
   .insprint__text {
     position: relative;
     top: 0rem;
-    right: 1rem;
+    left: 0.5rem;
     font-size: 16px;
+    font-weight: 700;
     font-family: "Open sans";
-    cursor: not-allowed;
+    cursor: pointer;
     font-weight: bold;
+    color: #030229 !important;
   }
 
   .insprint_auto {
@@ -806,8 +809,14 @@
     padding: 0 0.8rem;
     top: 1rem;
     right: 0.65rem;
-    cursor: not-allowed;
+    cursor: pointer;
   }
+  .repo__dropdown{
+    .p-dropdown{
+    border: 1px solid #030229 !important;
+    }
+  }
+
   .disabled {
     // float: left;
     padding-right: 2rem;
@@ -824,7 +833,7 @@
   }
 
   .info__btn_utility {
-    cursor: not-allowed;
+    cursor: pointer;
     height: 11%;
     left: 23%;
     position: relative;
@@ -844,7 +853,7 @@
   .insprint__text {
     position: relative;
     top: 0rem;
-    right: 1rem;
+    right: 0rem;
     font-size: 16px;
     font-family: "Open sans";
     cursor: pointer;

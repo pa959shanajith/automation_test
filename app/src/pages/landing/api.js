@@ -312,4 +312,30 @@ export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenrai
     }
   }
 
+  export const getScreens = async(params) => {
+    try{
+        const res = await axios(url+'/getScreens', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {projectId:params.projectId,
+                param:params.param},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
+    }
+}
+
 
