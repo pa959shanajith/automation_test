@@ -337,6 +337,22 @@ exports.updateScreen_ICE = async (req, res) =>{
 	}
 };
 
+exports.insertScreen = async (req, res) =>{
+    const fnName = "insertScreen";
+    try {
+        logger.info("Inside UI service: " + fnName);
+        // var d = req.body;
+        var inputs = req.body.data;
+        inputs.userId = req.session.userid;
+        inputs.roleId = req.session.activeRoleId;
+        var data = await utils.fetchData(inputs, "design/insertScreen", fnName);
+        res.send(data)
+    } catch (exception) {
+        logger.error("Error occurred in insertScreen/"+fnName+":", exception);
+        res.status(500).send('fail');
+    }
+};
+
 exports.fetchReplacedKeywords_ICE = async (req, res) => {
 	const fname = "fetchReplacedKeywords_ICE";
 	try{

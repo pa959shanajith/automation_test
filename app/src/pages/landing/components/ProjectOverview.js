@@ -6,20 +6,29 @@ import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
+import ElementRepository from './ElementRepository';
 
 const ProjectOverview = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const [elementRepository, setElementRepository] = useState(false);
     let defaultselectedProject = reduxDefaultselectedProject;
+    const [overlay, setOverlay] = useState(null);
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
     if (localStorageDefaultProject) {
         defaultselectedProject = JSON.parse(localStorageDefaultProject);
     }
+
+    const handleElementRepository = () =>{
+        setElementRepository(true);
+        setOverlay("Loading Element Repository")
+    }
     const items = [
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
+        { label: 'Element Repository', command: ()=>handleElementRepository()}
     ];
 
     return (
@@ -43,6 +52,7 @@ const ProjectOverview = (props) => {
             {activeIndex === 0 && <ProjectCreation validateProjectLicense={props.validateProjectLicense} toastError={props.toastError} toastSuccess={props.toastSuccess} />}
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}
+            {activeIndex === 3 && <ElementRepository setOverlay={setOverlay} overlay={overlay}/>}
         </div>
     )
 }

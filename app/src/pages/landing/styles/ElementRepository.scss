@@ -1,0 +1,123 @@
+@import "../../global/styles/ColorVariables.scss";
+.repository__table{
+    top: 2rem;
+}
+
+.add_more_btn{
+    position: relative;
+    /* right: -11rem; */
+    left: 60rem;
+    bottom: 1rem;
+}
+
+.scenario-accordion{
+    display: flex;
+    flex-direction: row;
+    gap: 48rem;
+}
+
+.button-class{
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.scenario-text{
+    top: 1rem;
+}
+
+.accordion-class{
+    .p-accordion-tab{
+        .p-accordion-header{
+            .p-accordion-header-link{
+                padding: 0.8rem;
+            }
+        }
+    }  
+}
+
+.accordion-class-2{
+    .p-accordion-tab{
+        .p-accordion-header{
+            .p-accordion-header-link{
+                padding: 0.5rem;
+            }
+        }
+    }
+}
+
+.edit-text{
+    font: $f7_semibold !important;
+}
+.delete-text{
+    font: $f7_semibold !important;
+}
+
+.element-repository{
+    overflow: auto;
+}
+
+.button__elements{
+    position: relative;
+    left: 58.4rem;
+    bottom: rem;
+    top: 0.2rem;
+}
+
+.not_captured_ele {
+    height: 25vh;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 16vw;
+}
+
+.not_captured_message {
+    bottom: 1rem;
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    position: relative;
+    right: 1rem;
+  }
+
+.input__field{
+    position: absolute;
+    bottom: 0.8rem;
+}
+
+.name__ellipsis{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 21rem;
+        gap: 5rem;
+}
+
+.element_tag{
+    border-radius: 1rem !important;
+    width: 4rem;
+    padding: 0.1rem 0.1rem;
+    .p-tag-value{
+        position: relative;
+        right: 1.2rem;
+    }
+}
+
+.blue-text{
+    color: blue;
+}
+
+.reused__icon{
+    height: 1.5rem;
+}
+
+.relative{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 21rem;
+    width: 5rem;
+    display: flex;
+}
