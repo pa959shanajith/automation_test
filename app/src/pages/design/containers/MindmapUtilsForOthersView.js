@@ -964,7 +964,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
         state: 'created',
         path: '',
-        name: nNext[pt][0] === 'Scenario' ? tempName : tempName + "_teststeps",
+        name: nNext[pt][0] === 'Scenario' ? tempName : tempName,
         parent: nNext[pt][0] === 'Scenario' ? dNodes[pi] : (dNodes[pi].parent && dNodes[pi].parent.type === 'screens') ? {
             ...dNodes[pi].parent
         } : {
@@ -975,7 +975,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             parent: dNodes[pi],
             state: 'created',
             path: '',
-            name: tempName + "_screen",
+            name: tempName,
             childIndex: '',
             type: 'screens'
         },
@@ -1013,7 +1013,8 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     id: dNodes[pi].children[0].id,
                     x: dNodes[pi].children[0].x,
                     y: dNodes[pi].children[0].y,
-                    children: [...dNodes[pi].children]
+                    children: [...dNodes[pi].children],
+                    parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}
                 }]
             };
 
@@ -1025,9 +1026,15 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             const new_obj_data_for_uNix = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
             dNodes[uNix] = new_obj_data_for_uNix
         } else {
-            const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, children: [dNodes[uNix]] } }] };
-            getChildUpdate(dNodes, newObject)
-            dNodes[pi] = newObject;
+            if(dNodes[pi].type === 'teststepsgroups'){
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, children: [dNodes[uNix]] } }], parent:{...dNodes[pi].parent, children:[{...dNodes[pi].parent.children[0],children:[dNodes[uNix]]},dNodes[uNix]]} };
+                getChildUpdate(dNodes, newObject)
+                dNodes[pi] = newObject;
+            }else{
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, children: [dNodes[uNix]] } }] };
+                getChildUpdate(dNodes, newObject)
+                dNodes[pi] = newObject;
+            }
         }
     }
     else dNodes[pi].children.push(dNodes[uNix]);
@@ -1481,36 +1488,42 @@ export function restructureData(data) {
                     if (parentToUpdate) {
                         // Iterate over the children array
                         parentData.children.forEach(child => {
-                            // Find all occurrences of children with the specified id
-                            const existingChildrenIndices = findChildrenIndicesWithId(parentToUpdate, child.id);
-                    
-                            if (existingChildrenIndices.length > 0) {
-                                // Update all occurrences of the child
-                                existingChildrenIndices.forEach(path => {
-                                    let currentObject = parentToUpdate;
-                                    path.forEach(step => {
-                                        if (step === 'children') {
-                                            currentObject = currentObject.children;
-                                        } else {
-                                            currentObject = currentObject[step];
-                                        }
+                            if(child.state === 'created'){
+                                // Find all occurrences of children with the specified id
+                                const existingChildrenIndices = findChildrenIndicesWithId(parentToUpdate, child.id);
+                                                    
+                                if (existingChildrenIndices.length > 0) {
+                                    // Update all occurrences of the child
+                                    existingChildrenIndices.forEach(path => {
+                                        let currentObject = parentToUpdate;
+                                        path.forEach(step => {
+                                            if (step === 'children') {
+                                                currentObject = currentObject.children;
+                                            } else {
+                                                currentObject = currentObject[step];
+                                            }
+                                        });
+
+                                        // Update the child
+                                        parentToUpdate.children.push({
+                                            ...child,
+                                            children: [],
+                                            type: 'testcases',
+                                        });
                                     });
-                    
-                                    // Update the child
-                                    currentObject = {
-                                        ...child,
-                                        children: [],
-                                        type: 'testcases',
-                                    };
-                                });
-                            } else {
-                                // Add the new child
-                                parentToUpdate.children.push({
-                                    ...child,
-                                    children: [],
-                                    type: 'testcases',
-                                });
-                            }
+                                } else {
+                                    // Add the new child
+                                    parentToUpdate.children.forEach((child1)=>{
+                                        if(child1.name !== child.name){
+                                            parentToUpdate.children.push({
+                                                ...child,
+                                                children: [],
+                                                type: 'testcases',
+                                            });
+                                        }  
+                                    })
+                                }
+                            }     
                         });
                     } else {
                         scenariosChildren.push({
