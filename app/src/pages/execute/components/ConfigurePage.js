@@ -316,6 +316,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
+  localStorage.setItem("configData",JSON.stringify(getConfigData))
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -1423,10 +1424,11 @@ const showToast = (severity, detail) => {
 };
 
   const configModal = (getType, getData = null) => {
+    const lsGetConfigData = JSON.parse(localStorage.getItem("configData"))
     if (getType === "CancelUpdate") {
       const getAvogrid = [
-        ...getConfigData?.avoAgentAndGrid?.avoagents,
-        ...getConfigData?.avoAgentAndGrid?.avogrids,
+        ...lsGetConfigData?.avoAgentAndGrid?.avoagents,
+        ...lsGetConfigData?.avoAgentAndGrid?.avogrids,
       ];
       getAvogrid.forEach((el, index, arr) => {
         if (Object.keys(el).includes("Hostname")) {
@@ -1438,7 +1440,7 @@ const showToast = (severity, detail) => {
         ...avodropdown,
         avogrid: getData?.executionRequest?.avoagents[0] ? getAvogrid.filter(
           (el) => el.name === getData?.executionRequest?.avoagents[0]
-        )[0] : getConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
+        )[0] : lsGetConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
@@ -1959,7 +1961,15 @@ const showToast = (severity, detail) => {
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              scheduleThrough: showIcePopup ? "client" : (
+                fetechConfig[configItem]?.executionRequest?.avoagents[0]  
+                    ? (Object.values(fetechConfig[configItem].executionRequest.avoagents)[0])
+                    : getConfigData?.avoAgentAndGrid?.avogrids?.length > 0
+                      ? (getConfigData?.avoAgentAndGrid?.avogrids?.filter((item) => item?._id === fetechConfig[configItem]?.executionRequest?.avogridId)[0]?.name)
+                      : "Any Agent" 
+                         
+              ),
+              // scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
               testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
