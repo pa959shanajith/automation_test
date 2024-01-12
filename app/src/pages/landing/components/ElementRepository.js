@@ -864,7 +864,7 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
               editor={(options) => cellEditor(options)}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}></Column>
-              <Column field="tag" header="Element Property" body={(rowData) => rowData?.tag?.includes("iris")? elementTypeProp(rowData.tag.split(";")[1]): rowData?.tag ? elementTypeProp(rowData.tag):"Element"}></Column>
+              <Column field="tag" header="Element Property" body={(rowData) => rowData?.tag?.includes("iris")? elementTypeProp(rowData.tag.split(";")[1]): rowData?.tag ? elementTypeProp(rowData.tag):""}></Column>
               <Column field="actions" header="Actions" body={(rowData)=>renderActionsCell(screenDetails,rowData)} headerStyle={{ justifyContent: "center"}}/>
               {/* <Column field="age" header="Age"></Column> */}
             </DataTable>
