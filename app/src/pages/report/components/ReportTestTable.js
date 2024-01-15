@@ -33,6 +33,7 @@ import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
 import NetworkOperation from "./NetworkOperation";
+import { Tooltip } from 'primereact/tooltip';
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -627,7 +628,7 @@ export default function BasicDemo() {
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
             ? "static/imgs/fail.png"
-            : "static/imgs/treminated.png";
+            : "";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
@@ -792,14 +793,16 @@ export default function BasicDemo() {
             setVisibleScreenShot(image);
           }}
         >
-         <img src="static/imgs/view_screenshot_icon_before.svg" />
+        <Tooltip target=".screenshot" position="bottom" />
+         <img className="screenshot" src="static/imgs/ViewScreenshot.svg" data-pr-tooltip="View Screenshot" />
         </div>
       )}
       {getLink?.data?.Network_Data && (
       <div>
+        <Tooltip target=".Network_icon" position="bottom" />
         <img
-          className="plug_icon"
-          src="static/imgs/plug_icon.svg"
+          className="Network_icon"
+          src="static/imgs/Network_icon.svg" data-pr-tooltip="View Network Operation" 
               onClick={() => { setNewtorkDialog(true);
                  setNetworkData(getLink?.data?.Network_Data);
                   setDescription(reportData?.rows.filter((el) => el?.slno === getLink?.data?.slno)[0]?.StepDescription);
