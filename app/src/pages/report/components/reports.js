@@ -22,6 +22,7 @@ import { Paginator } from 'primereact/paginator';
 import useDebounce from '../../../customHooks/useDebounce';
 import { convertIdIntoNameOfAppType } from '../../design/components/UtilFunctions';
 import { Divider } from 'primereact/divider';
+import { Badge } from 'primereact/badge';
 export var navigate
 
 const reports = () => {
@@ -47,7 +48,7 @@ const reports = () => {
       "View by Execution Profile"
     );
     const customDropdownIcon = classNames("pi", "pi-sort-alt");
-
+    const [filteredBadge, setFilteredBadge] = useState(false);
     const [reportData, setReportData] = useState([]);
     const sort = [
       { name: "Last modified", code: "0" },
@@ -202,10 +203,13 @@ const reports = () => {
           sortedData.sort((a, b) =>
             a.configurename.localeCompare(b.configurename)
           );
+          setFilteredBadge(true)
         } else if(sortType.code === "1") {
           sortedData.sort((a, b) => Date.parse(b.execDate) - Date.parse(a.execDate));
+          setFilteredBadge(true)
         } else if(sortType.code === "0") {
           sortedData.sort((a, b) => b.noOfExecution - a.noOfExecution);
+          setFilteredBadge(false)
         }
         setReportData(sortedData);
         setSelectedItem(sortType);
@@ -323,6 +327,7 @@ const reports = () => {
               className="sort_dropdown"
               placeholder={selectedItem}
             />
+            {filteredBadge && <Badge style={{position:'absolute'}} severity="success" ></Badge>}
           </div>
         </div>
         <div className="report_landing mt-2">

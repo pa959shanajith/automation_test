@@ -2570,7 +2570,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </defs>}
             <g className='ct-container'>
             {Object.entries(links).map((link)=>{
-            return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} markerEnd='url(#arrow)' d={link[1].d}></path>)
+            return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} markerEnd={link[0].startsWith('link-0-')?"":'url(#arrow)'} d={link[1].d}></path>)
             })}
             {Object.entries(nodes).map((node)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>

@@ -140,15 +140,14 @@ const InputBox = (props) => {
                 function updateData(node) {
                     node.children.forEach(child => {
                         if (child.id === dNodes[pi].id) {
-                            child.name = dNodes[pi].name + "-teststeps";
-                            child.parent.name = dNodes[pi].name + "-screen";
-                            
+                            child.name = dNodes[pi].name;
+                            child.parent.name = dNodes[pi].name;
                             // Use map on child.parent.children to update specific child
                             child.parent.children = child.parent.children.map(subChild => {
                                 if (subChild.childIndex === dNodes[pi].childIndex) {
-                                    subChild.name = dNodes[pi].name + "-teststeps";
+                                    subChild.name = dNodes[pi].name;
                                 }else if(subChild.id === dNodes[pi].id){
-                                    subChild.name = dNodes[pi].name + "-teststeps";
+                                    subChild.name = dNodes[pi].name;
                                 }
                                 return subChild;
                             });

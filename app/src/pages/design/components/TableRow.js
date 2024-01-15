@@ -171,6 +171,7 @@ const TableRow = (props) => {
         setOutputPlaceholder(placeholders.outputval);
         setInputPlaceholder(placeholders.inputval);
         setObjName(event.value)
+        submitData(event.value)
         setKeyword(caseData.keywords[0]);
         setSelectedOptions({value:caseData.keywords[0] ,label:!props.arrow?props.keywordData[caseData.obType][caseData.keywords[0]].description:caseData.keywords[0]})
         setTcAppType(caseData.appType);
@@ -190,6 +191,7 @@ const TableRow = (props) => {
             setOutputPlaceholder(placeholders.outputval);
             setInputPlaceholder(placeholders.inputval);
             setKeyword(event.value);
+            submitDatakeyword(event.value)
             setAllKeyword(optionKeyword);
             setSelectedOptions(event);
             // testcaseDropdownRef.current.focus();
@@ -197,9 +199,13 @@ const TableRow = (props) => {
             document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
         }
     };
-    const submitData = () =>{
-        props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
-        props.setStepSelect(oldState=>({...oldState, highlight: []}));
+    const submitData = (e) =>{
+        props.setRowData({rowIdx: props.idx, operation: "row", objName: e, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
+        // props.setStepSelect(oldState=>({...oldState, highlight: []}));
+    }
+    const submitDatakeyword = (e) =>{
+        props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: e, inputVal: input, outputVal: output, appType: tcAppType});
+        // props.setStepSelect(oldState=>({...oldState, highlight: []}));
     }
     const submitChanges = event => {
         if (event.keyCode === 13){
@@ -370,7 +376,7 @@ const TableRow = (props) => {
                     //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                     //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
                     // </select>
-                    <Select  value={objetListOption} onChange={onObjSelect} onMenuClose={submitData} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
+                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
                         <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
@@ -383,7 +389,7 @@ const TableRow = (props) => {
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
                     { focused ? 
                     <>
-                        <Select className='select-option' value={selectedOptions.label !== undefined?selectedOptions.label !== ''?selectedOptions.label!==selectedOptions.value?selectedOptions:objType !== null? {label:props.keywordData[objType][selectedOptions.value]?.description!==undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword, value:props.keywordData[objType][selectedOptions.value]?.description!== undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword}:selectedOptions:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}} id="testcaseDropdownRefID" blurInputOnSelect={false} ref={testcaseDropdownRef} isDisabled={objName==="OBJECT_DELETED"?true:optionKeyword === undefined?true:false} onChange={onKeySelect} onMenuClose={submitData} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} isMulti={false} closeMenuOnSelect={false} options={optionKeyword}  menuPortalTarget={document.body} styles={customStyles} getOptionLabel={getOptionLabel} menuPlacement="auto" placeholder='Select'/>
+                        <Select className='select-option' value={selectedOptions.label !== undefined?selectedOptions.label !== ''?selectedOptions.label!==selectedOptions.value?selectedOptions:objType !== null? {label:props.keywordData[objType][selectedOptions.value]?.description!==undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword, value:props.keywordData[objType][selectedOptions.value]?.description!== undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword}:selectedOptions:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}} id="testcaseDropdownRefID" blurInputOnSelect={false} ref={testcaseDropdownRef} isDisabled={objName==="OBJECT_DELETED"?true:optionKeyword === undefined?true:false} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} isMulti={false} closeMenuOnSelect={false} options={optionKeyword}  menuPortalTarget={document.body} styles={customStyles} getOptionLabel={getOptionLabel} menuPlacement="auto" placeholder='Select'/>
                     </> :
                         <div className="d__row_text" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""}>{props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? !props.arrow?props.keywordData[objType][keyword].description:keyword : keyword}</div>}
                             
