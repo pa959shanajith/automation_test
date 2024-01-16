@@ -27,9 +27,10 @@ const FolderView = (props) => {
     const [valueOfNewAddedCase, setValueOfNewAddedCase] = useState(null);
     const [testCaseVar, setTestCaseVar] = useState(null);
     const [modifiedDataToChange, setModifiedDataToChange] = useState(null);
+    const [modifiedDataToAddNewTSG, setModifiedDataToAddNewTSG] = useState(null);
     const [passSelectedCaseToAddNewStepGrp, setPassSelectedCaseToAddNewStepGrp] = useState({});
-    const [updateSelectedCaseToAddNewStepGrp, setUpdateSelectedCaseToAddNewStepGrp] = useState(passSelectedCaseToAddNewStepGrp);
-    const [stepKey, setStepKey] = useState(null);
+    const [editing, setEditing] = useState(true);
+    const [createNewTS, setCreateNewTS] = useState(false);
     const toast = useRef(null);
     const operationOnSuites = useRef(null);
     const operationOnCases = useRef(null);
@@ -48,7 +49,22 @@ const FolderView = (props) => {
                 data: [{ layer: "layer_1", testSuitName: onlyNormalSuites[h].name, testSuitId: onlyNormalSuites[h]._id, childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]] }],
                 children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
             })
+
     }
+    // const handlingNewTS =()=>{
+    //     moduledataForTree.push(
+    //         {
+    //             key: null,
+    //             label: [<img src="static/imgs/moduleIcon.png" alt="modules" />, <div style={{
+    //                 width: '10rem', 
+    //                 overflow: "hidden",
+    //                 textOverflow: "ellipsis"
+    //             }} >{onlyNormalSuites[h].name}</div>, <Button label="..." value={h} onMouseDownCapture={(e) => operationOnSuites.current.show(e)} onClick={e => { receivingfullTreeDataOnClickOfMoreButton(e.target.value) }} className='buttonForMoreTestSuites' text />],
+    //             data: [{ layer: "layer_1", testSuitName: onlyNormalSuites[h].name, testSuitId: onlyNormalSuites[h]._id, childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]] }],
+    //             children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
+    //         })
+    // }
+
     const onExpandOfSuite = async (event) => {
         dispatch(typeOfOprationInFolder({ onExpand: event.node }))
 
@@ -75,6 +91,7 @@ const FolderView = (props) => {
         // Call the function to update the data
         const modifiedData = transformDataFromTreetoFolder(res);
         setModifiedDataToChange(modifiedData)
+        setModifiedDataToAddNewTSG(modifiedData)
         setSelectedStepData(modifiedData.children)
         const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
 
@@ -131,13 +148,13 @@ const FolderView = (props) => {
         // Call the function to update the data
         const modifiedData = transformDataFromTreetoFolder(res);
         setModifiedDataToChange(modifiedData);
-
         const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
 
         setTestCaseVar(testCases)
         dispatch(selectedScreenOfStepSlice(testCases))
         setChildComponents(testCases)
         setPassSelectedCaseToAddNewStepGrp(event?.node);
+
 
     };
 
@@ -231,7 +248,7 @@ const FolderView = (props) => {
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">Test Suite Folder</h3>
                         <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
-                        <img className=" " src="static/imgs/plusNew.png" alt="NewModules" />
+                        <img className=" " onClick={() => { dispatch(createNewTestSuit({ newTS: true })); setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
                     <div className='searchNormal'>
@@ -254,7 +271,7 @@ const FolderView = (props) => {
                     <div className='E2ETitleAndPlusBtn commonClass'>
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">End to End Flow</h3>
-                        <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
+                        {/* <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img> */}
                         <img className=" " src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
@@ -275,7 +292,7 @@ const FolderView = (props) => {
 
 
             </div>
-            <FolderViewRightContainer modifiedData={modifiedDataToChange} setBlockui={props.setBlockui} screenDatapassing={screenDatapassing} eventSelectData={eventSelectData} />
+            <FolderViewRightContainer modifiedData={modifiedDataToChange} modifiedDataToAddNewTSG={modifiedDataToAddNewTSG} setBlockui={props.setBlockui} screenDatapassing={screenDatapassing} eventSelectData={eventSelectData} />
         </>
     )
 }

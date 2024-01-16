@@ -1,6 +1,6 @@
-
 @import "../../global/styles/ColorVariables.scss";
-.toolbar__header{
+
+.toolbar__header {
     background-color: $borderThree;
     height: 30px;
     // padding: 0 10px;
@@ -8,15 +8,18 @@
     // padding-top: 5px;
     width: 49%;
     display: flex;
+    justify-content: space-between;
 }
-.projectLabel{
+
+.projectLabel {
     display: inline-block;
     max-width: 100%;
     position: relative;
     margin: 2px 8px 0 0;
     font: $f7_semibold;
 }
-.projectSelect{
+
+.projectSelect {
     width: 160px;
     padding: 2px;
     position: relative;
@@ -26,7 +29,8 @@
     box-shadow: none;
     font: $f6_regular;
 }
-.toolbar__header-menus{
+
+.toolbar__header-menus {
     display: flex;
     // height: 0vh;
     // white-space: nowrap;
@@ -34,29 +38,32 @@
     align-items: center;
 
 
-    .p-inputswitch{
+    .p-inputswitch {
         bottom: 0.2rem;
     }
-    .p-divider-vertical:before{
+
+    .p-divider-vertical:before {
         height: 66% !important;
     }
 }
-.line{
+
+.line {
     height: 2rem;
     position: relative;
     margin-right: 1rem;
 }
-.am{
+
+.am {
     height: 3rem;
     // position: relative;
     // bottom: 0.6rem;
 }
-  
+
 // .toolbar__header-menus i{
 //     margin-left: 11%;
 //     margin-right: 3%;
 // }
-.toolbar__header button{
+.toolbar__header button {
     color: $whiteColor;
     border: 0;
     border-radius: 20px;
@@ -71,24 +78,29 @@
     float: right;
     margin-right: 30px;
 }
-.toolbar__header button:hover{
+
+.toolbar__header button:hover {
     color: $whiteColor;
 }
-.toolbar__header button:focus{
+
+.toolbar__header button:focus {
     outline: 0;
     box-shadow: none;
 }
-.toolbar__header-searchbox{
+
+.toolbar__header-searchbox {
     float: right;
     width: 15%;
     min-width: 189px;
 }
-.toolbar__header-searchbox img{
+
+.toolbar__header-searchbox img {
     vertical-align: middle;
     border-style: none;
     margin-left: -25px;
 }
-.toolbar__header-searchbox input{
+
+.toolbar__header-searchbox input {
     width: 100%;
     border-radius: 6px;
     border: 1px solid darkgrey;
@@ -98,6 +110,30 @@
     outline-style: none;
     box-shadow: none;
 }
+
 .active-map {
     color: $primaryColorRich;
+}
+
+.TypesOfViewsDrop {
+    align-items: center;
+
+    .p-dropdown-panel {
+        .p-dropdown-items-wrapper {
+            max-height: 242px;
+
+            .p-dropdown-items {
+                .p-dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0rem;
+
+                    .TypesOfViewsContaints {
+                        align-items: center;
+                    }
+                }
+            }
+        }
+    }
 }

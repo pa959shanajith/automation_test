@@ -1740,7 +1740,7 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
     const testCases = [];
     const childData = modifiedData.children;
     // testCase loop
-    for (let i = 0; i < childData.length; i++) {
+    for (let i = 0; i < childData?.length; i++) {
         const childComponent = childData[i];
         const children = [];
         // testStep loop
