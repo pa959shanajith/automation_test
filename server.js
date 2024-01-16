@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-				var redisStore = require('connect-redis')(sessions);
+						var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -161,7 +161,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+						}
 						return next();
 		});
 
@@ -271,6 +271,10 @@ if (cluster.isMaster) {
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
+		app.post('/devopsReports/getReportsData_ICE', report.getReportsData_ICE);
+        app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
+		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
+        app.get('/devopsReports/viewReport', report.viewReport);
 		// ALM API's
 		app.post('/sap-calm-testautomation/api/v1/scopechanged',ALM.Scope_Changed);
 		app.post('/sap-calm-testautomation/api/v1/createtestcase', ALM.create_ALM_Testcase);
@@ -280,8 +284,7 @@ if (cluster.isMaster) {
 		app.get('/sap-calm-testautomation/api/v1/job/status',ALM.Job_Status);
 		app.get('/sap-calm-testautomation/api/v1/testcases/executionhistory',ALM.Execution_History);
 		app.post('/saveSAP_ALMDetails_ICE', ALM.saveSAP_ALMDetails_ICE);
-		
-
+		app.get('/fetchALM_Testcases',ALM.fetchALM_Testcases)
 		app.use(csrf({
 		cookie: true
 		}));

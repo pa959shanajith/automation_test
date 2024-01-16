@@ -44,6 +44,28 @@ exports.create_ALM_Testcase = async function (req, res) {
     }
   };
 
+exports.fetchALM_Testcases = async function (req,res) {
+      logger.info("ALM fetch all testcases service called");
+  try {
+      logger.info("making an call to DAS to fetch the testcases");
+      var inputs = {};
+      inputs['query'] = "alm_create_testcase";
+      const result = await utils.fetchData(inputs, "/fetchALM_Testcases", "alm_fetch_testcases", true);
+      // const statusCode = findStatusCode();
+      if (result &&  !(result[1].statusCode >= 200 && result[1].statusCode <= 299)) {
+          logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+          return res.status(result[1].statusCode).json({
+              error: result[1].statusMessage || 'Unknown error',
+          });
+      }
+      logger.info("info : ALM testcases found");
+      res.status(result[1].statusCode).send({  "testCases": result[0].rows || [] });
+
+  } catch (error) {
+      logger.error('Error: ', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+}  
   exports.getALM_Testcases = async function (req, res) {
  
     logger.info("ALM get testcases service called");
