@@ -23,6 +23,7 @@ let socketMapScheduling = {};
 let socketMapNotify = {};
 let iceUserMap = {};
 let iceIPMap = {};
+let resMap = {};
 module.exports = io;
 module.exports.allSocketsMap = socketMap;
 module.exports.allSocketsICEUser=userICEMap;
@@ -30,6 +31,7 @@ module.exports.allSocketsMapUI = socketMapUI;
 module.exports.allSchedulingSocketsMap = socketMapScheduling;
 module.exports.socketMapNotify = socketMapNotify;
 module.exports.allICEIPMap = iceIPMap;
+module.exports.resMap = resMap;
 
 var logger = require('../../logger');
 var utils = require('./utils');
@@ -96,6 +98,7 @@ io.on('connection', async socket => {
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
 					if(!userICEMap[clientName][result.username]) userICEMap[clientName][result.username] = []
+					if(resMap[clientName] == undefined) resMap[clientName] = {};
 					iceUserMap[icename] = result.username;
 					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username][0] = icename;
 					initListeners(socket);
@@ -244,6 +247,11 @@ io.on('connection', async socket => {
 		const notifySocMap = socketMapNotify[clientName];
 		const resSent = true;
 		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent);
+	});
+
+	socket.on("scrape", async (message)=>{
+		logger.info("Sending objects");
+		resMap[clientName][username].send(message)
 	});
 
 });
