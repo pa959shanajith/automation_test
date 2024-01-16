@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScreenOverlay, VARIANT, Messages as MSG, ValidationExpression } from '../../global'
-import { getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData } from '../api';
+import { getUserRoles, manageUserDetails, getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails, fetchICE, manageSessionData, createMulitpleLdapUsers } from '../api';
 import '../styles/CreateUser.scss'
 import CreateLanding from '../components/CreateLanding';
 import EditLanding from '../components/EditLanding';
@@ -46,6 +46,7 @@ const CreateUser = (props) => {
     const [ldapUserList, setLdapUserList] = useState([])
     const [ldapUserListInitial, setLdapUserListInitial] = useState([])
     const [loading, setLoading] = useState(false)
+    const [updatedInfo, setUpdatedInfo] = useState(true);
     const type = useSelector(state => state.admin.type);
     const addRole = useSelector(state => state.admin.addRole);
     const allRoles = useSelector(state => state.admin.allRoles);
@@ -65,6 +66,8 @@ const CreateUser = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
     const nocreate = useSelector(state => state.admin.nocreate);
     const editUser = useSelector(state => state.admin.editUser);
+    const ldapUserFilter = useSelector(state => state.admin.ldapUserFilter);
+    const ldapFetchUsersData = useSelector(state => state.admin.ldapFetchUsersData);
     const [showEditUser, setShowEditUser] = useState(false);
     const [allRolesUpdate, setAllRolesUpdate] = useState([]);
     const [roleDropdownValue, setRoleDropdownValue] = useState("");
@@ -76,6 +79,9 @@ const CreateUser = (props) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
     const [ldapSelectedUserList, setLdapSelectedUserList] = useState([]);
+    const [ldapIceProvisionUserList, setLdapIceProvisionUserList] = useState([]);
+    const [ldapUserDetailsTabDisable, setLdapUserDetailsTabDisable] = useState([]);
+
 
     useEffect(() => {
         click();
@@ -99,7 +105,6 @@ const CreateUser = (props) => {
                     allRolesList.push(roleObject);
                 }
             });
-
             allRolesList.sort((a, b) => {
                 if (a.name === 'Quality Manager') return -1;
                 if (a.name === 'Quality Lead' && b.name === 'Quality Engineer') return -1;
@@ -112,7 +117,7 @@ const CreateUser = (props) => {
     }, [allRoles.length > 0]);
 
     const tabHeader = [
-        { label: 'User Details', key: 'userDetails', text: 'User Details' },
+        { label: 'User Details', key: 'userDetails', text: 'User Details', disabled: ldapUserDetailsTabDisable},
         { label: 'Avo Assure Client Provision', key: 'avoAzzureClient', text: 'Avo Assure Client Provision', disabled:!editUser && !nocreate },
     ];
 
@@ -141,15 +146,29 @@ const CreateUser = (props) => {
     const manage = (input) => {
         props.toast.current.clear();
         setUserNameForIceToken(userName);
-        const action = input.action;
-        if (!validate({ action: action })) return;
-        const bAction = action.charAt(0).toUpperCase() + action.substr(1);
+        const action =  type==="ldap" ? "createMultipleLdapUsers" : input.action;
         const uType = type;
+        if(type !== "ldap")
+        {   
+            if (!validate({ 
+                action: action, 
+                userName: userName,
+                lastname:lastname,
+                firstname: firstname,
+                passWord:passWord, 
+                email: email,
+                role: role,
+                addRole: addRole,
+                type: uType
+                })) return;
+        }
+        const bAction = action.charAt(0).toUpperCase() + action.substr(1);
         const addRole = [];
         for (let role in addRole) {
             if (addRole[role]) addRole.push(role);
         }
         const createdbyrole = allRoles.filter((e) => (e[0].toLowerCase() === "admin"));;
+        
         var userObj = {
             userid: userId,
             username: userName,
@@ -164,6 +183,49 @@ const CreateUser = (props) => {
             server: server,
             isadminuser: adminCheck // if user is Quality Manager, she/he has the Admin rights and it is optional
         };
+        let ldapUserList = [];
+        let ldapIceProvisionUserList = [];
+        if (uType === "ldap") {
+            setLdapUserDetailsTabDisable(true);
+            ldapFetchUsersData.forEach(user => {
+                let filteredUser =  ldapSelectedUserList.find( filteredUser => {
+                    if(filteredUser.domain === user.ldapname) 
+                        return filteredUser;
+                });
+                let managerRoledata = undefined;
+                if (filteredUser.roleId === 'ManagerWithadmin') managerRoledata = allRolesUpdate.find(role => {if(role.name === 'Quality Manager') return role});
+                let roleId = managerRoledata?.value
+                    if (!validate({
+                        action: action,
+                        userName: user.username,
+                        lastname:user.lastname,
+                        firstname: user.firstname,
+                        passWord:passWord,
+                        email: user.email,
+                        role: filteredUser.roleId === 'ManagerWithadmin'? roleId : filteredUser.roleId,
+                        addRole: addRole,
+                        type: uType
+                    })) { return };
+                
+                let newEachuserData = { 
+                                userid: userId,
+                                username: user.username,
+                                passWord: passWord,
+                                firstname: user.firstname,
+                                lastname: user.lastname,
+                                email: user.email,
+                                role: filteredUser.roleId === 'ManagerWithadmin'? roleId : filteredUser.roleId,
+                                addRole: addRole,
+                                type: uType,
+                                createdbyrole: createdbyrole,
+                                server: server,
+                                isadminuser: filteredUser.isAdmin,
+                                ldapUser: filteredUser.domain
+                            }
+                ldapUserList.push(newEachuserData);
+                ldapIceProvisionUserList.push({...newEachuserData, 'roleName': filteredUser.role})
+            })
+        }
 
         const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role};
 
@@ -172,58 +234,80 @@ const CreateUser = (props) => {
 
         (async () => {
             try {
-                var data = await manageUserDetails(action, userObj);
-                if (data.error) { displayError(data.error); return; }
-                setLoading(false);
-                if (data === "success") {
-                    if(userInfo && userInfo.user_id === userObj.userid){
-                    localStorage.setItem("userInfo", JSON.stringify(userdetail))
-                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role }))
+                if(uType !== "ldap"){
+                    var data = await manageUserDetails(action, userObj );
+                    if (data.error) { displayError(data.error); return; }
+                    setLoading(false);
+                    if (data === "success") {
+                        if(userInfo && userInfo.user_id === userObj.userid){
+                        localStorage.setItem("userInfo", JSON.stringify(userdetail))
+                        dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role }))
+                        }
+                        props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
+                        if (action === "create") { 
+                            setSelectedTab("avoAzzureClient") }
+                        else {
+                            edit();
+                            setSelectedTab("avoAzzureClient")
+                        };
+                        if (action === "delete") {
+                            props.setRefreshUserList(!props.refreshUserList);
+                            const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
+                            if (data0.error) { displayError(data0.error); return; }
+                            var data1 = await fetchICE(userObj.userid)
+                            if (data1.error) { displayError(data1.error); return; }
+                            else if (data1.length === 0) return false;
+                            const icename = data1[0].icename;
+                            var data2 = await manageSessionData('disconnect', icename, '?', 'dereg')
+                            if (data2.error) { displayError(data2.error); return; }
+                        }
+                    } else if (data === "exists") {
+                        props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
+                    }  else if (data === "email exists") {
+                        props.toastWarn(MSG.CUSTOM("User with provided mail already exist",VARIANT.ERROR));
+                    } else if (data === "fail") {
+                        if (action === "create") click();
+                        else edit();
+                        props.toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
                     }
-                    props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
-                    if (action === "create") { 
-                        setSelectedTab("avoAzzureClient") }
-                    else {
-                        edit();
-                        setSelectedTab("avoAzzureClient")
-                    };
-                    if (action === "delete") {
-                        props.setRefreshUserList(!props.refreshUserList);
-                        const data0 = await manageSessionData('logout', userObj.username, '?', 'dereg')
-                        if (data0.error) { displayError(data0.error); return; }
-                        var data1 = await fetchICE(userObj.userid)
-                        if (data1.error) { displayError(data1.error); return; }
-                        else if (data1.length === 0) return false;
-                        const icename = data1[0].icename;
-                        var data2 = await manageSessionData('disconnect', icename, '?', 'dereg')
-                        if (data2.error) { displayError(data2.error); return; }
+                    else if (/^2[0-4]{8}$/.test(data)) {
+                        if (JSON.parse(JSON.stringify(data)[1])) {
+                            props.toastError(MSG.CUSTOM("Failed to " + action + " user. Invalid Request!", VARIANT.ERROR));
+                            return;
+                        }
+                        var errfields = [];
+                        let hints = 'Hint:';
+                        if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
+                        if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
+                        if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
+                        if (JSON.parse(JSON.stringify(data)[5])) errfields.push("Password");
+                        if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
+                        if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
+                        if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
+                        if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
+                        if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
+                        props.toastWarn(MSG.CUSTOM("Following values are invalid: " + errfields.join(", ") + " " + hints, VARIANT.WARNING));
                     }
-                } else if (data === "exists") {
-                    props.toastWarn(MSG.ADMIN.WARN_USER_EXIST);
-                }  else if (data === "email exists") {
-                    props.toastWarn(MSG.CUSTOM("User with provided mail already exist",VARIANT.ERROR));
-                } else if (data === "fail") {
-                    if (action === "create") click();
-                    else edit();
-                    props.toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
                 }
-                else if (/^2[0-4]{8}$/.test(data)) {
-                    if (JSON.parse(JSON.stringify(data)[1])) {
-                        props.toastError(MSG.CUSTOM("Failed to " + action + " user. Invalid Request!", VARIANT.ERROR));
-                        return;
+                else {
+                    var data = await createMulitpleLdapUsers(action, ldapUserList);
+                    setLoading(false);
+                    console.log('ldapMultiUser', data);
+                    let errorMsg = ''
+                    let iceProvisonUserData = []
+                    data.map((user, index )=> {
+                        if(user.rows.status === "success"){
+                            iceProvisonUserData.push({...ldapIceProvisionUserList[index], userid : user.rows.userData.uid})
+                        }
+                        else if(user.rows === 'exists'){
+                            errorMsg = errorMsg + ldapIceProvisionUserList[index].username + ", "
+                        }
+                    })
+                    setLdapIceProvisionUserList(iceProvisonUserData);
+                    if(errorMsg !== ''){
+                        props.toastError(MSG.CUSTOM(errorMsg +" these users are already exists", VARIANT.ERROR));
                     }
-                    var errfields = [];
-                    let hints = 'Hint:';
-                    if (JSON.parse(JSON.stringify(data)[2])) errfields.push("User Name");
-                    if (JSON.parse(JSON.stringify(data)[3])) errfields.push("First Name");
-                    if (JSON.parse(JSON.stringify(data)[4])) errfields.push("Last Name");
-                    if (JSON.parse(JSON.stringify(data)[5])) errfields.push("Password");
-                    if (JSON.parse(JSON.stringify(data)[6])) errfields.push("Email");
-                    if (JSON.parse(JSON.stringify(data)[7])) errfields.push("Authentication Server");
-                    if (JSON.parse(JSON.stringify(data)[8])) errfields.push("User Domain Name");
-                    if (JSON.stringify(data)[5] === '1') hints += " Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase alphabet, length should be minimum 8 characters and maximum 16 characters.";
-                    if (JSON.stringify(data)[5] === '2') hints += " Password provided does not meet length, complexity or history requirements of application.";
-                    props.toastWarn(MSG.CUSTOM("Following values are invalid: " + errfields.join(", ") + " " + hints, VARIANT.WARNING));
+                    if(iceProvisonUserData.length > 0) setSelectedTab("avoAzzureClient")
                 }
             }
             catch (error) {
@@ -233,7 +317,7 @@ const CreateUser = (props) => {
     }
 
     //Validate Input Fields Before Doing Action
-    const validate = ({ action }) => {
+    const validate = ({ action, userName, lastname, firstname, passWord, email, role, addRole, type }) => {
         var flag = true;
         setUserNameAddClass(false); setfirstnameAddClass(false); setLastnameAddClass(false); setPasswordAddClass(false);
         setConfirmPasswordAddClass(false); setEmailAddClass(false); setLdapDirectoryAddClass(false); setUserIdNameAddClass(false);
@@ -285,7 +369,7 @@ const CreateUser = (props) => {
                 flag = false;
             }
         }
-        if (type === "ldap" && ldap.user === "") {
+        if (type === "ldap" && ldapFetchUsersData.length <= 0) {
             setLdapDirectoryAddClass("selectErrorBorder");
             flag = false;
         }
@@ -489,7 +573,7 @@ const CreateUser = (props) => {
         if (data === "empty") {
             props.toastWarn(MSG.ADMIN.WARN_NO_USER_FOUND);
         } else {
-            dispatch(AdminActions.UPDATE_LDAP_DATA(data))
+            dispatch(AdminActions.UPDATE_LDAP_DATA([...ldapFetchUsersData, ...data]));
         }
     }
 
@@ -519,16 +603,23 @@ const CreateUser = (props) => {
     const passwordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const confirmPasswordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const emailChange = (value) => {
         value = ValidationExpression(value, "email")
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(value))
+        {(email === value || value === props?.editUserData?.email) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
+    }
+
+    const roleChange = (value) =>{
+        {(role === value || value === props?.editUserData?.roleId) ?  setUpdatedInfo(true) : setUpdatedInfo(false)} 
     }
 
     const createUserDialogHide = () => {
@@ -575,7 +666,7 @@ const CreateUser = (props) => {
             onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
-            disabled={nocreate}
+            disabled={editUser ? updatedInfo : false}
             size="small"
             >
             {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
@@ -605,7 +696,7 @@ const CreateUser = (props) => {
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
                         ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
                         showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} primaryRoles={allRolesUpdate}
-                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList}/>
+                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList} updatedInfo={updatedInfo} setUpdatedInfo={setUpdatedInfo} editUserData={props.editUserData} setEditUserData={props.setEditUserData}/>
 
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
@@ -674,7 +765,7 @@ const CreateUser = (props) => {
                                     optionLabel="name"
                                     className= {`w-full md:w-20rem p-inputtext-sm ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
-                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)); roleChange(event.target.value)}}
                                     // disabled={editUser}
                                 />
                             </div>
@@ -695,8 +786,9 @@ const CreateUser = (props) => {
                     toastError={props.toastError}
                     toastSuccess={props.toastSuccess}
                     toast={props.toast} 
-                    ldapSelectedUserList={ldapSelectedUserList} 
-                    setLdapSelectedUserList={setLdapSelectedUserList}/>}
+                    ldapIceProvisionUserList={ldapIceProvisionUserList}
+                    createUserDialogHide={createUserDialogHide} 
+                    setLdapIceProvisionUserList={setLdapIceProvisionUserList}/>}
             </Dialog>
         </Fragment>
     );
