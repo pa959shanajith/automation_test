@@ -4,7 +4,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { useDispatch, useSelector } from 'react-redux';
-import { RedirectPage, Messages as MSG, setMsg } from '../../global/index.js';
+import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import * as api from '../../settings/api.js';
 import { uploadgeneratefile, getall_uploadfiles } from '../../admin/api.js';
 import { Toast } from "primereact/toast";
@@ -12,12 +12,12 @@ import { Paginator } from 'primereact/paginator';
 import { Checkbox } from 'primereact/checkbox';
 import axios from "axios";
 import '../styles/jira.scss';
-import LoginModal from "../../settings/Login/LoginModal.js";
+import LoginModal from "./../../../pages/settings/Login/LoginModal";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import {
     selectedProject, selectedIssue, selectedTCReqDetails, syncedTestCases, selectedTestCase, screenType,
     mappedTree, mappedPair, selectedScenarioIds, resetIntergrationLogin, resetScreen, selectedAvoproject
-} from '../../settings/settingSlice.js';
+} from '../../settings/settingSlice';
 //import AzureTestcase from "./azureTestcase";
 
 
