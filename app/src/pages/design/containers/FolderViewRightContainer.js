@@ -52,12 +52,25 @@ const FolderViewRightContainer = (props) => {
         return (itemsOf);
     }
     const items = handlingBreadCrumb();
-
-
+    //     console.log("modulkeList",props.modifiedDataToAddNewTSG)
+    //     if( props.modifiedDataToAddNewTSG.children?.length){
+    //         const data = props.modifiedDataToAddNewTSG;
+    //     const selectedTCForAddingTSG =data.children._id.find(eventsOfFolder.onSelect.data[0].testCaseId)
+    //     console.log("selectedTC",selectedTCForAddingTSG)
+    // }
     //modifying testStepGroup to screen and step, also making data to save
     const modifyingStepGroupToParentAndSaveFun = () => {
-        const data = props.modifiedData;
+        // const data = props.modifiedDataToAddNewTSG;
+        // console.log("data",data)
 
+
+
+        const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+        const selectedTCForAddingTSG = data.children.find((e) => e._id === eventsOfFolder.onSelect.data[0].testCaseId)
+
+        console.log("selectedTC", selectedTCForAddingTSG)
+        data.id = 0;
+        data.display_name = data.name
         for (let cases = 0; cases < data?.children?.length; cases++) {
             //here every TestCases will looped
             for (let steps = 0; steps < data.children[cases].children.length; steps++) {
@@ -70,30 +83,225 @@ const FolderViewRightContainer = (props) => {
             }
 
             data.children[cases] = data?.children[cases]
-
-
-
+            console.log("screen", data.children[0].children[0])
         }
-        data.id = 0;
-        data.display_name = data.name
-        const newTestCase = {
-            childIndex: data.children.length + 1,
+        if (eventsOfFolder.onSelect.data[0].layer === 'layer_2') {
+            const findingIndexOfTCToAddTSG = data.children.findIndex((e) => e._id === selectedTCForAddingTSG._id)
+            console.log("addingNewStepGrpToTC", findingIndexOfTCToAddTSG)
+            let TSuitChild = data.children;
+            let TCChildLength = 0;
+            let screenChildLength = 0;
+
+            for (let i = 0; i < TSuitChild.length; i++) {
+                TCChildLength += TSuitChild[i].children.length;
+
+                const TCChild = TSuitChild[i].children;
+                for (let j = 0; j < TCChild.length; j++) {
+                    screenChildLength += TCChild[j].children.length;
+                }
+            }
+            const gettingLengthOfAllNode = data.children.length + TCChildLength + screenChildLength
+            console.log("Total TCChildLength:", TCChildLength);
+            console.log("Total screenChildLength:", screenChildLength);
+            console.log("Total nodeLength:", gettingLengthOfAllNode);
+            //         childIndex: 1
+            // children: []
+            // cidxch: "true"
+            // display_name: "TestSteps1"
+            // id: 3
+            // name: "TestSteps1"
+            // parent: {id: 2, children: Array(0), y: 443, x: 90, parent: {…}, …}
+            // path: ""
+            // state: "created"
+            // type: "testcases"
+            // mapTS
+            // childIndex
+            // : 
+            // 1
+            // cidxch
+            // : 
+            // "true"
+            // id
+            // : 
+            // 6
+            // name
+            // : 
+            // "TSG0006"
+            // oid
+            // : 
+            // null
+            // orig_name
+            // : 
+            // null
+            // pid   /////// actual == 5
+            // : 
+            // undefined
+            // pid_c
+            // : 
+            // undefined
+            // projectID
+            // : 
+            // "657c2d9bce3c0be6ba4bf032"
+            // renamed
+            // : 
+            // false
+            // screenname  /////actual ==  screen2
+            // : 
+            // undefined
+            // state
+            // : 
+            // "created"
+            // task
+            // : 
+            // null
+            // taskexists
+            // : 
+            // null
+            // type
+            // : 
+            // "testcases"
+            // _id
+            // : 
+            // null
+            const newTestStep = {
+                childIndex: 1,// adding from TSG to TSG has to handle it should change
+                cidxch: "true",
+                children: [],
+                id: gettingLengthOfAllNode + 2,//data.children.length + selectedTCForAddingTSG.children.length + 2,//adding from TSG to TSG has to handle
+                cidxch: "true",
+                name: valueOfNewAddedstepGrp,
+                display_name: valueOfNewAddedstepGrp.slice(0, 10),
+                projectID: data.projectID,
+                reuse: true,
+                state: "created",
+                stepsLen: 0,
+                task: null,
+                taskexists: null,
+                type: "testcases",
+                _id: null,
+                path: ""
+            }
+            //         screen {
+            //             childIndex: 1
+            // children: [{…}]
+            // cidxch: "true"
+            // display_name: "Screen1"
+            // id: 2
+            // name: "Screen1"
+            // parent: {_id: '659ee64aa698ffaf57ecd6d7', childIndex: 1, children: Array(0), name: 'TestCase1csc', projectID: '657c2d9bce3c0be6ba4bf032', …}
+            // path: ""
+            // state: "created"
+            // type: "screens"
+
+            //         }
+            //             mapScreen
+            //             childIndex
+            // : 
+            // 1
+            // cidxch
+            // : 
+            // null  ////true
+            // id
+            // : 
+            // 5
+            // name
+            // : 
+            // "TSG0006"
+            // oid
+            // : 
+            // null
+            // orig_name
+            // : 
+            // null
+            // pid
+            // : 
+            // 2
+            // pid_c
+            // : 
+            // undefined
+            // projectID
+            // : 
+            // "657c2d9bce3c0be6ba4bf032"
+            // renamed
+            // : 
+            // false
+            // state
+            // : 
+            // "created"
+            // task
+            // : 
+            // null
+            // taskexists
+            // : 
+            // null
+            // type
+            // : 
+            // "screens"
+            // _id
+            // : 
+            // null
+            const newScreenData = {
+                childIndex: selectedTCForAddingTSG.children.length + 1,//check
+                children: [],
+                cidxch: "true",
+                id: gettingLengthOfAllNode + 1,//data.children.length + selectedTCForAddingTSG.children.length + 1,//check
+                name: valueOfNewAddedstepGrp,
+                display_name: valueOfNewAddedstepGrp.slice(0, 10),
+                objLen: 0,//check
+                parent: selectedTCForAddingTSG,
+                projectID: data.projectID,
+                reuse: true,
+                state: "created",
+                task: null,
+                taskexists: null,
+                type: "screens",
+                _id: null,
+                path: ""
+            }
+            newScreenData.children.push(newTestStep);
+            newTestStep.parent = newScreenData;
+            newTestStep.screenname = newScreenData.name;
+
+            data.children[findingIndexOfTCToAddTSG].children.push(newScreenData);
+        }
+
+        if (eventsOfFolder.onSelect.data[0].layer === 'layer_1') {
+            const newTestCase = {
+                childIndex: data.children.length + 1,
+                cidxch: "true",
+                children: [],
+                display_name: valueOfNewAddedCase.slice(0, 10),
+                id: data.children.length + 1,
+                name: valueOfNewAddedCase,
+                parent: data,
+                projectID: data.projectID,
+                reuse: false,
+                state: "created",
+                task: null,
+                taskexists: null,
+                type: "scenarios",
+                _id: null,
+                path: ''
+            }
+            data.children[data.children.length] = newTestCase;
+        }
+        const createNewTestSuite = {
+            childIndex: 0,
             cidxch: "true",
             children: [],
-            display_name: valueOfNewAddedCase.slice(0, 10),
-            id: data.children.length + 1,
-            name: valueOfNewAddedCase,
-            parent: data,
+            display_name: '',
+            id: 0,
+            name: '',
+            parent: null,
             projectID: data.projectID,
             reuse: false,
             state: "created",
             task: null,
             taskexists: null,
-            type: "scenarios",
+            type: "modules",
             _id: null,
-            path: ''
         }
-        data.children[data.children.length] = newTestCase;
+
         setParentScreenData(data)
 
     }
@@ -103,11 +311,11 @@ const FolderViewRightContainer = (props) => {
         <div className='folderViewRightMaincontainer'>
             <div className="card">
                 <Card>
-                    {eventsOfFolder?.onSelect?.data[0]?.layer === "layer_3" ?
+                    {/* {eventsOfFolder?.onSelect?.data[0]?.layer === "layer_3" ?
                         null :
                         <div style={{ display: eventLayer === "layer_1" || eventLayer === "layer_2" || eventLayer === "layer_3" ? "" : "none" }} className='BreadOfRightSide'>
                             <BreadCrumb model={items} className='brdcmb' />
-                        </div >}
+                        </div >} */}
                     {eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1" || eventsOfFolder?.onSelect?.data[0]?.layer === "layer_2" ?
                         <div className='childOfSuites'>
 
@@ -164,6 +372,7 @@ const FolderViewRightContainer = (props) => {
                                                             if (e.key === 'Enter') {
                                                                 setEditingOfStep(false);
                                                                 setValueOfNewAddedstepGrp(e.target.value);
+                                                                modifyingStepGroupToParentAndSaveFun();
                                                             }
                                                         }}
                                                         autoFocus
