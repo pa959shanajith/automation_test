@@ -130,13 +130,13 @@ const DisplayProject = (props) => {
       const projectList = await fetchProjects({ readme: "projects" });
       setProjectsDetails(projectList);
       const arrayNew = projectList.map((element, index) => {
-        const lastModified = DateTimeFormat(element.releases[0].modifiedon);
+        const lastModified = DateTimeFormat(element.modifiedon);
         return {
           key: index,
           projectName: element.name,
           progressStep: element.progressStep,
           modifiedName: element.firstname,
-          modifieDateProject: element.releases[0].modifiedon,
+          modifieDateProject: element.modifiedon,
           modifiedDate: lastModified,
           createdDate: element.releases[0].createdon,
           appType: convertIdIntoNameOfAppType(element.type),
@@ -165,8 +165,8 @@ const DisplayProject = (props) => {
           props.toastError("Error while fetching the project Details");
         } else {
           const arraynew = ProjectList.map((element, index) => {
-            const lastModified = DateTimeFormat(element.releases[0].modifiedon);
-            const modified_Date = element.releases[0].modifiedon;
+            const lastModified = DateTimeFormat(element.modifiedon);
+            const modified_Date = element.modifiedon;
             return (
               {
                 key: index,
