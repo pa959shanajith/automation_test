@@ -1757,7 +1757,7 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
                         textOverflow: "ellipsis"
                     }} className='teststepName'>{child.name}</div>, <Button onMouseDownCapture={(e) => operationOnTestSteps.current.show(e)} className='buttonForMoreTestSteps' label="..." text />
                 ],
-                data: [{ layer: "layer_3", testSuitName: modifiedData.name, testCaseName: childComponent.name, testStepGroupId: child._id, testStepGroupName: child.name, parentScreenName: child.parent.name, parentScreenId: child.parent._id }],
+                data: [{ layer: "layer_3", testSuitName: modifiedData.name,testSuitId:modifiedData._id, testCaseName: childComponent.name, testStepGroupId: child._id, testStepGroupName: child.name, parentScreenName: child.parent.name, parentScreenId: child.parent._id }],
                 // featchData:[child,"2rdloop"],
                 // children: stepChild, // Added stepChild here
             });
@@ -1773,7 +1773,7 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
                     textOverflow: "ellipsis"
                 }}>{childComponent.name}</div>, <Button onMouseDownCapture={(e) => { operationOnCases.current.show(e) }} className='buttonForMoreTestCases' label="..." text />
             ],
-            data: [{ layer: "layer_2", testSuitName: modifiedData.name, testCaseName: childComponent.name, testCaseId: childComponent._id }],
+            data: [{ layer: "layer_2", testSuitName: modifiedData.name,testSuitId:modifiedData._id, testCaseName: childComponent.name, testCaseId: childComponent._id }],
             children: children,
         });
     }

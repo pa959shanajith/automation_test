@@ -7,7 +7,7 @@ import { Tree } from 'primereact/tree';
 import { Toast } from 'primereact/toast';
 import { getModules, getScreens, populateScenarios, getProjectList, saveE2EDataPopup, getProjectsMMTS, updateE2E } from '../api'
 import { transformDataFromTreetoFolder, handlingTreeOfTestSuite } from './MindmapUtilsForOthersView';
-import { screenData, typeOfOprationInFolder, selectedScreenOfStepSlice } from '../designSlice';
+import { screenData, typeOfOprationInFolder, selectedScreenOfStepSlice, } from '../designSlice';
 import FolderViewRightContainer from './FolderViewRightContainer';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -248,7 +248,7 @@ const FolderView = (props) => {
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">Test Suite Folder</h3>
                         <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
-                        <img className=" " onClick={() => { dispatch(createNewTestSuit({ newTS: true })); setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
+                        <img className=" " onClick={() => {dispatch(typeOfOprationInFolder({ createNewTestSuit:true  })); setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
                     <div className='searchNormal'>
