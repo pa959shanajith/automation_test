@@ -852,6 +852,7 @@ exports.getScreens = async (req, res) => {
 	const fnName = "getScreens";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		const projectid = req.body.projectId;
 		const param = req.body.param;
 		const inputs= { projectid,param }
 		const result = await utils.fetchData(inputs, "mindmap/getScreens", fnName);
