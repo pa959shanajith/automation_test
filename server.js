@@ -740,7 +740,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
 
 		// Create Multiple Ldap Users
-		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMulitpleLdapUsers);
+		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMultipleLdapUsers);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

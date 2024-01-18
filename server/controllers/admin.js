@@ -200,7 +200,7 @@ exports.manageUserDetails = async (req, res) => {
 	}
 };
 
-exports.createMulitpleLdapUsers = async (req, res) => {
+exports.createMultipleLdapUsers = async (req, res) => {
     const fnName = "createMulitpleLdapUsers";
     logger.info("Inside UI Service: " + fnName);
     try {
@@ -281,7 +281,9 @@ exports.createMulitpleLdapUsers = async (req, res) => {
             if (flag == "200000000") {
                 // return res.send(flag);
                 validUsers['users'].push(inputs)
-            }
+            } else {
+				validUsers['users'].push('InvalidUser')
+			}
         }
  
         const result = await utils.fetchData(validUsers, "admin/manageUserDetails", fnName);
@@ -1910,10 +1912,62 @@ exports.fetchICE = async (req, res) => {
 	}
 };
 
+let multipleProvisionIce = async (requestData) => {
+
+	let inputs = {
+		'query': 'multipleProvisionIce',
+		'tokensInfo':[]
+	}
+	for(tokenData in requestData['tokenInfo']) {
+		const tokeninfo = tokenData;
+		if (regEx.test(tokeninfo.icename)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
+			inputs['tokensInfo'].push('invalidUsername')
+			continue
+		}
+		inputs['tokensInfo'].push({
+			provisionedto: tokeninfo.userid,
+			icename: tokeninfo.icename.toLowerCase(),
+			icetype: tokeninfo.icetype,
+			query: tokeninfo.action,
+			uid: tokeninfo.userid,
+			email: tokeninfo.email,
+			url:tokeninfo.url,
+			firstname: tokeninfo.firstName,
+			lastname: tokeninfo.lastName,
+		    username: tokeninfo.username
+		});
+	}
+	const multipleResult = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+	if(multipleResult == 'fail') return multipleResult;
+
+	// Will get ice tokens for each user
+	for(let result in multipleResult) {
+		if(result !== 'fail' && result !== 'invalidUsername' && result !== 'DuplicateIceName'){
+			const uData = {
+				uid: result.tokeninfo.uid,
+				email: result.tokeninfo.email,
+				token:result.generatedToken,
+				url:result.tokeninfo.url,
+			    firstname: result.tokeninfo.firstName,
+			    lastname: result.tokeninfo.lastName,
+				username: result.tokeninfo.username
+			}
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+		}
+	}
+	return multipleResult
+}
 exports.provisionICE = async (req, res) => {
 	const fnName = "provisionICE";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		// To provide multiple ice provision feature
+		if(req.body.action == 'multipleProvisionIce') {
+			const result = multipleProvisionIce(req.body);
+			return res.send(result);
+		}
+
 		const tokeninfo = req.body.tokeninfo;
 		if (regEx.test(tokeninfo.icename)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
