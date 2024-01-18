@@ -1831,7 +1831,7 @@ const screenOption = screenData?.map((folder) => ({
                     {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                     <p className='text-600'>PDF Utility</p> */}
                     <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
-                      placeholder="Select screen" className="w-full md:w-10rem repo__dropdown" />
+                      placeholder={<h5 style={{color: 'gray',fontSize: '19px'}}>{parentData.name}</h5>} className="w-full md:w-10rem repo__dropdown" />
                   </span>
                 </div>
                 }

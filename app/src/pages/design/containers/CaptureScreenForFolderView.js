@@ -3,17 +3,17 @@ import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import '../styles/CaptureScreenForFolderView.scss';
+import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Tag } from 'primereact/tag'
+import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue, CompareData, CompareFlag, CompareObj, CompareElementSuccessful } from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
-import { RedirectPage, ScreenOverlay, ResetSession, setMsg } from '../../global';
+import { RedirectPage, ScreenOverlay,ResetSession,setMsg } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -26,123 +26,121 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import { RadioButton } from 'primereact/radiobutton';
 // import LaunchApplication from '../components/LaunchApplication';
 import "../styles/LaunchApplication.scss";
-import { getDeviceSerialNumber_ICE, checkingMobileClient_ICE } from "../api";
+import {getDeviceSerialNumber_ICE,checkingMobileClient_ICE} from "../api";
 // import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
+import { Dropdown } from 'primereact/dropdown';
+import { getScreens } from '../../landing/api';
 
 const CaptureModal = (props) => {
-    const dispatch = useDispatch();
-    const history = useNavigate()
-    const toast = useRef();
-    const objValues = useSelector(state => state.design.objValue);
-    const compareSuccessful = useSelector(state => state.design.compareSuccessful);
-    const compareFlag = useSelector(state => state.design.compareFlag);
-    const [visible, setVisible] = useState(false);
-    const [visibleOtherApp, setVisibleOtherApp] = useState(false);
-    const [showCaptureData, setShowCaptureData] = useState([]);
-    const [showPanel, setShowPanel] = useState(true);
-    const [overlay, setOverlay] = useState(null);
-    const [isInsprintHovered, setIsInsprintHovered] = useState(false);
-    const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
-    const [isPdfHovered, setIsPdfHovered] = useState(false);
-    const [isCreateHovered, setIsCreateHovered] = useState(false);
-    const [currentDialog, setCurrentDialog] = useState(false);
-    const [rowClick, setRowClick] = useState(true);
-    const [selectedSpan, setSelectedSpan] = useState(null);
-    const [hoveredRow, setHoveredRow] = useState(null);
-    const [scrapeItems, setScrapeItems] = useState([]);
-    const [newScrapedData, setNewScrapedData] = useState({});
-    const [scrapedURL, setScrapedURL] = useState("");
-    const [mirror, setMirror] = useState({ scrape: null, compare: null });
-    const [orderList, setOrderList] = useState([]);
-    const [saved, setSaved] = useState({ flag: true });
-    const [mainScrapedData, setMainScrapedData] = useState({});
-    const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
-    const [captureData, setCaptureData] = useState([]);
-    const certificateInfo = useSelector(state => state.design.cert);
-    const [screenshotData, setScreenshotData] = useState([]);
-    const [endScrape, setEndScrape] = useState(false)
-    const [showObjModal, setShowObjModal] = useState(false);
-    const [showPop, setShowPop] = useState("");
-    const [capturedDataToSave, setCapturedDataToSave] = useState([]);
-    const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
-    const [masterCapture, setMasterCapture] = useState(false);
-    const [showNote, setShowNote] = useState(false);
-    const [screenshotY, setScreenshotY] = useState(null);
-    const [mirrorHeight, setMirrorHeight] = useState("0px");
-    const [dsRatio, setDsRatio] = useState(1);
-    const [highlight, setHighlight] = useState(false);
-    const appType = props.appType;
-    const [imageHeight, setImageHeight] = useState(0);
-    const [activeEye, setActiveEye] = useState(false);
-    const [showConfirmPop, setShowConfirmPop] = useState(false);
-    const [modified, setModified] = useState([]);
-    const [editingCell, setEditingCell] = useState(null);
-    const [deleted, setDeleted] = useState([]);
-    const [browserName, setBrowserName] = useState(null)
-    const [saveDisable, setSaveDisable] = useState(true);
-    //element properties states 
-    const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
-    const [elementPropertiesVisible, setElementProperties] = useState(false);
-    // console.log("elementPropertiesVisible",elementPropertiesVisible)
-    const [elementValues, setElementValues] = useState([])
-    const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
-    const [regex, setRegex] = useState("")
-    const [moveCardUp, setMoveCardUp] = useState(false)
-    const [cardBottom, setCardBottom] = useState(null)
-    const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
-    const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
-    const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
-    const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
-    const [identifierModified, setIdentifierModiefied] = useState(false);
-    const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
-    const [idx, setIdx] = useState(0);
-    const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
-    let NameOfAppType = projectAppType
-    const imageRef1 = useRef(null);
-    const imageRef2 = useRef(null);
-    const imageRef3 = useRef(null);
-    const imageRef4 = useRef(null);
-    const { endPointURL, method, opInput, reqHeader, reqBody, paramHeader } = useSelector(state => state.design.WsData);
-    const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
-    const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [inputValue, setInputValue] = useState('');
-    const [showEmptyMessage, setShowEmptyMessage] = useState(true);
-    const [irisObject, setIrisObject] = useState(null);
-    const [scrapeDataForIris, setScrapeDataForIris] = useState();
-    const [cordData, setCordData] = useState({});
-    const [irisScrapedData, setIrisScrapedData] = useState({});
-    let addMore = useRef(false);
-    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-    if (!userInfo) userInfo = userInfoFromRedux;
-    else userInfo = userInfo;
+  const dispatch = useDispatch();
+  const history=useNavigate()
+  const toast = useRef();
+  const objValues = useSelector(state => state.design.objValue);
+  const compareSuccessful = useSelector(state => state.design.compareSuccessful);
+  const compareFlag = useSelector(state=>state.design.compareFlag);
+  const [visible, setVisible] = useState(false);
+  const [visibleOtherApp, setVisibleOtherApp] = useState(false);
+  const [showCaptureData, setShowCaptureData] = useState([]);
+  const [showPanel, setShowPanel] = useState(true);
+  const [overlay, setOverlay] = useState(null);
+  const [isInsprintHovered, setIsInsprintHovered] = useState(false);
+  const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
+  const [isPdfHovered, setIsPdfHovered] = useState(false);
+  const [isCreateHovered, setIsCreateHovered] = useState(false);
+  const [currentDialog, setCurrentDialog] = useState(false);
+  const [rowClick, setRowClick] = useState(true);
+  const [selectedSpan, setSelectedSpan] = useState(null);
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [scrapeItems, setScrapeItems] = useState([]);
+  const [newScrapedData, setNewScrapedData] = useState({});
+  const [scrapedURL, setScrapedURL] = useState("");
+  const [mirror, setMirror] = useState({ scrape: null, compare: null });
+  const [orderList, setOrderList] = useState([]);
+  const [saved, setSaved] = useState({ flag: true });
+  const [mainScrapedData, setMainScrapedData] = useState({});
+  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+  const [captureData, setCaptureData] = useState([]);
+  const certificateInfo = useSelector(state=>state.design.cert);
+  const [screenshotData, setScreenshotData] = useState([]);
+  const [endScrape, setEndScrape] = useState(false)
+  const [showObjModal, setShowObjModal] = useState(false);
+  const [showPop, setShowPop] = useState("");
+  const [capturedDataToSave, setCapturedDataToSave] = useState([]);
+  const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
+  const [masterCapture, setMasterCapture] = useState(false);
+  const [showNote, setShowNote] = useState(false);
+  const [screenshotY, setScreenshotY] = useState(null);
+  const [mirrorHeight, setMirrorHeight] = useState("0px");
+  const [dsRatio, setDsRatio] = useState(1);
+  const [highlight, setHighlight] = useState(false);
+  const appType = props.appType;
+  const [imageHeight, setImageHeight] = useState(0);
+  const [activeEye, setActiveEye] = useState(false);
+  const [showConfirmPop, setShowConfirmPop] = useState(false);
+  const [modified, setModified] = useState([]);
+  const [editingCell, setEditingCell] = useState(null);
+  const [deleted, setDeleted] = useState([]);
+  const[browserName,setBrowserName]=useState(null)
+  const [saveDisable,setSaveDisable] = useState(true);
+  //element properties states 
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
+  const [elementPropertiesVisible, setElementProperties] = useState(false);
+  // console.log("elementPropertiesVisible",elementPropertiesVisible)
+  const [elementValues, setElementValues] = useState([])
+  const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
+  const [regex, setRegex] = useState("")
+  const [moveCardUp, setMoveCardUp] = useState(false)
+  const [cardBottom, setCardBottom] = useState(null)
+  const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
+  const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
+  const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
+  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
+  const [identifierModified, setIdentifierModiefied] = useState(false);
+  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectId"] });
+  const [idx, setIdx] = useState(0);
+  const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
+  let NameOfAppType = projectAppType
+  const imageRef1 = useRef(null);
+  const imageRef2 = useRef(null);
+  const imageRef3 = useRef(null);
+  const imageRef4 = useRef(null);
+const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
+  const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
+  const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [showEmptyMessage, setShowEmptyMessage] = useState(true);
+  const [irisObject, setIrisObject] = useState(null);
+  const [scrapeDataForIris,setScrapeDataForIris] = useState();
+  const [cordData, setCordData] = useState({});
+  const [irisScrapedData, setIrisScrapedData] = useState({});
+  let addMore = useRef(false);
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  let AppTypeElementIdentifier;
+  const showCaptureScreen = useSelector((state) => state.landing.openCaptureScreen);
+  const [selectedScreen, setSelectedScreen] = useState(null);
+  const [screenData, setScreenData] = useState([]);
+  const [elementRepo, setElementRepo] = useState(false);
+  const [parentId, setParentId] = useState(null);
+  if(!userInfo) userInfo = userInfoFromRedux; 
+  else userInfo = userInfo ;
 
-    // useEffect(() => {
-    //     setParentData({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] })
-    //     // fetchScrapeData()
-    // }, [props.fetchingDetails.name])
-    // console.log("parntUseEff",parentData)
-    // useEffect(() => {
-    //     fetchScrapeData()
-    // }, [props.fetchingDetails.name])
-    useEffect(() => {
-        setParentData((prevData) => ({
-          ...prevData,
-          id: props.fetchingDetails["_id"],
-          name: props.fetchingDetails["name"]
-        }));
-      }, [props.fetchingDetails]); 
-    
-      useEffect(() => {
-        fetchScrapeData();
-      }, [parentData]);
-      console.log("parntUseEff",parentData)
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+    NameOfAppType = JSON.parse(localStorageDefaultProject);
+    AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
+}
+
+
+  useEffect(() => {
+    fetchScrapeData()
+  }, [parentData,parentId])
     useEffect(() => {
         let browserName = (function (agent) {
 
@@ -272,7 +270,7 @@ const CaptureModal = (props) => {
         setInputValue('');
     };
 
-    const parentScreen = props.fetchingDetails["parent"];
+    const parentScreen = showCaptureScreen?"":props.fetchingDetails["parent"]["children"];
     useEffect(() => {
         const parentScreenId = () => {
             for (let i = 0; i < parentScreen.length; i++) {
@@ -508,11 +506,10 @@ const CaptureModal = (props) => {
             let viewString = capturedDataToSave;
             let haveItems = viewString.length !== 0;
             let newlyScrapeList = [];
-
+            let Id = parentId !== null?parentId:parentData.id
             // setCapturedDataToSave(viewString);
             // (type, screenId, projectId, testCaseId:optional)
-            console.log("parentData",parentData)
-            scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, parentData.id, parentData.projectId, "")
+            scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
                 .then(data => {
                     // current_task.subTask === "Scrape" (not sure !!)
                     if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -680,7 +677,6 @@ const CaptureModal = (props) => {
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
         setSaveDisable(false);
     }
-    // {console.log(captureData[0].selectall)}
 
     const saveScrapedObjects = () => {
         let scrapeItemsL = [...capturedDataToSave];
@@ -688,300 +684,310 @@ const CaptureModal = (props) => {
         let views = [];
         let orderList = [];
         let modifiedObjects = Object.values(modified);
-
+    
         for (let scrapeItem of scrapeItemsL) {
-            if (!Array.isArray(scrapeItem)) {
-                if (!scrapeItem.objId) {
-                    if (scrapeItem.isCustom) {
-                        views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
-                    } else {
-                        const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
-                        if (foundItem) {
-                            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-                        }
-                    }
-                    // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-                    orderList.push(scrapeItem.tempOrderId);
-                }
-                else orderList.push(scrapeItem.objId);
+          if (!Array.isArray(scrapeItem)) {
+            if (!scrapeItem.objId) {
+              if (scrapeItem.isCustom){ 
+                views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+            }else {
+                 const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
+              if (foundItem) {
+                views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+              }}
+              // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+              orderList.push(scrapeItem.tempOrderId);
             }
-
+            else {
+              if(parentId !== null){
+                const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+                if (foundItem) {
+                  views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+                }
+                orderList.push(scrapeItem.objId);
+      
+              }
+              
+            }
+          }
+    
         }
+        setParentId(null);
         // const newdeleted=deleted.filter(element=>element!==undefined)
-
+    
         let params = {
-            'deletedObj': deleted,
-            'modifiedObj': modifiedObjects,
-            'addedObj': { ...added, view: views },
-            'screenId': parentData.id,
-            'userId': userInfo.user_id,
-            'roleId': userInfo.role,
-            'param': 'saveScrapeData',
-            'orderList': orderList
+          'deletedObj': deleted,
+          'modifiedObj': modifiedObjects,
+          'addedObj': { ...added, view: views },
+          'screenId': parentData.id,
+          'userId': userInfo.user_id,
+          'roleId': userInfo.role,
+          'param': 'saveScrapeData',
+          'orderList': orderList
         }
-
+    
         scrapeApi.updateScreen_ICE(params)
-            .then(response => {
-                if (response === "Invalid Session") return RedirectPage(history);
-                else fetchScrapeData().then(resp => {
-                    addMore.current = false
-                    if (resp === 'success' || typeof (resp) === "object") {
-
-                        typeof (resp) === "object" && resp.length > 0
-                            ? setShowPop({
-                                title: "Saved Scrape Objects",
-                                content: <div className="ss__dup_labels">
-                                    Scraped data saved successfully.
-                                    <br /><br />
-                                    <strong>Warning: Please scrape an IRIS reference object.</strong>
-                                    <br /><br />
-                                    Matching objects found for:
-                                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                                    <div className="ss__dup_scroll">
-                                        {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
-                                    </div>
-                                    {/* </ScrollBar> */}
-                                </div>,
-                                footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
-                            })
-                            : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
-                        let numOfObj = scrapeItemsL.length;
-                        // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-                    } else { console.error(resp); addMore.current = true; }
-                }).catch(error => console.error(error));
-            })
-            .catch(error => console.error(error))
-        setSaveDisable(true);
-    }
-
-    const startScrape = (browserType, compareFlag, replaceFlag) => {
+          .then(response => {
+            if (response === "Invalid Session") return RedirectPage(history);
+            else fetchScrapeData().then(resp => {
+              addMore.current=false
+              if (resp === 'success' || typeof (resp) === "object") {
+    
+                typeof (resp) === "object" && resp.length > 0
+                  ? setShowPop({
+                    title: "Saved Scrape Objects",
+                    content: <div className="ss__dup_labels">
+                      Scraped data saved successfully.
+                      <br /><br />
+                      <strong>Warning: Please scrape an IRIS reference object.</strong>
+                      <br /><br />
+                      Matching objects found for:
+                      {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                      <div className="ss__dup_scroll">
+                        {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+                      </div>
+                      {/* </ScrollBar> */}
+                    </div>,
+                    footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
+                  })
+                  : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+                let numOfObj = scrapeItemsL.length;
+                // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
+              } else { console.error(resp); addMore.current = true; }
+            }).catch(error => console.error(error));
+          })
+          .catch(error => console.error(error))
+          setSaveDisable(true);
+      }
+    
+      const startScrape = (browserType, compareFlag, replaceFlag) => {
         if (typesOfAppType === "Webservice") {
-            let arg = {}
-            let testCaseWS = []
-            let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
-            let wsdlInputs = [
-                endPointURL, method, opInput, getFormattedValue(reqHeader),
-                getFormattedValue(paramHeader), getFormattedValue(reqBody, true)
-            ];
-            if (Object.keys(certificateInfo).length)
-                wsdlInputs.push(...[certificateInfo.certsDetails + ";", certificateInfo.authDetails]);
-
-            if (endPointURL.indexOf('https') === 0)
-                arg.res = certificateInfo;
-
-            let [error, auth, proceed] = validateWebserviceInputs(wsdlInputs);
-
-            if (error) dispatch(actionError(error));
-
-            if (proceed) {
-                dispatch(actionError([]));
-                if (auth)
-                    keywordVal.push(...["addClientCertificate", "setBasicAuth"])
-
-                if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
-                else wsdlInputs.splice(4, 1);
-
-                setOverlay("Fetching Response Header & Body...");
-                ResetSession.start();
-                for (let i = 0; i < wsdlInputs.length; i++) {
-                    if (wsdlInputs[i] !== "") {
-                        testCaseWS.push(getWSTestCase(i, typesOfAppType, wsdlInputs[i], keywordVal[i]));
-                    }
-                }
-                testCaseWS.push(getWSTestCase(testCaseWS.length, typesOfAppType, "", "executeRequest"));
-                arg.testcasename = "";
-                arg.apptype = "Webservice";
-                arg.testcase = testCaseWS;
-                scrapeApi.initScrapeWS_ICE(arg)
-                    .then(data => {
-                        setOverlay("");
-                        ResetSession.end();
-                        if (data === "Invalid Session") {
-                            return RedirectPage(history);
-                        } else if (data === "unavailableLocalServer") {
-                            setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
-                        } else if (data === "scheduleModeOn") {
-                            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-                        } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed") {
-                            setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
-                        } else if (typeof data === "object") {
-                            setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
-                            dispatch(WsData({ respHeader: data.responseHeader[0].split("##").join("\n") }));
-                            let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
-                            dispatch(WsData({ respBody: localRespBody }));
-                        } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
-                    })
-                    .catch(error => {
-                        setOverlay("");
-                        ResetSession.end();
-                        console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-                        setMsg(MSG.SCRAPE.ERR_OPERATION);
-                    });
+          let arg = {}
+          let testCaseWS = []
+          let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+          let wsdlInputs = [ 
+              endPointURL, method, opInput, getFormattedValue(reqHeader), 
+              getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
+          ];
+          if (Object.keys(certificateInfo).length)
+              wsdlInputs.push(...[certificateInfo.certsDetails+";", certificateInfo.authDetails]);
+    
+          if (endPointURL.indexOf('https')===0) 
+              arg.res = certificateInfo;
+    
+          let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
+    
+          if (error) dispatch(actionError(error));
+    
+          if (proceed) {
+              dispatch(actionError([]));
+              if (auth)
+                  keywordVal.push(...["addClientCertificate","setBasicAuth"])
+    
+              if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
+              else wsdlInputs.splice(4, 1);
+    
+              setOverlay("Fetching Response Header & Body...");
+              ResetSession.start();
+              for (let i = 0; i < wsdlInputs.length; i++) {
+                  if (wsdlInputs[i] !== "") {
+                      testCaseWS.push(getWSTestCase(i, typesOfAppType, wsdlInputs[i], keywordVal[i]));
+                  }
+              }
+              testCaseWS.push(getWSTestCase(testCaseWS.length, typesOfAppType, "", "executeRequest"));
+              arg.testcasename = "";
+              arg.apptype = "Webservice";
+              arg.testcase = testCaseWS;
+              scrapeApi.initScrapeWS_ICE(arg)
+              .then(data => {
+                  setOverlay("");
+                  ResetSession.end();
+                  if (data === "Invalid Session") {
+                      return RedirectPage(history);
+                  } else if (data === "unavailableLocalServer") {
+                      setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                  } else if (data === "scheduleModeOn") {
+                      setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                  } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
+                      setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                  } else if (typeof data === "object") {
+                      setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                      dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
+                      let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
+                      dispatch(WsData({respBody: localRespBody}));
+                  } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+              })
+              .catch(error => {
+                  setOverlay("");
+                  ResetSession.end();
+                  console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
+                  setMsg(MSG.SCRAPE.ERR_OPERATION);
+              });
+          }
+      } 
+      else{
+        let screenViewObject = {};
+        let blockMsg = 'Capturing in progress. Please Wait...';
+        if (compareFlag) {
+          blockMsg = 'Comparing Element in progress...';
+          handleClose()
+        };
+        if (replaceFlag) {
+          blockMsg = 'Capture and Replace Element in progress...';
+        };
+        screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
+        setOverlay(blockMsg);
+        scrapeApi.initScraping_ICE(screenViewObject)
+          .then(data => {
+            let err = null;
+            setOverlay("");
+            setVisible(false);
+            // ResetSession.end();
+            if (data === "Invalid Session") return RedirectPage(history);
+            else if (data === "Response Body exceeds max. Limit.")
+              err = 'Scraped data exceeds max. Limit.' ;
+            else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
+              let scrapedItemsLength = scrapeItems.length;
+              if (scrapedItemsLength > 0) dispatch(disableAction(true));
+              else dispatch(disableAction(false));
+              setSaved({ flag: false });
+              err =
+    
+                  data === 'scheduleModeOn' ?
+                    MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                    MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+    
+              
+            } else if (data === "fail")
+              err = MSG.SCRAPE.ERR_SCRAPE;
+            else if (data === "Terminate") {
+              setOverlay("");
+              err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
             }
-        }
-        else {
-            let screenViewObject = {};
-            let blockMsg = 'Capturing in progress. Please Wait...';
-            if (compareFlag) {
-                blockMsg = 'Comparing Element in progress...';
-                handleClose()
-            };
-            if (replaceFlag) {
-                blockMsg = 'Capture and Replace Element in progress...';
-            };
-            screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
-            setOverlay(blockMsg);
-            scrapeApi.initScraping_ICE(screenViewObject)
-                .then(data => {
-                    let err = null;
-                    setOverlay("");
-                    setVisible(false);
-                    // ResetSession.end();
-                    if (data === "Invalid Session") return RedirectPage(history);
-                    else if (data === "Response Body exceeds max. Limit.")
-                        err = 'Scraped data exceeds max. Limit.';
-                    else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
-                        let scrapedItemsLength = scrapeItems.length;
-                        if (scrapedItemsLength > 0) dispatch(disableAction(true));
-                        else dispatch(disableAction(false));
-                        setSaved({ flag: false });
-                        err =
-
-                            data === 'scheduleModeOn' ?
-                                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-                                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-
-
-                    } else if (data === "fail")
-                        err = MSG.SCRAPE.ERR_SCRAPE;
-                    else if (data === "Terminate") {
-                        setOverlay("");
-                        err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
-                    }
-                    else if (data === "wrongWindowName")
-                        err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
-                    else if (data === "ExecutionOnlyAllowed")
-                        err = MSG.GENERIC.WARN_EXECUTION_ONLY;
-
-                    if (err) {
-                        toastError(err)
-                        return false;
-                    }
-                    //COMPARE & UPDATE SCRAPE OPERATION
-                    if (data.action === "compare") {
-                        if (data.status === "SUCCESS") {
-                            let compareObj = generateCompareObject(data, capturedDataToSave.filter(object => object.xpath.substring(0, 4) === "iris"));
-                            let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
-                            //     setScrapeItems(newScrapeList);
-                            setOrderList(newOrderList);
-                            dispatch(CompareFlag(true));
-                            //     setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
-                            dispatch(CompareData(data));
-                            dispatch(CompareObj(compareObj));
-
-                            // } else {
-                            //     if (data.status === "EMPTY_OBJECT")
-                            //         setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
-                            //     else
-                            //         setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
-
-                        }
-                    }
-                    else if (data.action === "replace") {
-                        let viewString = data;
-                        if (viewString.view.length !== 0) {
-                            let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-                            let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-                            setNewScrapedData(scrapeItemList);
-                            handleDialog("replaceObjectPhase2");
-                        } else {
-                            // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                            toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                        }
-                    }
-                    else {
-                        let viewString = data;
-                        if (capturedDataToSave.length !== 0 && masterCapture) {
-                            let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
-                            let deleted = capturedDataToSave.map(item => item.objId);
-                            setCaptureData([]);
-                            setCapturedDataToSave([]);
-                            let params = {
-                                'deletedObj': deleted,
-                                'modifiedObj': [],
-                                'addedObj': { ...added, view: [] },
-                                'screenId': props.fetchingDetails["_id"],
-                                'userId': userInfo.user_id,
-                                'roleId': userInfo.role,
-                                'param': 'saveScrapeData',
-                                'orderList': []
-                            }
-                            scrapeApi.updateScreen_ICE(params)
-                                .then(response => {
-                                    console.log('done')
-                                })
-                                .catch(error => console.log(error))
-                        }
-                        // fetchScrapeData();
-
-                        if (viewString.view.length !== 0) {
-
-                            let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-
-                            let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-
-                            let updatedNewScrapeData = { ...newScrapedData };
-                            if (updatedNewScrapeData.view) {
-                                let viewArr = [...updatedNewScrapeData.view]
-                                viewArr.push(...viewString.view);
-                                updatedNewScrapeData = { ...viewString, view: viewArr };
-                            }
-                            else updatedNewScrapeData = viewString;
-
-                            setNewScrapedData(updatedNewScrapeData);
-                            setIrisScrapedData(updatedNewScrapeData);
-                            setNewScrapedCapturedData(updatedNewScrapeData);
-
-                            if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
-                                setCapturedDataToSave([...scrapeItemList])
-                            }
-                            else {
-                                if (capturedDataToSave.length > 0) { //when click on addmore
-                                    addMore.current = true;
-                                    setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
-                                }
-                                else { // when captured data is empty  
-                                    addMore.current = false;
-                                    setCapturedDataToSave([...scrapeItemList]);
-                                }
-                            }
-                            updateScrapeItems(scrapeItemList);
-                            setScrapedURL(updatedNewScrapeData.scrapedurl);
-                            setMirror({ scrape: viewString.mirror, compare: null });
-                            setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
-
-                            if (viewString.view.length > 0) setSaved({ flag: false });
-                            setEndScrape(true)
-                        }
-                    }
+            else if (data === "wrongWindowName")
+              err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
+            else if (data === "ExecutionOnlyAllowed")
+              err = MSG.GENERIC.WARN_EXECUTION_ONLY;
+    
+            if (err) {
+              toastError(err)
+              return false;
+            }
+            //COMPARE & UPDATE SCRAPE OPERATION
+            if (data.action === "compare") {
+              if (data.status === "SUCCESS") {
+                  let compareObj = generateCompareObject(data, capturedDataToSave.filter(object => object.xpath.substring(0, 4)==="iris"));
+                  let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
+              //     setScrapeItems(newScrapeList);
+                  setOrderList(newOrderList);
+                  dispatch(CompareFlag(true));
+              //     setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
+                  dispatch(CompareData(data));
+                  dispatch(CompareObj(compareObj));
+                  
+              // } else {
+              //     if (data.status === "EMPTY_OBJECT")
+              //         setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
+              //     else
+              //         setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
+              
+              }
+            }
+            else if (data.action === "replace") {
+              let viewString = data;
+              if (viewString.view.length !== 0){
+                  let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+                  let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+                  setNewScrapedData(scrapeItemList);
+                  handleDialog("replaceObjectPhase2");
+              } else {
+                  // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                  toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                }               
+            }
+    else{
+            let viewString = data;
+            if (capturedDataToSave.length !== 0 && masterCapture) {
+              let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
+              let deleted = capturedDataToSave.map(item => item.objId);
+              setCaptureData([]);
+              setCapturedDataToSave([]);
+              let params = {
+                'deletedObj': deleted,
+                'modifiedObj': [],
+                'addedObj': { ...added, view: [] },
+                'screenId': props.fetchingDetails["_id"],
+                'userId': userInfo.user_id,
+                'roleId': userInfo.role,
+                'param': 'saveScrapeData',
+                'orderList': []
+              }
+              scrapeApi.updateScreen_ICE(params)
+                .then(response => {
+                  console.log('done')
                 })
-                .catch(error => {
-                    setOverlay("");
-                    // ResetSession.end();
-                    toastError(MSG.SCRAPE.ERR_SCRAPE);
-                    console.error("Fail to Load design_ICE. Cause:", error);
-                });
+                .catch(error => console.log(error))
+            }
+            // fetchScrapeData();
+    
+            if (viewString.view.length !== 0) {
+    
+              let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+    
+              let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+    
+              let updatedNewScrapeData = { ...newScrapedData };
+              if (updatedNewScrapeData.view) {
+                let viewArr = [...updatedNewScrapeData.view]
+                viewArr.push(...viewString.view);
+                updatedNewScrapeData = { ...viewString, view: viewArr };
+              }
+              else updatedNewScrapeData = viewString;
+    
+              setNewScrapedData(updatedNewScrapeData);
+              setIrisScrapedData(updatedNewScrapeData);
+              setNewScrapedCapturedData(updatedNewScrapeData);
+    
+              if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+                setCapturedDataToSave([...scrapeItemList])
+              }
+              else {
+                if (capturedDataToSave.length > 0) { //when click on addmore
+                  addMore.current = true;
+                  setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+                }
+                else { // when captured data is empty  
+                  addMore.current = false;
+                  setCapturedDataToSave([...scrapeItemList]);
+                }
+              }
+              updateScrapeItems(scrapeItemList);
+              setScrapedURL(updatedNewScrapeData.scrapedurl);
+              setMirror({ scrape: viewString.mirror, compare: null });
+              setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
+    
+              if (viewString.view.length > 0) setSaved({ flag: false });
+              setEndScrape(true)
+            }
+          }
+          })
+          .catch(error => {
+            setOverlay("");
+            // ResetSession.end();
+            toastError(MSG.SCRAPE.ERR_SCRAPE);
+            console.error("Fail to Load design_ICE. Cause:", error);
+          });
         }
-
-    }
-
-    const updateScrapeItems = newList => {
+    
+      }
+    
+      const updateScrapeItems = newList => {
         setScrapeItems([...scrapeItems, ...newList])
-    }
-
-    const handleMouseEnterRow = (rowData) => {
+      }
+    
+      const handleMouseEnterRow = (rowData) => {
         setHoveredRow(rowData.index);
-    };
+      };
 
 
     const handleDelete = (rowData, confirmed) => {
@@ -1488,7 +1494,7 @@ const CaptureModal = (props) => {
         elementVals.find(v => v.key === key).value = value;
 
 
-        console.log(elementVals)
+        // console.log(elementVals)
     };
     const textEditor = (options) => {
         return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
@@ -1667,10 +1673,7 @@ const CaptureModal = (props) => {
     };
     // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
 
-    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    if (localStorageDefaultProject) {
-        NameOfAppType = JSON.parse(localStorageDefaultProject);
-    }
+
 
 
     const isWebApp = NameOfAppType.appType === "Web";
@@ -1755,37 +1758,96 @@ const CaptureModal = (props) => {
         if (!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
         setCapturedDataToSave(localScrapeItems);
     }
+    const elementValuetitle=(rowdata)=>{
+        return (
+          <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+        )
+       }
+       useEffect(() => {
+        (async () => {
+            try {
+                let params = {
+                  param : "globalRepo",
+                  projectId :  NameOfAppType.projectId
+                }
+      
+                const screens = await getScreens(params);
+                if(screens === 'fail') {
+                  setScreenData([]);
+                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
+                else if(screens === "no orderlist present") {
+                  setScreenData([]);
+                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+                else setScreenData(screens.screenList);
+            } catch (error) {
+                console.error('Error fetching User list:', error);
+            }
+        })();
+      }, [NameOfAppType.projectId]);
+      
+       const handleScreenChange = (e) => {
+        const selectedFolderValue = e.value;
+        setSelectedScreen(selectedFolderValue);
+        // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+        setParentId(selectedFolderValue.id);
+        // fetchScrapeData();
+        setSaveDisable(false);
+        setElementRepo(true);
+      };
+      const screenOption = screenData?.map((folder) => ({
+        label: folder.name,
+        id:folder["_id"],
+        related_dataobjects: folder.related_dataobjects,
+        orderlist:folder.orderlist,
+        parent:folder.parent
+      }));
     return (
         <>
-            {overlay && <ScreenOverlay content={overlay} />}
-            {showPop && <PopupDialog />}
-            {showConfirmPop && <ConfirmPopup />}
-            <Toast ref={toast} position="bottom-center" baseZIndex={1000} className='toastOfCapture' style={{ maxWidth: "35rem", height: '8rem' }} />
-            {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
-            {typesOfAppType != "Webservice" && !props.testSuiteInUse ? <div className="card_modal">
-                <Card className='panel_card'>
-                    <div className="action_panelCard">
-                        {!showPanel && <div className='insprint__block1'>
-                            <div>
-                                <p className='insprint__text1'>In Sprint Automation</p></div>
-                        </div>}
-                        {showPanel && <div className='insprint__block'>
-                            <p className='insprint__text'>In Sprint Automation</p>
-                            <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
-                            <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
-                            <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                                <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
-                                {isWebApp && <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
-                                <p>Add Element</p>
-                            </span>
-                            <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                                <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
-                                {isWebApp && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
+     {overlay && <ScreenOverlay content={overlay} />}
+      {showPop && <PopupDialog />}
+      {showConfirmPop && <ConfirmPopup />}
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
+      {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
+      {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
+          <Card className='panel_card'>
+            <div className="action_panelCard">
+            {!showPanel && <div className='utility__block'>
+                  <div className='panel_head1'>
+                  <p className='insprint__text'>Select from repository</p> </div>
+                  </div> }
+                {showPanel && <div className='utility__block'>
+                  <p className='insprint__text'>Select from repository</p>
+                  {/* <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/> */}
+                  <span className="insprint_auto">
+                    {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
+                    <p className='text-600'>PDF Utility</p> */}
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
+                      placeholder={<h5>{props.fetchingDetails['name']}</h5>} className="w-full md:w-10rem repo__dropdown" />
+                  </span>
+                </div>
+                }
+              {!showPanel && <div className='insprint__block1'>
+                <div>
+                <p className='insprint__text1'>In Sprint Automation</p></div>
+                </div>}
+            {showPanel && <div className='insprint__block'>
+                <p className='insprint__text'>In Sprint Automation</p>
+                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
+                <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
+                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
+                  {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
+                  <p>Add Element</p>
+                </span>
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
+                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
+                  {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
-                                <p>Map Element</p>
-                            </span>
-                            {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
-                            {/* {isInsprintHovered &&
+                  <p>Map Element</p>
+                </span>
+                {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
+                {/* {isInsprintHovered &&
                
                 (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
                   <h3>InSprint Automation</h3>
@@ -1819,25 +1881,20 @@ const CaptureModal = (props) => {
                   <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
-                        </div>}
-                        {!showPanel && <div className='utility__block'>
-                            <div className='panel_head1'>
-                                <p className='insprint__text text-500'>Capture from PDF</p> </div>
-                        </div>}
-                        {showPanel && <div className='utility__block'>
-                            <p className='insprint__text text-500'>Capture from PDF</p>
-                            <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                            <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF." />
-                            <span className="insprint_auto">
-                                <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
-                                <p className='text-600'>PDF Utility</p>
-                            </span>
-                            {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Capture from PDF</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)} */}
-                        </div>}
+              </div>}
+              {/* {!showPanel && <div className='utility__block'>
+                <div className='panel_head1'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div>
+                </div> }
+               {showPanel && <div className='utility__block'>
+                <p className='insprint__text text-500'>Capture from PDF</p>
+                <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
+                <span className="insprint_auto">
+                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
+                  <p className='text-600'>PDF Utility</p>
+                </span>
+              </div>} */}
 
                         {!showPanel && <div className='createManual__block'>
                             <div className='panel_head2'>
@@ -1967,174 +2024,174 @@ const CaptureModal = (props) => {
            </span>}
          customClass="OEBS"
         />: null} */}
-            {typesOfAppType === "OEBS" ? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={() => setVisibleOtherApp(false)} appPop={{ appType: typesOfAppType, startScrape: startScrape }} /> : null}
-            {typesOfAppType === "Mainframe" ? <AvoModal
-                visible={visibleOtherApp}
-                setVisible={setVisibleOtherApp}
-                onModalBtnClick={onLaunchBtn}
-                headerTxt="MainFrames"
-                footerType="Launch"
-                modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
-                content={"hello"}
-                customClass="Mainframes"
-            /> : null}
-            {typesOfAppType === "MobileApp" ? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={() => setVisibleOtherApp(false)} appPop={{ appType: typesOfAppType, startScrape: startScrape }} /> : null}
-            {typesOfAppType === "System" ? <AvoModal
-                visible={visibleOtherApp}
-                setVisible={setVisibleOtherApp}
-                onModalBtnClick={onLaunchBtn}
-                headerTxt="System_application"
-                footerType="Launch"
-                content={"hello"}
-                customClass="MobileWeb"
-            /> : null}
-            {typesOfAppType === "Web" ? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible === 'compare' ? footerCompare : footerCapture} draggable={false}>
-                <div className={"compare__object"}>
-                    <span className='compare__btn'>
-                        <p className='compare__text'>List of Browsers</p>
-                    </span>
-                    <span className='browser__col'>
-                        {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-                        <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                    </span>
-                </div>
-                {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
-            </Dialog> : null}
-            {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
-            <AvoConfirmDialog
-                visible={showNote}
-                onHide={() => setShowNote(false)}
-                showHeader={false}
-                message={confirmPopupMsg}
-                icon="pi pi-exclamation-triangle"
-                accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Mainframe"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="MainFrames"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
+         content = {"hello"}
+         customClass="Mainframes"
+        />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "System"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="System_application"
+          footerType="Launch"
+         content = {"hello"}
+         customClass="MobileWeb"
+        />: null}
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture} draggable={false}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+        {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
+      </Dialog> : null}
+      {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
+      <AvoConfirmDialog
+        visible={showNote}
+        onHide={() => setShowNote(false)}
+        showHeader={false}
+        message={confirmPopupMsg}
+        icon="pi pi-exclamation-triangle"
+        accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+      </Dialog> : null}
 
-            {typesOfAppType === "Web" ? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
-                <div className={"compare__object"}>
-                    <span className='compare__btn'>
-                        <p className='compare__text'>List of Browsers</p>
-                    </span>
-                    <span className='browser__col'>
-                        {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-                        <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                    </span>
-                </div>
-            </Dialog> : null}
+      {currentDialog === 'addObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        addCustomElement={addedCustomElement}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        elementTypeProp ={elementTypeProp}
+        captureData={captureData}
+        capturedDataToSave={capturedDataToSave}
+      />}
 
-            {currentDialog === 'addObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                addCustomElement={addedCustomElement}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-                captureData={captureData}
-                capturedDataToSave={capturedDataToSave}
-            />}
+      {currentDialog === 'mapObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        captureList={capturedDataToSave}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        setShow={setCurrentDialog}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        elementTypeProp ={elementTypeProp}
+      />}
 
-            {currentDialog === 'mapObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                captureList={capturedDataToSave}
-                fetchingDetails={props.fetchingDetails}
-                fetchScrapeData={fetchScrapeData}
-                setShow={setCurrentDialog}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-            />}
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        captureList={capturedDataToSave}
+        setShow={setCurrentDialog}
+        newScrapedData={newScrapedData}
+        startScrape={startScrape}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setOverlay={setOverlay}
+        setShowPop={setShowPop}
+        parentData={parentData}
+      />}
 
-            {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                fetchingDetails={props.fetchingDetails}
-                fetchScrapeData={fetchScrapeData}
-                captureList={capturedDataToSave}
-                setShow={setCurrentDialog}
-                newScrapedData={newScrapedData}
-                startScrape={startScrape}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setOverlay={setOverlay}
-                setShowPop={setShowPop}
-                parentData={parentData}
-            />}
+      {currentDialog === 'createObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        scrapeItems={scrapeItems}
+        capturedDataToSave={capturedDataToSave}
+        setCapturedDataToSave={setCapturedDataToSave}
+        setNewScrapedData={setNewScrapedData}
+        updateScrapeItems={updateScrapeItems}
+        setOrderList={setOrderList}
+        setSaved={setSaved}
+        setShow={setCurrentDialog}
+        setCaptureData={setCaptureData}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setSaveDisable={setSaveDisable}
+      />}
 
-            {currentDialog === 'createObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                scrapeItems={scrapeItems}
-                capturedDataToSave={capturedDataToSave}
-                setCapturedDataToSave={setCapturedDataToSave}
-                setNewScrapedData={setNewScrapedData}
-                updateScrapeItems={updateScrapeItems}
-                setOrderList={setOrderList}
-                setSaved={setSaved}
-                setShow={setCurrentDialog}
-                setCaptureData={setCaptureData}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setSaveDisable={setSaveDisable}
-            />}
-
-            {(currentDialog === 'compareObject' || compareFlag) && <ActionPanel
-                isOpen={'compareObject'}
-                OnClose={handleClose}
-                startScrape={startScrape}
-                mainScrapedData={mainScrapedData}
-                fetchingDetails={props.fetchingDetails}
-                orderList={orderList}
-                fetchScrapeData={fetchScrapeData}
-                setShow={setCurrentDialog}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-            />}
+      {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
+       isOpen={'compareObject'} 
+       OnClose={handleClose} 
+      startScrape={startScrape} 
+      mainScrapedData={mainScrapedData} 
+      fetchingDetails={props.fetchingDetails} 
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
-            {showObjModal === "importModal" && <ImportModal
-                fetchScrapeData={fetchScrapeData}
-                setOverlay={setOverlay}
-                show={showObjModal}
-                setShow={setShowObjModal}
-                appType={typesOfAppType}
-                fetchingDetails={props.fetchingDetails}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setSaveDisable={setSaveDisable}
-            />}
-            {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
-            {/* //Element properties  */}
-            {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData} toastSuccess={toastSuccess}
-                toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects} />
-                :
-                <>
-                    {typesOfAppType === "Web" ?
-                        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
-                            <div className="card">
-                                <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
-                                    <Column rowReorder style={{ width: '3rem' }} />
-                                    <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
-                                    {/* <column ></column> */}
-                                    <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-                                    <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
-                                </DataTable>
-                            </div>
-                        </Dialog> : null}</>}
-            {/* Element reorder */}
-            <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => { setShowIdentifierOrder(false); setSelectedCapturedElement([]) }} footer={footerContentIdentifier} >
-                <div className="card" >
-                    <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
-                        <Column rowReorder style={{ width: '3rem' }} />
-                        {dynamicColumns}
-                    </DataTable>
-                </div>
-            </Dialog>
-        </>
+      {showObjModal === "importModal" && <ImportModal
+        fetchScrapeData={fetchScrapeData}
+        setOverlay={setOverlay}
+        show={showObjModal}
+        setShow={setShowObjModal}
+        appType={typesOfAppType}
+        fetchingDetails={props.fetchingDetails}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setSaveDisable={setSaveDisable}
+      />}
+      {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
+      {/* //Element properties  */}
+      {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects}/>
+        :
+        <>
+        {typesOfAppType ==="Web"?
+        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+          <div className="card">
+            <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+              <Column rowReorder style={{ width: '3rem' }} />
+              <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+              {/* <column ></column> */}
+              <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+            </DataTable>
+          </div>
+        </Dialog>: null }</>}
+      {/* Element reorder */}
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} footer={footerContentIdentifier} >
+        <div className="card" >
+          <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
+            <Column rowReorder style={{ width: '3rem' }} />
+            {dynamicColumns}
+          </DataTable>
+        </div>
+      </Dialog>
+    </>
     );
 }
 

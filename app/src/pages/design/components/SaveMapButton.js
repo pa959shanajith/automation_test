@@ -86,7 +86,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     }}
     setBlockui({show:true,content:'Saving flow! Please wait...'})
     var data1;
-    if( typeOfView !== "folderView"){
+    if( typeOfView === 'journeyView' && typeOfView !== "folderView"){
         data1 = restructureData(dNodes[0])
     }
     // else if(typeOfView === "folderView"){
