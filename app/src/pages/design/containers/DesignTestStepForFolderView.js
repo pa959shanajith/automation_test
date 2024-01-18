@@ -1386,7 +1386,7 @@ const DesignModal = (props) => {
             <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ height: "8rem" }} />
             {/* <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}> */}
             <div className='toggle__tab'>
-                <DataTable value={screenLavelTestSteps.length > 0 ? uniqueArray(screenLavelTestSteps) : []} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
+                <DataTable value={screenLavelTestSteps.length > 0 ? uniqueArray(screenLavelTestSteps,'index') : []} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                     onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
                     onSelectionChange={e => { setSelectedTestCase({ name: e.value.name, id: e.value.id }) }} rowExpansionTemplate={rowExpansionTemplate}
                     dataKey="id" tableStyle={{ minWidth: '60rem' }}>

@@ -36,19 +36,13 @@
     stroke-width: 0;
 }
 .ct-legendBox{
-    // position: absolute;
     height: 26px;
     width: 22.5rem;
-    // top: calc(100% - 620px);
-    // left: 1610px;
-    // margin-left:72% ;
 }
 .legendBoxAlignment  {
-    // margin: 0rem -70rem 0.2rem;
-    // margin-left: 6%;
     position: fixed;
-   right: -1rem;
-    
+    right: 0rem;
+    top: 2.8rem;
    }
 
 .ct-nodeLabel{
