@@ -322,10 +322,11 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
     const [dropdownValue, setDropdownValue] = useState('');
 
     useEffect(() => {
-        if (defaultValue && document.getElementById("ldapServerName").selectedIndex !== 0 && ldapEdit) {
+        if (defaultValue !== "None" && ldapEdit) {
             inputRef.current = defaultValue;
-            var items = [...data].filter((e) => e.toUpperCase().indexOf(defaultValue.toUpperCase()) !== -1)
-            setList(items)
+            setDropdownValue(defaultValue);
+            // var items = [...data].filter((e) => e.toUpperCase().indexOf(defaultValue.toUpperCase()) !== -1)
+            setList([...data]);
         }
         else {
             // var items = [...data].filter((e) => e.toUpperCase().indexOf(inputRef.current.toUpperCase()) !== -1)
@@ -336,7 +337,7 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
 
     useEffect(() => {
         inputRef.current = "";
-        document.getElementById("ldapServerName").selectedIndex = "0";
+        // document.getElementById("ldapServerName").selectedIndex = "0";
         setList([...data]);
     }, [resetVal])
 
@@ -367,7 +368,13 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
                 {/* {list.map((e) => (
                             <option key={e} onClick={selectOption} value={e}> {e}</option>
                         ))} */}
-                        <Dropdown value={dropdownValue} ref={inputRef} onChange={(e) => {setDropdownValue(e.target.value); inputFilter(e)}} options={list} placeholder="Select"
+                        <Dropdown 
+                            id="ldapServerName"
+                            value={dropdownValue} 
+                            ref={inputRef} 
+                            onChange={(e) => {setDropdownValue(e.target.value); inputFilter(e)}} 
+                            options={list} 
+                            placeholder="Select"
                             filter className="w-full md:w-29rem" />
 
                 {/* </div> */}
