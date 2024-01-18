@@ -2,15 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { Avatar } from 'primereact/avatar';
 import { TieredMenu } from 'primereact/tieredmenu';
 import { Tooltip } from "primereact/tooltip";
-import { ConfirmDialog } from 'primereact/confirmdialog';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
 import { useNavigate, Link } from "react-router-dom";
 import EditProfile from '../components/EditProfile'
 import Agent from '../components/Agent';
 import { getModules,updateTestSuiteInUseBy } from "../../design/api";
-// import 'primereact/resources/themes/saga-blue/theme.css';
-// import 'primereact/resources/primereact.min.css';
 import '../styles/userProfile.scss';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { Button } from "primereact/button";
@@ -183,6 +180,13 @@ const UserDemo = (props) => {
             icon: 'pi pi-fw pi-bell',
         },
         {
+            label: 'View Plans',
+            icon: <img src="static/imgs/ViewPlans.svg" alt="ViewPlans" width = '22.56' height='19' className="ViewPlans"/>,
+            command: () => {
+                window.open('https://avoautomation.ai/avo-pricing', '_blank');
+              }
+        },
+        {
             separator: true
         },
         {
@@ -246,9 +250,6 @@ const UserDemo = (props) => {
                 image={userImage}
                 label={label}
                 onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" 
-                // image={userInfo?.userimage !=="" ? userInfo.userimage : initials}
-                // label={(userInfo?.userimage === "") ? initials : ''}
-                // onClick={(e) => menu.current.toggle(e)} size='small' shape="circle" 
             />
         </div>
     </>
