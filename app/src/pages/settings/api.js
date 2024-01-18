@@ -711,3 +711,36 @@ export const getDetails_BROWSERSTACK = async() => {
         return {error:MSG.SETTINGS.ERR_ZEPHYR_FETCH}
     }
 }
+export const getjira_json = async(input_payload) => {
+    try{
+        const res = await axios(url+'/getjira_json', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {   
+                'project': input_payload['project'],
+                'issuetype': input_payload['issuetype'],
+                'itemType': input_payload['itemType'],
+                'url': input_payload['url'],
+                'username': input_payload['username'],
+                'password': input_payload['password'],
+                'projects': input_payload['projects_data'],
+                'key':input_payload['key'],
+                "action": "getJiraJSON"
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
