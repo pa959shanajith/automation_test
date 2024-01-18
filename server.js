@@ -246,6 +246,8 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
         var designscreen = require('./server/controllers/designscreen');
 		var browserstack = require('./server/controllers/browserstack');
+		var generateAI = require('./server/controllers/generateAI');
+		
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -275,6 +277,13 @@ if (cluster.isMaster) {
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.get('/devopsReports/viewReport', report.viewReport);
+		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
+		app.get('/getall_uploadfiles',report.getall_uploadfiles);
+		app.post('/getjira_json',report.getJiraJSON_ICE)
+		app.post('/generate_testcase',generateAI.generateTestcase);
+		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
+		app.post('/save_testcase',generateAI.save_GenTestcases);
+
 		app.use(csrf({
 		cookie: true
 		}));
@@ -596,6 +605,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);
 		app.post('/getScrapeDataScreenLevel_ICE', auth.protect, designscreen.getScrapeDataScreenLevel_ICE);
 		app.post('/updateScreen_ICE', auth.protect, designscreen.updateScreen_ICE);
+		app.post('/insertScreen', auth.protect, designscreen.insertScreen);
 		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);

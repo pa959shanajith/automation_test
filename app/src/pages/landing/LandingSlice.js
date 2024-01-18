@@ -21,7 +21,9 @@ export const loadUserInfo = createSlice({
             'projectid': undefined,
             'testsuitename': undefined
         },
-        updatedProject: false
+        updatedProject: false,
+        openCaptureScreen: false,
+        updateElementRepository: false,
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -89,6 +91,12 @@ export const loadUserInfo = createSlice({
         },
         updatedProject: (state, action) => {
             state.updatedProject = action.payload;
+        },
+        openCaptureScreen: (state, action) => {
+            state.openCaptureScreen = action.payload;
+        },
+        updateElementRepository: (state, action) => {
+            state.updateElementRepository = action.payload;
         },
         // need it in future
         // ----------------------------------

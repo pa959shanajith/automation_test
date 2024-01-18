@@ -1680,3 +1680,23 @@ export const importDefinition = async(sourceUrl) => {
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
     }
 }
+
+export const insertScreen = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/insertScreen", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
