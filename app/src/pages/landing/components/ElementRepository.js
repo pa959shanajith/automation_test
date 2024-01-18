@@ -102,28 +102,28 @@ const ElementRepository = (props) => {
     let params = {
       deletedObj: [],
       modifiedObj: [],
-      addedObj: { view: [{...copiedRow, tempOrderId: copiedRow.tempOrderId ? copiedRow.tempOrderId :uuid()}]},
+      addedObj: { view: [{...copiedRow, tempOrderId: copiedRow?.tempOrderId ? copiedRow?.tempOrderId :uuid()}]},
       screenId: updatedScreen["_id"],
       userId: userInfo.user_id,
       roleId: userInfo.role,
       param: 'screenPaste',
-      orderList: [copiedRow["_id"]],
+      orderList: [copiedRow?._id],
     };
 
     scrapeApi.updateScreen_ICE(params)
     .then(response =>  {
-     if (response == "Success") {
-     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
-
-   }})
+        if(copiedRow!==null){
+        if (response == "Success") {
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
+   }}})
    .catch(error => console.log(error))
     }
     // Use params as needed
-  }, [screenData, accordionIndex]);
+  }, [screenData, accordionIndex,copiedRow != null]);
 
   const pasteRow = (targetAccordionIndex) => {
     setAccordionIndex(targetAccordionIndex);
-    if (copiedRow) {
+    if (copiedRow !== null) {
       setScreenData((prevScreens) => {
         const updatedScreens = prevScreens.map((screen, index) =>
           index === targetAccordionIndex
@@ -140,7 +140,8 @@ const ElementRepository = (props) => {
         );
         return updatedScreens;
       });
-}
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: 'Copy any row before pasting.', life: 5000 });
   };
 
 
@@ -149,7 +150,7 @@ const ElementRepository = (props) => {
       // Check if orderlist exists in screenItem
       if (screenItem.orderlist) {
         const matchingOrderItem = screenItem.orderlist?.find((orderItem) => {
-          return orderItem._id === rowData._id && orderItem.flag === true;
+          return orderItem?._id === rowData?._id && orderItem?.flag === true;
         });
     
         if (matchingOrderItem) {
@@ -399,64 +400,6 @@ const handleAccordionNameEdit = (index, newName) => {
   // }
   setElementProperties(true)
 }
-
-  // const renderActionsCell = (rowData) => {
-  //   if(Object.keys(rowData).length > 0){
-  //   let selectedElement=[]
-  //   selectedElement.push(rowData)
-  //   setScrapeDataForIris(rowData)
-  //  let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
-  //   screenData.forEach(screen => {
-  //     let hasFlagTrue = false;
-  //     if(screen.orderlist){
-  //     screen.orderlist.forEach(item => {
-  //       if (item && item.flag === true) {
-  //         hasFlagTrue = true;
-  //       }
-        
-  //     });
-  //   }
-  // //  setIrisObject(scrapeType[0]);
-  //   return (
-  //     <div >
-        
-        
-  //       {/* {!saveDisable?
-  //       <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />} */}
-  //       {  (scrapeType[0] === "iris" || "Web")  && 
-  //       <button
-  //       // disabled={!saveDisable}
-  //       onClick={() => {setSelectedCapturedElement(selectedElement);openElementProperties(rowData);}}
-  //     >
-  //       <img
-  //         src="static/imgs/ic-edit.png"
-  //         alt="Edit Icon"
-  //         style={{ height: "20px", width: "20px"}}
-  //         className="edit__icon"
-  //       />
-  //     </button>
-      
-  //       }
-  //       {/* <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." /> */}
-  //       <img
-
-  //         src="static/imgs/ic-delete-bin.png"
-  //         style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-  //         className="delete__icon"
-  //         onClick={()=>{
-  //           if (hasFlagTrue) {
-  //             setResusedDeleteElement(true);
-  //             setReuseDelMessage("Selected element is re-used. By deleting this, it will impact other Element Repository.\n \n Are you sure you want to delete permanently?");
-  //           } else {
-  //             setDeleteElements(true);
-  //           }
-  //         }}/>
-  //     </div>
-  //   )
-  //       })
-  //   }
-
-  // };
 
   const renderActionsCell = (screenDetails,rowData) => {
     if (Object.keys(rowData).length > 0) {
@@ -792,6 +735,33 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
   saveDeleteAllElements(updatedDeletedArr);
 }
 
+const saveScreens = (screenDetails) => {
+    let params = {
+        screenIds: [screenDetails._id],
+      scenarioIds:[],
+      testcaseIds:[],
+    }
+  
+    scrapeApi.deleteScenario(params)
+      .then(response =>  {
+        if (response == "Success") {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen deleted successfully', life: 5000 });
+      }
+      
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+      }
+      dispatch(loadUserInfoActions.updateElementRepository(true));
+    })
+  }
+
+const deleteScreens = (index, screenDetails)=>{
+    // const allScreenData = [...screenData]
+    const updatedScreenData = screenData.filter(screen => screen._id !== screenDetails._id);
+      setScreenData(updatedScreenData);
+      saveScreens(screenDetails);
+}
+
 
 
   
@@ -802,7 +772,7 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
     {/* {props.overlay && <ScreenOverlay content={props.overlay} />} */}
     <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
     <div className='element-repository'>
-      {screenData.length === 0 ? 
+      {screenData?.length === 0 ? 
       (<div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">No Element Repository yet</p>
@@ -832,7 +802,7 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
-                    <span>{screenDetails.name}</span>
+                    <span className='screenname__display'>{screenDetails.name}</span>
                   )}
                 </span>
               {activeAccordionIndex === index && (
@@ -843,7 +813,7 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
                   "name": screenDetails.name,
                   "projectId": defaultselectedProject.projectId
                 })}} className='edit-text'/>
-                <Button label="Delete" severity="danger" className='delete-text'/>
+                <Button label="Delete" severity="danger" onClick={()=>deleteScreens(index,screenDetails)} className='delete-text'/>
                 
               </div>
               </>)}
