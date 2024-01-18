@@ -24,46 +24,89 @@ const FolderView = (props) => {
     const [expandedMainNode, setExpandedMainNode] = useState();
     const [screenDatapassing, setScreenDatapassing] = useState({});
     const [eventSelectData, setEventSelectData] = useState('');
-    const [valueOfNewAddedCase, setValueOfNewAddedCase] = useState(null);
+    const [valueOfNewTS, setValueOfNewTS] = useState(null);
     const [testCaseVar, setTestCaseVar] = useState(null);
     const [modifiedDataToChange, setModifiedDataToChange] = useState(null);
     const [modifiedDataToAddNewTSG, setModifiedDataToAddNewTSG] = useState(null);
     const [passSelectedCaseToAddNewStepGrp, setPassSelectedCaseToAddNewStepGrp] = useState({});
-    const [editing, setEditing] = useState(true);
+    const [editingOfTS, setEditingOfTS] = useState(true);
     const [createNewTS, setCreateNewTS] = useState(false);
     const toast = useRef(null);
     const operationOnSuites = useRef(null);
     const operationOnCases = useRef(null);
     const operationOnTestSteps = useRef(null);
-    const moduledataForTree = [];
+    moduledataForTree = [];
+
+    // Assuming `moduleLists` and `childComponents` are defined somewhere before this code
     const onlyNormalSuites = moduleLists.filter(mod => mod.type === 'basic');
+
+    // Function to handle new test suite
+
+
+    // Loop through normal suites and add them to moduledataForTree
     for (let h = 0; h < onlyNormalSuites.length; h++) {
-        moduledataForTree.push(
-            {
-                key: h,
-                label: [<img src="static/imgs/moduleIcon.png" alt="modules" />, <div style={{
+        moduledataForTree.push({
+            key: h,
+            label: [
+                <img src="static/imgs/moduleIcon.png" alt="modules" />,
+                <div style={{
                     width: '10rem',
                     overflow: "hidden",
                     textOverflow: "ellipsis"
-                }} >{onlyNormalSuites[h].name}</div>, <Button label="..." value={h} onMouseDownCapture={(e) => operationOnSuites.current.show(e)} onClick={e => { receivingfullTreeDataOnClickOfMoreButton(e.target.value) }} className='buttonForMoreTestSuites' text />],
-                data: [{ layer: "layer_1", testSuitName: onlyNormalSuites[h].name, testSuitId: onlyNormalSuites[h]._id, childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]] }],
-                children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
-            })
-
+                }}>{onlyNormalSuites[h].name}</div>,
+                <Button
+                    label="..."
+                    value={h}
+                    onMouseDownCapture={(e) => operationOnSuites.current.show(e)}
+                    onClick={(e) => receivingfullTreeDataOnClickOfMoreButton(e.target.value)}
+                    className='buttonForMoreTestSuites'
+                    text
+                />
+            ],
+            data: [{
+                layer: "layer_1",
+                testSuitName: onlyNormalSuites[h].name,
+                testSuitId: onlyNormalSuites[h]._id,
+                childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]]
+            }],
+            children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
+        });
     }
-    // const handlingNewTS =()=>{
-    //     moduledataForTree.push(
-    //         {
-    //             key: null,
-    //             label: [<img src="static/imgs/moduleIcon.png" alt="modules" />, <div style={{
-    //                 width: '10rem', 
-    //                 overflow: "hidden",
-    //                 textOverflow: "ellipsis"
-    //             }} >{onlyNormalSuites[h].name}</div>, <Button label="..." value={h} onMouseDownCapture={(e) => operationOnSuites.current.show(e)} onClick={e => { receivingfullTreeDataOnClickOfMoreButton(e.target.value) }} className='buttonForMoreTestSuites' text />],
-    //             data: [{ layer: "layer_1", testSuitName: onlyNormalSuites[h].name, testSuitId: onlyNormalSuites[h]._id, childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]] }],
-    //             children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
-    //         })
-    // }
+
+    if (createNewTS) {
+        const newObject = {
+            key: onlyNormalSuites.length,
+            label: [
+                <img src="static/imgs/moduleIcon.png" alt="modules" />,
+                <div style={{
+                    width: '13rem',
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                }}>{editingOfTS ? <InputText className='inputOfTS'
+                    value={valueOfNewTS}
+                    // placeholder=""
+                    onChange={(e) => setValueOfNewTS(e.target.value)}
+                    onBlur={() => { if (valueOfNewTS?.length > 0) { setEditingOfTS(false); dispatch(typeOfOprationInFolder({ createNewTestSuit: valueOfNewTS })) } }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            setEditingOfTS(false);
+                            setValueOfNewTS(e.target.value);
+                            dispatch(typeOfOprationInFolder({ createNewTestSuit: valueOfNewTS }))
+                        }
+                    }}
+                    autoFocus
+                /> : valueOfNewTS}</div>,
+                <Button label="..." className='buttonForMoreTestSuites' text />
+            ],
+            data: [{}],
+            children: [{}]
+        };
+
+        moduledataForTree.unshift(newObject);
+    }
+
+    let moduledataForTree;
+
 
     const onExpandOfSuite = async (event) => {
         dispatch(typeOfOprationInFolder({ onExpand: event.node }))
@@ -248,7 +291,7 @@ const FolderView = (props) => {
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">Test Suite Folder</h3>
                         <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
-                        <img className=" " onClick={() => {dispatch(typeOfOprationInFolder({ createNewTestSuit:true  })); setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
+                        <img className=" " onClick={() => { setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
                     <div className='searchNormal'>
