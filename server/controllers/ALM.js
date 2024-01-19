@@ -434,6 +434,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         let inputs = {
           "testscenarioid": itr.scenarioId,
           'projectid': itr.projectId,
+          "projectname": itr.projectName,
           'testname': itr.testCaseName,
           'testCaseDescription': itr.testCaseDescription,
           "testid":itr.testcaseId,
