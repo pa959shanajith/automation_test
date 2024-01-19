@@ -4,7 +4,7 @@ var async = require('async');
 var Client = require("node-rest-client").Client;
 var utils = require('../lib/utils');
 const socket_io = require("../lib/socket")
-
+const http = require('http');
 
 
 exports.create_ALM_Testcase = async function (req, res) {
@@ -426,27 +426,32 @@ exports.fetchALM_Testcases = async function (req,res) {
     try {
       var mappedDetails = req.body.mappedDetails;
       var flag = mappedDetails.length > 0;
-      if (!flag) return res.send('fail');
-      // for (let i=0; i<mappedDetails.length; i++) {
-      //   let itr = mappedDetails[i];
+      var statusMessage = 'Unknown error';
+      var statusCode = 400;
+      if (!flag) return res.status(statusCode).json({error:'bad request'});
+      for (let i=0; i<mappedDetails.length; i++) {
+        let itr = mappedDetails[i];
         let inputs = {
-          "testscenarioid": mappedDetails[0].scenarioId[0],
-          'projectId': mappedDetails[0].projectId,			
-          'projectName': mappedDetails[0].projectName,
-          // 'itemCode': mappedDetails[0].testCode,
-          'itemType': mappedDetails[0].itemType,
-          'testCaseName': mappedDetails[0].testCaseName,
-          'testCaseDescription': mappedDetails[0].testCaseDescription,
-          "testcaseId":req.body.testcaseId,
-          "query": "saveALM_MappedTestcase"
+          "testscenarioid": itr.scenarioId,
+          'projectid': itr.projectId,
+          'testname': itr.testCaseName,
+          'testCaseDescription': itr.testCaseDescription,
+          "testid":itr.testcaseId,
+          "type":"SAP ALM",
+          "query": "saveSAP_ALMDetails_ICE"
         };
-        const result = await utils.fetchData(inputs, "/saveALM_MappedTestcase", fnName);
-        if (result == "fail") flag = false;
-      // }
-      if (!flag) return res.send('fail');
-      res.send("success");
+        const result = await utils.fetchData(inputs, "/saveALM_MappedTestcase", fnName,true);
+        if (result &&  !(result[1].statusCode >= 200 && result[1].statusCode <= 299)) {
+          logger.error(`request error : ` ,result[0] === 'fail' ? result[2].error : result[1].statusMessage || 'Unknown error');
+          flag = false;
+      }
+      statusCode = result[1].statusCode;
+      statusMessage = result[0] === 'fail' ? result[1].statusMessage : result[0].message;
+      }
+      if (!flag) return res.status(statusCode).json({error:statusMessage});
+      res.status(statusCode).json({message:statusMessage});
     } catch (exception) {
       logger.error("Error occurred in ALM/"+fnName+":", exception);
-      res.send("fail");
+      res.status(500).json({error:exception.message});
     }
   };
