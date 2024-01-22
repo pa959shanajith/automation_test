@@ -1085,7 +1085,7 @@ setPreventDefaultModule(true);
                         : null}
                       <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
                       <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
-                      {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} /> : null}
+                      {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} projectName={projectInfo.projectName} projectID={projectInfo.projectId}/> : null}
                       <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                       <img className={`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
                     </>
