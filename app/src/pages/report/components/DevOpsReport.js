@@ -5,7 +5,7 @@ import { setMsg, Messages as MSG, VARIANT, Header } from '../../global';
 // import ModuleSelection from '../components/ModuleSelection';
 import ExecutionsContainer from './ExecutionsContainer';
 // import { SearchDropdown, TextField } from '@avo/designcomponents';
-import { fetchReportMeta, fetchOpenModuleData, getOpenfetchScenarioInfoDevOps, publicViewReport, getPublicFunctionalReportsDevOps} from '../api';
+import { fetchReportMeta, fetchOpenModuleData, getOpenfetchScenarioInfoDevOps, publicViewReport, getFunctionalReportsDevops} from '../api';
 import { prepareOptionLists, prepareModuleList, getFunctionalBarChartValues, prepareExecutionCard, prepareBatchExecutionCard, prepareLogData } from '../containers/ReportUtils';
 import "../styles/FunctionalTesting.scss";
 import {hideOverlay} from '../reportSlice';
@@ -48,7 +48,7 @@ const DevOpsReport = props => {
 
     
     const onWebClick = ({reportid, testscenarioid}) => async() => {
-        const win = window.open("/executionReport", "_blank"); 
+        const win = window.open(`/viewReports?reportID=${reportid}&execution=${testscenarioid}`, "_blank"); 
         win.focus();
         localStorage['executionReportId'] = reportid;
         localStorage['logData'] = JSON.stringify(logData[testscenarioid]);
@@ -101,7 +101,7 @@ const DevOpsReport = props => {
     },[]);
 
     const fetchFunctionalReports = async(projId, relName, cycId) => {
-        const reportResponse = await getPublicFunctionalReportsDevOps(projId, relName, ''); //getReportsData_ICE
+        const reportResponse = await getFunctionalReportsDevops(urlParams.configurekey,urlParams.executionListId,''); //getReportsData_ICE
         if(reportResponse.error){
             console.error(reportResponse.error);
             setMsg(MSG.REPORT.ERR_FETCH_MODULES);
