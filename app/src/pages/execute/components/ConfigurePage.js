@@ -1543,6 +1543,7 @@ const showToast = (severity, detail) => {
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
           batchInfoData.push({
+            key:item.key,
             scenarioTaskType: "disable",
             testsuiteName: item.suitename,
             testsuiteId: item.suiteid,
@@ -1568,6 +1569,7 @@ const showToast = (severity, detail) => {
           });
         }
       });
+      batchInfoData.sort((item1,item2)=>item1.key-item2.key)
 
       let executionData = {
         type: "",
