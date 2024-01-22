@@ -16,13 +16,14 @@ import { Dropdown } from 'primereact/dropdown';
 
 
 
-const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop, toast}) => {
+const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop, toast,projectName, projectID}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(true)
     const [mindmapData,setMindmapData] = useState([])
     const [gitExportDetails,setGitExportDetails] =useState([])
+    const [project, setProject] = useState({})
     
     useEffect(()=>{
         (async()=>{
@@ -31,6 +32,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
             if(res.error){displayError(res.error);return;}
             var data = parseProjList(res)
             setProjList(data)
+            setProject(data[projectID])
             setBlockui({show:false})
         })()
     },[]) 
@@ -40,13 +42,13 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
         {/* <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/> */}
         <Dialog className='ImportDialog' header='Import Test Suite' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
             <Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}
-             setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails} Toast={toast}/>
+             setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails} Toast={toast}  project={project}/>
         </Dialog>
     </>
     )
 }
 
-const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport,setGitExportDetails,gitExportDetails,Toast}) => {
+const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport,setGitExportDetails,gitExportDetails,Toast,project}) => {
     const dispatch = useDispatch()
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
@@ -95,7 +97,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setImportType(e.value)        
         setFiledUpload(undefined)
         setDisableSubmit(true)
-        setProjectValue(null)
+        // setProjectValue(null)
         setError('')
         if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
         if (e.target.value==="git"){ resetImportModules();setComMsgRef("");
@@ -111,6 +113,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 id = e.target.name[i].key
                 setProjectId(e.target.name[i].key);
             }
+        }
+        if(!e?.value){
+            setProjectValue(project.name)
+            setProjectId(project.id)
+            id=project.id
         }
         if(id) {
             var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
@@ -143,6 +150,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                   setProjectImportId(e.target.name[i].key);
               }
           }
+          if(!e?.value){
+            setProjectValue(project.name)
+            setProjectId(project.id)
+            id=project.id
+        }
           if(id) {
               var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
               if (moduledata.length>0){
