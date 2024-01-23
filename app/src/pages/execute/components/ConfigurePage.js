@@ -516,13 +516,13 @@ $body = @"
     
 try {
     $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-    Write-Host "Status            :" $response.status
-    Write-Host "ReportLink        :" $response.reportLink
-    Write-Host "RunningStatusLink :" $response.runningStatusLink
     $status = $response.status
     
     # Check if status is pass or fail
     if ($status -ne "fail") {
+        Write-Host "Status            :" $response.status
+        Write-Host "ReportLink        :" $response.reportLink
+        Write-Host "RunningStatusLink :" $response.runningStatusLink
         $runningStatusLink = $response.runningStatusLink
         $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
         $runningStatus = $statusResponse.status
@@ -569,13 +569,16 @@ body='{
 }'
 # Make the POST request with wget
 response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
-echo "$response"
   
 # Check if the request was successful
 status=$(echo "$response" | jq -r '.status')
   
 if [ "$status" != "fail" ]; then
   runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+  reportLink=$(echo "$response" | jq -r '.reportLink')
+  echo "status            : $status"
+  echo "reportLink        : $reportLink"
+  echo "runningStatusLink : $runningStatusLink"
 
   # Check the execution status in a loop
   while true; do
