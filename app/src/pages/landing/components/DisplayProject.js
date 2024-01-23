@@ -68,15 +68,15 @@ const DisplayProject = (props) => {
   }, []);
 
 
-  const DateTimeFormat = (inputDate) => {
+  const DateTimeFormat = (inputDate,createDate) => {
     // Provided date
     const providedDate = new Date(inputDate);
-
+    const createddate = new Date(createDate);
+    let createdNowProject = false;
+    {providedDate.toISOString() === createddate.toISOString() ? createdNowProject = true : createdNowProject = false}
+    
     // Current date
     const currentDate = new Date();
-
-    // Calculate the time difference in milliseconds
-    // const timeDifference = currentDate - providedDate;
 
     // Calculate years, months, days, hours, and seconds
     const millisecondsInASecond = 1000;
@@ -84,13 +84,6 @@ const DisplayProject = (props) => {
     const millisecondsInAnHour = 60 * millisecondsInAMinute;
     const millisecondsInADay = 24 * millisecondsInAnHour;
     const millisecondsInAYear = 365 * millisecondsInADay;
-
-    // const years = Math.floor(timeDifference / millisecondsInAYear);
-    // const months = Math.floor((timeDifference % millisecondsInAYear) / (30 * millisecondsInADay)); // Assuming 30 days in a month for simplicity
-    // const days = Math.floor((timeDifference % millisecondsInADay) / millisecondsInADay);
-    // const hours = Math.floor((timeDifference % millisecondsInADay) / millisecondsInAnHour);
-    // const minutes = Math.floor((timeDifference % millisecondsInAnHour) / millisecondsInAMinute);
-    // const seconds = Math.floor((timeDifference % millisecondsInAMinute) / millisecondsInASecond);
 
     const date1 = moment(providedDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
     const date2 = moment(new Date(), 'ddd MMM DD YYYY HH:mm:ss ZZ');
@@ -105,7 +98,7 @@ const DisplayProject = (props) => {
 
     let output="";
       if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0) {
-        output = "Created now";
+        output = createdNowProject ? "Created now" : "Edited Now";
       }
       else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {
         output = `Last Edited ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
@@ -130,7 +123,7 @@ const DisplayProject = (props) => {
       const projectList = await fetchProjects({ readme: "projects" });
       setProjectsDetails(projectList);
       const arrayNew = projectList.map((element, index) => {
-        const lastModified = DateTimeFormat(element.modifiedon);
+        const lastModified = DateTimeFormat(element.modifiedon , element.releases[0].createdon);
         return {
           key: index,
           projectName: element.name,
@@ -165,7 +158,7 @@ const DisplayProject = (props) => {
           props.toastError("Error while fetching the project Details");
         } else {
           const arraynew = ProjectList.map((element, index) => {
-            const lastModified = DateTimeFormat(element.modifiedon);
+            const lastModified = DateTimeFormat(element.modifiedon, element.releases[0].createdon);
             const modified_Date = element.modifiedon;
             return (
               {
