@@ -246,7 +246,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
     { label: "cURL", value: "curl" },
-    { label: "HTTP", value: "http" },
     { label: "Javascript", value: "javascript" },
     { label: "Python", value: "python" },
     { label: "PowerShell - RestMethod", value: "powershell" },
@@ -429,16 +428,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     \"executionType\": \"${executionTypeInRequest}\"
 }"`,
 
-    http: `POST /execAutomation HTTP/1.1
-Host: ${url.slice(8, -15)}
-Content-Type: application/json
-Content-Length: 93
-
-{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
-}`,
-
     javascript: `var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 
@@ -527,7 +516,9 @@ $body = @"
     
 try {
     $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-    ($response | ConvertTo-Json) -replace '\\\\u0026', '&'
+    Write-Host "Status            :" $response.status
+    Write-Host "ReportLink        :" $response.reportLink
+    Write-Host "RunningStatusLink :" $response.runningStatusLink
     $status = $response.status
     
     # Check if status is pass or fail
