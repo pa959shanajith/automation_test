@@ -150,10 +150,10 @@ export default function Input({ items, callback, isReset }) {
                </div>
                <div className="tools-container">
                   <div class="icon-wrapper selected" onClick={() => handleJiraIconClick({ name: 'Jira', code: 'JA' })} >
-                     <span>
-                        <img src="static/imgs/jira_icon.svg" className="img__jira mx-3" />
-                     </span>
-                     <span className="text__jira">Jira</span>
+                     <div style={{ display: "flex",  alignItems: "center", gap: "10px", margin: "auto" }}>
+                        <img src="static/imgs/jira_icon.svg" className="img__jira" />
+                        <p className="text__jira">Jira</p>
+                     </div>
                   </div>
                   {/* <div class="icon-wrapper " onClick={() => handleJiraIconClick({ name: 'Azure DevOps', code: 'ADO' })} >
                         <span>
