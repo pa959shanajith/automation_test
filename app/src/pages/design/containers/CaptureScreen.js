@@ -355,6 +355,13 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
   }
 
+  const toastWarn = (warnMessage) => {
+    if (warnMessage.CONTENT) {
+        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+  }
+
   const onSave = (e, confirmed) => {
 
     let continueSave = true;
@@ -788,23 +795,23 @@ const elementTypeProp =(elementProperty) =>{
               if (data === "Invalid Session") {
                   return RedirectPage(history);
               } else if (data === "unavailableLocalServer") {
-                  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                  toastError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
               } else if (data === "scheduleModeOn") {
-                  setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                  toastWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
-                  setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));
-              } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+              } else toastError(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
           })
           .catch(error => {
               setOverlay("");
               ResetSession.end();
               console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-              setMsg(MSG.SCRAPE.ERR_OPERATION);
+              toastError(MSG.SCRAPE.ERR_OPERATION);
           });
       }
   } 
