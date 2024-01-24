@@ -57,6 +57,8 @@ const ElementRepository = (props) => {
   const [value, setValue] =  useState('');
   const [screenId, setScreenId] =  useState(false);
   const refreshRepository = useSelector((state) => state.landing.updateElementRepository);
+  const [updatePastedData, setUpdatPastedData] = useState(false);
+  const [updateDeleteCurrentElements, setUpdateDeleteCurrentElements] = useState(false);
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -85,7 +87,7 @@ const ElementRepository = (props) => {
             console.error('Error fetching User list:', error);
         }
     })();
-}, [defaultselectedProject.projectId, showCaptureElement,screenId,refreshRepository]);
+}, [defaultselectedProject.projectId, showCaptureElement,screenId,updatePastedData,updateDeleteCurrentElements]);
 
   
   const copyRow = (selectedRowData) => {
@@ -115,11 +117,12 @@ const ElementRepository = (props) => {
         if(copiedRow!==null){
         if (response == "Success") {
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
+        setUpdatPastedData(true);
    }}})
    .catch(error => console.log(error))
     }
     // Use params as needed
-  }, [screenData, accordionIndex,copiedRow != null]);
+  }, [accordionIndex,copiedRow != null]);
 
   const pasteRow = (targetAccordionIndex) => {
     setAccordionIndex(targetAccordionIndex);
@@ -175,7 +178,7 @@ const ElementRepository = (props) => {
     
 
     const uniqueArray = isUnique(matchingDataArray, '_id');
-    dispatch(loadUserInfoActions.updateElementRepository(true));
+    // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
         <div className={`flex flex-row name__ellipsis ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
@@ -607,8 +610,8 @@ const saveDeletedElements = (screenDetails,deletedArr) => {
   scrapeApi.updateScreen_ICE(params)
     .then(response =>  {
       if (response == "Success") {
+        setUpdateDeleteCurrentElements(true);
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-        dispatch(loadUserInfoActions.updateElementRepository(true));
     }
     else {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
