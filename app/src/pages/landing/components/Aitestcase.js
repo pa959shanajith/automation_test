@@ -1,5 +1,5 @@
 import React, { useState,useRef } from 'react';
-import '../styles/Testcase.scss';
+import '../styles/testcase.scss';
 import { TabMenu } from 'primereact/tabmenu';
 import Input from  './AiInput';
 import Output from './AiOutput';

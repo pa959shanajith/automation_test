@@ -351,6 +351,7 @@ export default function Output() {
           (
             <div className=" card d-flex flex-column bd-highlight  mt-2 default_cls" >
               <div className="default_inner_cls">
+                <span style={{ font: '600 1rem/1.5rem Open Sans' }}>Choose one among the three ways listed above</span>
                 {isLoading && <div className="spinner" style={{ position: 'absolute', top: '15rem', left: '20rem' }}>
                   <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>}
@@ -363,7 +364,6 @@ export default function Output() {
                 <div className=" p-2 bd-highlight py-2 mt-1 hypen_cls" >
                   <Button className="btn button3" label="Generate user story level test case" disabled={buttonDisabled} outlined />
                 </div>
-                <span style={{ font: '600 1rem/1.5rem Open Sans' }}>Choose one among the three ways listed above</span>
               </div>
 
             </div>
