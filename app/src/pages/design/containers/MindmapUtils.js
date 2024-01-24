@@ -753,7 +753,7 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
         let f;
         if (dNodes[pi].type === 'testcases'){
             for(let d = 0; d<dNodes.length; d++){
-                if(dNodes[d].name === dNodes[pi].parent.name){
+                if(dNodes[d].id === dNodes[pi].parent.id){
                     f = d
                     break
                 }

@@ -22,6 +22,7 @@ import DetailsDialog from "../components/DetailsDialog";
 import PasteStepDialog from "../components/PasteStepDialog";
 import SelectMultipleDialog from "../components/SelectMultipleDialog";
 import { Checkbox } from 'primereact/checkbox';
+import { Sidebar } from 'primereact/sidebar';
 
 
 const DesignModal = (props) => {
@@ -917,10 +918,27 @@ const DesignModal = (props) => {
             debugTestCases()
         }
     }
+    const [ingredients, setIngredients] = useState([]);
+    const [visibleRight, setVisibleRight] = useState(false);
+    const onIngredientsChange = (e) => {
+        let _ingredients = [...ingredients];
+
+        if (e.checked)
+            _ingredients.push(e.value);
+        else
+            _ingredients.splice(_ingredients.indexOf(e.value), 1);
+
+        setIngredients(_ingredients);
+    }
+    console.log(ingredients)
     const footerContent = (
         <div>
+            <div className="flex align-items-right">
+                <Checkbox inputId="ingredient1" name="Debug" value="Advance Debug" onChange={onIngredientsChange} checked={ingredients.includes('Advance Debug')} />
+                <label htmlFor="ingredient1" className="ml-2">Advance Debug</label>
+            </div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
+            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={() =>{!ingredients.includes('Advance Debug')? handleDebug(selectedSpan):DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)}} autoFocus />
         </div>
     );
     
@@ -1334,7 +1352,7 @@ const DesignModal = (props) => {
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
-                    <span className="step_col d__step_head" ></span>
+                    <span className="step_col d__step_head" >Braek Point</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
                     <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i></span>
@@ -1384,11 +1402,21 @@ const DesignModal = (props) => {
         }
     setExpandedRows(_expandedRow)
     }
+    const watchlist=[
+        {
+            testStep:1,
+           
+            name: '@Genric',
+            variable: '{c1}',
+            value: '6',
+           
+        }
+    ]
     return (
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
+            <Dialog className='design_dialog_box' header={headerTemplate} position={visibleRight?'left':'right'} visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
@@ -1440,6 +1468,30 @@ const DesignModal = (props) => {
                     </div>
                 </div>
             </Dialog>
+            <div className='AdvanceDebug'>
+                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => setVisibleRight(false)}>
+                    <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
+                    <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
+                        <img src='static/imgs/start.svg' alt='' style={{height:'30px'}}/>
+                        <img src='static/imgs/stepInto.svg' alt='' style={{height:'30px'}}/>
+                        <img src='static/imgs/stepOver.svg' alt='' style={{height:'30px'}}/>
+                        <img src='static/imgs/stepout.svg' alt='' style={{height:'30px'}}/>
+                        <img src='static/imgs/stop.svg' alt='' style={{height:'30px'}}/>
+                    </div>
+                    <div><Button label="DEBUG" style={{height:'30px'}} size="small"/></div>
+
+                    </div>
+                    <div className="card">
+            <DataTable value={watchlist}>
+                <Column field="testStep" header="Step no."></Column>
+                <Column field="name" header="Element Name"></Column>
+                <Column field="variable" header="Variable"></Column>
+                
+            </DataTable>
+        </div>
+                </Sidebar>
+            </div>
         </>
     )
 }

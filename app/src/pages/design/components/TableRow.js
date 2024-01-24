@@ -367,7 +367,7 @@ const TableRow = (props) => {
     return (
         <>
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col">{props.idx + 1}</span>
+                <span className="step_col"><i className='pi pi-hashtag'/>{props.idx + 1}</span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
