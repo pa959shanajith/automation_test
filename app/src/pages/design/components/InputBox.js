@@ -4,6 +4,8 @@ import {setMsg, VARIANT, Messages as MSG} from '../../global';
 import { useSelector} from 'react-redux';
 import * as d3 from 'd3';
 import '../styles/InputBox.scss'
+import { getScreens } from '../api';
+import { Toast } from 'primereact/toast';
 var initdata = []
 
 
@@ -20,6 +22,21 @@ const InputBox = (props) => {
     var pt = p.select('.ct-nodeLabel');
     var t = p.attr('data-nodetype');
     var dNodes = props.dNodes
+    const toast = useRef();
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  let defaultselectedProject = reduxDefaultselectedProject;
+
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+        defaultselectedProject = JSON.parse(localStorageDefaultProject);
+    }
+
+    const toastError = (erroMessage) => {
+        if (erroMessage && erroMessage.CONTENT) {
+          toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
+      }
 
     useEffect(()=>{
         document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
@@ -37,7 +54,16 @@ const InputBox = (props) => {
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
+    console.log(screenData);
+
     useEffect(()=>{
+        (async ()=>{
+           var res = await getScreens(defaultselectedProject.projectId);
+           if(res.error){
+            toastError(res.error);
+            return;
+           }
+        
         var nodetype = props.node.attr('data-nodetype');
         if(nodetype === "modules" || nodetype === "scenarios"){
             setSuggestList([]);
@@ -46,17 +72,18 @@ const InputBox = (props) => {
             return;
         }
         if(nodetype === "testcases"){
-            setSuggestList(screenData.testCaseList);
-            initdata = screenData.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
+            setSuggestList(res.testCaseList);
+            initdata = res.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
             filterSuggest()
             return;
         }
         if(nodetype === "screens"){
-            setSuggestList(screenData.screenList)
-            initdata = screenData.screenList;
+            setSuggestList(res.screenList)
+            initdata = res.screenList;
             filterSuggest()
             return;
         }
+    })();
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[screenData])
 
