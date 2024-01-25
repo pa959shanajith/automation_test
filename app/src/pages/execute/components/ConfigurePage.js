@@ -1455,6 +1455,7 @@ const showToast = (severity, detail) => {
       setDefaultValues({ ...defaultValues, EmailSenderAddress: getData.executionRequest.emailNotificationSender, EmailRecieverAddress: getData.executionRequest.emailNotificationReciever});
       setIsNotifyOnExecutionCompletion(getData.executionRequest.isNotifyOnExecutionCompletion);
       setIsEmailNotificationEnabled(getData.executionRequest.isEmailNotificationEnabled);
+      setCheckedExecution(getData.executionRequest.execType)
     } else {
       setUpdateKey("");
       setAvodropdown({});
