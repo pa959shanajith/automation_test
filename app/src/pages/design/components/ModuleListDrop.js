@@ -827,8 +827,8 @@ setPreventDefaultModule(true);
         return(
           <div className="EachScenarioNameBox" >
             <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-              <h4>{e.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName})</h3></h5></div>
-                <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName})</h3></h5></div>
+              <h4>{e.sceName}</h4><div className="modIconSce"><h5><img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName}</h3></h5></div>
+                <div className="projIconSce"><h5><img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName}</h3></h5></div>
                 </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(idx.rowIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
           </div>
         )
