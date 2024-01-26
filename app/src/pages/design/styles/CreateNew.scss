@@ -45,6 +45,16 @@
 .loading-bar{
     position:absolute!important;
 }
+.canvas_topbar{
+    align-items: center;
+    background-color: #e6e6fa;
+    display: flex;
+    flex-direction: row;
+    height: 8%;
+    width: 100%;
+    gap: 1rem;
+    padding-left: 2rem;
+}
 .ms-Dialog-title {
 
     font-size: 16px;

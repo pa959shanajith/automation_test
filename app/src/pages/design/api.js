@@ -434,6 +434,10 @@ export const importGitMindmap = async(data) => {
             console.error(res.data)
             return {error:res.data}
         }
+        if(res.data === "Unable to find the given commit in GIT repository."){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_COMMIT_GIT}
+        }
         // if (!('testscenarios' in res.data)){
         //     console.error(res.data)
         //     return {error:MSG.MINDMAP.ERR_JSON_INCORRECT_IMPORT}
@@ -486,9 +490,14 @@ export const exportToGit = async(data) => {
             console.error(res.data)
             return {error:MSG.MINDMAP.ERR_GIT_BRANCH_EXIST}
         }
+        
         else if(res.data==='Invalid url'){
             console.error(res.data)
             return {error:MSG.MINDMAP.ERR_INVALID_GIT_CLONE_PATH}
+        }
+        else if(res.data==="Unable to connect GIT"){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_PROJECT_GIT_CON}
         }
         else if(res.data==='Invalid token'){
             console.error(res.data)
@@ -1699,4 +1708,27 @@ export const insertScreen = arg => {
         })
         .catch(error=>reject(error));
     });
+}
+export const fetch_git_exp_details = async(data) => {
+    try{
+        const res = await axios(url+'/fetch_git_exp_details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
 }

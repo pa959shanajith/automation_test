@@ -1,0 +1,80 @@
+.gitVersion_dialog {
+    .label-cls {
+      width: 150px;
+  
+    }
+  
+    .p-dialog-header {
+      background-color: #EBEBFF!important;
+    }
+    .note-cls  {
+    float: left;
+    color: #fc4f4f;
+    font-weight: 600;
+   }
+  
+    .label {
+      padding-right: 9px;
+    }
+    .dropdown-image {
+      height: 20px;
+    }
+    .git_input {
+      margin-bottom: 16px;
+    }
+      .Git-config_cls .git_comp , .Git-config_cls  .a__btn {
+      display: none;
+    }
+    .Git-config_cls .git_container {
+      bottom: 0rem !important;
+      margin: 30px auto;
+    }
+    .Git-config_cls .git_container .adminActionBtn_git {
+      left: 35rem;
+      position: absolute;
+      top: 30rem;
+  }
+  .gitConfigurationLabel {
+    margin-left: 50px;
+   font-weight: 500;
+  }
+  .GitVersion_cls .p-inputtext-sm {
+    height: 40px !important;
+    width: 100px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+    .commit_testcase_list{
+      display: flex;
+      flex-direction: column;
+      // justify-content: center;
+      border: 1.5px solid rgba(169, 175, 175, 0.267);
+      border-radius: 0.3rem;
+      padding: 0.5rem;
+      width: 20rem;
+      max-height: 18rem;
+      height: 18rem;
+  }
+  .import_cls .p-datatable {
+    border: ipx solid #dee2e6;
+    margin:20px 0px;
+  }
+  
+  .import_cls .p-datatable .p-datatable-tbody>tr>td {
+   text-align: center !important; 
+    border-width:0.1px !important ;
+    }
+    .import_cls .desination_cls {
+      display: inline-flex;
+    }
+    .import_cls .projectSelect {
+      width: 110px;
+      margin-right: 10px;
+    }
+   .import_cls .restore_cls {
+  padding: .75rem !important;
+    }
+    
+  }
+  

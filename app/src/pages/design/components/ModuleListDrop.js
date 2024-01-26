@@ -27,6 +27,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { checkRole, roleIdentifiers } from "../components/UtilFunctions";
+import Toolbarmenu from './ToolbarMenu.js';
 
 
 const ModuleListDrop = (props) =>{
@@ -1033,6 +1034,7 @@ setPreventDefaultModule(true);
           </div>}
           <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
+             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
             {warning.modID?<ModalContainer
                 show = {warning.modID} 
                 style={{width:"30%"}}
@@ -1048,19 +1050,8 @@ setPreventDefaultModule(true);
              <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); }}/> 
           </div>
             <div className="Whole_container" style={{ width: collapseWhole ? "17rem" : "0.9rem", transitionDuration: '0.7s ', overflow: !collapseWhole ? "hidden" : "",backgroundColor: !collapseWhole? "#c1c1ef" : ""  }}>
-              {/* <div className="project_name_section">
-             <h5>Home/</h5>
-             <select onChange={(e)=>{setprojectId(e.target.value)}} style={{width:'10rem', height:'19px'}}>
-             {projectList.map((project, index) => (
-                      
-                               <option value={project.id} key={index}>{project.name}</option>
-                              
-                    
-                       ))}
-                 
-             </select>
-              </div> */}
-
+            <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
+              
               <div className="normalModule_main_container"  style={{  display: !collapseWhole ? "none" : "", overflow: !collapseWhole ? "hidden" : "" }}>
                 <div className="moduleLayer_plusIcon">
                   <div className="moduleLayer_icon">

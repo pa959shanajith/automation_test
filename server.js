@@ -283,6 +283,8 @@ if (cluster.isMaster) {
 		app.post('/generate_testcase',generateAI.generateTestcase);
 		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
 		app.post('/save_testcase',generateAI.save_GenTestcases);
+		app.post('/fetch_git_exp_details',auth.protect, mindmap.fetch_git_exp_details);
+		
 
 		app.use(csrf({
 		cookie: true
