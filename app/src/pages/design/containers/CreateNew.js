@@ -154,15 +154,20 @@ return (
 {(delSnrWarnPop) ? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} /> : null}
 {(!loading) ?
 <div className='mp__canvas_container'>
+
+    
+{/* commented below div */}
+
 {/* <div className='mp__toolbar__container'>
 <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
-</div> */}
+</div>  */}
+
 <div style={{ display: 'flex', height: '95%', width: 'auto' }}>
 <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
 </div>
 <div className='canvas_topbar'>
 <Dropdown className={'w-full md:w-10rem p-inputtext-sm '} />
-{/* <GitDropdown toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} appType={Proj.appType} projectName={Proj.projectName} projectId={Proj.projectId} userId={userInfo.user_id} toast={toast} /> */}
+<GitDropdown toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} appType={Proj.appType} projectName={Proj.projectName} projectId={Proj.projectId} userId={userInfo.user_id} toast={toast} />
 </div>
 <div id='mp__canvas' className='mp__canvas'>
 {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?

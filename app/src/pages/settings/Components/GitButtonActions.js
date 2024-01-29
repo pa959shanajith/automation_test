@@ -19,6 +19,7 @@ const GitButtonActions = (props) => {
 	const gitUsername = props.gituser
     const gitEmail = props.gitemail
     const gitUrl = props.url
+    const gitBranch=props.gitbranch
     const userData = props.userData
     const projectData = props.projectData
     const setLoading = props.setLoading
@@ -29,13 +30,13 @@ const GitButtonActions = (props) => {
 
     useEffect(()=>{
         if(updateBtnRef!== undefined && updateBtnRef.current !==undefined )
-        updateBtnRef.current.disabled = (gitConfigName.current.value === 'none' || gitAccToken.current.value === 'none' || gitUrl.current.value === "def-opt" || gitUsername.current.value ==='none' || gitEmail.current.value==='none')
-    },[gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail])
+        updateBtnRef.current.disabled = (gitConfigName.current.value === 'none' || gitAccToken.current.value === 'none' || gitUrl.current.value === "def-opt" || gitUsername.current.value ==='none' || gitEmail.current.value==='none'|| gitBranch.current.value==='none')
+    },[gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail,gitBranch])
 
     const gitConfigAction = async (action) => {
-        if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail)) return;
+        if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail,gitBranch)) return;
         setLoading("Loading...");
-        const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim());
+        const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim(),  gitBranch.current.value.trim());
         if(data.error){displayError(data.error);return;}
         else if (data === 'GitConfig exists') props.toastWarn(Messages.ADMIN.WARN_GITCONFIG_EXIST);
         else if(data  === 'GitUser exists')  props.toastWarn(Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
@@ -76,7 +77,7 @@ const GitButtonActions = (props) => {
     );
 }
 
-const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail) => {
+const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail,gitBranch) => {
     var flag = true;
     const errBorder = '2px solid red';
     var regExUrl = /^https:\/\//g;
@@ -88,6 +89,7 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     gitUrl.current.style.outline = "";
 	gitUsername.current.style.outline = "";
     gitEmail.current.style.outline = "";
+    gitBranch.current.style.outline = "";
 
     if(user.current.value === 'def-opt'){
         user.current.style.outline = errBorder;
@@ -121,6 +123,11 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
         gitEmail.current.style.outline = errBorder
         flag = false;
     }
+    if(gitBranch.current.value === "" && action!=="delete"){
+        gitBranch.current.style.outline = errBorder  
+        flag = false;
+    }
+
     if(!regExUrl.test(gitUrl.current.value.trim())){
         gitUrl.current.style.outline = errBorder;
         // toastWarn(Messages.ADMIN.WARN_GIT_URL);
