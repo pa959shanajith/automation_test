@@ -246,6 +246,8 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
         var designscreen = require('./server/controllers/designscreen');
 		var browserstack = require('./server/controllers/browserstack');
+		var generateAI = require('./server/controllers/generateAI');
+		
 
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
@@ -260,6 +262,7 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
@@ -275,6 +278,13 @@ if (cluster.isMaster) {
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.get('/devopsReports/viewReport', report.viewReport);
+		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
+		app.get('/getall_uploadfiles',report.getall_uploadfiles);
+		app.post('/getjira_json',report.getJiraJSON_ICE)
+		app.post('/generate_testcase',generateAI.generateTestcase);
+		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
+		app.post('/save_testcase',generateAI.save_GenTestcases);
+
 		app.use(csrf({
 		cookie: true
 		}));
@@ -604,6 +614,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
 		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
+		app.post('/launchAndServerConnectSAPGenius_ICE', auth.protect, designscreen.launchAndServerConnectSAPGenius_ICE);
+		app.post('/startScrapingSAPGenius_ICE', auth.protect, designscreen.startScrapingSAPGenius_ICE);
+		app.post('/stopScrapingSAPGenius_ICE', auth.protect, designscreen.stopScrapingSAPGenius_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
