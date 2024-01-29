@@ -776,7 +776,6 @@ exports.getLDAPConfig = async (req, res) => {
 	try {
 		const action = req.body.action;
 		const name = req.body.args;
-		const opts = (req.body.opts || "").trim();
 		let inputs = {};
 		if (action != "server") inputs.name = name;
 		const resConf = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
@@ -814,29 +813,39 @@ exports.getLDAPConfig = async (req, res) => {
 		const filter = dataMaps.uname;
 		const ad = new activeDirectory(adConfig);
 		let resSent = false;
+		const opts = (req.body.opts || "");
 		if (opts.length > 0) {
-			ad.findUser(opts, function (err, result) {
-				if (resSent) return;
-				resSent = !resSent;
-				if (err) {
-					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
-					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
-					if (data == "fail") data = "server_error";
-				}
-				else if (result) {
-					data = {
-						username: result[filter],
-						firstname: result[dataMaps.fname],
-						lastname: result[dataMaps.lname],
-						email: result[dataMaps.email],
-						ldapname: result.dn
-					};
-				} else {
-					logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
-					data = "empty";
-				}
-				return res.send(data);
-			});
+			let multipleUsers = []
+			for(let user of opts){
+				multipleUsers.push(
+					new Promise((resolve,reject)=>{	
+						ad.findUser(user.trim(), function (err, result) {
+						//if (resSent) return;
+						//resSent = !resSent;
+							if (err) {
+								var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+								logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+								if (data == "fail") data = "server_error";
+							}
+							else if (result) {
+								data = {
+									username: result[filter],
+									firstname: result[dataMaps.fname],
+									lastname: result[dataMaps.lname],
+									email: result[dataMaps.email],
+									ldapname: result.dn
+								};
+							} else {
+								logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
+								data = "empty";
+							}
+							resolve(data);
+						});
+					})
+				)
+			}
+
+			Promise.all(multipleUsers).then((data)=>{return res.send(data);});
 		} else {
 			ad.find(filter+"=*", function (err, result) {
 				if (resSent) return;
