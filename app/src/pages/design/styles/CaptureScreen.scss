@@ -665,7 +665,7 @@
 .upgrade__block {
   border-right: 1px solid #E2E2ED;
   cursor: pointer;
-  width: 17rem;
+  width: 19rem;
 
   .insprint__text {
     position: relative;
@@ -766,12 +766,12 @@
   }
   .add_obj_import{
     position: relative;
-    right: 1rem;
+    right: 0.5rem;
     top: 0.2rem;
   }
   .add_obj_export{
     position: relative;
-    right: 0rem;
+    right: 0.5rem;
     top: 0.3rem;
   }
 
@@ -784,7 +784,7 @@
 .utility__block {
   border-right: 2px solid #E2E2ED;
   cursor: pointer;
-  opacity: 0.4;
+  // opacity: 0.4;
 
   .insprint__text {
     position: relative;
@@ -808,7 +808,7 @@
     font-size: 14px;
     padding: 0 0.8rem;
     top: 1rem;
-    right: 0.65rem;
+    right: 0.2rem;
     cursor: pointer;
   }
   .repo__dropdown{

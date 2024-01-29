@@ -690,24 +690,24 @@ const elementTypeProp =(elementProperty) =>{
       if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
           if (scrapeItem.isCustom){ 
-            views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+            views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid() });
         }else {
              const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
           if (foundItem) {
-            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid()});
           }}
           // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-          orderList.push(scrapeItem.tempOrderId);
+          orderList.push(scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid())
         }
         else {
-          if(parentId !== null){
-            const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
-            if (foundItem) {
-              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
-            }
+          // if(parentId !== null){
+          //   const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+          //   if (foundItem) {
+          //     views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+          //   }
             orderList.push(scrapeItem.objId);
   
-          }
+          // }
           
         }
       }
@@ -1797,6 +1797,13 @@ const elementValuetitle=(rowdata)=>{
   // fetchScrapeData();
   setSaveDisable(false);
   setElementRepo(true);
+  addMore.current = true;
+  let newData = capturedDataToSave;
+  newData.push(...selectedFolderValue.related_dataobjects)
+  setCapturedDataToSave(newData);
+  // setCaptureData(newData);
+  setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+
 };
 
 console.log(props.screenData);
@@ -1831,7 +1838,12 @@ const screenOption = screenData?.map((folder) => ({
                     {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                     <p className='text-600'>PDF Utility</p> */}
                     <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
-                      placeholder="Select screen" className="w-full md:w-10rem repo__dropdown" />
+                      placeholder={<h5 style={{color:'gray', fontSize:'19px'}}>{parentData.name}</h5>} className="w-full md:w-10rem repo__dropdown" />
+                      {/* <select value={selectedScreen} defaultValue={showCaptureScreen?parentData.name:""} onChange={handleScreenChange} placeholder="Select screen">
+                        {screenOption.map(option => (
+                          <option key={option._id} value={option._id}>{option.label}</option>
+                        ))}
+                    </select> */}
                   </span>
                 </div>
                 }

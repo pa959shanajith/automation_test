@@ -7,6 +7,7 @@ import ProjectCreation from './ProjectCreation'
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
 import ElementRepository from './ElementRepository';
+import AiTestcase from './Aitestcase';
 
 const ProjectOverview = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -28,8 +29,10 @@ const ProjectOverview = (props) => {
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
-        { label: 'Element Repository', command: ()=>handleElementRepository()}
+        { label: 'Element Repository', command: ()=>handleElementRepository()},
+        { label: 'AI Testcase' }
     ];
+    
 
     return (
         <div className="surface-100 OverviewSection">
@@ -53,6 +56,7 @@ const ProjectOverview = (props) => {
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}
             {activeIndex === 3 && <ElementRepository setOverlay={setOverlay} overlay={overlay}/>}
+            {activeIndex === 4 && <AiTestcase/>}
         </div>
     )
 }

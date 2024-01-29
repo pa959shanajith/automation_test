@@ -3,11 +3,9 @@ import {RedirectPage, Messages as MSG} from '../global'
 import {history} from './index'
 import {url} from '../../App'
 // import { GroupShowAll } from '@fluentui/react';
-
 /* Component
   api returns [["Admin": ""],["Test Lead": ""],["": ""],["": ""]...]
 */
-
 export const getUserRoles = async() => { 
     try{
         const res = await axios(url+'/getUserRoles', {
@@ -35,7 +33,6 @@ export const getUserRoles = async() => {
 /* Component
   api returns string "sucess" , "fail"
 */
-
 export const manageUserDetails = async(action, userObj) => { 
     try{
         const res = await axios(url+'/manageUserDetails', {
@@ -1306,6 +1303,7 @@ export const fetchAvoDiscoverMap = async() => {
         return {error:MSG.ADMIN.ERR_FETCH_AVODISCOVER_MAP}
     }
 }
+
 export const getAgent = async () => {
     try {
         // const res = await fetch("/downloadAgent");
@@ -1408,6 +1406,132 @@ export const deleteAvoGrid = async(props) => {
             data: props,
             credentials: 'include'
         });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+//APi for upload
+/* Component
+  Genarative AI api returns string ex. "success"
+*/
+export const uploadgeneratefile = async(props) => {
+    try{
+        const res = await axios(url+'/uploadgeneratefile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            data: props,
+                   });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+/* Component
+  Genarative AI api returns string ex. "success"
+*/
+export const getall_uploadfiles = async(props) => {
+       try{
+        const res = await axios(url+'/getall_uploadfiles', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            params:props                     
+                   });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+/* Component
+  Genarative AI api returns string ex. "success"
+*/
+export const generate_testcase = async(props) => {
+       try{
+        const res = await axios(url+'/generate_testcase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+            });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        //console.error(res.data)
+       return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        // console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+/* Component
+  Genarative AI api returns string ex. "success"
+*/
+export const getJSON_userstory = async(props) => {
+       try{
+        const res = await axios(url+'/getJSON_userstory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+                  });
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }else if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        console.error(res.data)
+     return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+/* Component
+  Genarative AI api returns string ex. "success"
+*/
+export const save_testcase = async(props) => {
+    try{
+        const res = await axios(url+'/save_testcase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: props,
+                  });
         if(res.status===200 && res.data !== "fail"){
             return res.data;
         }else if(res.status === 401 || res.data === "Invalid Session"){
