@@ -1,0 +1,94 @@
+.flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.testCasesDiv {
+    overflow: scroll;
+}
+
+.cards {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100vw;
+}
+
+#cardsDiv {
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+}
+
+.calm_cards {
+    width: 45%;
+    height: 65vh;
+}
+
+.bouncing-loader {
+    display: flex;
+    position: absolute;
+    top: 70%;
+    left: 40%;
+}
+
+.test__tcName {
+    padding-left: 0.5rem;
+    color: black;
+    position: relative;
+}
+
+.test_tree_leaves {
+    margin-bottom: 0.55rem;
+}
+
+.leafId {
+    padding-left: 0.5rem;
+    color: #0052CC;
+}
+
+#map-btn {
+    height: 6vh;
+    ;
+}
+
+.calmTestCasesCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 58vh;
+}
+
+.leafId {
+    cursor: pointer;
+    color: #0052CC;
+    font-weight: 500;
+    padding-left: 0 !important;
+}
+
+
+.test_tree_nodes {
+    margin-bottom: 5px;
+    width: fit-content;
+}
+
+.selected {
+    background-color: yellow;
+    padding: 5px;
+}
+
+#projectName {
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.selected_projNameText {
+    overflow: hidden;
+    text-transform: capitalize;
+}

@@ -355,22 +355,18 @@ const CloudSettings = () => {
         {showDelete? <SaucelabsDeleteModal show={showDelete} confirmDelete={()=>{setShowDelete(false); manageDetails('delete', {});}} cancelDelete={()=>{setShowDelete(false);}} />: null}
         {showBrowserstackDelete? <BrowserstackDeleteModal show={showBrowserstackDelete} confirmDelete={()=>{setShowBrowserstackDelete(false); manageDetailsBrowserstack('delete', {});}} cancelDelete={()=>{setShowBrowserstackDelete(false);}} />: null}
         {loading ? <ScreenOverlay content={loading} /> : null}
-        <div className="login_container_integrations">
-                <div className="side-panel">
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'saucelab' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'saucelab', code: 'sl' })} >
-                        <span><img src="static/imgs/Saucelabs-1.png" className="img__azure"></img></span>
-                        <span className="text__saucelabs">SauceLabs</span>
-                    </div>
-                    <div className={`icon-wrapper ${selectedscreen?.name === 'browserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
-                        <span><img src="static/imgs/browserstack_icon 48x48.svg" className="img__alm"></img></span>
-                        <span className="text__browserstack">BrowserStack</span>
-                    </div>
+        <div className="login_container_integrations_logo_div">
+            <div className="integration_login_icons">
+                <div className={`integration-card ${selectedscreen?.name === 'saucelab' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'saucelab', code: 'sl' })} >
+                    <img src="static/imgs/Saucelabs-1.png" className="cloud_integration_logos"></img>
+                    <p>SauceLabs</p>
                 </div>
-        </div>
-         
-
-                
-            
+                <div className={`integration-card ${selectedscreen?.name === 'browserstack' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'browserstack', code: 'st' })}>
+                    <img src="static/imgs/browserstack_icon 48x48.svg" className="cloud_integration_logos"></img>
+                    <p>BrowserStack</p>
+                </div>
+            </div>
+        
             <Card className="card__login__cloud">
             {selectedscreen.name==="saucelab" ?( 
             <div>
@@ -473,8 +469,7 @@ const CloudSettings = () => {
                 )}
 
             </Card>
-          
-       
+            </div>
         </>
         
     )

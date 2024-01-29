@@ -119,6 +119,33 @@ export const getDetails_JIRA = async() => {
     }
 }
 
+export const fetchALMTestCases = async (setShowLoginCard) => {
+    try {
+        const { data, status } = await axios(url + '/fetchALM_Testcases', {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history);
+            return {
+                error: MSG.GENERIC.INVALID_SESSION
+            };
+        } else if (status === 200 && data !== "fail") {
+            setShowLoginCard(false);
+            return data;
+        }
+    } catch (err) {
+        console.error(err);
+        return {
+            error: MSG.SETTINGS.ERR_JIRA_FETCH
+        };
+    }
+}
+
 export const getDetails_Azure = async() => { 
     try{
         const res = await axios(url+'/getDetails_Azure', {

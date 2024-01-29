@@ -22,9 +22,10 @@
 }
 
 .login-cls{
-    padding: 1.5rem 0rem;
     font-size: 23px;
     font-weight: 600;
+    position: absolute;
+    bottom: 20rem;
 }
 .input-cls, .passwrd-cls, .url-cls{
     display: flex;
@@ -209,11 +210,24 @@ height: 2.5rem !important;
 
 .card__login__jira {
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 89%;
+    position: absolute;
+    height: 20rem;
+    width: 31rem;
+    bottom: 7rem;
+    left: 20rem;
     box-shadow: none !important;
+
+
+
+    .p-card-body {
+
+        width: 33rem;
+
+    }
+
+
+
+
 }
 
 
@@ -236,7 +250,11 @@ height: 2.5rem !important;
 
 
 
-.login_container_integrations {
+.login_container_integrations_logo_div {
+
+    display: flex;
+
+    flex-direction: row;
 
     .p-component{
 
@@ -246,25 +264,55 @@ height: 2.5rem !important;
 
 }
 
+.integration_login_icons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+    overflow: scroll;
+    height: 75vh;
+}
+
 .manage_integrations{
     .p-dialog-content{
         overflow: hidden;
     }
 }
 
+.cloud_integration_logos {
+    height: 2rem;
+    width: 35px;
+}
+
+.integration-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px 10px;
+}
 
 .side-panel_login {
     .icon-wrapper {
         position: relative;
-        top: 0.5rem;
+        top: 2rem;
         width: 40px;
         cursor: pointer;
     }
+
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    align-content: center;
     width: 7rem;
+    gap: 1.2rem;
+    overflow: scroll;
+    height: 78%;
+    overflow-x: hidden;
+    position: absolute;
+    text-align: center;
+    justify-content: flex-start;
+
     .img__saucelabs{
         height: 2rem;
         width: 38px;
@@ -290,6 +338,12 @@ height: 2.5rem !important;
     .img__zephyr {
         height: 2rem;
         width: 33px;
+        cursor: pointer;
+    }
+    
+    .img__testrail {
+        height: 2rem;
+        width: 40px;
         cursor: pointer;
     }
 
@@ -361,6 +415,13 @@ height: 2.5rem !important;
     border: 1px solid #6837e6;
     border-radius: 7px;
     padding: 1rem 4rem 2rem 2rem;
+    background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+    cursor: pointer;
+  }
+
+  .side-panel_login .integration-card.selected {
+    border: 1px solid #6837e6;
+    border-radius: 7px;
     background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
     cursor: pointer;
   }
