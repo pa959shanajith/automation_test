@@ -1,6 +1,7 @@
 import React, { useState,useRef } from 'react';
-import '../styles/Testcase.scss';
+import '../styles/testcase.scss';
 import { TabMenu } from 'primereact/tabmenu';
+import { TabView, TabPanel } from 'primereact/tabview';
 import Input from  './AiInput';
 import Output from './AiOutput';
 
@@ -9,7 +10,7 @@ export default function AiTestcase() {
  const[isReset,setIsReset]=useState(false)
 const tabMenuRef = useRef(null);
 const items = [
-   { label: 'Input', icon: <img src="static/imgs/Input.svg" alt="Input" className="icon-with-padding mr-1 p-2 text-dark" /> },
+   { label: 'Input', icon: <img src="static/imgs/InputAi.svg" alt="Input" className="icon-with-padding mr-1 p-2 text-dark" /> },
    { label: 'Output', icon: <img src="static/imgs/Output.svg" alt="Output" className="icon-with-padding mr-2 p-2 text-dark" /> },
     ];
       const handleNextButtonClick = () => {
@@ -26,25 +27,25 @@ const items = [
      console.log(getDetails)
      }
    return (
-    <div className='tab_continer p-0 flex flex-column'>
-       <div className="row">
-          <div className="card">
-          
-            <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} ref={tabMenuRef}/>
-            {activeIndex === 0 && <Input  items={items} callback={callback} isReset={isReset}  />}
+      <div className='tab_continer p-0 flex flex-column'>
+         <div className="row">
+            <div className="card">
+
+               <TabMenu model={items} activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} ref={tabMenuRef} className='ai_menu'/>
+               {activeIndex === 0 && <Input  items={items} callback={callback} isReset={isReset} />}
                {activeIndex === 1 && <Output  />}
-                    </div>
-            </div>
-            {activeIndex === 0 ?(
-         <div className='row btn-alignment'> 
-            <div className=" float-right d-flex justify-content-end gap-2">
-               <button type="button" class="btn-cls btn btn-outline-primary m-1 " style={{ padding: '1rem 2rem' }} onClick={resetInputs}>Reset</button>
-               <button type="button" class=" btn-cls text-light bg-primary  ml-3 " style={{ padding: '1rem 2rem' }} onClick={handleNextButtonClick}>Next</button>
             </div>
          </div>
-            ) : null
+         {activeIndex === 0 ?(
+            <div className='row btn-alignment'>
+               <div className=" float-right d-flex justify-content-end gap-2">
+                  <button type="button" class="btn-cls btn btn-outline-primary m-1 " style={{ padding: '1rem 2rem' }} onClick={resetInputs}>Reset</button>
+                  <button type="button" class=" btn-cls text-light bg-primary  ml-3 " style={{ padding: '1rem 2rem' }} onClick={handleNextButtonClick}>Next</button>
+               </div>
+            </div>
+         ) : null
          }
-    </div>
+      </div>
     )
 }
         

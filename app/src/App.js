@@ -35,7 +35,7 @@ import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
 import AdminContainer from './pages/admin/containers/AdminHome';
 import GeniusDialog from './pages/global/components/GeniusDialog';
-
+import GeniusSapDialog from './pages/global/components/GeniusSapDialog';
 
 
 
@@ -95,6 +95,7 @@ const RouteApp = () => {
   return (
     <>
     <GeniusDialog />
+    <GeniusSapDialog/>
       <Routes>
       
         <Route path="/login" element={<Login />} />
