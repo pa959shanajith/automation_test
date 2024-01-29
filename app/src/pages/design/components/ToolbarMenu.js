@@ -230,55 +230,14 @@ const Toolbarmenu = ({setBlockui,displayError,isAssign}) => {
             footer={<Footer clickExport={clickExport}/>}
             content={<Container isEndtoEnd={"endtoend"} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName isAssign={isAssign}/>} 
             />:null} 
-        <div style={{display:'flex'}}>
+        <div style={{display:'flex', height:'5%'}}>
             <div style={{background:"white", width: '17rem'}}>
                 <label data-test="projectLabel" className='projectLabel'>Project:</label>
                 <select data-test="projectSelect" className='projectSelect' value={initProj} onChange={(e)=>{handleProjectSelecte(e.target.value)}}>
                     {projectList.map((e,i)=><option value={e[1].id} key={i}>{e[1].name}</option>)}
                 </select> 
             </div>     
-            <div className='toolbar__header'>    
-                {/* <span data-test="headerMenu" className='toolbar__header-menus'>
-                    <i className={"fa fa-crop fa-lg active-map"} title="Select" onClick={clickSelectBox}></i>
-                    <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
-                    <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                </span> */}
-                    <div data-test="headerMenu" className='toolbar__header-menus'>
-                        <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
-                        <div >40%</div>
-                        <img className='am' src='static/imgs/add.svg' alt='add' />
-                    {/* <img className='line' src='static/imgs/line.svg' alt='line'/> */}
-                    {/* <div className="flex justify-content-center gap-2 text-500">
-                        <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
-                        <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
-                        <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
-                    </div> */}
-                    <img className='line' src='static/imgs/line.svg' alt='line'/>
-                </div>
-                 {/* Radio buttons for map views */}
-                 <div className="card flex justify-content-center">
-                            <div className="flex flex-wrap gap-1.5">
-                                <div className="flex align-items-center">
-                                    <RadioButton inputId="journeyView"  value="journeyView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'journeyView'} />
-                                    <label htmlFor="journeyView" className="ml-2 mr-2">Journey View</label>
-                                </div>
-                                <div className="flex align-items-center">
-                                    <RadioButton inputId="tableView"  value="tableView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'tableView'} />
-                                    <label htmlFor="tableView" className="ml-2 mr-2">Table View</label>
-                                </div>
-                                <div className="flex align-items-center">
-                                    <RadioButton inputId="folderView"  value="folderView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'folderView'} />
-                                    <label htmlFor="folderView" className="ml-2 mr-2">Folder View</label>
-                                </div>
-                                <div className="flex align-items-center">
-                                    <RadioButton inputId="mindMapView"  value="mindMapView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'mindMapView'} />
-                                    <label htmlFor="mindMapView" className="ml-2 mr-2">Tree View</label>
-                                </div>
-            </div>
-        </div>
-                {/* <img  className='line' src='static/imgs/line.svg' alt='line'/> */}
-                {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
-            </div>
+            
         </div>
         </Fragment>
     )
@@ -528,4 +487,45 @@ Toolbarmenu.propTypes={
 export default Toolbarmenu;
 
 
-         
+        //  <div className='toolbar__header'>    
+                {/* <span data-test="headerMenu" className='toolbar__header-menus'>
+                    <i className={"fa fa-crop fa-lg active-map"} title="Select" onClick={clickSelectBox}></i>
+                    <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
+                    <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
+                </span> */}
+//                 <div data-test="headerMenu" className='toolbar__header-menus'>
+//                 <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
+//                 <div >40%</div>
+//                 <img className='am' src='static/imgs/add.svg' alt='add' />
+//             {/* <img className='line' src='static/imgs/line.svg' alt='line'/> */}
+//             {/* <div className="flex justify-content-center gap-2 text-500">
+//                 <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
+//                 <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
+//                 <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
+//             </div> */}
+//             <img className='line' src='static/imgs/line.svg' alt='line'/>
+//         </div>
+//          {/* Radio buttons for map views */}
+//          <div className="card flex justify-content-center">
+//                     <div className="flex flex-wrap gap-1.5">
+//                         <div className="flex align-items-center">
+//                             <RadioButton inputId="journeyView"  value="journeyView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'journeyView'} />
+//                             <label htmlFor="journeyView" className="ml-2 mr-2">Journey View</label>
+//                         </div>
+//                         <div className="flex align-items-center">
+//                             <RadioButton inputId="tableView"  value="tableView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'tableView'} />
+//                             <label htmlFor="tableView" className="ml-2 mr-2">Table View</label>
+//                         </div>
+//                         <div className="flex align-items-center">
+//                             <RadioButton inputId="folderView"  value="folderView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'folderView'} />
+//                             <label htmlFor="folderView" className="ml-2 mr-2">Folder View</label>
+//                         </div>
+//                         <div className="flex align-items-center">
+//                             <RadioButton inputId="mindMapView"  value="mindMapView" onChange={(e) =>{ dispatch(TypeOfViewMap(e.value))}} checked={handleTypeOfViewMap === 'mindMapView'} />
+//                             <label htmlFor="mindMapView" className="ml-2 mr-2">Tree View</label>
+//                         </div>
+//     </div>
+// </div>
+//         {/* <img  className='line' src='static/imgs/line.svg' alt='line'/> */}
+//         {!isEnELoad ?<Fragment><Legends/></Fragment>:<Fragment><Legends isEnE={true}/> </Fragment>} 
+//     </div>

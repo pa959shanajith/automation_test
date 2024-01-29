@@ -1050,7 +1050,7 @@ setPreventDefaultModule(true);
              <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); }}/> 
           </div>
             <div className="Whole_container" style={{ width: collapseWhole ? "17rem" : "0.9rem", transitionDuration: '0.7s ', overflow: !collapseWhole ? "hidden" : "",backgroundColor: !collapseWhole? "#c1c1ef" : ""  }}>
-            <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
+             { collapseWhole && <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>}
               
               <div className="normalModule_main_container"  style={{  display: !collapseWhole ? "none" : "", overflow: !collapseWhole ? "hidden" : "" }}>
                 <div className="moduleLayer_plusIcon">
