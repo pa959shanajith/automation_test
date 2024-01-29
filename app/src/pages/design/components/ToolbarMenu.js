@@ -45,7 +45,7 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
     const initEnEProj = useSelector(state => state.design.initEnEProj)
     const [isCreateE2E, setIsCreateE2E] = useState(false)
     const isEnELoad = useSelector(state => state.design.isEnELoad);
-    const [selectedView, setSelectedView] = useState({ code: 'folderView', name: <div><img src="static/imgs/journey_view_icon.svg" alt="modules" /><h5>Folder View</h5></div> });
+    const [selectedView, setSelectedView] = useState({ code: 'mindMapView', name: <div><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div> });
     // const [radioButClicked, setRadioButClicked] = useState('journeyView');
     const [selectedGitOpp, setSelectedGitOpp] = useState(null);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
@@ -248,7 +248,9 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
             case 'mindMapView':
                 dispatch(TypeOfViewMap("mindMapView"));
                 break;
-
+            default:
+                dispatch(TypeOfViewMap("mindMapView"));
+                break;
 
         }
 
@@ -289,7 +291,7 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
                     {/* Radio buttons for map views */}
                     <div className="card flex justify-content-center">
                         <Dropdown value={selectedView} onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }} options={views} optionLabel="name"
-                            className="w-full md:w-12rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/folderViewIcon.svg" alt="modules" /><h5>Folder View</h5></div>}
+                            className="w-full md:w-12rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
                         />
                     </div>
                     <div className="card flex justify-content-center">

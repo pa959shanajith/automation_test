@@ -53,7 +53,7 @@ const initialState = {
   enableExport: false,
   exportProjname: "",
   enableExportMindmapButton: true,
-  typeOfViewMap: 'folderView',
+  typeOfViewMap: 'mindMapView',
   typeOfOprationInFolder: { onExpand: null, onCollapse: null, onSelect: null, onUnselect: null, screenDataForCapture: null, addNewTestStepGroup: null,createNewTestSuit:null },
   selectedScreenOfStepSlice: [],
   oldModuleForReset: "",
