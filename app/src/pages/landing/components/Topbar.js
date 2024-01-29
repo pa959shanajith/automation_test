@@ -8,10 +8,24 @@ import { Tooltip } from 'primereact/tooltip';
 import { useSelector} from 'react-redux';
 import WelcomeWizard from "../../login/components/WelcomeWizard";
 import { Toast } from "primereact/toast";
-
+import { Badge } from "primereact/badge";
+import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
+import DropDownList from "../../global/components/DropDownList";
+import { ListBox } from "primereact/listbox";
+import { Tag } from "primereact/tag";
+import { createKeyword } from "../../design/containers/DesignTestStep";
+import {
+  DesignModal,
+  inputKeywordName,
+} from "../../design/containers/DesignTestStep";
+import { color } from "d3";
+import { TieredMenu } from "primereact/tieredmenu";
 
 const MenubarDemo = (props) => {
   const toast = useRef();
+  const notificationMenu = useRef(null);
+  const [isMenuVisible, setMenuVisibility] = useState(false);
   const [showExtraheaderItem, setShowExtraheaderItem] = useState(false);
   const location = useLocation();
   const needHelpmenuLeft = useRef(null);
@@ -89,6 +103,83 @@ const MenubarDemo = (props) => {
     }
   ];
 
+  const keywordItems = [
+    {
+      label: <p style={{ color: "green" }}>Approved</p>,
+      items: [
+        {
+          template: (<div className="flex flex-row justify-content-left" style={{marginLeft:"1.2rem" ,alignContent:"center"}}>
+          
+          <p style={{margin: "0 0 0.75rem 0.5rem"}}>Keyword 1</p><i className="pi pi-times" style={{marginTop:'0.25rem', marginLeft:' 6rem'}}></i>
+          </div>)
+        },
+        {
+          template: (<div className="flex flex-row justify-content-left" style={{marginLeft:"1.2rem",alignContent:"center"}}>
+          
+          <p style={{margin: "0 0 0.75rem 0.5rem"}}>Keyword 2</p><i className="pi pi-times" style={{marginTop:'0.25rem', marginLeft:' 6rem'}}></i>
+          </div>)
+        },
+        {
+          template: (<div className="flex flex-row justify-content-left" style={{marginLeft:"1.2rem" ,alignContent:"center"}}>
+          
+          <p style={{margin: "0 0 0.75rem 0.5rem"}}>Keyword 3</p><i className="pi pi-times" style={{marginTop:'0.25rem', marginLeft:' 6rem'}}></i>
+          </div>)
+        },
+      ],scrollable: true,
+    },
+    
+    {
+      label: <p style={{ color: "red" }}>Rejected</p>,
+      items: [
+        {
+          
+          template: (<div className="flex flex-row justify-content-center" style={{marginLeft:"1.2rem",alignContent:"center"}}>
+          
+          <p style={{margin: "0 0 0.75rem 0.5rem"}}>Keyword 3</p>
+            <Button style={{height: "1.5rem",marginLeft:" 1rem"}}>Improve</Button><i className="pi pi-times" style={{marginTop:'0.25rem', marginLeft:"0.75rem"  }}></i></div>
+            
+          ),
+        //   items: [
+        //     {
+        //       label: "Improve",
+        //       icon: "pi pi-fw pi-pencil",
+        //     },
+        //     {
+        //       separator: true
+        //   },
+        //     {
+        //       label: "Delete",
+        //       icon: "pi pi-fw pi-trash",
+        //     },
+        //   ],
+          },
+        
+        { template: (<div className="flex flex-row justify-content-center" style={{marginLeft:"1.2rem",alignContent:"center"}}>
+       
+        <p style={{margin: "0 0 0.75rem 0.5rem"}}>Keyword 4</p>
+          <Button style={{height: "1.5rem",marginLeft:" 1rem"}}>Improve</Button> <i className="pi pi-times" style={{marginTop:'0.25rem',marginLeft:"0.75rem"}}></i></div>
+          ),
+          // items: [
+          //   {
+          //     label: "Improve",
+          //     icon: "pi pi-fw pi-pencil",
+          //   },
+          //   {
+          //     separator: true
+          // },
+          //   {
+          //     label: "Delete",
+          //     icon: "pi pi-fw pi-trash",
+          //   },
+          // ],
+        },
+      ],
+    },
+  ];
+  // const showMyCustomKeynotification = (event) => {
+  //   setMenuVisibility(!isMenuVisible);
+  //   notificationMenu.current.toggle(event);
+  // };
   useEffect(() => {
     if (["/design", "/execute", "/reports"].includes(location.pathname)) {
       setShowExtraheaderItem(true);
@@ -135,7 +226,42 @@ const MenubarDemo = (props) => {
           {showExtraheaderItem && <NavLink to="/reports" activeClassName="active">Reports</NavLink>}
         </>
       </div>
-      <UserProfile toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/>
+      <div>
+        {/* <Button aria-controls="popup_menu_left" aria-haspopup
+        icon="pi pi-bell p-overlay-badge"
+        onClick={(event)=>{notificationMenu.current.toggle(event);}}
+        style={{ margin: "2rem 2rem 2rem 2rem", fontSize: "1.4rem" }}
+      >
+        <Badge className="notify" severity={"danger"}></Badge>
+      </Button> */}
+
+        <div className="card flex justify-content-center">
+          <Menu style={{width:'16rem',maxHeight: keywordItems.find((section) => section.label.props.style.color === 'green')?.scrollable ? '200px' : 'none',
+        overflowY: keywordItems.find((section) => section.label.props.style.color === 'green')?.scrollable ? 'auto' : 'hidden',}}
+          className="keyword_menu"
+            id="popup_menu_left"
+            ref={notificationMenu}
+            model={keywordItems}
+            popup
+          />
+        </div>
+
+        <i
+          className="pi pi-bell p-overlay-badge"
+          onClick={(event) => {
+            notificationMenu.current.toggle(event);
+          }}
+          style={{ margin: "2rem 2rem 2rem 2rem", fontSize: "1.4rem" }}
+        >
+          <Badge className="notify" severity={"danger"}></Badge>
+        </i>
+      </div>
+
+      <UserProfile
+        toastError={toastError}
+        toastSuccess={toastSuccess}
+        toastWarn={toastWarn}
+      />
     </div>
   );
 
