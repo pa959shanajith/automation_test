@@ -55,40 +55,40 @@ const CreateLanding = (props) => {
         { value: "oidc", name: "OpenID" },
     ]
 
-    
-    const sortingFunction = (array) =>{
+
+    const sortingFunction = (array) => {
         let inputArray = array;
         inputArray.sort((a, b) => {
             const nameA = a.name.toUpperCase();
             const nameB = b.name.toUpperCase();
-          
+
             if (nameA < nameB) {
-              return -1;
+                return -1;
             }
-          
+
             if (nameA > nameB) {
-              return 1;
+                return 1;
             }
-          
+
             return 0; // names are equal
-         });
+        });
         return inputArray;
     }
 
-    useEffect (() => {
-        let newRolesList = [...primaryRoles, {name: "Quality Manager & Admin", value:"ManagerWithadmin"}]
+    useEffect(() => {
+        let newRolesList = [...primaryRoles, { name: "Quality Manager & Admin", value: "ManagerWithadmin" }]
         setPrimaryRoles(newRolesList);
-    },[]);
+    }, []);
 
     useEffect(() => {
         let modifyData = []
-        if(ldapAllUserList.length > 0){
+        if (ldapAllUserList.length > 0) {
             ldapAllUserList.map(item => {
-                let object={}
+                let object = {}
                 object.name = item.html;
                 object.domain = item.value;
                 object.role = ""
-                object.roleId="" 
+                object.roleId = ""
                 modifyData.push(object);
             })
             let updatedlist = sortingFunction(modifyData)
@@ -107,16 +107,19 @@ const CreateLanding = (props) => {
     const selectServerHandler = (event) => {
         setServerName(event.value);
         dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
-        dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-        props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName: event.target.value.name});
+        if (type === "ldap") {
+            dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
+            props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName: event.target.value.name });
+        }
+
     }
 
     //checked users 
     const selectLeftSideHandler = (event) => {
         let _selectedUserList = [...tempCheckedUserListLeftSide]
         if (event.checked) {
-            LDAPUserList.filter((item) =>{
-                if(item.name === (event.target.name)) _selectedUserList.push(item);
+            LDAPUserList.filter((item) => {
+                if (item.name === (event.target.name)) _selectedUserList.push(item);
             });
         }
         else {
@@ -147,22 +150,22 @@ const CreateLanding = (props) => {
 
     const transferSelectedUsersToRightSide = () => {
         let newSelectesUserList = [...tempCheckedUserListLeftSide, ...props.ldapSelectedUserList];
-        
+
         function isSubarrayEqual(subArr1, subArr2) {
             return subArr1.name === subArr2.name;
         }
         let updatedUserList = LDAPUserList.filter(subArr1 =>
-          !newSelectesUserList.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
+            !newSelectesUserList.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
         );
 
         let checkedUserListData = [];
         let domainNameList = [];
         tempCheckedUserListLeftSide.map(item => {
-            let object={...item, role : "Quality Engineer", roleId:"5db0022cf87fdec084ae49ac", isAdmin: false };
+            let object = { ...item, role: "Quality Engineer", roleId: "5db0022cf87fdec084ae49ac", isAdmin: false };
             domainNameList.push(item.domain);
             checkedUserListData.push(object);
         })
-        let newLdapSelectedUserListTemp = sortingFunction([...props.ldapSelectedUserList,...checkedUserListData])
+        let newLdapSelectedUserListTemp = sortingFunction([...props.ldapSelectedUserList, ...checkedUserListData])
         setTempCheckedUserListLeftSide([]);
         setFilterListSearchUser(sortingFunction(updatedUserList));
         props.setLdapSelectedUserList(newLdapSelectedUserListTemp);
@@ -179,24 +182,26 @@ const CreateLanding = (props) => {
         let updatedCheckedUserList = sortingFunction(props.ldapSelectedUserList.filter(subArr1 =>
             !tempCheckedUserListRightSide.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
         ));
-        let userLists = [...filterListSearchUser,...tempCheckedUserListRightSide]
+        let userLists = [...filterListSearchUser, ...tempCheckedUserListRightSide]
 
         setTempCheckedUserListRightSide([]);
-        setFilterListSearchUser(sortingFunction(userLists)); 
+        setFilterListSearchUser(sortingFunction(userLists));
         props.setLdapSelectedUserList(updatedCheckedUserList);
         setSelectedLdapUserListTemp(updatedCheckedUserList);
         let newldapFetchUsersData = [];
-        ldapFetchUsersData.filter(arr1=> { updatedCheckedUserList.some(arr2 =>{
-            if(arr1.ldapname === arr2.domain) newldapFetchUsersData.push(arr1);
-        })});
+        ldapFetchUsersData.filter(arr1 => {
+            updatedCheckedUserList.some(arr2 => {
+                if (arr1.ldapname === arr2.domain) newldapFetchUsersData.push(arr1);
+            })
+        });
         dispatch(AdminActions.UPDATE_LDAP_DATA(newldapFetchUsersData));
     }
 
     const selectRightSideUserListHandler = (event) => {
         let _selectedUserList = [...tempCheckedUserListRightSide]
         if (event.checked) {
-            props.ldapSelectedUserList.filter((item) =>{
-                if(item.name === (event.target.name)) _selectedUserList.push(item);
+            props.ldapSelectedUserList.filter((item) => {
+                if (item.name === (event.target.name)) _selectedUserList.push(item);
             });
         }
         else {
@@ -212,8 +217,8 @@ const CreateLanding = (props) => {
         let updatedLdapUserList = [];
         updateUser.map(((userData, index) => {
 
-            if(index === updateUserIndex){
-                let userObj = {...userData, roleId: primaryRoles[roleIndex].value, role: primaryRoles[roleIndex].name, isAdmin: event.target.value === "ManagerWithadmin" ? true:false }
+            if (index === updateUserIndex) {
+                let userObj = { ...userData, roleId: primaryRoles[roleIndex].value, role: primaryRoles[roleIndex].name, isAdmin: event.target.value === "ManagerWithadmin" ? true : false }
                 updatedLdapUserList.push(userObj);
             }
             else updatedLdapUserList.push(userData);
@@ -239,12 +244,12 @@ const CreateLanding = (props) => {
     }
     const firstNameChange = (value) => {
         dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(value));
-        {(firstname === value || value === props?.editUserData?.firstName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false)}
+        { (firstname === value || value === props?.editUserData?.firstName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
     }
 
-    const lastNameChange = (value) => { 
+    const lastNameChange = (value) => {
         dispatch(AdminActions.UPDATE_INPUT_LASTNAME(value));
-        {(firstname === value || value === props?.editUserData?.lastName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false)}
+        { (firstname === value || value === props?.editUserData?.lastName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
     }
 
 
@@ -322,7 +327,7 @@ const CreateLanding = (props) => {
 
                             </div>
 
-                            <div className='flex flex-column justify-content-center' style={{gap:'0.8rem', padding:'0.3rem'}}>
+                            <div className='flex flex-column justify-content-center' style={{ gap: '0.8rem', padding: '0.3rem' }}>
                                 <Button label=">" size="small" onClick={transferSelectedUsersToRightSide} disabled={tempCheckedUserListLeftSide.length <= 0} outlined></Button>
                                 <Button label="<" size="small" onClick={transferSelectedUsersToLeftSide} disabled={tempCheckedUserListRightSide.length <= 0} outlined> </Button>
                             </div>
@@ -345,7 +350,7 @@ const CreateLanding = (props) => {
 
                                 <div className='user_list_container'>
                                     {(selectedLdapUserListTemp.length > 0) ? selectedLdapUserListTemp.map((user, index) =>
-                                        <div key={index} className="flex flex-row pb-2 w-full" style={{alignItems:'center'}}>
+                                        <div key={index} className="flex flex-row pb-2 w-full" style={{ alignItems: 'center' }}>
                                             <Checkbox inputId={user.name} name={user.name} onChange={selectRightSideUserListHandler} checked={tempCheckedUserListRightSide.some(item => item.name === user.name)} />
                                             <label htmlFor={user.name} className={`ldap_selected_username ldap_label_${index} ml-2`}>{user.name}</label>
                                             <Tooltip target={`.ldap_label_${index}`} position='bottom' content={user.name}></Tooltip>
@@ -371,7 +376,7 @@ const CreateLanding = (props) => {
                     </>
                     : null
                 }
-                {(type === "inhouse") ?
+                {(type === "inhouse" || type === "saml") ?
                     <>
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className="flex flex-column">
@@ -379,7 +384,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="userName-input__create"
                                     type="text"
-                                    className={`w-full md:w-20rem p-inputtext-sm placeHolder ${props.userNameAddClass ? 'inputErrorBorder': ''}`}
+                                    className={`w-full md:w-20rem p-inputtext-sm placeHolder ${props.userNameAddClass ? 'inputErrorBorder' : ''}`}
                                     id="userName"
                                     value={userName} onChange={(event) => { userNameChange(event.target.value) }}
                                     name="userName" maxLength="100"
@@ -393,7 +398,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="email"
                                     value={email}
-                                    onChange={(event) => {props.emailChange(event.target.value.toLowerCase())}}
+                                    onChange={(event) => { props.emailChange(event.target.value.toLowerCase()) }}
                                     name="email"
                                     id="email"
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
@@ -402,8 +407,6 @@ const CreateLanding = (props) => {
                                 />
                             </div>
                         </div>
-
-
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className='flex flex-column'>
                                 <label htmlFor='firstname' className="pb-2 font-medium">First Name <span style={{ color: "#d50000" }}>*</span></label>
@@ -411,17 +414,17 @@ const CreateLanding = (props) => {
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="firstname" id="firstname" value={firstname}
-                                    onChange={(event) => {firstNameChange(event.target.value)}}
+                                    onChange={(event) => { firstNameChange(event.target.value) }}
                                     maxLength="100"
                                     placeholder="Enter First Name" />
                             </div>
                             <div className='flex flex-column'>
                                 <label htmlFor='lastname' className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
                                 <InputText data-test="lastName-input__create"
-                                className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
+                                    className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="lastname" id="lastname" value={lastname}
-                                    onChange={(event) => {lastNameChange(event.target.value)}}
+                                    onChange={(event) => { lastNameChange(event.target.value) }}
                                     maxLength="100"
                                     placeholder="Enter Last Name" />
                             </div>

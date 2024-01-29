@@ -1420,6 +1420,7 @@ export const deleteAvoGrid = async(props) => {
     }
 }
 
+// Multiple Ldap user creation
 export const createMulitpleLdapUsers = async(action, userObj) => { 
     try{
         const res = await axios(url+'/createMulitpleLdapUsers', {
@@ -1442,6 +1443,8 @@ export const createMulitpleLdapUsers = async(action, userObj) => {
     }catch(err){
         console.error(err)
         return {error:"Failed to "+action+" user."}
+    }
+}
 //APi for upload
 /* Component
   Genarative AI api returns string ex. "success"

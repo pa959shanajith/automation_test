@@ -292,7 +292,6 @@ const CreateUser = (props) => {
                 else {
                     var data = await createMulitpleLdapUsers(action, ldapUserList);
                     setLoading(false);
-                    console.log('ldapMultiUser', data);
                     let errorMsg = ''
                     let iceProvisonUserData = []
                     data.map((user, index )=> {
