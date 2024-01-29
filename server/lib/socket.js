@@ -229,6 +229,12 @@ io.on('connection', async socket => {
 		iceIPMap[clientName][username] = value.hostip;
 		cache.sethmap(username,value)
 	});
+
+	socket.on('sap_scrape_data', async (data) => {
+		var address;
+		address = data["user_name"];
+		socketMapNotify[clientName][address].emit('get_sap_scrape_data', data);
+	});
 });
 //SOCKET CONNECTION USING SOCKET.IO
 
