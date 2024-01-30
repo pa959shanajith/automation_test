@@ -1922,12 +1922,12 @@ exports.fetchICE = async (req, res) => {
 };
 
 let multipleProvisionIce = async (requestData) => {
-
+	let fnName = 'multipleProvisionIce'
 	let inputs = {
 		'query': 'multipleProvisionIce',
 		'tokensInfo':[]
 	}
-	for(tokenData in requestData['tokenInfo']) {
+	for(tokenData of requestData['tokeninfo']['userList']) {
 		const tokeninfo = tokenData;
 		if (regEx.test(tokeninfo.icename)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
@@ -1947,11 +1947,11 @@ let multipleProvisionIce = async (requestData) => {
 		    username: tokeninfo.username
 		});
 	}
-	const multipleResult = await utils.fetchData(inputs, "admin/provisionICE", fnName);
+	const multipleResult = await utils.fetchData(inputs, "admin/multipleProvisionICE", fnName);
 	if(multipleResult == 'fail') return multipleResult;
 
 	// Will get ice tokens for each user
-	for(let result in multipleResult) {
+	for(let result of multipleResult) {
 		if(result !== 'fail' && result !== 'invalidUsername' && result !== 'DuplicateIceName'){
 			const uData = {
 				uid: result.tokeninfo.uid,
@@ -1963,6 +1963,7 @@ let multipleProvisionIce = async (requestData) => {
 				username: result.tokeninfo.username
 			}
 			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+			delete result.tokeninfo
 		}
 	}
 	return multipleResult
