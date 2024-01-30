@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Genius.scss";
 import { getProjectList, getModules, saveMindmap, getScreens } from '../../design/api';
-import { ScreenOverlay, ResetSession,RedirectPage, Messages as MSG } from '../../global';
+import { ScreenOverlay, VARIANT, ResetSession,RedirectPage, Messages as MSG } from '../../global';
 // import {selectedModule} from '../designSlice'
 import { Divider } from 'primereact/divider';
 import { Dialog } from 'primereact/dialog';
@@ -20,7 +20,6 @@ import {deleteScenario} from "../../design/api"
 import FileSaver from 'file-saver';
 import GeniusMindmap from "../../design/containers/GeniusMindmap";
 import { ConfirmDialog } from 'primereact/confirmdialog';
-import { Toast } from 'primereact/toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectedModuleReducer, screenData, moduleList } from '../../design/designSlice';
 import { showGenuis, showSmallPopup } from '../../global/globalSlice';
@@ -49,7 +48,6 @@ let count=0;
 
 const GeniusSap = (props) => {
   const history = useNavigate()
-  const toast = useRef();
   const menu = useRef(null);
   const cm = useRef(null);
 
@@ -133,7 +131,7 @@ const GeniusSap = (props) => {
   const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
   const [data, setData] = useState([]);
-  const [startGenius, setStartGenius] = useState(true);
+  const [startGenius, setStartGenius] = useState("Activate Genius");
   const sapGeniusScrapeData = useSelector((state) => state.landing.sapGeniusScrapeData);
   const [counter, setCounter] = useState(3);
   const [dataObjects, setDataObjects] = useState([]);
@@ -193,6 +191,7 @@ const GeniusSap = (props) => {
   const [displayBasic2, setDisplayBasic2] = useState(false);
   const [DataParamPath, setDataParamPath] = useState(null)
   const [showMindmap, setShowMindmap] = useState(false);
+  const [dataSaved, setDataSaved] = useState(false);
   const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
@@ -383,142 +382,17 @@ const GeniusSap = (props) => {
   }
 
   const showDialog= () => {
-    data.push({
-      id: 1,
-      name: "SAP_Launch",
-      step: `Step 1`,
-      elementName: "@Sap",
-      keywordVal: "LaunchApplication",
-      testData: <div style={{ width: '18rem',wordWrap:'break-word'}}>{applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1]}</div>,
-      testcases: {
-        xpath: '',
-        objectName:'',
-        keywordVal:'',
-        id: '',
-        inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
-        tag: '',
-        custname: '@Sap',
-        left: '',
-        top: '',
-        height: '',
-        width: '',
-        stepNo: 1,
-        keywordVal: 'LaunchApplication',
-        window_name: 'SAP_Launch',
-        tooltip: '',
-        defaulttooltip: ''
-      }
-    },
-    {
-      id: 2,
-      name: "SAP_Launch",
-      step: `Step 2`,
-      elementName: "@Sap",
-      keywordVal: "ServerConnect",
-      testData: <div style={{ width: '18rem',wordWrap:'break-word'}}>{applicationPath.split(';')[2]}</div>,
-      testcases: {
-        xpath: '',
-        objectName:'',
-        keywordVal:'',
-        id: '',
-        inputVal: applicationPath.split(';')[2],
-        tag: '',
-        custname: '@Sap',
-        left: '',
-        top: '',
-        height: '',
-        width: '',
-        stepNo: 2,
-        keywordVal: 'ServerConnect',
-        window_name: 'SAP_Launch',
-        tooltip: '',
-        defaulttooltip: ''
-      }
-    });
-    setDataLength(data.length);
-
-    testSteps.push({
-      xpath: '',
-      id: '',
-      inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
-      tag: '',
-      custname: '@Sap',
-      left: '',
-      top: '',
-      height: '',
-      width: '',
-      keywordVal: 'LaunchApplication',
-      window_name: 'SAP_Launch',
-      tooltip: '',
-      defaulttooltip: ''
-    },
-    {
-      xpath: '',
-      id: '',
-      inputVal: applicationPath.split(';')[2],
-      tag: '',
-      custname: '@Sap',
-      left: '',
-      top: '',
-      height: '',
-      width: '',
-      keywordVal: 'ServerConnect',
-      window_name: 'SAP_Launch',
-      tooltip: '',
-      defaulttooltip: ''
-    });
-
-    allScreenData["SAP_Launch"] = { 
-      data_objects: [],
-      name: "SAP_Launch",
-      scrapedUrl: '',
-      screen_number: 0,
-      screenshot: '',
-      starting_stepNumber: 1,
-      tabIndex: 0,
-      testcases: [{
-        xpath: '',
-        id: '',
-        inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
-        tag: '',
-        custname: '@Sap',
-        left: '',
-        top: '',
-        height: '',
-        width: '',
-        keywordVal: 'LaunchApplication',
-        window_name: 'SAP_Launch',
-        tooltip: '',
-        defaulttooltip: ''
-      },
-      {
-        xpath: '',
-        id: '',
-        inputVal: applicationPath.split(';')[2],
-        tag: '',
-        custname: '@Sap',
-        left: '',
-        top: '',
-        height: '',
-        width: '',
-        keywordVal: 'ServerConnect',
-        window_name: 'SAP_Launch',
-        tooltip: '',
-        defaulttooltip: ''
-      }]
-    }
-
-    let screenViewObject = {};
-    screenViewObject.appType = "SAP";
-    screenViewObject.applicationPath = applicationPath;
-    screenViewObject.scrapeType = "Genius";
-
     setVisible(true);
-    DesignApi.launchAndServerConnectSAPGenius_ICE(screenViewObject);
   };
 
   const onHideSap = () => {
     setVisible(false);
+    setData([]);
+    setDataLength(0);
+    setTestSteps([]);
+    setAllScreenData({});
+    setStartGenius("Activate Genius");
+    setDataSaved(false)
   };
   
   const displayError = (error) => {
@@ -672,7 +546,11 @@ const GeniusSap = (props) => {
       <React.Fragment>
         <Button label="No" icon="pi pi-times" className="p-button-text" onClick={() => seteraseData(false)} />
         <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={() => {
-          setFinalData([]); setTempData([]); seteraseData(false); setTableAfterOperation([]); setRawTable([]); showPopup(true); setMessage('Test Step Erased Successfully.')
+          setFinalData([]); setTempData([]); seteraseData(false); setTableAfterOperation([]); setRawTable([]); showPopup(true); setMessage('Test Step Erased Successfully.');setData([]);
+          setDataLength(0);
+          setTestSteps([]);
+          setAllScreenData({});
+          setStartGenius("Activate Genius");
         }
         } />
       </React.Fragment>
@@ -711,36 +589,25 @@ const GeniusSap = (props) => {
       setExpandedRows(_expandedRows);
     }
 
-    const toastError = (erroMessage) => {
-      if (erroMessage && erroMessage.CONTENT) {
-        toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
-      }
-      else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
-    }
-    const toastSuccess = (successMessage) => {
-      if (successMessage && successMessage.CONTENT) {
-        toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
-      }
-      else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
-    }
+ 
 
     const handleModuleCreate = async (e) => {
     
       if (!(moduleName)) {
-       toastError(MSG.CUSTOM("Please fill the mandatory fields", "error"));
+       props.toastError(MSG.CUSTOM("Please fill the mandatory fields", "error"));
         return;
       }
       const regEx = /[~*+=?^%<>()|\\|\/]/;
       if (!(selectedProject && selectedProject.key)) {
-       toastError(MSG.CUSTOM("Please select a project", "error"))
+       props.toastError(MSG.CUSTOM("Please select a project", "error"))
         return;
       }
       else if (regEx.test(moduleName)) {
-       toastError(MSG.CUSTOM("Module name cannot contain special characters", "error"))
+       props.toastError(MSG.CUSTOM("Module name cannot contain special characters", "error"))
         return;
       }
       else if (projModules.filter((mod) => mod.name === moduleName).length > 0) {
-       toastError(MSG.CUSTOM("Module already exists", "error"));
+       props.toastError(MSG.CUSTOM("Module already exists", "error"));
         return;
       }
       
@@ -775,7 +642,7 @@ const GeniusSap = (props) => {
         const response = await saveMindmap(module_data);
         if (response === "Invalid Session") return RedirectPage(history);
         if (response.error) { displayError(response.error); return }
-        toastSuccess(MSG.CUSTOM("Module Created Successfully", "success"));
+        props.toastSuccess(MSG.CUSTOM("Module Created Successfully", "success"));
         let modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": null });
         if (modulesdata === "Invalid Session") return RedirectPage(history);
         if (modulesdata.error) { displayError(modulesdata.error); return; }
@@ -797,20 +664,20 @@ const GeniusSap = (props) => {
 
     const handleScenarioCreate = async () => {
       if (!(scenarioName)) {
-        toastError(MSG.CUSTOM("Please enter Testcase", "error"));
+        props.toastError(MSG.CUSTOM("Please enter Testcase", "error"));
         return;
       }
       const regEx = /[~*+=?^%<>()|\\|\/]/;
       if (!(selectedModule && selectedModule.key)) {
-        toastError(MSG.CUSTOM("Please select a module", "error"))
+        props.toastError(MSG.CUSTOM("Please select a module", "error"))
         return;
       }
       else if (regEx.test(scenarioName)) {
-        toastError(MSG.CUSTOM("Testcase name cannot contain special characters", "error"))
+        props.toastError(MSG.CUSTOM("Testcase name cannot contain special characters", "error"))
         return;
       }
       else if (modScenarios.filter((scenario) => scenario.name === scenarioName).length > 0) {
-        toastError(MSG.CUSTOM("Testcase already exists", "error"));
+        props.toastError(MSG.CUSTOM("Testcase already exists", "error"));
         return;
       }
       
@@ -887,7 +754,7 @@ const GeniusSap = (props) => {
         const response = await saveMindmap(scenario_data);
         if (response === "Invalid Session") return RedirectPage(history);
         if (response.error) { displayError(response.error); return }
-        toastSuccess(MSG.CUSTOM("Scenario Created Successfully", "success"));
+        props.toastSuccess(MSG.CUSTOM("Scenario Created Successfully", "success"));
         var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
         if (moduledata === "Invalid Session") return RedirectPage(history);
         if (moduledata.error) { displayError(moduledata.error); return; }
@@ -929,12 +796,150 @@ const onScreenNameChange = (e, name) => {
     screenViewObject.appType = "SAP";
     screenViewObject.applicationPath = applicationPath;
     screenViewObject.scrapeType = "Genius";
-    if (startGenius === true) {
-      setStartGenius(false);
-      DesignApi.startScrapingSAPGenius_ICE(screenViewObject);
+    if (startGenius === "Activate Genius") {
+      setStartGenius("Stop Genius");
+      data.push({
+        id: 1,
+        name: "SAP_Launch",
+        step: `Step 1`,
+        elementName: "@Sap",
+        keywordVal: "LaunchApplication",
+        testData: <div style={{ width: '18rem',wordWrap:'break-word'}}>{applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1]}</div>,
+        testcases: {
+          xpath: '',
+          objectName:'',
+          keywordVal:'',
+          id: '',
+          inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
+          tag: '',
+          custname: '@Sap',
+          left: '',
+          top: '',
+          height: '',
+          width: '',
+          stepNo: 1,
+          keywordVal: 'LaunchApplication',
+          window_name: 'SAP_Launch',
+          tooltip: '',
+          defaulttooltip: ''
+        }
+      },
+      {
+        id: 2,
+        name: "SAP_Launch",
+        step: `Step 2`,
+        elementName: "@Sap",
+        keywordVal: "ServerConnect",
+        testData: <div style={{ width: '18rem',wordWrap:'break-word'}}>{applicationPath.split(';')[2]}</div>,
+        testcases: {
+          xpath: '',
+          objectName:'',
+          keywordVal:'',
+          id: '',
+          inputVal: applicationPath.split(';')[2],
+          tag: '',
+          custname: '@Sap',
+          left: '',
+          top: '',
+          height: '',
+          width: '',
+          stepNo: 2,
+          keywordVal: 'ServerConnect',
+          window_name: 'SAP_Launch',
+          tooltip: '',
+          defaulttooltip: ''
+        }
+      });
+      setDataLength(data.length);
+  
+      testSteps.push({
+            xpath: '',
+            id: '',
+            inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
+            tag: '',
+            custname: '@Sap',
+            left: '',
+            top: '',
+            height: '',
+            width: '',
+            keywordVal: 'LaunchApplication',
+            window_name: 'SAP_Launch',
+            tooltip: '',
+            defaulttooltip: ''
+        },
+        {
+            xpath: '',
+            id: '',
+            inputVal: applicationPath.split(';')[2],
+            tag: '',
+            custname: '@Sap',
+            left: '',
+            top: '',
+            height: '',
+            width: '',
+            keywordVal: 'ServerConnect',
+            window_name: 'SAP_Launch',
+            tooltip: '',
+            defaulttooltip: ''
+        });
+  
+      allScreenData["SAP_Launch"] = { 
+            data_objects: [],
+            name: "SAP_Launch",
+            scrapedUrl: '',
+            screen_number: 0,
+            screenshot: '',
+            starting_stepNumber: 1,
+            tabIndex: 0,
+            testcases: [{
+            xpath: '',
+            id: '',
+            inputVal: applicationPath.split(';')[0] + ";" + applicationPath.split(';')[1],
+            tag: '',
+            custname: '@Sap',
+            left: '',
+            top: '',
+            height: '',
+            width: '',
+            keywordVal: 'LaunchApplication',
+            window_name: 'SAP_Launch',
+            tooltip: '',
+            defaulttooltip: ''
+            },
+            {
+            xpath: '',
+            id: '',
+            inputVal: applicationPath.split(';')[2],
+            tag: '',
+            custname: '@Sap',
+            left: '',
+            top: '',
+            height: '',
+            width: '',
+            keywordVal: 'ServerConnect',
+            window_name: 'SAP_Launch',
+            tooltip: '',
+            defaulttooltip: ''
+            }]
+      }
+
+      DesignApi.launchAndServerConnectSAPGenius_ICE(screenViewObject)
+      .then(data => {
+          if (data == "unavailableLocalServer") {
+              props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
+          }
+          else {
+            DesignApi.startScrapingSAPGenius_ICE(screenViewObject)
+            .then(data => {
+              if (data == "unavailableLocalServer") {
+                  props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
+              }
+            });
+          }
+      });
     }
-    else if (startGenius === false) {
-      setStartGenius(true);
+    else if (startGenius === "Stop Genius") {
+      setStartGenius(false);
       DesignApi.stopScrapingSAPGenius_ICE(screenViewObject);
     }
   }
@@ -943,7 +948,10 @@ const onScreenNameChange = (e, name) => {
     setSelectedProject(null);
     setSelectedModule(null);
     setSelectedScenario(null);
+    setScenarioName("");
     setAppType(null);
+    setApplicationPath("");
+    setScenarioChosen(null)
   }
   const templateForMindmapSaving = (scenario) => {
     return {
@@ -1062,10 +1070,11 @@ const onScreenNameChange = (e, name) => {
       const res = await landingApi.getGeniusDataSAP(data, scenarioData,isAlreadySaved,completeScenraioDetials,scrnreused);
       savedRef.current = true;
       if (res.status === "success") {
-        toastSuccess(MSG.CUSTOM("Data Saved Successfully", "success"));
+        setDataSaved(true);
+        props.toastSuccess(MSG.CUSTOM("Data Saved Successfully", "success"));
       }
       else {
-        toastSuccess(MSG.CUSTOM("Error Occurred While Saving Data", "error"));
+        props.toastSuccess(MSG.CUSTOM("Error Occurred While Saving Data", "error"));
       }
     }
     catch (err) {
@@ -1471,19 +1480,23 @@ const onScreenNameChange = (e, name) => {
   };
 
 const showSuccess = (success) => {
-  toast.current.show({severity:'success', summary: 'Success', detail:success, life: 2000});
+    props.toastSuccess(success);
+//   toast.current.show({severity:'success', summary: 'Success', detail:success, life: 2000});
 }
 
 const showInfo = (Info) => {
-  toast.current.show({severity:'info', summary: 'Info', detail:Info, life: 3000});
+   props.toastInfo(Info) 
+//   toast.current.show({severity:'info', summary: 'Info', detail:Info, life: 3000});
 }
 
 const showWarn = (Warn) => {
-  toast.current.show({severity:'warn', summary: 'Warning', detail:Warn, life: 3000});
+    props.toastWarn(Warn)
+//   toast.current.show({severity:'warn', summary: 'Warning', detail:Warn, life: 3000});
 }
 
 const showError = (Error) => {
-  toast.current.show({severity:'error', summary: 'Error', detail:Error, life: 5000});
+    props.toastError(Error)
+//   toast.current.show({severity:'error', summary: 'Error', detail:Error, life: 5000});
 }
 
 const debugTestCases = selectedBrowserType => {
@@ -1514,15 +1527,15 @@ const debugTestCases = selectedBrowserType => {
                       else if (debugData === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
                       else if (debugData === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
                       else if (debugData.status === "success"){
-                        toastError(MSG.CUSTOM(MSG.DESIGN.SUCC_DEBUG.CONTENT, "success"));
+                        props.toastError(MSG.CUSTOM(MSG.DESIGN.SUCC_DEBUG.CONTENT, "success"));
                       } else {
-                        toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
+                        props.toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
                       }										
                   })
                   .catch(error => {
                       setOverlay("");
                       ResetSession.end();
-                      toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
+                      props.toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
                       console.log("Error while traversing while executing debugTeststeps method! \r\n " + (error.data));
                   });
           }
@@ -1530,7 +1543,7 @@ const debugTestCases = selectedBrowserType => {
       .catch(error => {
           setOverlay("");
           ResetSession.end();
-          toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
+          props.toastError(MSG.CUSTOM(MSG.DESIGN.ERR_DEBUG.CONTENT, "error"));
           console.log("Error while traversing while executing debugTeststeps method! \r\n " + (error.data));
       });
 };
@@ -1628,7 +1641,7 @@ const debugTestCases = selectedBrowserType => {
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>X-path</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].objectName.trim().length !== 0 ? (popupData[0].objectName.trim().length > 10 && !showFullXpath ? popupData[0].objectName.trim().substring(0, 20) + "..." : popupData[0].objectName.trim()) : 'Not Found'}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].xpath.trim().length !== 0 ? (popupData[0].xpath.trim().length > 10 && !showFullXpath ? popupData[0].xpath.trim().substring(0, 20) + "..." : popupData[0].xpath.trim()) : 'Not Found'}</p>
     </div>
     <Divider style={{ margin: '0' }} />
   </div>
@@ -1644,7 +1657,6 @@ const debugTestCases = selectedBrowserType => {
     <>
     <div className="plugin-bg-container">
       {!errorMessage?<>
-        <Toast ref={toast} />
         <ConfirmDialog 
       visible={visibleScenario ||visibleReset} 
       onHide={() =>{visibleScenario? setVisibleScenario(false):setVisibleReset(false)}} message={visibleScenario?"Recording this scenarios with Avo Genius will override the current scenario. Do you wish to proceed?":"All the entered data will be cleared."}
@@ -1949,14 +1961,13 @@ const debugTestCases = selectedBrowserType => {
               {props.selectedProject?null:<button className="reset-action__exit" style={{ border: "none", color: "#605BFF", borderRadius: "4px", padding: "8px 25px", background: "white" }}
                onClick={resetGeniusFields}
                >Reset</button>}
-              <button className="reset-action__next"
+              <button className="reset-action__next" disabled={!(selectedProject && selectedProject.key) || !(selectedModule && selectedModule.key) || !(scenarioChosen && scenarioChosen.key) || !applicationPath}
                 style={{ color: "white", borderRadius: "4px", width:'5rem',padding: "8px 25px", background: "#605BFF",border:'none' }} onClick={(e) => {
                   DesignApi.getKeywordDetails_ICE(appType.text)
                     .then(keywordData => {
                       if (keywordData === "Invalid Session") return RedirectPage(history);
                       setProjectData(keywordData);
                       showDialog()
-                    
                     })
                   
                     .catch((err) => { console.log("error"); setLoading(false); })
@@ -2015,29 +2026,28 @@ const debugTestCases = selectedBrowserType => {
                 </div>
               </div>
             </div>
-            <Button label={startGenius === true ? "Activate Genius" : "Stop Genius"} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/>
+            { startGenius && <Button label={startGenius} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/> }
             <div class="icon-bar">
           {/* <Button label="Save" icon="pi pi-times" className="p-button-text" onClick={() => {
             port.postMessage({ data: { "module": projectData.module, "project": projectData.project, "scenario": projectData.scenario, "appType": projectData.appType, "screens": tableDataNew } })
           }} /> */}
 
-          <div>
-            <span className="bottombartooltips" data-pr-tooltip={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.3rem' }}>   <i className='pi pi-chevron-circle-down' style={{ fontSize: '18px',cursor:'pointer' }} ></i></span>
+          <div disabled={tableDataNew.length <= 0} onClick={(e) => { if(tableDataNew.length <= 0) e.preventDefault() }}>
+            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
             {/* <span className= "bottombartooltips" data-pr-tooltip="Collapse All " data-pr-position="top"onClick={() => setExpandedRows(null)}>p<i className='pi pi-chevron-circle-right' style={{ fontSize: '18px' }} ></i></span> */}
           </div> {/** undo the last step */}
-          <div className="bottombartooltips" data-pr-tooltip="Erase all data " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'5rem',cursor:'pointer' }} onClick={() => seteraseData(true)} > {/** erase all data */}
-            <span><img src='\static\imgs\eraseall_icon.svg'></img></span>
-            <span></span>
+          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
+            <span><img src={`static/imgs/${startGenius || dataSaved ? "erase_all_disable" : "erase_all_enable"}.svg`}></img></span> 
           </div>
-          <div className="bottombartooltips" data-pr-tooltip="Run test steps "  data-pr-position="top"  style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'10rem',cursor:'pointer' }} onClick={() => debugTestCases('1')}><img src="static\imgs\Vector.png"/></div>  {/** execute the steps */}
+          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
 
-            <div className="bottombartooltips" data-pr-tooltip="Save Data "  data-pr-position="top" >
-            <span><i className="pi pi-save" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1.5rem', left:'15rem',cursor:'pointer'}} onClick={handleSaveMindmap}> </i>
+            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "}  data-pr-position="top" >
+              <span onClick={(e) => {if(startGenius || dataSaved) {e.preventDefault()} else {handleSaveMindmap()}}}><img src={`static/imgs/${startGenius || dataSaved ? "save_disable" : "save_enable"}.svg`}></img>
             </span>
 
           </div>
-          <div className="bottombartooltips" data-pr-tooltip="Show Mindmap " data-pr-position="top" style={{ 'fontSize': '1.7rem', position: 'absolute', bottom: '1rem', left: '20rem', cursor: 'pointer' }} onClick={() => {setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}} ><img src='static\imgs\mindmap.png' /></div> {/** view the mindmap */}
-          <div className="bottombartooltips" data-pr-tooltip="Data Parameterization " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'25rem',cursor:'pointer' }} onClick={() => { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}><img src='static\imgs\view.png'  /></div>
+          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
+          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
           {/* <div className="bottombartooltips" data-pr-tooltip={"Minimize"} data-pr-position="top" style={{ border: 'none' }} ></div> * maximize genius window */}
           {/* <div className="bottombartooltips" data-pr-tooltip="Close Genius App " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'30rem',cursor:'pointer' }} ><img src='static\imgs\close_icon.svg'></img></div>* close genius window */}
             </div>
