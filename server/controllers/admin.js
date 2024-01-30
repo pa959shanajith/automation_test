@@ -358,10 +358,10 @@ exports.manageSessionData = async (req, res) => {
 	try {
 		const currUser = req.session.username;
 		const action = req.body.action;
+		var clientName=utils.getClientName(req.headers.host);
 		if (action == "get") {
 			logger.info("Inside UI service: manageSessionData/getSessions");
 			const data = {sessionData: [], clientData: []};
-			var clientName=utils.getClientName(req.headers.host);
 			const connectusers = mySocket.allSocketsMap[clientName]
 			const allICEIPMap = mySocket.allICEIPMap[clientName]
 			for (ice in connectusers){
@@ -402,7 +402,7 @@ exports.manageSessionData = async (req, res) => {
 				if (key != '?') key = Buffer.from(req.body.key, "base64").toString();
 				else {
 					try {
-						key = await utils.findSessID(user);
+						key = await utils.findSessID(user,clientName);
 					} catch (err) {
 						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
 						logger.debug(err);
@@ -2702,6 +2702,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
+				if(req.body.tokeninfo.action == 'multipleProvisionIce') return next();
 				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":
