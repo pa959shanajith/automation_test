@@ -9,6 +9,8 @@
     .search_container {
         padding-top: 0.5rem;
         width: 20%;
+        position: relative;
+        right: 40rem;
         .p-input-icon-left {
             width: 100%;
         }
@@ -18,6 +20,9 @@
             .p-treenode {
                 padding: 0;
             }
+        }
+        .p-badge.p-badge-info {
+            background-color: #605BFF;
         }
         padding: 0;
         border: none;
@@ -54,12 +59,21 @@
                 border-left: 1px solid #dee2e6;
                 .testSuite_col1 {
                     width: 35vw;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 } 
                 .testSuite_col2 {
                     width: 33vw;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 } 
                 .badge_icon {
                     margin-right: 0.5rem;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 }
                 .badge_txt {
                     display: inline-block;
@@ -193,4 +207,29 @@
             background-color: lightgray;
         }
     }
+}
+.statusBadge{
+    .p-badge.p-badge-success {
+        background: white !important;
+        color: #10e91091 !important;
+        border: 1px solid #5cff5c !important;
+    }
+    .p-badge.p-badge-danger {
+        background: white;
+        color: #ee1c0d91;
+        border: 1px solid #ff5c5c;
+    }
+    .p-badge.p-badge-warning {
+        background: white;
+        color: #f55b1491;
+        border: 1px solid #f88149;
+    }
+    .p-badge.p-badge-info {
+        background: white;
+        color: #605BFF;
+        border: 1px solid #795bff;
+    }
+}
+.executionNo{
+    font-size: small;
 }

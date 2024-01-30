@@ -20,6 +20,7 @@ import { RedirectPage} from '../../global';
 import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
+import {generateTreeOfView} from './MindmapUtilsForOthersView'
 import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
@@ -43,6 +44,8 @@ import { Tooltip } from 'primereact/tooltip';
 import { Toast } from 'primereact/toast';
 import { Tag } from 'primereact/tag';
 import '../styles/ActionPanelObjects.scss'
+import { transformDataFromTreetoJourney,createNodeForJourneyView, deleteNodeForJourneyView,moveNodeEndForJourney,moveNodeBeginForJourney, pasteNodeData } from './MindmapUtilsForOthersView';
+import DesignTestStepsGroups from './DesignTestStepsGroups';
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 
 /*Component Canvas
@@ -55,6 +58,11 @@ const types = {
     'screens': 362,
     'testcases': 487
 };
+const typesForJourney = {
+    'modules': 112,
+    'scenarios': 237,
+    'teststepsgroups': 487,
+  }
 var count;
 var temp = {
     s: [],
@@ -74,6 +82,7 @@ const CanvasNew = (props) => {
     const deletedNoded = useSelector(state=>state.design.deletedNodes)
     const screenData = useSelector(state=>state.design.screenData)
     const objVal=useSelector(state=>state.design.objValue)
+    const typeOfView = useSelector(state=>state.design.typeOfViewMap)
     const [sections,setSection] =  useState({});
     const [fetchingDetails,setFetchingDetails] = useState(null); // this can be used for fetching testcase/screen/scenario/module details
     const [fetchingDetailsImpact,setFetchingDetailsImpact]=useState(null)
@@ -106,6 +115,7 @@ const CanvasNew = (props) => {
     const menuRef_scenario =useRef(null);
     const menuRef_screen = useRef(null);
     const menuRef_Teststep = useRef(null);
+    const menuRef_Teststepgroup=useRef(null);
     readCtScale = () => ctScale
     const [box, setBox] = useState(null);
     const [visibleScenario, setVisibleScenario] = useState(false);
@@ -132,6 +142,7 @@ const CanvasNew = (props) => {
     const [editingRowsTestCases, setEditingRowsTestCases] = useState({});
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(false);
     const [visibleDesignStep, setVisibleDesignStep] = useState(false);
+    const [visibleDesignStepGroups,setVisibleDesignStepGroups] = useState(false);
     const [selectedSpan, setSelectedSpan] = useState(null);
     const[browserName,setBrowserName]=useState(null)
     const analyzeScenario = useSelector(state=>state.design.analyzeScenario);
@@ -149,9 +160,10 @@ const CanvasNew = (props) => {
     const[marqueItem,setMarqueItem]=useState({})
     const[hightlightcustname,setHighlightedCustname]=useState("")
     const [activeEye, setActiveEye] = useState(false);
-    const[mainScrapedData,setMainScrapedData]=useState(null)
+    const[copyNodeData,setCopyNodeData]=useState([])
     const[orderList,setOrderList]=useState(null)
     const[fetchingDetailsScreen,setFetchingDetailsScreen]=useState(null)
+    const[fetchingDetailsForGroup, setFetchingDetailsForGroup] = useState(null);
     const[testSuiteInUse,setTestSuiteInUse]=useState(false);
     const[inputValValid, setInputValValid] = useState(false);
     const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
@@ -231,11 +243,21 @@ const CanvasNew = (props) => {
   )
     useEffect(() => {
         var tree;
-        count = {
+        var journey;
+       
+        if(typeOfView === "mindMapView" ){
+          count = {
             'modules': 0,
             'scenarios': 0,
             'screens': 0,
             'testcases': 0
+          }
+        }else{
+          count = {
+            'modules': 0,
+            'scenarios': 0,
+            'teststepsgroups':0
+        }
         }
         if (props.module.createnew && verticalLayout===props.verticalLayout) {
             if(props.module.importData){
@@ -275,7 +297,7 @@ const CanvasNew = (props) => {
                 if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
             }else{
                 //create new mindmap
-                tree = createNewMap(props.verticalLayout,undefined,undefined,types)
+                tree = createNewMap(props.verticalLayout,undefined,undefined,typeOfView === "mindMapView"?types:typesForJourney)
                 tree.links = {}
                 tree.dLinks = []
                 if(zoom){
@@ -307,8 +329,15 @@ const CanvasNew = (props) => {
                 tree = dNodes[0]
             }
             //load mindmap from data
-            tree = generateTree(tree,types,{...count},props.verticalLayout,screenData)
-            count= {...count,...tree.count}
+            if(typeOfView === 'mindMapView'){
+              tree = generateTree(tree,types,{...count},props.verticalLayout,screenData)
+              count= {...count,...tree.count}
+            }else{
+              journey = transformDataFromTreetoJourney(tree)
+              tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData)
+              count= {...count,...tree.count}
+            }
+           
         }
         // eslint-disable-next-line no-lone-blocks
         {!props.gen?d3.select('.ct-container').attr("transform", "translate(" + tree.translate[0]+','+tree.translate[1] + ")scale(" + 1 + ")"):d3.select('.ct-container-genius').attr("transform", "translate(" + 50+','+tree.translate[1] + ")scale(" + 1 + ")")}
@@ -325,7 +354,7 @@ const CanvasNew = (props) => {
         dispatch(SetOldModuleForReset(tree.dNodes[0]._id))
         localStorage.setItem('OldModuleForReset',tree.dNodes[0]._id)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.module,props.reload,props.verticalLayout,analyzeScenario]);
+    }, [props.module,props.reload,props.verticalLayout,analyzeScenario,typeOfView]);
     useEffect(()=>{
         if(createnew === 'save'){
             setCreateNew(false)
@@ -334,9 +363,9 @@ const CanvasNew = (props) => {
             setCreateNew(false)
         }
         else if(createnew !== false){
-            var p = d3.select('#node_'+createnew);
+            var p = d3.select('#node_' + createnew);
             setCreateNew(false)
-            setInpBox(p)
+            // setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
@@ -355,9 +384,9 @@ const CanvasNew = (props) => {
           case 8:
             setBrowserName("chromium")
             break;
-           
-
-         
+          default:
+            setBrowserName("chrome")
+            break;
         }
       }
     };
@@ -375,49 +404,98 @@ const CanvasNew = (props) => {
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
     ];
-    const menuItemsScenario = [
-        { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([{ id:  1, value : inputValScreen , isEditing:false}]);setShowInputScreen(true);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+    const menuItemsScenario = typeOfView !== "mindMapView"?[
+        { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-      { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
         
+    ]:[
+      { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
+      { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+      {separator: true},
+      { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
+      { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
+      { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+      {separator: true},
+      { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
+      { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
     ];
     const menuItemsScreen = !testSuiteInUse?[
-        { label: 'Add Test steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Add Multiple Test steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([{id:1, value : inputValTestStep, isEditing:false}]);setShowInputTestStep(true);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Test Steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
+        { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
+        { label: 'Element Reposiotry',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
       ]:[
-        { label: 'Capture Elements',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
+        { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
   
       ];
-
+    const menuItemTestStepGroups = !testSuiteInUse? [
+        { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
+        { label: 'Copy/Cut Test Steps Groups',icon:<img src="static/imgs/ic-jq-copysteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{handleCopyNodeData()}},
+        { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
+        {separator: true},
+        { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
+        {separator: true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
+        {separator: true},
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
+      ]:[
+        { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
+      ]
 
       const menuItemsTestSteps = !testSuiteInUse?[
-        { label: 'Design Test steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
+        { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
       ]:[
-          { label: 'Design Test steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
+          { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
     
         ]
     const nodeClick=(e)=>{
       d3.select('#'+box).classed('node-highlight',false)
     }
+    const handlePasteNodeData = (e) =>{
+      var res = pasteNodeData(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},copyNodeData,false)
+      setCreateNew(res.dNodes.length-1)
+      setNodes(res.nodeDisplay)
+      setLinks(res.linkDisplay)
+      setdLinks(res.dLinks)
+      setdNodes(res.dNodes)
+      count= {...count,...res.count}
+      setCopyNodeData([])
+    }
+    const handleCopyNodeData = () =>{
+      if (toastData !== true){
+        setCopyNodeData([fetchingDetailsForGroup]);
+        d3.select('#'+box).classed('node-highlight',false)
+      }else{
+        toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
+      }
+    }
     const handleCapture = () =>{
       if (toastData !== true){
         setVisibleCaptureElement(true);
+        d3.select('#'+box).classed('node-highlight',false)
+      }else{
+        toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
+      }
+    }
+    const handleTestStepsGroups = () =>{
+      if (toastData !== true){
+        setVisibleDesignStepGroups(true);
         d3.select('#'+box).classed('node-highlight',false)
       }else{
         toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
@@ -459,13 +537,23 @@ const CanvasNew = (props) => {
         props.toast.current.show({ severity: 'success', summary: 'Success', detail: MSG.MINDMAP.SUCC_NODE_CREATE.CONTENT, life: 3000 });
     }
     const clickAddNode=(e)=>{
-        var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
-        setCreateNew(res.dNodes.length-1)
-        setNodes(res.nodeDisplay)
-        setLinks(res.linkDisplay)
-        setdLinks(res.dLinks)
-        setdNodes(res.dNodes)
-        count= {...count,...res.count}
+        if(typeOfView === 'mindMapView'){
+          var res = createNode(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
+          setCreateNew(res.dNodes.length-1)
+          setNodes(res.nodeDisplay)
+          setLinks(res.linkDisplay)
+          setdLinks(res.dLinks)
+          setdNodes(res.dNodes)
+          count= {...count,...res.count}
+        }else{
+          var resJourneyView = createNodeForJourneyView(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},undefined,verticalLayout)
+          setCreateNew(resJourneyView.dNodes.length-1)
+          setNodes(resJourneyView.nodeDisplay)
+          setLinks(resJourneyView.linkDisplay)
+          setdLinks(resJourneyView.dLinks)
+          setdNodes(resJourneyView.dNodes)
+          count= {...count,...resJourneyView.count}
+        }
         // setCreateNew('autosave')
     }
     const clickDeleteNode=(id)=>{
@@ -604,7 +692,9 @@ const CanvasNew = (props) => {
       clickDeleteNodeHere(selectedDelNode)
   }
   const clickDeleteNodeHere=(id)=>{
-      var res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
+    var res
+    if(typeOfView === 'mindMapView'){
+      res = deleteNode(id,[...dNodes],[...dLinks],{...links},{...nodes})
       if(res){
           // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
           setReuseDelConfirm(false)
@@ -613,9 +703,22 @@ const CanvasNew = (props) => {
           setdLinks(res.dLinks)
           setdNodes(res.dNodes)
       }
+    }else{
+      res = deleteNodeForJourneyView(id,[...dNodes],[...dLinks],{...links},{...nodes})
+      if(res){
+          // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
+          setReuseDelConfirm(false)
+          setNodes(res.nodeDisplay)
+          setLinks(res.linkDisplay)
+          setdLinks(res.dLinks)
+          setdNodes(res.dNodes)
+      }
+    }
   }
-  const processDeleteNode = (sel_node) => {        
-      var res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
+  const processDeleteNode = (sel_node) => { 
+    var res
+    if(typeOfView === 'mindMapView'){       
+      res = deleteNode(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
       if(res){
           // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
           dispatch(deletedNodes([...deletedNoded,...res.deletedNodes]))
@@ -627,6 +730,20 @@ const CanvasNew = (props) => {
       setReuseDelConfirm(false);
       setDelConfirm(false);
       setEndToEndDelConfirm(false);
+    }else{
+      res = deleteNodeForJourneyView(sel_node?sel_node:selectedDelNode,[...dNodes],[...dLinks],{...links},{...nodes})
+      if(res){
+          // dispatch({type:actionTypes.UPDATE_DELETENODES,payload:[...deletedNodes,...res.deletedNodes]})
+          dispatch(deletedNodes([...deletedNoded,...res.deletedNodes]))
+          setNodes(res.nodeDisplay)
+          setLinks(res.linkDisplay)
+          setdLinks(res.dLinks)
+          setdNodes(res.dNodes)
+      }
+      setReuseDelConfirm(false);
+      setDelConfirm(false);
+      setEndToEndDelConfirm(false);
+    }
   }
     const clickCollpase=(e)=>{
         var id = e.target.parentElement.id;
@@ -641,7 +758,7 @@ const CanvasNew = (props) => {
         var res;
         var id = e.target.parentElement.id.split('node_')[1];
         if(type==='KeyUp'){
-            res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp},verticalLayout)
+            if(typeOfView === 'mindMapView'){res = moveNodeEnd(id,[...dNodes],[...dLinks],{...links},{...temp},verticalLayout)
             setLinks(res.linkDisplay)
             nodeMoving = false
             temp = {
@@ -649,13 +766,28 @@ const CanvasNew = (props) => {
                 hidden:[],
                 deleted:[],
                 t: ""
-            };
+            };}else{
+              res = moveNodeEndForJourney(id,[...dNodes],[...dLinks],{...links},{...temp},verticalLayout)
+            setLinks(res.linkDisplay)
+            nodeMoving = false
+            temp = {
+                s: [],
+                hidden:[],
+                deleted:[],
+                t: ""
+            }
+            }
         }
         else{
             nodeMoving = true
-            res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'createnew')
+            if(typeOfView === 'mindMapView'){res = moveNodeBegin(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'createnew')
+            setLinks(res.linkDisplay)
+            temp={...temp,...res.temp}}
+            else{
+              res = moveNodeBeginForJourney(id,{...links},[...dLinks],{...temp},{...ctScale},verticalLayout,'createnew')
             setLinks(res.linkDisplay)
             temp={...temp,...res.temp}
+            }
         }
     }
     const DelReuseMsgContainer = ({message}) => (
@@ -1042,12 +1174,12 @@ const CanvasNew = (props) => {
 
   const reject = () => {}
   const handleContext=(e,type,value)=>{
-    if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!=undefined && props.module.currentlyInUse!==userInfo.username){
-      if(type=="modules"){
+    if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!==undefined && props.module.currentlyInUse!==userInfo.username){
+      if(type==="modules"){
         toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
-      if(type=="scenarios"){
+      if(type==="scenarios"){
         toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
@@ -1056,15 +1188,19 @@ const CanvasNew = (props) => {
       setToastData(true);
     }else{
       setToastData(false)
-    }
-    setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+    } 
     setBox(e.target.parentElement.id)
-    setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+    if(type === "teststepsgroups"){
+      setFetchingDetailsForGroup(dNodes[e.target.parentElement.id.split("_")[1]])
+    }else{
+      setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+    }
     const element = d3.select('#'+e.target.parentElement.id)
     if(type==="modules"){ menuRef_module.current.show(e);element.classed('node-highlight',!0)}
     else if(type==="scenarios"){menuRef_scenario.current.show(e);element.classed('node-highlight',!0)}
     else if(type==="screens"){menuRef_screen.current.show(e);element.classed('node-highlight',!0)}
-    else {menuRef_Teststep.current.show(e);element.classed('node-highlight',!0)}
+    else if(type==="teststepsgroups"){menuRef_Teststepgroup.current.show(e);element.classed('node-highlight',!0)}
+    else{menuRef_Teststep.current.show(e);element.classed('node-highlight',!0)}
     
   }
       const addRowScenario = () => {
@@ -2300,8 +2436,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         scenarioId={fetchingDetails['_id']}
       ></MapElement>
       }
-{visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetails} testSuiteInUse={testSuiteInUse}/>}
-{visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} testSuiteInUse={testSuiteInUse}/>}
+{visibleCaptureElement && <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={fetchingDetailsForGroup?fetchingDetailsForGroup['parent']:fetchingDetails} testSuiteInUse={testSuiteInUse}/>}
+{visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup?fetchingDetailsForGroup:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} testSuiteInUse={testSuiteInUse}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
              <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Testcase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
@@ -2378,10 +2514,12 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
+            {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
             <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
             <ContextMenu model={menuItemsTestSteps} ref={menuRef_Teststep}/>
+            <ContextMenu model={menuItemTestStepGroups} ref={menuRef_Teststepgroup}/>
             {props.GeniusDialog?null:<NavButton setCtScale={setCtScale} ctScale={ctScale} zoom={zoom}/>}
             {/* <Legends/> */}
             {props.GeniusDialog?<Legends />:null}
@@ -2425,9 +2563,14 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                 </g>
             </svg>:
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
+              {typeOfView !== 'mindMapView' && <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="13" refY="5" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z"></path>
+                </marker>
+              </defs>}
             <g className='ct-container'>
             {Object.entries(links).map((link)=>{
-            return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} d={link[1].d}></path>)
+            return(<path id={link[0]} key={link[0]+'_link'} className={"ct-link"+(link[1].hidden?" no-disp":"")} style={{stroke:'black',fill: 'none',opacity: 1}} markerEnd={link[0].startsWith('link-0-')?"":'url(#arrow)'} d={link[1].d}></path>)
             })}
             {Object.entries(nodes).map((node)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>

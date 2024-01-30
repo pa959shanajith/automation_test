@@ -1,0 +1,214 @@
+.folderViewLeftContainer {
+    width: 23%;
+    height: 96%;
+
+    // border:1px solid black;
+    .commonClass {
+        display: flex;
+        align-items: center;
+    }
+
+    .normalModuleSection {
+        // border:1px solid red;
+        height: 60vh;
+
+        .ModuleTitleAndPlusBtn {
+            // border:1px solid green;
+            justify-content: space-between;
+            height: 2.1rem;
+
+            img {
+                width: 25px;
+                height: 25px;
+            }
+
+        }
+
+        .searchNormal {
+            display: flex;
+            justify-content: center;
+
+            .p-input-icon-left {
+                width: 18rem;
+                height: 2rem;
+
+                .p-component {
+                    width: 18rem;
+                    height: 1.9rem;
+                }
+            }
+        }
+
+        .treeNormal {
+            width: 100%;
+            height: 100%;
+            // border: 1px solid yellow;
+
+            .card {
+                height: 100%;
+                width: 100%;
+
+                .p-tree {
+                    width: 100%;
+                    height: 85%;
+                    overflow-y: scroll;
+                    overflow-x: hidden;
+                    padding: 1.2rem 0rem 0rem 1rem;
+
+                    .p-tree-container {
+                        overflow-x: hidden;
+
+                        .p-treenode {
+                            padding: 0rem;
+
+                            .p-treenode-children {
+                                // padding: 0rem;
+                            }
+
+                            .p-treenode-selectable {
+                                height: 2rem;
+                                width: 18rem;
+
+
+
+                                .p-link {
+                                    width: 1rem;
+                                    height: 1rem;
+                                }
+
+                                .p-treenode-label {
+                                    display: flex;
+                                    align-items: center;
+                                    width: 16rem;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+
+                                    img {
+                                        width: 1.3rem;
+                                        height: 1.3rem;
+                                    }
+                                }
+
+                                .buttonForMoreTestSuites {
+                                    display: flex;
+                                    flex-direction: row;
+                                    position: sticky;
+                                    left: 17rem;
+                                    height: 13px;
+                                    min-width: 23px;
+                                    font-size: 1rem;
+                                    font-weight: 800;
+                                    color: #605BFF;
+                                    width: 12px;
+                                    justify-content: center;
+
+                                    span {
+                                        margin-bottom: 9px;
+                                        font-size: 23px;
+                                    }
+
+                                }
+
+                                .buttonForMoreTestCases {
+                                    display: flex;
+                                    flex-direction: row;
+                                    position: sticky;
+                                    left: 17rem;
+                                    height: 13px;
+                                    min-width: 23px;
+                                    font-size: 1rem;
+                                    font-weight: 800;
+                                    color: #605BFF;
+                                    width: 12px;
+                                    justify-content: center;
+
+                                    span {
+                                        margin-bottom: 9px;
+                                        font-size: 23px;
+                                    }
+
+                                    color: #FA8E42;
+
+                                }
+
+                                .buttonForMoreTestSteps {
+                                    display: flex;
+                                    flex-direction: row;
+                                    position: sticky;
+                                    left: 17rem;
+                                    height: 13px;
+                                    min-width: 23px;
+                                    font-size: 1rem;
+                                    font-weight: 800;
+                                    color: #605BFF;
+                                    width: 12px;
+                                    justify-content: center;
+
+                                    span {
+                                        margin-bottom: 9px;
+                                        font-size: 23px;
+                                    }
+
+                                    color: #41c5B7;
+
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+            }
+
+
+        }
+
+    }
+
+    .E2ESection {
+        // border:1px solid red;
+        height: 25vh;
+
+        .E2ETitleAndPlusBtn {
+            // border:1px solid green;
+            justify-content: space-between;
+            height: 2.1rem;
+
+            img {
+                width: 25px;
+                height: 25px;
+            }
+
+        }
+
+        .searchE2E {
+            display: flex;
+            justify-content: center;
+
+            .p-input-icon-left {
+                width: 18rem;
+                height: 2rem;
+
+                .p-component {
+                    width: 18rem;
+                    height: 1.9rem;
+                }
+            }
+        }
+
+        .treeE2E {}
+
+    }
+
+}
+
+.modlabel {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+
+    img {
+        width: 23px;
+        height: 23px;
+    }
+}

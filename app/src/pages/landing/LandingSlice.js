@@ -21,7 +21,10 @@ export const loadUserInfo = createSlice({
             'projectid': undefined,
             'testsuitename': undefined
         },
-        updatedProject: false
+        updatedProject: false,
+        openCaptureScreen: false,
+        updateElementRepository: false,
+        sapGeniusScrapeData: {},
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -68,7 +71,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, action) => {
             state.socket = action.payload
         },
-
+        setSAPGeniusScrapeData: (state, action) => {
+            state.sapGeniusScrapeData = action.payload;
+        },
         updateNotify: (state, action) => {
             var value = action.payload
             value.dateTime = new Date().toLocaleString();
@@ -89,6 +94,12 @@ export const loadUserInfo = createSlice({
         },
         updatedProject: (state, action) => {
             state.updatedProject = action.payload;
+        },
+        openCaptureScreen: (state, action) => {
+            state.openCaptureScreen = action.payload;
+        },
+        updateElementRepository: (state, action) => {
+            state.updateElementRepository = action.payload;
         },
         // need it in future
         // ----------------------------------

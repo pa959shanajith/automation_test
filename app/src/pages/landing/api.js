@@ -312,4 +312,52 @@ export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenrai
     }
   }
 
+  export const getScreens = async(params) => {
+    try{
+        const res = await axios(url+'/getScreens', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: {projectId:params.projectId,
+                param:params.param},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.MINDMAP.ERR_FETCH_SCREEN}
+    }
+}
+
+export const getGeniusDataSAP = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused) => {
+    try{
+        const res = await axios(url+'/getGeniusDataSAP', {
+            method: 'POST',
+            credentials: 'include',
+            data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused}
+        });
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }else if(res.status===200 && res.data === "fail"){            
+            return {error : MSG.PLUGIN.ERR_SAVING_GENIUS_DATA};
+        }
+        else if(res.status === 401 || res.data === "Invalid Session"){
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        return {error:MSG.PLUGIN.ERR_SAVING_GENIUS_DATA}
+    }catch(err){
+        return {error:MSG.PLUGIN.ERR_SAVING_GENIUS_DATA}
+    }
+}
+
+
 

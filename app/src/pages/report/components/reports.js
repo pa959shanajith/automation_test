@@ -21,6 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import { Paginator } from 'primereact/paginator';
 import useDebounce from '../../../customHooks/useDebounce';
 import { convertIdIntoNameOfAppType } from '../../design/components/UtilFunctions';
+import { Divider } from 'primereact/divider';
+import { Badge } from 'primereact/badge';
 export var navigate
 
 const reports = () => {
@@ -45,8 +47,8 @@ const reports = () => {
     const [executionButon, setExecutionButon] = useState(
       "View by Execution Profile"
     );
-    const customDropdownIcon = classNames("pi", "pi-sort-amount-down");
-
+    const customDropdownIcon = classNames("pi", "pi-sort-alt");
+    const [filteredBadge, setFilteredBadge] = useState(false);
     const [reportData, setReportData] = useState([]);
     const sort = [
       { name: "Last modified", code: "0" },
@@ -201,10 +203,13 @@ const reports = () => {
           sortedData.sort((a, b) =>
             a.configurename.localeCompare(b.configurename)
           );
+          setFilteredBadge(true)
         } else if(sortType.code === "1") {
           sortedData.sort((a, b) => Date.parse(b.execDate) - Date.parse(a.execDate));
+          setFilteredBadge(true)
         } else if(sortType.code === "0") {
           sortedData.sort((a, b) => b.noOfExecution - a.noOfExecution);
+          setFilteredBadge(false)
         }
         setReportData(sortedData);
         setSelectedItem(sortType);
@@ -222,7 +227,7 @@ const reports = () => {
     }
 
     const viewByTemplate = (option) => {
-      return <div><i className={option.icon}></i><span>{option.value}</span></div>;
+      return <div><img className='view_img' src={option.icon === "Test_suites"?"static/imgs/"+option.icon+".png":"static/imgs/"+option.icon+".svg"} alt={option.icon}/><span>{option.value}</span></div>;
     };
 
     const onPageChange = (e) => {
@@ -276,6 +281,7 @@ const reports = () => {
                   handleTest(e.value);
                   setTestType(e.value);
                 }}
+                style={{background:'#605BFF'}}
                 options={testTypesOptions}
               />
             </div>
@@ -292,12 +298,14 @@ const reports = () => {
                     setSearchReportData("");
                     setFirstPage(1);
                   }}
+                  style={{background:'#605BFF'}}
                   options={viewByOptions}
                 />
               </div>
             ) : null}
           </div>
         </div>
+        <Divider type="solid" />
         <div className="flex justify-content-center ml-4 mr-4 mt-5 mb-3 search_container">
           <div className="p-input-icon-left">
             <i className="pi pi-search" />
@@ -319,6 +327,7 @@ const reports = () => {
               className="sort_dropdown"
               placeholder={selectedItem}
             />
+            {filteredBadge && <Badge style={{position:'absolute'}} severity="success" ></Badge>}
           </div>
         </div>
         <div className="report_landing mt-2">
@@ -365,9 +374,9 @@ const reports = () => {
                                               ? "static/imgs/E2EModuleSideIcon.png"
                                               : "static/imgs/moduleIcon.png"
                                           }
-                                          className="exe_type_icon"
+                                          className="exe_type_icon" alt='icon'
                                         />
-                                        <span
+                                        {/* <span
                                           style={{
                                             display: "inline-block",
                                             marginLeft: "0.4rem",
@@ -378,7 +387,7 @@ const reports = () => {
                                           data.selectedModuleType === "endtoend"
                                             ? "End to End"
                                             : "Test Suite"}
-                                        </span>
+                                        </span> */}
                                       </span>
                                     </div>
                                     <div className="col-12 exe_namebox">
@@ -413,13 +422,14 @@ const reports = () => {
                                       className="col-4 lg:col-4 xl:col-4 md:col-12 sm:col-12 flex justify-content-end"
                                       style={{ position: "relative" }}
                                     >
-                                      <i
-                                        className="pi pi-cog"
+                                      <img
+                                        src='static/imgs/Execution_number_icon.svg'
+                                        alt='Execution_number_icon'
                                         style={{
                                           fontSize: "2rem",
                                           marginRight: "1.2rem",
                                         }}
-                                      ></i>
+                                      />
                                       <span className="count_exe">
                                         {data?.noOfExecution
                                           ? data?.noOfExecution
@@ -496,13 +506,13 @@ const reports = () => {
             {show && <ReportTestTable />}
           </div>
           {activeIndex !== "Accessibility Test" && (
-            <Paginator
+            <div  className='reportPagination'><Paginator
               first={firstPage}
               rows={rowsPage}
               totalRecords={configPages}
               rowsPerPageOptions={[10, 20, 30]}
               onPageChange={onPageChange}
-            />
+            /></div>
           )}
           <div>
             <Footer />

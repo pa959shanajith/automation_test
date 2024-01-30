@@ -1,261 +1,280 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-    projectList : {},
-    moduleList: [],
-    screenData: {testCaseList:[],screenList:[]},
-    selectedProj: undefined,
-    searchModule: undefined,
-    initEnEProj: undefined,
-    isEnELoad: false,
-    selectedModule: {},
-    selectedModulelist:[],
-    selectBoxState: false,
-    selectNodes: {nodes:[],links:[]},
-    copyNodes: {nodes:[],links:[]},
-    deletedNodes: [],
-    scenarioList:[],
-    importData:{createdby:undefined,data:undefined},
-    unassignTask:[],
-    toDeleteScenarios: [],
-    appType:undefined,
-    savedList:false,
-    dontShowFirstModule:false,
-    ScrapeData : [],
-    disableAction: false,
-    disableAppend: false,
-    compareFlag: false,
-    compareData: {},
-    compareObj: {changedObj: [], notChangedObj: [], notFoundObj: [], fullScrapeData: []},
-    scenarioLevelImpact:[],
-    analyzeScenario:false,
-    impactAnalysisScreenLevel: false,
-    objValue: { val: null },
-    isFiltered: false,
-    compareSuccessful:false,
-    cert: {},
-    WsData: {
-        endPointURL: "",
-        method: "0",
-        opInput: "",
-        reqHeader: "",
-        reqBody: "",
-        respHeader: "",
-        respBody: "",
-        paramHeader: "",
-    },
-    wsdlError: [],
-    actionError: [],
-    copiedTestCases: {},
-    TestCases: [],
-    Modified: {},
-    SaveEnable: false,
-    enableExport:false,
-    exportProjname:"",
-    enableExportMindmapButton:true,
-    oldModuleForReset:"",
-    currentModuleId:"",
-    currentid:""
+  projectList: {},
+  moduleList: [],
+  screenData: { testCaseList: [], screenList: [] },
+  selectedProj: undefined,
+  searchModule: undefined,
+  initEnEProj: undefined,
+  isEnELoad: false,
+  selectedModule: {},
+  selectedModulelist: [],
+  selectBoxState: false,
+  selectNodes: { nodes: [], links: [] },
+  copyNodes: { nodes: [], links: [] },
+  deletedNodes: [],
+  scenarioList: [],
+  importData: { createdby: undefined, data: undefined },
+  unassignTask: [],
+  toDeleteScenarios: [],
+  appType: undefined,
+  savedList: false,
+  dontShowFirstModule: false,
+  ScrapeData: [],
+  disableAction: false,
+  disableAppend: false,
+  compareFlag: false,
+  compareData: {},
+  compareObj: { changedObj: [], notChangedObj: [], notFoundObj: [], fullScrapeData: [] },
+  scenarioLevelImpact: [],
+  analyzeScenario: false,
+  impactAnalysisScreenLevel: false,
+  objValue: { val: null },
+  isFiltered: false,
+  compareSuccessful: false,
+  cert: {},
+  WsData: {
+    endPointURL: "",
+    method: "0",
+    opInput: "",
+    reqHeader: "",
+    reqBody: "",
+    respHeader: "",
+    respBody: "",
+    paramHeader: "",
+  },
+  wsdlError: [],
+  actionError: [],
+  copiedTestCases: {},
+  TestCases: [],
+  Modified: {},
+  SaveEnable: false,
+  enableExport: false,
+  exportProjname: "",
+  enableExportMindmapButton: true,
+  typeOfViewMap: 'folderView',
+  typeOfOprationInFolder: { onExpand: null, onCollapse: null, onSelect: null, onUnselect: null, screenDataForCapture: null, addNewTestStepGroup: null },
+  selectedScreenOfStepSlice: [],
+  oldModuleForReset: "",
+  currentModuleId: "",
+  currentid: ""
 }
 
 export const designSlice = createSlice({
   name: 'design',
   initialState,
   reducers: {
-    projectList:(state, action) =>{
-       state.projectList = action.payload
+    projectList: (state, action) => {
+      state.projectList = action.payload
     },
     moduleList: (state, action) => {
       state.moduleList = action.payload
     },
-    screenData: (state, action)=>{
-       state.screenData = action.payload
+    screenData: (state, action) => {
+      state.screenData = action.payload
     },
-    selectedProj: (state, action)=>{
+    selectedProj: (state, action) => {
       state.selectedProj = action.payload
     },
-    searchModule: (state, action)=>{
+    searchModule: (state, action) => {
       state.searchModule = action.payload
     },
-    initEnEProj: (state, action)=>{
+    initEnEProj: (state, action) => {
       state.initEnEProj = action.payload
     },
-    isEnELoad: (state, action)=>{
+    isEnELoad: (state, action) => {
       state.isEnELoad = action.payload
     },
-    selectedModuleReducer: (state, action)=>{
+    selectedModuleReducer: (state, action) => {
       state.selectedModule = action.payload
     },
-    selectedModulelist:(state, action)=>{
+    selectedModulelist: (state, action) => {
       state.selectedModulelist = action.payload
     },
-    selectBoxState: (state, action)=>{
+    selectBoxState: (state, action) => {
       state.selectBoxState = action.payload
     },
-    selectNodes: (state, action)=>{
+    selectNodes: (state, action) => {
       state.selectNodes = action.payload
     },
-    copyNodes: (state, action)=>{
+    copyNodes: (state, action) => {
       state.copyNodes = action.payload
     },
-    deletedNodes: (state, action)=>{
+    deletedNodes: (state, action) => {
       state.deletedNodes = action.payload
     },
-    scenarioList:(state, action)=>{
+    scenarioList: (state, action) => {
       state.scenarioList = action.payload
     },
-    setImportData:(state, action)=>{
+    setImportData: (state, action) => {
       var res = action.payload
       return {
         ...state,
-        selectedProj : res.selectProj,
-        selectedModule : res.selectModule,
-        screenData : res.screenData,
-        moduleList : res.moduleList,
-        importData : res.selectModule.importData
+        selectedProj: res.selectProj,
+        selectedModule: res.selectModule,
+        screenData: res.screenData,
+        moduleList: res.moduleList,
+        importData: res.selectModule.importData
       }
     },
-    unassignTask:(state, action)=>{
+    unassignTask: (state, action) => {
       state.unassignTask = action.payload
     },
-    toDeleteScenarios: (state, action)=>{
+    toDeleteScenarios: (state, action) => {
       state.toDeleteScenarios = action.payload
     },
-    AppType:(state, action)=>{
+    AppType: (state, action) => {
       state.appType = action.payload
     },
-    savedList:(state, action)=>{
+    savedList: (state, action) => {
       state.savedList = action.payload
     },
-    dontShowFirstModule:(state,action)=>{
+    dontShowFirstModule: (state, action) => {
       state.dontShowFirstModule = action.payload
     },
     saveMindMap: (state, action) => {
-      return{
+      return {
         ...state,
         screenData: action.payload.screendata,
         deletedNodes: [],
         moduleList: action.payload.moduledata,
         selectedModule: action.payload.moduleselected,
         selectedModulelist: [],
-        scenarioList:[],
-        unassignTask:[]
-    }
+        scenarioList: [],
+        unassignTask: []
+      }
     },
-    ScrapeData:(state, action) =>{
+    ScrapeData: (state, action) => {
       state.ScrapeData = action.payload;
     },
-    Cert:(state, action) =>{
+    Cert: (state, action) => {
       state.cert = action.payload;
-    },    
-    disableAction:(state, action)=>{
+    },
+    disableAction: (state, action) => {
       state.disableAction = action.payload;
     },
-    disableAppend:(state, action)=>{
-      state.disableAppend= action.payload;
+    disableAppend: (state, action) => {
+      state.disableAppend = action.payload;
     },
-    actionError:(state, action)=>{
+    actionError: (state, action) => {
       state.actionError = action.payload;
     },
-    WsData:(state, action)=>{
-     state.WsData = { ...state.WsData, ...action.payload};
+    WsData: (state, action) => {
+      state.WsData = { ...state.WsData, ...action.payload };
     },
-    wsdlError:(state,action)=>{
-     state.wsdlError = action.payload;
+    wsdlError: (state, action) => {
+      state.wsdlError = action.payload;
     },
-    copiedTestCases: (state, action)=>{
+    copiedTestCases: (state, action) => {
       state.copiedTestCases = action.payload;
     },
-    TestCases:(state, action)=>{
+    TestCases: (state, action) => {
       state.TestCases = action.payload;
     },
-    Modified:(state, action)=>{
+    Modified: (state, action) => {
       state.Modified = action.payload;
     },
-    SaveEnable:(state, action)=>{
+    SaveEnable: (state, action) => {
       state.SaveEnable = action.payload;
     },
-    objValue:(state, action)=>{
+    objValue: (state, action) => {
       state.objValue = action.payload
     },
-    EnableExport:(state, action)=>{
+    EnableExport: (state, action) => {
       state.enableExport = action.payload
     },
-    ExportProjname:(state, action)=>{
+    ExportProjname: (state, action) => {
       state.exportProjname = action.payload
     },
-    EnableExportMindmapButton:(state, action)=>{
+    EnableExportMindmapButton: (state, action) => {
       state.enableExportMindmapButton = action.payload
     },
-    ImpactAnalysisScreenLevel:(state,action)=>{
-      state.impactAnalysisScreenLevel=action.payload
+    ImpactAnalysisScreenLevel: (state, action) => {
+      state.impactAnalysisScreenLevel = action.payload
     },
-    CompareFlag:(state,action)=>{
-      state.compareFlag=action.payload
+    CompareFlag: (state, action) => {
+      state.compareFlag = action.payload
     },
-    CompareObj:(state,action)=>{
-      state.compareObj=action.payload
+    CompareObj: (state, action) => {
+      state.compareObj = action.payload
     },
-    CompareData:(state,action)=>{
-      state.compareData=action.payload
+    CompareData: (state, action) => {
+      state.compareData = action.payload
     },
-    CompareElementSuccessful:(state,action)=>{
-      state.compareSuccessful=action.payload
+    CompareElementSuccessful: (state, action) => {
+      state.compareSuccessful = action.payload
     },
-    AnalyzeScenario:(state,action)=>{
-      state.analyzeScenario=action.payload
+    AnalyzeScenario: (state, action) => {
+      state.analyzeScenario = action.payload
     },
-    ScenarioLevelImpact:(state,action)=>{
-      state.scenarioLevelImpact=action.payload
+    ScenarioLevelImpact: (state, action) => {
+      state.scenarioLevelImpact = action.payload
     },
-    SetOldModuleForReset:(state,action)=>{
-      state.oldModuleForReset=action.payload
+    TypeOfViewMap: (state, action) => {
+      state.typeOfViewMap = action.payload
     },
-    SetCurrentModuleId:(state,action)=>{
-      state.currentModuleId=action.payload
+    SetOldModuleForReset: (state, action) => {
+      state.oldModuleForReset = action.payload
     },
-    SetCurrentId:(state, action)=>{
-      state.currentid= action.payload
+    SetCurrentModuleId: (state, action) => {
+      state.currentModuleId = action.payload
+    },
+    SetCurrentId: (state, action) => {
+      state.currentid = action.payload
+    },
+    typeOfOprationInFolder: (state, action) => {
+      state.typeOfOprationInFolder = {
+        ...state.typeOfOprationInFolder,
+        ...action.payload
+      }
+    },
+    selectedScreenOfStepSlice: (state, action) => {
+      state.selectedScreenOfStepSlice = action.payload
     }
 
-}  })
+  }
+})
 
 // Action creators are generated for each case reducer function
-export const { projectList, moduleList,screenData,
-selectedProj,
-SetCurrentModuleId,
-SetCurrentId,
-searchModule,
-initEnEProj,
-isEnELoad,
-selectedModuleReducer,
-selectedModulelist,
-selectBoxState,
-selectNodes,
-copyNodes,
-deletedNodes,
-scenarioList,
-setImportData,
-unassignTask,
-toDeleteScenarios,
-appType,
-savedList,saveMindMap ,ScrapeData, disableAction,copiedTestCases, disableAppend,actionError,WsData,wsdlError,
-Cert,
-TestCases,
-ImpactAnalysisScreenLevel,
-CompareData,
-CompareFlag,
-CompareObj,
-CompareElementSuccessful,
-Modified,
-SaveEnable,
-objValue,
-EnableExport,
-ExportProjname,
-EnableExportMindmapButton,
-dontShowFirstModule,
-AnalyzeScenario,
-ScenarioLevelImpact,
-SetOldModuleForReset} = designSlice.actions
+export const { projectList, moduleList, screenData,
+  selectedProj,
+  SetCurrentModuleId,
+  SetCurrentId,
+  searchModule,
+  initEnEProj,
+  isEnELoad,
+  selectedModuleReducer,
+  selectedModulelist,
+  selectBoxState,
+  selectNodes,
+  copyNodes,
+  deletedNodes,
+  scenarioList,
+  setImportData,
+  unassignTask,
+  toDeleteScenarios,
+  appType,
+  savedList, saveMindMap, ScrapeData, disableAction, copiedTestCases, disableAppend, actionError, WsData, wsdlError,
+  Cert,
+  TestCases,
+  ImpactAnalysisScreenLevel,
+  CompareData,
+  CompareFlag,
+  CompareObj,
+  CompareElementSuccessful,
+  Modified,
+  SaveEnable,
+  objValue,
+  EnableExport,
+  ExportProjname,
+  EnableExportMindmapButton,
+  dontShowFirstModule,
+  AnalyzeScenario,
+  ScenarioLevelImpact,
+  TypeOfViewMap,
+  SetOldModuleForReset,
+  typeOfOprationInFolder,
+  selectedScreenOfStepSlice } = designSlice.actions
 
 export default designSlice.reducer

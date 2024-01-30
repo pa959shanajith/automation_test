@@ -5,6 +5,7 @@ import SaveMapButton from '../components/SaveMapButton';
 import Toolbarmenu from '../components/ToolbarMenu';
 import ModuleListSidePanel from '../components/ModuleListSidePanel';
 import CanvasNew from './CanvasNew';
+import FolderView from './FolderView';
 import ExportMapButton from '../components/ExportMapButton';
 import {ClickFullScreen, ClickSwitchLayout, parseProjList} from './MindmapUtils';
 import {ScreenOverlay, setMsg} from '../../global';
@@ -38,6 +39,7 @@ const CreateNew = ({importRedirect}) => {
   const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate?true:false)
   const isEnELoad = useSelector(state=>state.design.isEnELoad);
   const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  const handleTypeOfViewMap = useSelector(state=>state.design.typeOfViewMap)
   let Proj = reduxDefaultselectedProject;
 
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -142,12 +144,13 @@ const CreateNew = ({importRedirect}) => {
                 <div className='mp__toolbar__container'>
                     <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
                 </div>
+                {(handleTypeOfViewMap ==='folderView')?<div className='folderViewMain'><FolderView setBlockui={setBlockui}/></div>:<>{(handleTypeOfViewMap ==='tableView')?<h1>hello i am Table view</h1>:<>
                 <div style={{display:'flex',height: '85.5vh',maxHeight: '100%'}}>
-                <ModuleListDrop  setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect}/>
+                  <ModuleListDrop  setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect}/>
                 </div>
               <div id='mp__canvas' className='mp__canvas'>
                      {!isEnELoad ? ((Object.keys(moduleSelect).length>0)?
-                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType}/>
+                     <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType}/>
                     :<Fragment>
                         <ExportMapButton/>
                         <SaveMapButton disabled={true}/>
@@ -158,7 +161,7 @@ const CreateNew = ({importRedirect}) => {
                      :<Fragment>
                         <SaveMapButton disabled={true}/>
                       </Fragment>)}      
-              </div>
+              </div></>}</>}
             </div>:null
         }
     </Fragment>
