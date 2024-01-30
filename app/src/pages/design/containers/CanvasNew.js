@@ -104,7 +104,7 @@ const CanvasNew = (props) => {
     const [DelConfirm,setDelConfirm] = useState(false)
     const [reuseDelContent,setReuseDelContent] = useState()
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
-    const [verticalLayout,setVerticalLayout] = useState(true);
+    const [verticalLayout,setVerticalLayout] = useState(typeOfView === "mindMapView"?true:false);
     const proj = useSelector(state=>state.design.selectedProj)
     const projectList = useSelector(state=>state.design.projectList)
     const setBlockui=props.setBlockui
@@ -223,6 +223,9 @@ const CanvasNew = (props) => {
                   if(deletedNoded[i][1]==="testcases"){
                       testcaseIds.push(deletedNoded[i][0]);                    
                   }
+                  if(deletedNoded[i][1]==="teststepsgroups"){  
+                    testcaseIds.push(deletedNoded[i][0]);                    
+                }
               }
               
           } 
@@ -469,7 +472,7 @@ const CanvasNew = (props) => {
     }
     const handlePasteNodeData = (e) =>{
       var res = pasteNodeData(e,{...nodes},{...links},[...dNodes],[...dLinks],{...sections},{...count},copyNodeData,false)
-      setCreateNew(res.dNodes.length-1)
+      // setCreateNew(res.dNodes.length-1)
       setNodes(res.nodeDisplay)
       setLinks(res.linkDisplay)
       setdLinks(res.dLinks)
@@ -627,6 +630,20 @@ const CanvasNew = (props) => {
               return;
           }
       }
+      else if (type==='teststepsgroups'){
+        if (reu){
+            reusedNode(dNodes,sid,type);
+            setSelectedDelNode(id);
+            setReuseDelContent("Selected Test steps groups is re used. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?");
+            setReuseDelConfirm(true);
+            return;
+        }
+        else{
+            setSelectedDelNode(id);
+            setDelConfirm(true);
+            return;
+        }
+    }
       // setReuseList(reusedNames)
       processDeleteNode(id)        
   }
@@ -672,6 +689,11 @@ const CanvasNew = (props) => {
                   reusedNodes.push(node.id);
               }
           }
+          if(node['type']==='teststepsgroups'  && type==='teststepsgroups'){
+            if(node['_id'] === selectedNodeId){
+              reusedNodes.push(node.id);
+            }
+        }
           
       });
       let nodesReused=[]
