@@ -128,6 +128,8 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [screenData, setScreenData] = useState([]);
   const [elementRepo, setElementRepo] = useState(false);
   const [parentId, setParentId] = useState(null);
+  const [screenChange, setScreenChange] = useState(false);
+  const [selectedFolderValue,setSelectedFolderValue] = useState([]);
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
 
@@ -700,14 +702,16 @@ const elementTypeProp =(elementProperty) =>{
           orderList.push(scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid())
         }
         else {
-          // if(parentId !== null){
-          //   const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
-          //   if (foundItem) {
-          //     views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
-          //   }
+          if(parentId !== null){
+            const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+            if (foundItem) {
+              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+            }
             orderList.push(scrapeItem.objId);
   
-          // }
+          }else{
+             orderList.push(scrapeItem.objId);
+          }
           
         }
       }
@@ -1790,23 +1794,41 @@ const elementValuetitle=(rowdata)=>{
 }, [NameOfAppType.projectId]);
 
  const handleScreenChange = (e) => {
-  const selectedFolderValue = e.value;
-  setSelectedScreen(selectedFolderValue);
+  setSelectedFolderValue(e.value)
+  // const selectedFolderValue = e.value;
+  // setSelectedScreen(selectedFolderValue);
+
+  if(captureData.length > 0){
+    setScreenChange(true);
+  }
+
   // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+  else{
+  setSelectedScreen(e.value);
+  setParentId(e.value.id);
+  // fetchScrapeData();
+  setSaveDisable(false);
+  setElementRepo(true);
+  }
+  // addMore.current = true;
+  // let newData = capturedDataToSave;
+  // newData.push(...selectedFolderValue.related_dataobjects)
+  // setCapturedDataToSave(newData);
+  // // setCaptureData(newData);
+  // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+
+};
+
+const confirmScreenChange = () => {
+  // Proceed with screen change using selectedFolderValue from state
+  setSelectedScreen(selectedFolderValue);
   setParentId(selectedFolderValue.id);
   // fetchScrapeData();
   setSaveDisable(false);
   setElementRepo(true);
-  addMore.current = true;
-  let newData = capturedDataToSave;
-  newData.push(...selectedFolderValue.related_dataobjects)
-  setCapturedDataToSave(newData);
-  // setCaptureData(newData);
-  setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
-
+  // Hide confirmation dialog
+  // setDisplayConfirmation(false);
 };
-
-console.log(props.screenData);
 
 const screenOption = screenData?.map((folder) => ({
   label: folder.name,
@@ -2021,6 +2043,13 @@ const screenOption = screenData?.map((folder) => ({
           </Dialog>
         </div>
       </Dialog>
+      <AvoConfirmDialog
+        visible={screenChange}
+        onHide={() => setScreenChange(false)}
+        showHeader={false}
+        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        icon="pi pi-exclamation-triangle"
+        accept={confirmScreenChange} />
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         

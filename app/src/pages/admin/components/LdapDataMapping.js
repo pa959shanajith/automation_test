@@ -24,7 +24,7 @@ const LdapDataMapping = (props) => {
                     <FormInpDropDownLdap
                         resetVal={props.resetField}
                         defVal={props.fieldmap.uname}
-                        // inpRef={userRef}
+                        inpRef={userRef}
                         data={props.fieldMapOpts}
                         errBorder={props.ldapFMapUnameErrBor}
                         ldapEdit={props.ldapEdit}
@@ -38,7 +38,7 @@ const LdapDataMapping = (props) => {
                     <FormInpDropDownLdap
                         resetVal={props.resetField}
                         defVal={props.fieldmap.fname}
-                        // inpRef={firstRef}
+                        inpRef={firstRef}
                         data={props.fieldMapOpts}
                         errBorder={props.ldapFMapFnameErrBor}
                         ldapEdit={props.ldapEdit}
@@ -50,7 +50,7 @@ const LdapDataMapping = (props) => {
                 <div className='flex flex-column'>
                     <span className="leftControl-ldap-dm">Lastname</span>
                     <FormInpDropDownLdap resetVal={props.resetField} defVal={props.fieldmap.lname}
-                        // inpRef={lastRef}
+                        inpRef={lastRef}
                         data={props.fieldMapOpts}
                         errBorder={props.ldapFMapLnameErrBor}
                         ldapEdit={props.ldapEdit} setFilter={(event) => { props.setFieldmap({ uname: props.fieldmap.uname, fname: props.fieldmap.fname, lname: event.target.value, email: props.fieldmap.email }) }}
@@ -62,7 +62,7 @@ const LdapDataMapping = (props) => {
                     <span className="leftControl-ldap-dm">Email</span>
                     <FormInpDropDownLdap
                         resetVal={props.resetField} defVal={props.fieldmap.email}
-                        // inpRef={emailRef}
+                        inpRef={emailRef}
                         data={props.fieldMapOpts}
                         errBorder={props.ldapFMapEmailErrBor}
                         ldapEdit={props.ldapEdit} setFilter={(event) => { props.setFieldmap({ uname: props.fieldmap.uname, fname: props.fieldmap.fname, lname: props.fieldmap.lname, email: event.target.value }) }}
