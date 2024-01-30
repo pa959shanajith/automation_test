@@ -34,6 +34,9 @@
             }
         }
     }
+    .p-dialog-content {
+        overflow: unset;
+    }
 }
 .groupsTabPosition{
     position: fixed;
@@ -52,5 +55,10 @@
         .p-tabview-nav-link {
             padding: 8px;
         }
+    }
+}
+.designGroup_dialog_div{
+    .p-dialog-content {
+        overflow: unset;
     }
 }

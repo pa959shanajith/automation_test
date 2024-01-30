@@ -277,27 +277,27 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
                     <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
                 </span> */}
                     <div data-test="headerMenu" className='toolbar__header-menus'>
-                        <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
+                        {/* <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
                         <div >40%</div>
-                        <img className='am' src='static/imgs/add.svg' alt='add' />
+                        <img className='am' src='static/imgs/add.svg' alt='add' /> */}
                         {/* <img className='line' src='static/imgs/line.svg' alt='line'/> */}
                         {/* <div className="flex justify-content-center gap-2 text-500">
                         <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
                         <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
                         <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
                     </div> */}
-                        <img className='line' src='static/imgs/line.svg' alt='line' />
-                    </div>
+                        {/* <img className='line' src='static/imgs/line.svg' alt='line' />*/}
+                    </div> 
                     {/* Radio buttons for map views */}
-                    <div className="card flex justify-content-center">
+                    <div className="flex justify-content-center">
                         <Dropdown value={selectedView} onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }} options={views} optionLabel="name"
                             className="w-full md:w-12rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
                         />
                     </div>
-                    <div className="card flex justify-content-center">
-                        <Dropdown value={selectedGitOpp} onChange={(e) => { setSelectedGitOpp(e.value) }} options={GitOpp} optionLabel="name"
+                    <div className="flex justify-content-center">
+                        {/* <Dropdown value={selectedGitOpp} onChange={(e) => { setSelectedGitOpp(e.value) }} options={GitOpp} optionLabel="name"
                             className="w-full md:w-13rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/folderViewIcon.svg" alt="modules" /><h5>select Git operation</h5></div>}
-                        />
+                        /> */}
                     </div>
                     {/* <img  className='line' src='static/imgs/line.svg' alt='line'/> */}
                     {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
