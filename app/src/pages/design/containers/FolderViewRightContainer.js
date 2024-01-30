@@ -13,6 +13,7 @@ import DesignModal from '../containers/DesignTestStepForFolderView.js';
 import { TabView, TabPanel } from 'primereact/tabview';
 import SaveMapButton from '../components/SaveMapButton';
 import { InputText } from 'primereact/inputtext';
+import { transformDataFromTreetoFolder } from './MindmapUtilsForOthersView';
 
 const FolderViewRightContainer = (props) => {
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
@@ -35,7 +36,11 @@ const FolderViewRightContainer = (props) => {
     if (selectedProject) {
         Proj = selectedProject;
     }
-
+    useEffect(() => {
+        if (eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1") {
+            handlingSelectedNode()
+        }
+    }, [eventsOfFolder?.onSelect])
     const eventLayer = eventsOfFolder.onSelect?.data[0]?.layer
     const handlingBreadCrumb = () => {
         let itemsOf = [];
@@ -53,6 +58,28 @@ const FolderViewRightContainer = (props) => {
         }
         return (itemsOf);
     }
+    async function handlingSelectedNode() {
+        if (eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1") {
+            let suitID = eventsOfFolder?.onSelect?.data[0]?.testSuitId
+            var req = {
+                tab: "createTab",
+                projectid: Proj,
+                version: 0,
+                cycId: null,
+                modName: "",
+                moduleid: suitID
+            }
+            try {
+                var res = await getModules(req)
+
+            }
+            catch (error) {
+                console.log("error while fetching getModules", error)
+            }
+            const modifiedData = transformDataFromTreetoFolder(res);
+        }
+
+    }
     const items = handlingBreadCrumb();
     //     console.log("modulkeList",props.modifiedDataToAddNewTSG)
     //     if( props.modifiedDataToAddNewTSG.children?.length){
@@ -60,6 +87,25 @@ const FolderViewRightContainer = (props) => {
     //     const selectedTCForAddingTSG =data.children._id.find(eventsOfFolder.onSelect.data[0].testCaseId)
     //     console.log("selectedTC",selectedTCForAddingTSG)
     // }
+    //here the screen will be directly fetched to testCases from parent of TSG.
+    const extractingScreenFromTSG = () => {
+        const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+        for (let cases = 0; cases < data?.children?.length; cases++) {
+            //here every TestCases will looped
+            for (let steps = 0; steps < data.children[cases].children.length; steps++) {
+                //here every TestStepGroup looped for screen 
+                let parentScreen = []
+                parentScreen = data.children[cases].children[steps].parent;
+                parentScreen.parent.id = data?.children[cases].id;
+                data.children[cases].children[steps] = parentScreen;
+                // setStepKey(steps)
+            }
+
+            data.children[cases] = data?.children[cases]
+        }
+        return data;
+    }
+
     //modifying testStepGroup to screen and step, also making data to save
     const modifyingStepGroupToParentAndSaveFun = () => {
         // const data = props.modifiedDataToAddNewTSG;
@@ -67,7 +113,8 @@ const FolderViewRightContainer = (props) => {
 
 
         if (eventsOfFolder.createNewTestSuit === null) {
-            const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+            // const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+            const data = extractingScreenFromTSG();
             const selectedTCForAddingTSG = data.children.find((e) => e._id === eventsOfFolder.onSelect.data[0].testCaseId)
 
             data.id = 0;
@@ -100,65 +147,7 @@ const FolderViewRightContainer = (props) => {
                     }
                 }
                 const gettingLengthOfAllNode = data.children.length + TCChildLength + screenChildLength
-                //         childIndex: 1
-                // children: []
-                // cidxch: "true"
-                // display_name: "TestSteps1"
-                // id: 3
-                // name: "TestSteps1"
-                // parent: {id: 2, children: Array(0), y: 443, x: 90, parent: {…}, …}
-                // path: ""
-                // state: "created"
-                // type: "testcases"
-                // mapTS
-                // childIndex
-                // : 
-                // 1
-                // cidxch
-                // : 
-                // "true"
-                // id
-                // : 
-                // 6
-                // name
-                // : 
-                // "TSG0006"
-                // oid
-                // : 
-                // null
-                // orig_name
-                // : 
-                // null
-                // pid   /////// actual == 5
-                // : 
-                // undefined
-                // pid_c
-                // : 
-                // undefined
-                // projectID
-                // : 
-                // "657c2d9bce3c0be6ba4bf032"
-                // renamed
-                // : 
-                // false
-                // screenname  /////actual ==  screen2
-                // : 
-                // undefined
-                // state
-                // : 
-                // "created"
-                // task
-                // : 
-                // null
-                // taskexists
-                // : 
-                // null
-                // type
-                // : 
-                // "testcases"
-                // _id
-                // : 
-                // null
+
                 const newTestStep = {
                     childIndex: 1,// adding from TSG to TSG has to handle it should change
                     cidxch: "true",
@@ -177,65 +166,7 @@ const FolderViewRightContainer = (props) => {
                     _id: null,
                     path: ""
                 }
-                //         screen {
-                //             childIndex: 1
-                // children: [{…}]
-                // cidxch: "true"
-                // display_name: "Screen1"
-                // id: 2
-                // name: "Screen1"
-                // parent: {_id: '659ee64aa698ffaf57ecd6d7', childIndex: 1, children: Array(0), name: 'TestCase1csc', projectID: '657c2d9bce3c0be6ba4bf032', …}
-                // path: ""
-                // state: "created"
-                // type: "screens"
 
-                //         }
-                //             mapScreen
-                //             childIndex
-                // : 
-                // 1
-                // cidxch
-                // : 
-                // null  ////true
-                // id
-                // : 
-                // 5
-                // name
-                // : 
-                // "TSG0006"
-                // oid
-                // : 
-                // null
-                // orig_name
-                // : 
-                // null
-                // pid
-                // : 
-                // 2
-                // pid_c
-                // : 
-                // undefined
-                // projectID
-                // : 
-                // "657c2d9bce3c0be6ba4bf032"
-                // renamed
-                // : 
-                // false
-                // state
-                // : 
-                // "created"
-                // task
-                // : 
-                // null
-                // taskexists
-                // : 
-                // null
-                // type
-                // : 
-                // "screens"
-                // _id
-                // : 
-                // null
                 const newScreenData = {
                     childIndex: selectedTCForAddingTSG.children.length + 1,//check
                     children: [],
@@ -308,13 +239,47 @@ const FolderViewRightContainer = (props) => {
 
 
     }
+    function handleRenamingNodes() {
+        // const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+        const data = extractingScreenFromTSG();
+        if (eventsOfFolder?.reNamingOfTS !== null && eventsOfFolder.reNamingOfTS[0].length) {
+            data.original_name = data.name;
+            data.name = eventsOfFolder.reNamingOfTS[0];
+            data.rnm = true;
+        }
+        if (eventsOfFolder?.reNamingOfTestCase !== null && eventsOfFolder.reNamingOfTestCase[0].length > 0) {
+            // const renamedTestCase = data.children.find((e)=>e._id ===eventsOfFolder.reNamingOfTestCase[1] )
+            data.children[eventsOfFolder.reNamingOfTestCase[1]].name = eventsOfFolder.reNamingOfTestCase[0]
+        }
+
+        setParentScreenData(data);
+
+    }
+    // function handleRenamingTC () {
+    //     const data = eventsOfFolder.onSelect.data[0].layer === 'layer_1' ? props.modifiedData : props.modifiedDataToAddNewTSG;
+    //     data.original_name = data.name;
+    //     data.name = eventsOfFolder.reNamingOfTS[0];
+    //     data.rnm = true;
+    //     setParentScreenData(data);
+
+    // }
     useEffect(() => {
         if (eventsOfFolder.createNewTestSuit !== null) {
             if (eventsOfFolder.createNewTestSuit.length) {
                 modifyingStepGroupToParentAndSaveFun()
             }
         }
-    }, [eventsOfFolder.createNewTestSuit]);
+        if (eventsOfFolder.reNamingOfTS !== null) {
+            if (eventsOfFolder.reNamingOfTS[0].length) {
+                handleRenamingNodes()
+            }
+        }
+        if (eventsOfFolder.reNamingOfTestCase !== null) {
+            if (eventsOfFolder.reNamingOfTestCase[0].length) {
+                handleRenamingNodes()
+            }
+        }
+    }, [eventsOfFolder.createNewTestSuit, eventsOfFolder.reNamingOfTS, eventsOfFolder.reNamingOfTestCase]);
 
 
 
