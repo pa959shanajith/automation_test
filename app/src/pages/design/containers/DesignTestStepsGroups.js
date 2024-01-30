@@ -20,24 +20,27 @@ function DesignTestStepsGroups(params) {
             <div>
                 <h5 className='dailog_headerGroups'>Design Steps Groups</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
-                    <TabPanel header="Capture Elements"></TabPanel>
+                    <TabPanel header="Element Reposiotry"></TabPanel>
                     <TabPanel header="Design Test Steps"></TabPanel>
                 </TabView>
             </div>
         </>
     );
     return(
-        <>
+        <div className="designGroup_dialog_div">
             <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>params.setVisibleDesignStepGroups(false)}>
                 <div className='designTestGroups'>
                     
-                {activeIndex === 0 ?<CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse}/>
-                        :
-                <DesignModal   fetchingDetails={params.fetchingDetailsForGroup} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>}
-                        
+                {activeIndex === 0 ?<div>
+                    <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse}/>
+                    </div>  
+                    :
+                    <div>
+                        <DesignModal   fetchingDetails={params.fetchingDetailsForGroup} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>
+                    </div>  }   
                 </div>
             </Dialog>
-        </>
+        </div>
     )
 }
 export default DesignTestStepsGroups;

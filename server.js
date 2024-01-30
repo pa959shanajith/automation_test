@@ -262,6 +262,7 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.post('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
@@ -615,6 +616,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
 		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
+		app.post('/launchAndServerConnectSAPGenius_ICE', auth.protect, designscreen.launchAndServerConnectSAPGenius_ICE);
+		app.post('/startScrapingSAPGenius_ICE', auth.protect, designscreen.startScrapingSAPGenius_ICE);
+		app.post('/stopScrapingSAPGenius_ICE', auth.protect, designscreen.stopScrapingSAPGenius_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);

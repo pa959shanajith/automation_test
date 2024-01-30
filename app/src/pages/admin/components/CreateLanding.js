@@ -9,6 +9,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from 'primereact/tooltip';
+
 
 
 /*Component CreateLanding
@@ -34,11 +36,16 @@ const CreateLanding = (props) => {
     const email = useSelector(state => state.admin.email);
     const [tempCheckedUserListLeftSide, setTempCheckedUserListLeftSide] = useState([]);
     const [tempCheckedUserListRightSide, setTempCheckedUserListRightSide] = useState([]);
-    const [serverName, setServerName] = useState([]);
+    const [serverName, setServerName] = useState('');
     const [selectSearchUser, setSelectSearchUser] = useState('');
-    const [filterListSelectUser, setFilterListSelectUser] = useState([]);
+    const [LDAPUserList, setLDAPUserList] = useState([]);
+    const [filterListSearchUser, setFilterListSearchUser] = useState([]);
     const [selectedSearchUserRightSide, setSelectedSearchUserRightSide] = useState('');
     const [primaryRoles, setPrimaryRoles] = useState(props.primaryRoles);
+    const [ldapSelectedUser, setLdapSelectedUser] = useState('');
+    const [selectedLdapUserListTemp, setSelectedLdapUserListTemp] = useState([]);
+    const ldapFetchUsersData = useSelector(state => state.admin.ldapFetchUsersData);
+
     const node = useRef();
 
     const serverItems = [
@@ -48,18 +55,45 @@ const CreateLanding = (props) => {
         { value: "oidc", name: "OpenID" },
     ]
 
+
+    const sortingFunction = (array) => {
+        let inputArray = array;
+        inputArray.sort((a, b) => {
+            const nameA = a.name.toUpperCase();
+            const nameB = b.name.toUpperCase();
+
+            if (nameA < nameB) {
+                return -1;
+            }
+
+            if (nameA > nameB) {
+                return 1;
+            }
+
+            return 0; // names are equal
+        });
+        return inputArray;
+    }
+
+    useEffect(() => {
+        let newRolesList = [...primaryRoles, { name: "Quality Manager & Admin", value: "ManagerWithadmin" }]
+        setPrimaryRoles(newRolesList);
+    }, []);
+
     useEffect(() => {
         let modifyData = []
-        if(ldapAllUserList.length > 0){
+        if (ldapAllUserList.length > 0) {
             ldapAllUserList.map(item => {
-                let object={}
-                object.name = item[0];
-                object.domain = item[1];
+                let object = {}
+                object.name = item.html;
+                object.domain = item.value;
                 object.role = ""
-                object.roleId="" 
+                object.roleId = ""
                 modifyData.push(object);
             })
-            setFilterListSelectUser(modifyData.sort());
+            let updatedlist = sortingFunction(modifyData)
+            setLDAPUserList(updatedlist)
+            setFilterListSearchUser(updatedlist);
         }
     }, [ldapAllUserList.length > 0]);
 
@@ -71,18 +105,21 @@ const CreateLanding = (props) => {
     }
 
     const selectServerHandler = (event) => {
-        setServerName(event.target.value.name);
+        setServerName(event.value);
         dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
-        dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-        props.ldapSwitchFetch({ userConf_ldap_fetch: "import" });
+        if (type === "ldap") {
+            dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
+            props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName: event.target.value.name });
+        }
+
     }
 
     //checked users 
     const selectLeftSideHandler = (event) => {
         let _selectedUserList = [...tempCheckedUserListLeftSide]
         if (event.checked) {
-            filterListSelectUser.filter((item) =>{
-                if(item.name === (event.target.name)) _selectedUserList.push(item);
+            LDAPUserList.filter((item) => {
+                if (item.name === (event.target.name)) _selectedUserList.push(item);
             });
         }
         else {
@@ -94,66 +131,77 @@ const CreateLanding = (props) => {
     const selectUsersSearchHandler = (event) => {
         let inputValue = event.target.value.toLowerCase();
         setSelectSearchUser(inputValue);
-        if (inputValue != '') {
-            const filterData = filterListSelectUser.filter((item) =>
-                item.name.toLowerCase().includes(inputValue)
-            );
-            setFilterListSelectUser(filterData.sort());
-        } else {
-            setFilterListSelectUser(filterListSelectUser.sort());
-        }
-
-    }
-
-    const transferSelectedUsersToRightSide = () => {
         function isSubarrayEqual(subArr1, subArr2) {
             return subArr1.name === subArr2.name;
         }
+        let updatedUserList = sortingFunction(LDAPUserList.filter(subArr1 =>
+            !props.ldapSelectedUserList.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
+        ));
 
-        let updatedUserList = filterListSelectUser.filter(subArr1 =>
-          !tempCheckedUserListLeftSide.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
+        if (inputValue != '') {
+            const filterData = updatedUserList.filter((item) =>
+                item.name.toLowerCase().includes(inputValue)
+            );
+            filterData.length > 0 ? setFilterListSearchUser(sortingFunction(filterData)) : setFilterListSearchUser([]);
+        } else {
+            setFilterListSearchUser(sortingFunction(updatedUserList));
+        }
+    }
+
+    const transferSelectedUsersToRightSide = () => {
+        let newSelectesUserList = [...tempCheckedUserListLeftSide, ...props.ldapSelectedUserList];
+
+        function isSubarrayEqual(subArr1, subArr2) {
+            return subArr1.name === subArr2.name;
+        }
+        let updatedUserList = LDAPUserList.filter(subArr1 =>
+            !newSelectesUserList.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
         );
 
-        let checkedUserListData = []
+        let checkedUserListData = [];
+        let domainNameList = [];
         tempCheckedUserListLeftSide.map(item => {
-            let object={...item, role : "Quality Engineer", roleId:"5db0022cf87fdec084ae49ac" };
+            let object = { ...item, role: "Quality Engineer", roleId: "5db0022cf87fdec084ae49ac", isAdmin: false };
+            domainNameList.push(item.domain);
             checkedUserListData.push(object);
         })
+        let newLdapSelectedUserListTemp = sortingFunction([...props.ldapSelectedUserList, ...checkedUserListData])
         setTempCheckedUserListLeftSide([]);
-        setFilterListSelectUser(updatedUserList.sort());  
-        props.setLdapSelectedUserList([...props.ldapSelectedUserList,...checkedUserListData].sort());
-        
-        // ------------------------------------------------ for single user LDAP ----------------------------------------------------------
-        let usernameLdap = '';
-        let domainName = '';
-        checkedUserListData.map(item => {
-            usernameLdap = item.name;
-            domainName = item.domain;
-        })
-        dispatch(AdminActions.UPDATE_LDAP_USER(usernameLdap));
-        dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(domainName));
-        props.ldapGetUser({ luser: usernameLdap });
-        //----------------------------------------------------------- END ---------------------------------------------------------------
+        setFilterListSearchUser(sortingFunction(updatedUserList));
+        props.setLdapSelectedUserList(newLdapSelectedUserListTemp);
+        setSelectedLdapUserListTemp(newLdapSelectedUserListTemp);
+        setSelectSearchUser('');
+        dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(newLdapSelectedUserListTemp));
+        props.ldapGetUser({ luser: domainNameList });
     }
 
     const transferSelectedUsersToLeftSide = () => {
         function isSubarrayEqual(subArr1, subArr2) {
             return subArr1.name === subArr2.name;
         }
-        let updatedCheckedUserList = props.ldapSelectedUserList.filter(subArr1 =>
+        let updatedCheckedUserList = sortingFunction(props.ldapSelectedUserList.filter(subArr1 =>
             !tempCheckedUserListRightSide.some(subArr2 => isSubarrayEqual(subArr1, subArr2))
-        )
-        let userLists = [...filterListSelectUser,...tempCheckedUserListRightSide]
+        ));
+        let userLists = [...filterListSearchUser, ...tempCheckedUserListRightSide]
+
         setTempCheckedUserListRightSide([]);
-        setFilterListSelectUser(userLists.sort()); 
-        props.setLdapSelectedUserList(updatedCheckedUserList.sort());
+        setFilterListSearchUser(sortingFunction(userLists));
+        props.setLdapSelectedUserList(updatedCheckedUserList);
+        setSelectedLdapUserListTemp(updatedCheckedUserList);
+        let newldapFetchUsersData = [];
+        ldapFetchUsersData.filter(arr1 => {
+            updatedCheckedUserList.some(arr2 => {
+                if (arr1.ldapname === arr2.domain) newldapFetchUsersData.push(arr1);
+            })
+        });
+        dispatch(AdminActions.UPDATE_LDAP_DATA(newldapFetchUsersData));
     }
 
     const selectRightSideUserListHandler = (event) => {
         let _selectedUserList = [...tempCheckedUserListRightSide]
         if (event.checked) {
-            props.ldapSelectedUserList.filter((item) =>{
-                if(item.name === (event.target.name)) _selectedUserList.push(item);
+            props.ldapSelectedUserList.filter((item) => {
+                if (item.name === (event.target.name)) _selectedUserList.push(item);
             });
         }
         else {
@@ -163,12 +211,56 @@ const CreateLanding = (props) => {
     }
 
     const primaryRoleHandler = (event, userData) => {
-        let updateUser = [...props.ldapSelectedUserList];
+        let updateUser = [...selectedLdapUserListTemp];
         let roleIndex = primaryRoles.findIndex(item => item.value === event.target.value);
-        let updateUserIndex = updateUser.findIndex(item => item.name === userData.name)
-        updateUser[updateUserIndex].roleId = primaryRoles[roleIndex].value;
-        updateUser[updateUserIndex].role = primaryRoles[roleIndex].name;
-        props.setLdapSelectedUserList(updateUser.sort());
+        let updateUserIndex = updateUser.findIndex(item => item.name === userData.name);
+        let updatedLdapUserList = [];
+        updateUser.map(((userData, index) => {
+
+            if (index === updateUserIndex) {
+                let userObj = { ...userData, roleId: primaryRoles[roleIndex].value, role: primaryRoles[roleIndex].name, isAdmin: event.target.value === "ManagerWithadmin" ? true : false }
+                updatedLdapUserList.push(userObj);
+            }
+            else updatedLdapUserList.push(userData);
+        }))
+        updatedLdapUserList = sortingFunction(updatedLdapUserList);
+        props.setLdapSelectedUserList(updatedLdapUserList);
+        dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(updatedLdapUserList));
+        setSelectedLdapUserListTemp(updatedLdapUserList);
+    }
+
+    const ldapSelectedUserSearchHandler = (event) => {
+        let inputValue = event.target.value.toLowerCase();
+        setLdapSelectedUser(inputValue);
+        if (inputValue != '') {
+            const filterData = props.ldapSelectedUserList.filter((item) =>
+                item.name.toLowerCase().includes(inputValue)
+            );
+            filterData.length > 0 ? setSelectedLdapUserListTemp(sortingFunction(filterData)) : setSelectedLdapUserListTemp([]);
+        } else {
+            setSelectedLdapUserListTemp(props.ldapSelectedUserList);
+        }
+
+    }
+    const firstNameChange = (value) => {
+        dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(value));
+        { (firstname === value || value === props?.editUserData?.firstName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
+    }
+
+    const lastNameChange = (value) => {
+        dispatch(AdminActions.UPDATE_INPUT_LASTNAME(value));
+        { (firstname === value || value === props?.editUserData?.lastName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
+    }
+
+
+    const selectConfigurationOnchange = (event) => {
+        props.click();
+        props.selectUserType({ type: event.target.value });
+        dispatch(AdminActions.UPDATE_TYPE(event.target.value));
+        setLdapSelectedUser('');
+        setFilterListSearchUser([]);
+        setSelectedLdapUserListTemp([]);
+        setSelectSearchUser('');
     }
 
     return (
@@ -183,7 +275,7 @@ const CreateLanding = (props) => {
                             value={type}
                             className='w-full md:w-20rem p-inputtext-sm'
                             options={serverItems}
-                            onChange={(event) => { props.click(); props.selectUserType({ type: event.target.value }); dispatch(AdminActions.UPDATE_TYPE(event.target.value)) }}
+                            onChange={selectConfigurationOnchange}
                             optionLabel="name"
                             disabled={editUser}
 
@@ -224,7 +316,7 @@ const CreateLanding = (props) => {
                                     </div>
                                 </div>
                                 <div className='user_list_container'>
-                                    {filterListSelectUser.length > 0 ? filterListSelectUser.map((user, index) =>
+                                    {filterListSearchUser.length > 0 ? filterListSearchUser.map((user, index) =>
                                         <div key={index} className="flex pb-2">
                                             <Checkbox inputId={user.name} name={user.name} onChange={selectLeftSideHandler} checked={tempCheckedUserListLeftSide.some(item => item.name === user.name)} />
                                             <label htmlFor={user.name} className="ml-2">{user.name}</label>
@@ -235,7 +327,7 @@ const CreateLanding = (props) => {
 
                             </div>
 
-                            <div className='flex flex-column justify-content-center gap-2'>
+                            <div className='flex flex-column justify-content-center' style={{ gap: '0.8rem', padding: '0.3rem' }}>
                                 <Button label=">" size="small" onClick={transferSelectedUsersToRightSide} disabled={tempCheckedUserListLeftSide.length <= 0} outlined></Button>
                                 <Button label="<" size="small" onClick={transferSelectedUsersToLeftSide} disabled={tempCheckedUserListRightSide.length <= 0} outlined> </Button>
                             </div>
@@ -248,8 +340,8 @@ const CreateLanding = (props) => {
                                     <small>Selected Users<span style={{ color: "#d50000" }}> *</span></small>
                                     <div>
                                         <InputText
-                                            value={selectedSearchUserRightSide}
-                                            // onChange={}
+                                            value={ldapSelectedUser}
+                                            onChange={ldapSelectedUserSearchHandler}
                                             className='w-full md:w-19rem p-inputtext-sm mb-2'
                                             placeholder="Search users"
                                         ></InputText>
@@ -257,10 +349,11 @@ const CreateLanding = (props) => {
                                 </div>
 
                                 <div className='user_list_container'>
-                                    {(props.ldapSelectedUserList.length > 0) ? props.ldapSelectedUserList.map((user, index) =>
-                                        <div key={index} className="flex flex-row pb-2 w-full">
+                                    {(selectedLdapUserListTemp.length > 0) ? selectedLdapUserListTemp.map((user, index) =>
+                                        <div key={index} className="flex flex-row pb-2 w-full" style={{ alignItems: 'center' }}>
                                             <Checkbox inputId={user.name} name={user.name} onChange={selectRightSideUserListHandler} checked={tempCheckedUserListRightSide.some(item => item.name === user.name)} />
-                                            <label htmlFor={user.name} className="ml-2 w-4">{user.name}</label>
+                                            <label htmlFor={user.name} className={`ldap_selected_username ldap_label_${index} ml-2`}>{user.name}</label>
+                                            <Tooltip target={`.ldap_label_${index}`} position='bottom' content={user.name}></Tooltip>
                                             <Dropdown
                                                 data-test="primaryroleDropdown"
                                                 id="primaryroleDropdown"
@@ -268,10 +361,11 @@ const CreateLanding = (props) => {
                                                 value={user.roleId}
                                                 options={primaryRoles}
                                                 optionLabel="name"
-                                                className='md:w-10rem p-inputtext-sm'
+                                                className={`ldap_selected_role${index} md:w-10rem p-inputtext-sm`}
                                                 placeholder='Select Role'
                                                 onChange={(e) => primaryRoleHandler(e, user)}
                                             />
+                                            <Tooltip target={`.ldap_selected_role${index}`} content={user.role} position='bottom'></Tooltip>
                                         </div>
                                     )
                                         : <small>No users selected</small>}
@@ -282,7 +376,7 @@ const CreateLanding = (props) => {
                     </>
                     : null
                 }
-                {(type === "inhouse") ?
+                {(type === "inhouse" || type === "saml") ?
                     <>
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className="flex flex-column">
@@ -290,7 +384,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="userName-input__create"
                                     type="text"
-                                    className={`w-full md:w-20rem p-inputtext-sm placeHolder ${props.userNameAddClass ? 'inputErrorBorder': ''}`}
+                                    className={`w-full md:w-20rem p-inputtext-sm placeHolder ${props.userNameAddClass ? 'inputErrorBorder' : ''}`}
                                     id="userName"
                                     value={userName} onChange={(event) => { userNameChange(event.target.value) }}
                                     name="userName" maxLength="100"
@@ -304,7 +398,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="email"
                                     value={email}
-                                    onChange={(event) => { props.emailChange(event.target.value.toLowerCase())}}
+                                    onChange={(event) => { props.emailChange(event.target.value.toLowerCase()) }}
                                     name="email"
                                     id="email"
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
@@ -313,8 +407,6 @@ const CreateLanding = (props) => {
                                 />
                             </div>
                         </div>
-
-
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className='flex flex-column'>
                                 <label htmlFor='firstname' className="pb-2 font-medium">First Name <span style={{ color: "#d50000" }}>*</span></label>
@@ -322,17 +414,17 @@ const CreateLanding = (props) => {
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="firstname" id="firstname" value={firstname}
-                                    onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(event.target.value)) }}
+                                    onChange={(event) => { firstNameChange(event.target.value) }}
                                     maxLength="100"
                                     placeholder="Enter First Name" />
                             </div>
                             <div className='flex flex-column'>
                                 <label htmlFor='lastname' className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
                                 <InputText data-test="lastName-input__create"
-                                className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
+                                    className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="lastname" id="lastname" value={lastname}
-                                    onChange={(event) => { dispatch(AdminActions.UPDATE_INPUT_LASTNAME(event.target.value)) }}
+                                    onChange={(event) => { lastNameChange(event.target.value) }}
                                     maxLength="100"
                                     placeholder="Enter Last Name" />
                             </div>
@@ -343,98 +435,3 @@ const CreateLanding = (props) => {
     )
 }
 export default CreateLanding;
-//---------------------- need it for reference, once the LDAP will completely then will delete this commented lines-----------------------------
-                    // <Fragment>
-                    //     <div data-test="userLDAPFetch" className="userLDAPFetch adminControl-create">
-                    //         <div className="Create-outer Create-outer-cust">
-                    //             <label className="adminFormRadio">
-                    //                 <RadioButton
-                    //                     data-test="ldapRadioMap"
-                    //                     checked={ldap.fetch === "map"}
-                    //                     value="map"
-                    //                     name="ldapFetch"
-                    //                     disabled={server === ''}
-                    //                     onChange={() => { dispatch(AdminActions.UPDATE_LDAP_FETCH("map")); props.ldapSwitchFetch({ userConf_ldap_fetch: "map" }); }}
-                    //                 />
-                    //                 <span className="ml-2 mr-6">Map New User</span></label>
-
-                    //             {/* <label htmlFor='ldapFetch' className="adminFormRadio">Map New User </label>
-                    //             <InputText data-test="ldapRadioMap"
-                    //                 checked={ldap.fetch === "map"}
-                    //                 type="radio" value="map"
-                    //                 onChange={() => { dispatch(AdminActions.UPDATE_LDAP_FETCH("map")); props.ldapSwitchFetch({ userConf_ldap_fetch: "map" }); }}
-                    //                 name="ldapFetch"
-                    //                 id='ldapFetch'
-                    //                 disabled={server === ''}
-                    //             /> */}
-
-                    //             <label htmlFor='' className="adminFormRadio">Import User</label>
-                    //             <RadioButton
-                    //                 data-test="ldapRadioImport"
-                    //                 checked={ldap.fetch === "import"}
-                    //                 type="radio" value="import"
-                    //                 onChange={() => {
-                    //                     dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-                    //                     props.ldapSwitchFetch({ userConf_ldap_fetch: "import" });
-                    //                 }}
-                    //                 name="ldapFetch"
-                    //                 disabled={server === ''}
-                    //             />
-
-                    //         </div>
-                    //         {/* {(ldap.fetch !== 'import') ?
-                    //             <div className="userForm-create">
-                    //                 <InputText
-                    //                     data-test="userDomainName"
-                    //                     autoComplete="off"
-                    //                     id="ldapDirectory"
-                    //                     name="ldapDirectory"
-                    //                     value={ldap.user}
-                    //                     onChange={(event) => { dispatch(AdminActions.UPDATE_LDAP_USER(event.target.value)) }}
-                    //                     // className={props.ldapDirectoryAddClass ? ((props.ldapDirectoryAddClass === "selectErrorBorder") ? "middle__input__border-create form-control__conv-create form-control-custom-create create selectErrorBorder" : "middle__input__border-create form-control__conv-create form-control-custom-create create inputErrorBorder") : "middle__input__border-create form-control__conv-create form-control-custom-create create"} 
-                    //                     placeholder="User Domain Name"
-                    //                 />
-                    //                 <Button
-                    //                     label="Fetch"
-                    //                     data-test="fetchButtonLdap"
-                    //                     title="Fetch"
-                    //                     disabled={server === ''}
-                    //                     onClick={() => { props.ldapGetUser(); }}
-                    //                 ></Button>
-                    //             </div>
-                    //             : null
-                    //         } */}
-                    //         {(ldap.fetch === 'import') ?
-                    //             <div className="dropdown dropdown-scroll userForm-create" >
-                    //                 <InputText
-                    //                     data-test="userListInput"
-                    //                     value={ldapUserFilter}
-                    //                     onChange={(event) => { dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(event.target.value)); props.searchFunctionLdap(event.target.value); }}
-                    //                     onClick={() => { props.click({ query: 'retaintype' }); props.setShowDropdown(!props.showDropdown); }}
-                    //                     // className={props.ldapDirectoryAddClass ? ((props.ldapDirectoryAddClass === "selectErrorBorder") ? "btn btn-users dropdown-toggle selectErrorBorder search-cust c__search-dropdown" : "btn btn-users dropdown-toggle inputErrorBorder  search-cust c__search-dropdown") : "btn btn-users dropdown-toggle search-cust c__search-dropdown"}
-                    //                     type="text"
-                    //                     autoComplete="off"
-                    //                     id="ldapDirectory"
-                    //                     data-toggle="dropdown"
-                    //                     placeholder="Search User.."
-                    //                 ></InputText>
-                    //                 {(props.showDropdown && ldapAllUserList !== []) ?
-                    //                     <ul ref={node} className=" dropdown-menu-edit dropdown-menu-users-ldap create-user__dropdown ldapDirectory-cust" role="menu" aria-labelledby="ldapDirectory" >
-                    //                         {props.ldapUserList.map((luser, index) => (
-                    //                             <li index={index}
-                    //                                 role="presentation"
-                    //                                 onClick={() => {
-                    //                                     props.setShowDropdown(!props.showDropdown);
-                    //                                     dispatch(AdminActions.UPDATE_LDAP_USER(luser.value));
-                    //                                     dispatch(AdminActions.UPDATE_LDAP_USER_FILTER(luser.html));
-                    //                                     props.ldapGetUser({ luser: luser.value });
-                    //                                 }}
-                    //                                 value={luser.value}
-                    //                                 className="ldap-user__li">{luser.html}</li>
-                    //                         ))}
-                    //                     </ul>
-                    //                     : null}
-                    //             </div>
-                    //             : null}
-                    //     </div>
-                    // </Fragment>
