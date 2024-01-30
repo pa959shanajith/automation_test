@@ -7,7 +7,7 @@ import { Tree } from 'primereact/tree';
 import { Toast } from 'primereact/toast';
 import { getModules, getScreens, populateScenarios, getProjectList, saveE2EDataPopup, getProjectsMMTS, updateE2E } from '../api'
 import { transformDataFromTreetoFolder, handlingTreeOfTestSuite } from './MindmapUtilsForOthersView';
-import { screenData, typeOfOprationInFolder, selectedScreenOfStepSlice } from '../designSlice';
+import { screenData, typeOfOprationInFolder, selectedScreenOfStepSlice, } from '../designSlice';
 import FolderViewRightContainer from './FolderViewRightContainer';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
@@ -24,31 +24,90 @@ const FolderView = (props) => {
     const [expandedMainNode, setExpandedMainNode] = useState();
     const [screenDatapassing, setScreenDatapassing] = useState({});
     const [eventSelectData, setEventSelectData] = useState('');
-    const [valueOfNewAddedCase, setValueOfNewAddedCase] = useState(null);
+    const [valueOfNewTS, setValueOfNewTS] = useState(null);
     const [testCaseVar, setTestCaseVar] = useState(null);
     const [modifiedDataToChange, setModifiedDataToChange] = useState(null);
+    const [modifiedDataToAddNewTSG, setModifiedDataToAddNewTSG] = useState(null);
     const [passSelectedCaseToAddNewStepGrp, setPassSelectedCaseToAddNewStepGrp] = useState({});
-    const [updateSelectedCaseToAddNewStepGrp, setUpdateSelectedCaseToAddNewStepGrp] = useState(passSelectedCaseToAddNewStepGrp);
-    const [stepKey, setStepKey] = useState(null);
+    const [editingOfTS, setEditingOfTS] = useState(true);
+    const [createNewTS, setCreateNewTS] = useState(false);
     const toast = useRef(null);
     const operationOnSuites = useRef(null);
     const operationOnCases = useRef(null);
     const operationOnTestSteps = useRef(null);
-    const moduledataForTree = [];
+    moduledataForTree = [];
+
+    // Assuming `moduleLists` and `childComponents` are defined somewhere before this code
     const onlyNormalSuites = moduleLists.filter(mod => mod.type === 'basic');
+
+    // Function to handle new test suite
+
+
+    // Loop through normal suites and add them to moduledataForTree
     for (let h = 0; h < onlyNormalSuites.length; h++) {
-        moduledataForTree.push(
-            {
-                key: h,
-                label: [<img src="static/imgs/moduleIcon.png" alt="modules" />, <div style={{
+        moduledataForTree.push({
+            key: h,
+            label: [
+                <img src="static/imgs/moduleIcon.png" alt="modules" />,
+                <div style={{
                     width: '10rem',
                     overflow: "hidden",
                     textOverflow: "ellipsis"
-                }} >{onlyNormalSuites[h].name}</div>, <Button label="..." value={h} onMouseDownCapture={(e) => operationOnSuites.current.show(e)} onClick={e => { receivingfullTreeDataOnClickOfMoreButton(e.target.value) }} className='buttonForMoreTestSuites' text />],
-                data: [{ layer: "layer_1", testSuitName: onlyNormalSuites[h].name, testSuitId: onlyNormalSuites[h]._id, childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]] }],
-                children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
-            })
+                }}>{onlyNormalSuites[h].name}</div>,
+                <Button
+                    label="..."
+                    value={h}
+                    onMouseDownCapture={(e) => operationOnSuites.current.show(e)}
+                    onClick={(e) => receivingfullTreeDataOnClickOfMoreButton(e.target.value)}
+                    className='buttonForMoreTestSuites'
+                    text
+                />
+            ],
+            data: [{
+                layer: "layer_1",
+                testSuitName: onlyNormalSuites[h].name,
+                testSuitId: onlyNormalSuites[h]._id,
+                childOfTestSuit: [childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]]
+            }],
+            children: childComponents && childComponents[h] && childComponents[h].length && childComponents[h][0].length ? childComponents[h][0] : [{}]
+        });
     }
+
+    if (createNewTS) {
+        const newObject = {
+            key: onlyNormalSuites.length,
+            label: [
+                <img src="static/imgs/moduleIcon.png" alt="modules" />,
+                <div style={{
+                    width: '13rem',
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                }}>{editingOfTS ? <InputText className='inputOfTS'
+                    value={valueOfNewTS}
+                    // placeholder=""
+                    onChange={(e) => setValueOfNewTS(e.target.value)}
+                    onBlur={() => { if (valueOfNewTS?.length > 0) { setEditingOfTS(false); dispatch(typeOfOprationInFolder({ createNewTestSuit: valueOfNewTS })) } }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            setEditingOfTS(false);
+                            setValueOfNewTS(e.target.value);
+                            dispatch(typeOfOprationInFolder({ createNewTestSuit: valueOfNewTS }))
+                        }
+                    }}
+                    autoFocus
+                /> : valueOfNewTS}</div>,
+                <Button label="..." className='buttonForMoreTestSuites' text />
+            ],
+            data: [{}],
+            children: [{}]
+        };
+
+        moduledataForTree.unshift(newObject);
+    }
+
+    let moduledataForTree;
+
+
     const onExpandOfSuite = async (event) => {
         dispatch(typeOfOprationInFolder({ onExpand: event.node }))
 
@@ -75,6 +134,7 @@ const FolderView = (props) => {
         // Call the function to update the data
         const modifiedData = transformDataFromTreetoFolder(res);
         setModifiedDataToChange(modifiedData)
+        setModifiedDataToAddNewTSG(modifiedData)
         setSelectedStepData(modifiedData.children)
         const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
 
@@ -131,13 +191,13 @@ const FolderView = (props) => {
         // Call the function to update the data
         const modifiedData = transformDataFromTreetoFolder(res);
         setModifiedDataToChange(modifiedData);
-
         const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
 
         setTestCaseVar(testCases)
         dispatch(selectedScreenOfStepSlice(testCases))
         setChildComponents(testCases)
         setPassSelectedCaseToAddNewStepGrp(event?.node);
+
 
     };
 
@@ -231,7 +291,7 @@ const FolderView = (props) => {
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">Test Suite Folder</h3>
                         <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
-                        <img className=" " src="static/imgs/plusNew.png" alt="NewModules" />
+                        <img className=" " onClick={() => { setCreateNewTS(true); }} src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
                     <div className='searchNormal'>
@@ -254,7 +314,7 @@ const FolderView = (props) => {
                     <div className='E2ETitleAndPlusBtn commonClass'>
                         <img src="static/imgs/moduleLayerIcon.png" alt="moduleLayerIcon" />
                         <h3 className="normalModHeadLine">End to End Flow</h3>
-                        <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img>
+                        {/* <img className="" src="static/imgs/import_new_18x18_icon.svg" ></img> */}
                         <img className=" " src="static/imgs/plusNew.png" alt="NewModules" />
                         <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                     </div>
@@ -275,7 +335,7 @@ const FolderView = (props) => {
 
 
             </div>
-            <FolderViewRightContainer modifiedData={modifiedDataToChange} setBlockui={props.setBlockui} screenDatapassing={screenDatapassing} eventSelectData={eventSelectData} />
+            <FolderViewRightContainer modifiedData={modifiedDataToChange} modifiedDataToAddNewTSG={modifiedDataToAddNewTSG} setBlockui={props.setBlockui} screenDatapassing={screenDatapassing} eventSelectData={eventSelectData} />
         </>
     )
 }

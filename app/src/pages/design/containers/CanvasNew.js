@@ -365,7 +365,7 @@ const CanvasNew = (props) => {
         else if(createnew !== false){
             var p = d3.select('#node_' + createnew);
             setCreateNew(false)
-            // setInpBox(p)
+            setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[createnew])
@@ -2585,7 +2585,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                 ):null}
                     <title val={node[0]} className="ct-node-title">{node[1].title}</title>         
                     {(node[1].type!=='testcases')?
-                    <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
+                    <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]?._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                     :null}
                     {(node[1].type!=='modules')?
                     <circle 
