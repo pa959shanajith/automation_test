@@ -25,7 +25,6 @@ const SamlConf = () => {
   const [selBox, setSelBox] = useState([])
   const [showDeleteModal, setshowDeleteModal] = useState(false)
   const toast = useRef();
-  const [charCheck, setCharCheck] = useState(false);
 
   useEffect(() => {
     setSamlEdit(false);
