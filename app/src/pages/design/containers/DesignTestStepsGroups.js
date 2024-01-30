@@ -27,7 +27,7 @@ function DesignTestStepsGroups(params) {
         </>
     );
     return(
-        <>
+        <div className="designGroup_dialog_div">
             <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>params.setVisibleDesignStepGroups(false)}>
                 <div className='designTestGroups'>
                     
@@ -40,7 +40,7 @@ function DesignTestStepsGroups(params) {
                     </div>  }   
                 </div>
             </Dialog>
-        </>
+        </div>
     )
 }
 export default DesignTestStepsGroups;

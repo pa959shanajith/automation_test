@@ -40,6 +40,7 @@ const CaptureModal = (props) => {
   const history=useNavigate()
   const toast = useRef();
   const objValues = useSelector(state => state.design.objValue);
+  const typeOfView = useSelector(state=>state.design.typeOfViewMap)
   const compareSuccessful = useSelector(state => state.design.compareSuccessful);
   const compareFlag = useSelector(state=>state.design.compareFlag);
   const [visible, setVisible] = useState(false);
@@ -1965,7 +1966,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
                         headerCheckboxToggleAllDisabled={false}
                         emptyMessage={showEmptyMessage ? emptyMessage : null}
                         scrollable
-                        scrollHeight="372px"
+                        scrollHeight={typeOfView === 'journeyView'?"370px":"325px"}
                         columnResizeMode="expand"
                         virtualScrollerOptions={{ itemSize: 20 }}
                     >
@@ -2000,10 +2001,21 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
                     </div>
                 </Dialog>
             </div>
-            <div>
+            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1rem', marginRight:'5rem'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
-                <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
-                <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
+                {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} label="Add more" />
+                    <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
+                    <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" />
+                    <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
+                </div> : null
+                }
+                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} ></Button> : null}
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
+                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)}></Button>
+                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable}></Button>
+                {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+                <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
             </div>
             {/* </Dialog> */}
 
