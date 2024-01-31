@@ -284,6 +284,7 @@ if (cluster.isMaster) {
 		app.post('/generate_testcase',generateAI.generateTestcase);
 		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
 		app.post('/save_testcase',generateAI.save_GenTestcases);
+		app.post('/saveTag', mindmap.saveTag);
 
 		app.use(csrf({
 		cookie: true

@@ -7,7 +7,14 @@
         display: flex;
         align-items: center;
     }
-
+.inputOfTS{
+    width: 10.04rem;
+    height: 1.4rem;
+}
+.inputOfTC{
+    width: 10.04rem;
+    height: 1.6rem;
+}
     .normalModuleSection {
         // border:1px solid red;
         height: 60vh;
@@ -20,6 +27,18 @@
             img {
                 width: 25px;
                 height: 25px;
+            }
+            .img:hover{
+                transform: scale(1.2);
+            }
+
+            .plusNormal{
+                margin-right: 0.5rem;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+            .plusNormal:hover{
+                transform: scale(1.2);
             }
 
         }

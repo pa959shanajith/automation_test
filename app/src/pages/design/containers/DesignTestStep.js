@@ -1199,7 +1199,7 @@ const DesignModal = (props) => {
     
             // Create a new array with updated test cases
             let updatedTestCases = testCaseUpdate.testCases.map((testCase, i) => {
-                if (i === rowIdx) {
+                if (i == rowIdx) {
                     let updatedTestCase = {...testCases[rowIdx]};
                     return updatedTestCase;
                 }
@@ -1371,7 +1371,7 @@ const DesignModal = (props) => {
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
-                    <span className="step_col d__step_head" ></span>
+                    <span className="step_col d__step_head" >Break Point</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
                     <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i></span>
