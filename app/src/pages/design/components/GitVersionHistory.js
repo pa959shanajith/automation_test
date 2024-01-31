@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { fetch_git_exp_details } from '../../design/api';
-import { fetchProjects } from "../../landing/api"; 
+import { fetch_git_exp_details } from '../../admin/api';
+import { fetchProjects } from "../../landing/api";
 import { importGitMindmap } from '../api';
 import { Button } from 'primereact/button';
 import { Toast } from "primereact/toast";
@@ -44,7 +44,7 @@ const GitVersionHistory = (props) => {
   const [defaultProjectId, setDefaultProjectId] = useState(null);
   const userInfo = userInfo1 || userInfoFromRedux;
   const [versionname, setVersionname] = useState("");
-    // if(!userInfo) userInfo = userInfoFromRedux; 
+  // if(!userInfo) userInfo = userInfoFromRedux; 
   // else userInfo = userInfo ;
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
   if (localStorageDefaultProject) {
@@ -161,7 +161,7 @@ const GitVersionHistory = (props) => {
                   title="restore"
                   onClick={() => handleRestore()}
                   className='restore_cls'
-                  disabled={isButtonDisabled}
+                 //disabled={isButtonDisabled}
                 />
               </div>
             </React.Fragment>
@@ -203,6 +203,8 @@ const GitVersionHistory = (props) => {
   ];
 
   const handleRestore = async () => {
+    console.log("sourceProjectId@@",sourceProjectId)
+    console.log("desProjectId@@",desProjectId)
     var data = await importGitMindmap({
       "appType": props.appType,
       "expProj": sourceProjectId,
@@ -250,6 +252,7 @@ const GitVersionHistory = (props) => {
 
   var projectList = Object.entries(prjList)
   const handleProjectSelecte = async (proj) => {
+    console.log("setSourceProjectId",initProj)
     setSourceProjectId(initProj);
     var reqForOldModule = {
       tab: "createTab",
@@ -268,27 +271,39 @@ const GitVersionHistory = (props) => {
     }
     var firstModld = await getModules(reqForNewModule)
     if (firstModld.length > 0) {
-          var reqForFirstModule = {
-        tab: "createTab",
-        projectid: proj,
-        version: 0,
-        cycId: null,
-        modName: "",
-        moduleid: firstModld[0]?._id
-      }
-      var firstModDetails = await getModules(reqForFirstModule)
-      if (!firstModDetails.currentlyInUse.length > 0) {
-        await updateTestSuiteInUseBy("Web", firstModld[0]._id, "123", userInfo?.username, true, false)
-        setHasTestsuite(true)
-        setIsButtonDisabled(false);
-      } else {
-        setHasTestsuite(false);
-      }
-    }
-    setDesProjectId(proj)
-    selectProj(proj)
-  }
+           toast.current.show({
+        severity: 'error',
+        summary: 'Error Message',
+        detail: '  Project which has no test suite.',
+      });
+      //setDesProjectId(proj)
+        setIsButtonDisabled(true);
 
+      //      var reqForFirstModule = {
+      //   tab: "createTab",
+      //   projectid: proj,
+      //   version: 0,
+      //   cycId: null,
+      //   modName: "",
+      //   moduleid: firstModld[0]?._id
+      // }
+      // var firstModDetails = await getModules(reqForFirstModule)
+      // if (!firstModDetails.currentlyInUse.length > 0) {
+      //   await updateTestSuiteInUseBy("Web", firstModld[0]._id, "123", userInfo?.username, true, false)
+      //   setHasTestsuite(true)
+      //   setIsButtonDisabled(false);
+      // } else {
+      //   setHasTestsuite(false);
+      // }
+    }
+    else {
+      setIsButtonDisabled(false);
+     // setDesProjectId(proj)
+    }
+     setDesProjectId(proj)
+     console.log("setDesProjectIdpppppp",proj);
+  // selectProj(proj)
+  }
   const customItemTemplate = (option) => {
     const icon = hasTestsuite ? <img src="static/imgs/Testsuite.svg" alt="Testsuite" /> : <img src="static/imgs/NoTestsuite.svg" alt="NoTestsuite" />;
     return (
@@ -343,7 +358,7 @@ const GitVersionHistory = (props) => {
       {isCreateProjectVisible && <div>
         <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError} />
       </div>}
-          </div>
+    </div>
   );
 };
 
