@@ -20,7 +20,7 @@ function DesignTestStepsGroups(params) {
             <div>
                 <h5 className='dailog_headerGroups'>Design Steps Groups</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
-                    <TabPanel header="Element Reposiotry"></TabPanel>
+                    <TabPanel header="Element Repository"></TabPanel>
                     <TabPanel header="Design Test Steps"></TabPanel>
                 </TabView>
             </div>
