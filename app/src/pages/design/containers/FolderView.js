@@ -351,6 +351,9 @@ const FolderView = (props) => {
 
     }
     let recievingRenamingData;
+    function handleRenameFun (){
+        handleRenamingTC()
+    }
     function handleRenamingTC() {
         const selectedTCToRename = passSelectedTSforRenaming?.node
         const keyTS = selectedTCToRename?.key?.slice(0, 1)
@@ -371,9 +374,10 @@ const FolderView = (props) => {
                 onBlur={() => { if (valueOfRenamingTC?.length > 0) { setRenamingTC(false); } }}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
+                        handleRenameFun()
                         setRenamingTC(false);
                         setValueOfRenamingTC(e.target.value);
-                        handleRenamingTC
+                        
                     }
                 }}
                 autoFocus
