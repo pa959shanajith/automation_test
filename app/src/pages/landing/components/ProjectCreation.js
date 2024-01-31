@@ -138,7 +138,9 @@ const ProjectCreation = (props) => {
             </Card>
           </>
         ) : null}
-        {userInfo && userInfo.rolename !== "Test Engineer" ? (
+
+        {/* Commented for future use of custom keyword */}
+        {/* {userInfo && userInfo.rolename !== "Test Engineer" ? (
           <Card
             className="reviewkeywords"
             style={{
@@ -178,7 +180,7 @@ const ProjectCreation = (props) => {
 
             <ol>{keywordListElements}</ol>
           </Card>
-        ) : null}
+        ) : null} */}
 
         {userInfo && userInfo.isadminuser === true ? (
           <Card
@@ -199,12 +201,13 @@ const ProjectCreation = (props) => {
                 <li className="list1">Manage Elastic Execution Grid</li>
               </Link>
             </div>
-            <Button size="small" className="admin-btn" onClick={handleClick}>
-              {" "}
-              Go to Admin
-            </Button>
+            <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
+        </Card>) : null}
+        {
+          userInfo && userInfo.rolename === "Quality Manager" && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
+            <Button className="CreateProj_btn" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
-        ) : null}
+}
       </div>
     </>
 

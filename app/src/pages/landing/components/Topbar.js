@@ -226,7 +226,9 @@ const MenubarDemo = (props) => {
           {showExtraheaderItem && <NavLink to="/reports" activeClassName="active">Reports</NavLink>}
         </>
       </div>
-      <div>
+
+      {/* Commented for future use of cutom keyword */}
+      {/* <div> */}
         {/* <Button aria-controls="popup_menu_left" aria-haspopup
         icon="pi pi-bell p-overlay-badge"
         onClick={(event)=>{notificationMenu.current.toggle(event);}}
@@ -235,7 +237,7 @@ const MenubarDemo = (props) => {
         <Badge className="notify" severity={"danger"}></Badge>
       </Button> */}
 
-        <div className="card flex justify-content-center">
+        {/* <div className="card flex justify-content-center">
           <Menu style={{width:'16rem',maxHeight: keywordItems.find((section) => section.label.props.style.color === 'green')?.scrollable ? '200px' : 'none',
         overflowY: keywordItems.find((section) => section.label.props.style.color === 'green')?.scrollable ? 'auto' : 'hidden',}}
           className="keyword_menu"
@@ -255,7 +257,7 @@ const MenubarDemo = (props) => {
         >
           <Badge className="notify" severity={"danger"}></Badge>
         </i>
-      </div>
+      </div> */}
 
       <UserProfile
         toastError={toastError}
