@@ -12,7 +12,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -35,6 +35,7 @@ const DesignModal = (props) => {
     const modified = useSelector(state => state.design.Modified);
     const saveEnable = useSelector(state => state.design.SaveEnable);
     const mainTestCases = useSelector(state => state.design.TestCases);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
@@ -1469,7 +1470,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => setVisibleRight(false)}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false))}}>
                     <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
@@ -1479,7 +1480,7 @@ const DesignModal = (props) => {
                         <img src='static/imgs/stepout.svg' alt='' style={{height:'30px'}}/>
                         <img src='static/imgs/stop.svg' alt='' style={{height:'30px'}}/>
                     </div>
-                    <div><Button label="DEBUG" style={{height:'30px'}} size="small"/></div>
+                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>dispatch(SetAdvanceDebug(true))}/></div>
 
                     </div>
                     <div className="card">

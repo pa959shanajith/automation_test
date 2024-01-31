@@ -58,7 +58,9 @@ const initialState = {
   selectedScreenOfStepSlice: [],
   oldModuleForReset: "",
   currentModuleId: "",
-  currentid: ""
+  currentid: "",
+  debuggerPoints:[],
+  advanceDebug:false,
 }
 
 export const designSlice = createSlice({
@@ -231,6 +233,18 @@ export const designSlice = createSlice({
     },
     selectedScreenOfStepSlice: (state, action) => {
       state.selectedScreenOfStepSlice = action.payload
+    },
+    SetDebuggerPoints:(state,action)=>{
+      if(action.payload.push){
+        state.debuggerPoints.push(action.payload.stepNo)
+      }
+      else{
+        let newDubbugerPoint=state.debuggerPoints.filter(step=>step!==action.payload.stepNo)
+        state.debuggerPoints=newDubbugerPoint
+      }
+    },
+    SetAdvanceDebug:(state,action)=>{
+      state.advanceDebug=action.payload
     }
 
   }
@@ -275,6 +289,8 @@ export const { projectList, moduleList, screenData,
   TypeOfViewMap,
   SetOldModuleForReset,
   typeOfOprationInFolder,
-  selectedScreenOfStepSlice } = designSlice.actions
+  selectedScreenOfStepSlice,
+  SetDebuggerPoints ,
+  SetAdvanceDebug} = designSlice.actions
 
 export default designSlice.reducer

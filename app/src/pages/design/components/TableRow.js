@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch ,useSelector} from 'react-redux';
 import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
 import {Tag} from 'primereact/tag'
 import Select from "react-select";
+import { SetDebuggerPoints } from '../designSlice';
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -24,7 +26,7 @@ import Select from "react-select";
 */
 
 const TableRow = (props) => {
-
+    const dispatch=useDispatch()
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
@@ -49,6 +51,9 @@ const TableRow = (props) => {
     const [objetListOption,setObjetListOption] = useState(null);
     const [debuggerPoint,setDebuggerPoint]=useState(false);
     const [debugeerInLightMode,setDebugeerInLightMode]=useState(false);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+
 
     let objList = props.objList;
     let draggable = props.draggable;
@@ -367,10 +372,21 @@ const TableRow = (props) => {
               fontFamily: "Open Sans",
             })
           };
+          const ActivateDebuggerPoint=()=>{
+            setDebuggerPoint(debuggerPoint=>!debuggerPoint)
+            if(!debuggerPoint){
+              dispatch(SetDebuggerPoints({push:true,stepNo:props.idx+1}))
+            }
+              else{
+                dispatch(SetDebuggerPoints({push:false,stepNo:props.idx+1}))
+              }
+              
+          }
     return (
         <>
-        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly'}} onClick={()=>{setDebuggerPoint(debuggerPoint=>!debuggerPoint)}}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:'grey',color:'white'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly'}} 
+                onClick={ActivateDebuggerPoint}>
                   <span><i style={{fontSize:'13px'}} className={debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
