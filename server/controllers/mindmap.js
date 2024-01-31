@@ -234,7 +234,7 @@ exports.saveData = async (req, res) => {
 		if (flag == 10) 
 		{
 			qpush=[]
-			var uidx = 0, rIndex;
+			var uidx = 0, rIndex, tag;
 			// var idn_v_idc = {};
 			var cycId=inputs.cycId;
 
@@ -243,9 +243,15 @@ exports.saveData = async (req, res) => {
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
+				if (e.type == "scenairos" ) tag = e.tag;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
+				if(e.type == "scenarios" ) {
+					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex ,tag:e.tag||[]});
+				}
+				else{
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
+				}
 				if(e.scrapedurl) {
 					nObj[nObj.length - 1]['scrapedurl'] = e.scrapedurl
 				}
@@ -280,7 +286,7 @@ exports.saveData = async (req, res) => {
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"tag":ts.tag, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
 				
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
@@ -1753,4 +1759,25 @@ exports.fetch_git_exp_details = async (req, res) => {
         logger.error("Error occurred in mindmap/"+fnName+":", exception);
         return res.status(500).send("fail");
     }
+};
+exports.saveTag = async (req, res) => {
+	const fnName = "saveTag";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		const inputs={ 
+			"query": "saveTag",
+			"testscenarioId": req.body.testscenarioId,
+			"tag": req.body.tag
+		 };
+		const result = await utils.fetchData(inputs, "mindmap/saveTag", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };

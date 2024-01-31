@@ -271,6 +271,7 @@ const treeIterator = (c, d, e) =>{
             state: (d.state) ? d.state : "created",
             cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
         };
+        if (d.type === "scenarios") obj.tag = d.tag;
         if (d.type === 'testcases') obj.screenname = d?.parent?.name; // **Impact check**
         c.push(obj);
     }

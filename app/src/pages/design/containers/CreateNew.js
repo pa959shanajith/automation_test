@@ -13,10 +13,11 @@ import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { Navigate } from 'react-router-dom';
-import { projectList, selectedProj, screenData, moduleList, AnalyzeScenario } from '../designSlice';
+import { projectList, selectedProj, screenData, moduleList, AnalyzeScenario, TypeOfViewMap } from '../designSlice';
 import ModuleListDrop from '../components/ModuleListDrop';
 import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
+import Legends from '../components/Legends';
 import GitDropdown from '../components/GitDropdown';
 /*Component CreateNew
 use: renders create New Mindmap page
@@ -42,6 +43,37 @@ const CreateNew = ({ importRedirect }) => {
     let Proj = reduxDefaultselectedProject;
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+
+    const [selectedView, setSelectedView] = useState({ code: 'mindMapView', name: <div><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div> });
+    const handleViewsDropDown = (view) => {
+        switch (view.value.code) {
+            case 'journeyView':
+                dispatch(TypeOfViewMap("journeyView"));
+                break;
+            case 'folderView':
+                dispatch(TypeOfViewMap("folderView"));
+                break;
+            case 'tableView':
+                dispatch(TypeOfViewMap("tableView"));
+                break;
+            case 'mindMapView':
+                dispatch(TypeOfViewMap("mindMapView"));
+                break;
+            default:
+                dispatch(TypeOfViewMap("mindMapView"));
+                break;
+
+        }
+
+    }
+
+    const views = [
+        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
+        { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/folderViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Folder View</h5></div>, code: 'folderView' },
+        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
+        { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/tableViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Table View</h5></div>, code: 'tableView' },
+    ];
+
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -155,20 +187,33 @@ const CreateNew = ({ importRedirect }) => {
                 {(!loading) ?
                     <div className='mp__canvas_container'>
 
-
-                        {/* commented below div */}
-
-                        {/* <div className='mp__toolbar__container'>
-<Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>
-</div>  */}
-
                         <div style={{ display: 'flex', height: '95%', width: 'auto' }}>
                             <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
                         </div>
                         <div className='canvas_topbar'>
-                            
-                            <Dropdown className={'w-full md:w-10rem p-inputtext-sm '} />
-                            <GitDropdown toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} appType={Proj.appType} projectName={Proj.projectName} projectId={Proj.projectId} userId={userInfo.user_id} toast={toast} />
+                            <div className='mp__toolbar__container'>
+                                <div className="mr-3">
+                                    <Dropdown 
+                                        className={'w-full md:w-12rem p-inputtext-sm'} 
+                                        value={selectedView}
+                                        onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
+                                        options={views} 
+                                        optionLabel="name"
+                                        placeholder={<div style={{display:"flex", alignItems:"center", height:"1rem"}}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
+                                    />                                    
+                                </div>
+                                <GitDropdown
+                                        toastError={toastError}
+                                        toastSuccess={toastSuccess}
+                                        toastWarn={toastWarn}
+                                        appType={Proj.appType}
+                                        projectName={Proj.projectName}
+                                        projectId={Proj.projectId}
+                                        userId={userInfo.user_id}
+                                        toast={toast}
+                                />
+                                {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
+                            </div>
                         </div>
                         <div id='mp__canvas' className='mp__canvas'>
                             {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?

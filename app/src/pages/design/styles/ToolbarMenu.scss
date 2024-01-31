@@ -115,25 +115,3 @@
     color: $primaryColorRich;
 }
 
-.TypesOfViewsDrop {
-    align-items: center;
-
-    .p-dropdown-panel {
-        .p-dropdown-items-wrapper {
-            max-height: 242px;
-
-            .p-dropdown-items {
-                .p-dropdown-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 0rem;
-
-                    .TypesOfViewsContaints {
-                        align-items: center;
-                    }
-                }
-            }
-        }
-    }
-}
