@@ -382,7 +382,20 @@ const GeniusSap = (props) => {
   }
 
   const showDialog= () => {
-    setVisible(true);
+    let screenViewObject = {};
+    screenViewObject.appType = "SAP";
+    screenViewObject.applicationPath = applicationPath;
+    screenViewObject.scrapeType = "Genius";
+
+    DesignApi.launchAndServerConnectSAPGenius_ICE(screenViewObject)
+      .then(data => {
+          if (data == "unavailableLocalServer") {
+              props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
+          }
+          else {
+            setVisible(true);
+          }
+        });
   };
 
   const onHideSap = () => {
@@ -392,7 +405,8 @@ const GeniusSap = (props) => {
     setTestSteps([]);
     setAllScreenData({});
     setStartGenius("Activate Genius");
-    setDataSaved(false)
+    setDataSaved(false);
+    seteraseData(false);
   };
   
   const displayError = (error) => {
@@ -550,7 +564,6 @@ const GeniusSap = (props) => {
           setDataLength(0);
           setTestSteps([]);
           setAllScreenData({});
-          setStartGenius("Activate Genius");
         }
         } />
       </React.Fragment>
@@ -923,24 +936,21 @@ const onScreenNameChange = (e, name) => {
             }]
       }
 
-      DesignApi.launchAndServerConnectSAPGenius_ICE(screenViewObject)
+      DesignApi.startScrapingSAPGenius_ICE(screenViewObject)
       .then(data => {
-          if (data == "unavailableLocalServer") {
-              props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
-          }
-          else {
-            DesignApi.startScrapingSAPGenius_ICE(screenViewObject)
-            .then(data => {
-              if (data == "unavailableLocalServer") {
-                  props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
-              }
-            });
-          }
-      });
+        if (data == "unavailableLocalServer") {
+            props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
+        }
+      });   
     }
     else if (startGenius === "Stop Genius") {
       setStartGenius(false);
-      DesignApi.stopScrapingSAPGenius_ICE(screenViewObject);
+      DesignApi.stopScrapingSAPGenius_ICE(screenViewObject)
+      .then(data => {
+        if (data == "unavailableLocalServer") {
+            props.toastError(MSG.CUSTOM("No Intelligent Core Engine (ICE) connection found with the Avo Assure logged in username. Please run the ICE batch file once again and connect to Server.", VARIANT.ERROR));
+        }
+      });
     }
   }
 
