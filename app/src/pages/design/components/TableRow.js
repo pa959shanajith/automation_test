@@ -47,6 +47,9 @@ const TableRow = (props) => {
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [objetListOption,setObjetListOption] = useState(null);
+    const [debuggerPoint,setDebuggerPoint]=useState(false);
+    const [debugeerInLightMode,setDebugeerInLightMode]=useState(false);
+
     let objList = props.objList;
     let draggable = props.draggable;
     
@@ -367,7 +370,10 @@ const TableRow = (props) => {
     return (
         <>
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col"><i className='pi pi-hashtag'/>{props.idx + 1}</span>
+                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly'}} onClick={()=>{setDebuggerPoint(debuggerPoint=>!debuggerPoint)}}>
+                  <span><i style={{fontSize:'13px'}} className={debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
+                  <span>{props.idx + 1}</span>
+                  </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
