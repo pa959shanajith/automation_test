@@ -733,6 +733,27 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
+export const launchAndServerConnectSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/launchAndServerConnectSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'launchAndServerConnectSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
 
 
 /*Component 

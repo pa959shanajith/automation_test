@@ -747,7 +747,7 @@ const saveScreens = (screenDetails) => {
   
     scrapeApi.deleteScenario(params)
       .then(response =>  {
-        if (response == "Success") {
+        if (response == "success") {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen deleted successfully', life: 5000 });
       }
       

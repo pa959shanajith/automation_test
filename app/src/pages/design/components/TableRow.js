@@ -126,7 +126,7 @@ const TableRow = (props) => {
                         rowIdx: props.idx,
                         operation: "row",
                         objName: !objName ? objList[0] : objName,
-                        keyword: !keyword ? keywordList[0] : keyword,
+                        keyword: !keyword ? keywordList !== null?keywordList[0] : props.getKeywords(props.testCase.custname).keywords : keyword,
                         inputVal: input,
                         outputVal: output,
                         appType: tcAppType
