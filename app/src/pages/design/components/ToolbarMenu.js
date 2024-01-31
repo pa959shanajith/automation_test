@@ -12,6 +12,8 @@ import { Divider } from 'primereact/divider';
 import { screenData, moduleList, selectedModuleReducer, selectedProj, selectedModulelist, selectBoxState, selectNodes, copyNodes, dontShowFirstModule, TypeOfViewMap } from '../designSlice'
 import { RadioButton } from "primereact/radiobutton";
 import { Dropdown } from 'primereact/dropdown';
+import GitDropdown from '../components/GitDropdown';
+
 
 
 
@@ -20,7 +22,10 @@ import { Dropdown } from 'primereact/dropdown';
   use: renders tool bar menus of create new page
 */
 
-const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
+const Toolbarmenu = (props) => {
+    const setBlockui = props.setBlockui;
+    const displayError = props.displayError;
+    const isAssign = props.isAssign;
     const dispatch = useDispatch()
     const SearchInp = useRef()
     const fnameRef = useRef()
@@ -234,27 +239,7 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
         { name: <div style={{ alignItems: 'center', display: 'flex',height:"7px"  }}><img src="static/imgs/versionHistoryIcon.svg" alt="modules" /><h5 style={{marginLeft:'0.9rem' }}>version History</h5></div>, code: 'folderView' },
 
     ];
-    const handleViewsDropDown = (view) => {
-        switch (view.value.code) {
-            case 'journeyView':
-                dispatch(TypeOfViewMap("journeyView"));
-                break;
-            case 'folderView':
-                dispatch(TypeOfViewMap("folderView"));
-                break;
-            case 'tableView':
-                dispatch(TypeOfViewMap("tableView"));
-                break;
-            case 'mindMapView':
-                dispatch(TypeOfViewMap("mindMapView"));
-                break;
-            default:
-                dispatch(TypeOfViewMap("mindMapView"));
-                break;
-
-        }
-
-    }
+   
     return (
         <Fragment>
             {exportBox ? <ModalContainer
@@ -269,38 +254,6 @@ const Toolbarmenu = ({ setBlockui, displayError, isAssign }) => {
                     <select data-test="projectSelect" className='projectSelect' value={initProj} onChange={(e) => { handleProjectSelecte(e.target.value) }}>
                         {projectList.map((e, i) => <option value={e[1].id} key={i}>{e[1].name}</option>)}
                     </select>
-                </div>
-                <div className='toolbar__header'>
-                    {/* <span data-test="headerMenu" className='toolbar__header-menus'>
-                    <i className={"fa fa-crop fa-lg active-map"} title="Select" onClick={clickSelectBox}></i>
-                    <i className="fa fa-files-o fa-lg" title="Copy selected map" id='copyImg' onClick={clickCopyNodes}></i>
-                    <i className="fa fa-clipboard fa-lg" title="Paste map" id="pasteImg" onClick={clickPasteNodes}></i>
-                </span> */}
-                    <div data-test="headerMenu" className='toolbar__header-menus'>
-                        {/* <img className='am' src='static/imgs/minus-icon.svg' alt='minus' />
-                        <div >40%</div>
-                        <img className='am' src='static/imgs/add.svg' alt='add' /> */}
-                        {/* <img className='line' src='static/imgs/line.svg' alt='line'/> */}
-                        {/* <div className="flex justify-content-center gap-2 text-500">
-                        <label style={{position:'relative', top:'0.3rem',fontSize:'12px',cursor:'not-allowed'}} htmlFor='input-metakey'>Map View</label>
-                        <InputSwitch style={{cursor:'not-allowed'}} disabled inputId="input-metakey" checked={checked} onChange={(e) => setChecked(e.value)} />
-                        <label htmlFor="input-metakey" style={{position:'relative', top:'0.3rem',fontSize:'12px',marginRight:'0.8rem',cursor:'not-allowed'}}>Table View</label>
-                    </div> */}
-                        {/* <img className='line' src='static/imgs/line.svg' alt='line' />*/}
-                    </div> 
-                    {/* Radio buttons for map views */}
-                    <div className="flex justify-content-center">
-                        <Dropdown value={selectedView} onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }} options={views} optionLabel="name"
-                            className="w-full md:w-12rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
-                        />
-                    </div>
-                    <div className="flex justify-content-center">
-                        {/* <Dropdown value={selectedGitOpp} onChange={(e) => { setSelectedGitOpp(e.value) }} options={GitOpp} optionLabel="name"
-                            className="w-full md:w-13rem TypesOfViewsDrop" placeholder={<div style={{ alignItems: 'center', display: 'flex' }}><img src="static/imgs/folderViewIcon.svg" alt="modules" /><h5>select Git operation</h5></div>}
-                        /> */}
-                    </div>
-                    {/* <img  className='line' src='static/imgs/line.svg' alt='line'/> */}
-                    {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
                 </div>
             </div>
         </Fragment>

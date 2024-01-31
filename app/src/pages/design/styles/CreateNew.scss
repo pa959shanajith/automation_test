@@ -53,8 +53,9 @@
 }
 
 .mp__toolbar__container{
-    background-color: $borderThree;
+    background-color: #e6e6fa;
     position: relative;
+    display: flex;
 }
 .loading-bar{
     position:absolute!important;

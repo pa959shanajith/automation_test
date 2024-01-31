@@ -1731,3 +1731,72 @@ export const insertScreen = arg => {
     });
 }
 
+export const startScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/startScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'startScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+export const stopScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/stopScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'stopScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+export const saveTag = async(tagsData) => {
+    try{
+        const res = await axios(url+'/saveTag', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:tagsData,
+            credentials: 'include',
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data; 
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+}

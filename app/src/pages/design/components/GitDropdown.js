@@ -179,8 +179,7 @@ const GitDropdown = (props) => {
             onChange={handleDropdownChange}
             className='p-inputtext-sm'
             optionLabel="label"
-            // app\public\static\imgs\Git_icon.svg
-            placeholder={<img src="static/imgs/Git_icon.svg" alt="Git Icon" className="dropdown-image" />}
+            placeholder={<span className='flex' style={{height:"15px"}}><img src="static/imgs/GitIcon.svg" style={{height:"0.8rem", width:"2rem"}} alt="Git Icon" className="dropdown-image" /> Git </span>}
             itemTemplate={(option) => (
               <div>
                 {renderIcon(option.icon)}
