@@ -1162,7 +1162,7 @@ const DesignModal = (props) => {
     
             // Create a new array with updated test cases
             let updatedTestCases = testCaseUpdate.testCases.map((testCase, i) => {
-                if (i === rowIdx) {
+                if (i == rowIdx) {
                     let updatedTestCase = {...testCases[rowIdx]};
                     return updatedTestCase;
                 }
