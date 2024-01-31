@@ -1765,3 +1765,29 @@ export const stopScrapingSAPGenius_ICE = screenViewObject => {
         .catch(err => reject(err))
     });
 }
+export const saveTag = async(tagsData) => {
+    try{
+        const res = await axios(url+'/saveTag', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:tagsData,
+            credentials: 'include',
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data; 
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+}

@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .object__type {
     font-family: 'Open Sans';
     font-size: 14px !important;
@@ -848,4 +849,181 @@
 .msg-CE{
     margin-top: -0.7rem !important;
     margin-bottom: 1rem !important;
+}
+addtag{
+    margin-top: 5rem;
+    justify-content: space-around;
+    margin-left: 1rem;
+}
+.inputtag{
+    margin-right: 2rem;
+}
+@media only screen and (max-width: 1024px) {
+    .inputtag {
+        margin-right: 6rem;
+    }
+    .addtag {
+        margin-left: 0;
+    }
+}
+.taglist{
+    margin-top: 2rem;
+    margin-left: 3rem;
+}
+.tag {
+    display: inline-flex;
+    align-items: center;
+    background-color: grey;
+    color: white;
+    border-radius: 50px;
+    padding: 5px 15px;
+    margin: 5px;
+  }
+  .tag-input{
+    margin-top: 3rem;
+  }
+//   .closebutton {
+//     background: none;
+//     border: none;
+//     color: white;
+//     cursor: pointer;
+//     font-size: 16px;
+//     margin-left: 10px;
+//   }
+  .no_card_content1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // margin-top: 16rem;
+    width: 100%;
+  
+    .image-container1 {
+      display: flex;
+      align-items: center;
+      // position: relative;
+      // bottom: 10rem;
+      // margin-left: -13rem;
+  
+      .img1 {
+        height: 10rem;
+        width: 14rem;
+        // margin-left: 7rem;
+      }
+  
+      .text1 {
+        margin-left: -11.5rem;
+        margin-top: 9rem;
+        font-family: "Open Sans";
+      }
+     
+    }
+  }
+  .tagcards{
+    height: 12rem;
+    width: 19rem;
+    margin-left: 5rem;
+    margin-top: 2rem;
+  }
+  .plus{
+    height: 2.5rem; 
+    margin-left: 1rem;
+    margin-top: 2rem;
+    margin-right: 2rem;
+
+  }
+.cardstag{
+    margin-top: 2rem;
+    margin-left: 1rem;
+    line-height: 4rem;
+    overflow-y: auto;
+    max-height: 10rem;
+}
+.cardimg{
+    height: 6rem;
+    margin-left: 4rem;
+}
+.tagtitle{
+    margin-top: -2rem;
+    margin-left: 3rem;
+}
+.cardstag > *:not(:last-child) {
+    margin-right: 0.5rem; 
+}
+/* YourComponent.css */
+
+.suggestion-box {
+    position: absolute;
+    max-height: 113px; 
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 13rem;
+    margin-top: 3rem;
+  }
+  
+  .suggestion-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .suggestion-box li {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .suggestion-box li:hover {
+    background-color: #f0f0f0;
+  }
+  /* Add these styles to your CSS stylesheet or style block */
+
+
+// .chip-container {
+//     display: inline-flex;
+//     flex-wrap: wrap;
+//   }
+  
+  .chiptag {
+    display: inline-flex;
+    align-items: center;
+    background-color: #C3C2ff;
+    border-radius: 50px;
+    display: inline-flex;
+    margin: 5px;
+    padding: 5px 5px 5px 20px;
+    height: 2.5rem;
+  }
+  
+  .closebutton {
+    border-color: transparent;
+    background: #C3C2ff;
+    padding: 2px 5px 2px 5px;
+    cursor: pointer;
+  }
+  
+ 
+  .tag-header{
+    background-color: #EBEBFF;
+    height: 4rem;
+  }
+  
+  .p-dialog .p-dialog-header {
+    background: #EBEBFF !important;
+   
+}
+.tagplace{
+font-family: "Open Sans";
+margin-left: 3rem;
+}
+.taginstruction{
+    margin-top: 2rem;
+    margin-left: 2rem;
+}
+.tagname{
+    font: $f6_semibold;
+
+}
+.savetag{
+    width: fit-content;
 }
