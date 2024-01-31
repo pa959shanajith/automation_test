@@ -625,6 +625,8 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/debugTestCase_ICE', auth.protect, design.debugTestCase_ICE);
 		app.post('/getKeywordDetails_ICE', auth.protect, design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', auth.protect, design.getTestcasesByScenarioId_ICE);
+		app.post('/createKeyword', auth.protect, design.createKeyword);
+		
 		//Webservices APIs
 		app.post('/execRequest', auth.protect, design.executeRequest);
 		app.post('/oauth2', auth.protect, design.oAuth2auth);
