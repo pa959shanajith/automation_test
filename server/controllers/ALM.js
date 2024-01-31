@@ -5,6 +5,7 @@ var Client = require("node-rest-client").Client;
 var utils = require('../lib/utils');
 const socket_io = require("../lib/socket")
 const http = require('http');
+const {execAutomation} = require('./suite');
 
 
 exports.create_ALM_Testcase = async function (req, res) {
@@ -429,26 +430,73 @@ exports.fetchALM_Testcases = async function (req,res) {
       var statusMessage = 'Unknown error';
       var statusCode = 400;
       if (!flag) return res.status(statusCode).json({error:'bad request'});
-      for (let i=0; i<mappedDetails.length; i++) {
-        let itr = mappedDetails[i];
-        let inputs = {
-          "testscenarioid": itr.scenarioId,
-          'projectid': itr.projectId,
-          "projectname": itr.projectName,
-          'testname': itr.testCaseName,
-          'testCaseDescription': itr.testCaseDescription,
-          "testid":itr.testcaseId,
-          "type":"SAP ALM",
-          "query": "saveSAP_ALMDetails_ICE"
+
+      // Updating TestSuite Details
+      const userInfo = { "userid": req.session.userid, "username": req.session.username, "role": req.session.activeRoleId };
+      var batchDetails = req.body.batchDetails;
+      var overallstatusflag = "success";
+      for (const testsuite of batchDetails) {
+        var inputs = {
+          "query": "updatetestsuitedataquery",
+          "conditioncheck": testsuite.conditioncheck,
+          "donotexecute": testsuite.donotexecute,
+          "getparampaths": testsuite.getparampaths,
+          "testscenarioids": testsuite.testscenarioids,
+          "modifiedby": userInfo.userid,
+          "modifiedbyrole": userInfo.role,
+          "testsuiteid": testsuite.testsuiteid,
+          "name": testsuite.testsuitename,
+          "accessibilityParameters": testsuite.accessibilityParameters
         };
-        const result = await utils.fetchData(inputs, "/saveALM_MappedTestcase", fnName,true);
-        if (result &&  !(result[1].statusCode >= 200 && result[1].statusCode <= 299)) {
-          logger.error(`request error : ` ,result[0] === 'fail' ? result[2].error : result[1].statusMessage || 'Unknown error');
-          flag = false;
+        const TestSuiteResult = await utils.fetchData(inputs, "suite/updateTestSuite_ICE", "updateTestSuite_ICE")
+        if (TestSuiteResult == "fail") overallstatusflag = "fail";
       }
-      statusCode = result[1].statusCode;
-      statusMessage = result[0] === 'fail' ? result[1].statusMessage : result[0].message;
+
+      // Create Execution Profile
+      const createProfileDoc = await generateExeProfile(req.body);
+      const fnName = "storeConfigureKey";
+      logger.info("Inside UI Service: " + fnName);
+
+      const exe_inputs = {
+        "executionData": createProfileDoc.executionData,
+        "session": req.session,
+        "query": "saveConfigureKey"
+      };
+      
+      const status = await utils.fetchData(exe_inputs, "devops/configurekey", fnName);
+      req.body.executionData = createProfileDoc.executionData;
+      if (status == "fail" || status == "forbidden") return res.send("fail");
+      else if(req.body.executionData.isExecuteNow){
+        req['body'] = {"key":req.body.executionData.configurekey,"isExecuteNow":req.body.executionData.isExecuteNow}
+        let result = await execAutomation(req, res);
+        if(result.status == 'pass') result.status = 'success'
+        return res.send(result.status);
       }
+      // if testsuite and execution profile create/updated mapping details will be saved here
+      if(overallstatusflag === "success" && status === "success"){
+        for (let i=0; i<mappedDetails.length; i++) {
+          let itr = mappedDetails[i];
+          let inputs = {
+            "testscenarioid": itr.scenarioId,
+            'projectid': itr.projectId,
+            "projectname": itr.projectName,
+            'testname': itr.testCaseName,
+            'testCaseDescription': itr.testCaseDescription,
+            "testid":itr.testcaseId,
+            "type":"CALM",
+            "query": "saveSAP_ALMDetails_ICE"
+          };
+          
+          const result = await utils.fetchData(inputs, "/saveALM_MappedTestcase", fnName,true);
+          if (result &&  !(result[1].statusCode >= 200 && result[1].statusCode <= 299)) {
+            logger.error(`request error : ` ,result[0] === 'fail' ? result[2].error : result[1].statusMessage || 'Unknown error');
+            flag = false;
+        }
+        statusCode = result[1].statusCode;
+        statusMessage = result[0] === 'fail' ? result[1].statusMessage : result[0].message;
+        }
+      }
+      
       if (!flag) return res.status(statusCode).json({error:statusMessage});
       res.status(statusCode).json({message:statusMessage});
     } catch (exception) {
@@ -456,3 +504,110 @@ exports.fetchALM_Testcases = async function (req,res) {
       res.status(500).json({error:exception.message});
     }
   };
+
+  function GenerateRandomName(keyName){
+    const randomString = Math.random().toString(36).substring(2,8);
+    return `${keyName}_${randomString}`;
+  }
+  function generateExeProfile(reqData) {
+    const batchInfo = reqData.batchDetails;
+    var prepareBatchObj = [];
+    batchInfo.forEach((obj,objIndex) => {
+      prepareBatchObj.push({
+                "scenarioTaskType": "disable",
+                "testsuiteName": obj.testsuitename,
+                "testsuiteId": obj.testsuiteid,
+                "batchname": "",
+                "versionNumber": 0,
+                "appType": "Web",
+                "domainName": "Banking",
+                "projectName": obj.projectName,
+                "projectId": obj.projectId,
+                "releaseId": "R1",
+                "cycleName": "C1",
+                "cycleId": "6540a954e846cc361ebc125d",
+                "scenarionIndex": [
+                    1
+                ],
+                "suiteDetails":[]
+      })
+      
+      if(obj.testscenarioids.length){
+        obj.testscenarioids.forEach((scn,scnIndex) => {
+          prepareBatchObj[objIndex].suiteDetails.push({
+            "condition": 0,
+            "dataparam": [
+                ""
+            ],
+            "scenarioName": obj.scenarioname[scnIndex],
+            "scenarioId": scn,
+            "accessibilityParameters": []
+          })
+        })
+      }
+    });
+    
+    const generateExe = {
+      donotexe: {
+        current: batchInfo.reduce((acc, obj) => {
+          acc[obj.testsuiteid] = [0];
+          return acc;
+        }, {})
+      }
+    };
+  
+    const executionProfile = {
+      "executionData": {
+        "type": "",
+        "poolid": "",
+        "targetUser": "",
+        "source": "task",
+        "exectionMode": "serial",
+        "executionEnv": "default",
+        "browserType": [
+            "1"
+        ],
+        "configurename": GenerateRandomName('CALM'),
+        "executiontype": "asynchronous",
+        "selectedModuleType": "normalExecution",
+        "configurekey": reqData.configurekey,
+        "isHeadless": false,
+        "avogridId": "",
+        "avoagents": [],
+        "integration": {
+            "alm": {
+                "url": "",
+                "username": "",
+                "password": ""
+            },
+            "qtest": {
+                "url": "",
+                "username": "",
+                "password": "",
+                "qteststeps": ""
+            },
+            "zephyr": {
+                "url": "",
+                "username": "",
+                "password": ""
+            },
+            "azure": {
+                "url": "",
+                "username": "",
+                "password": ""
+            }
+        },
+        "batchInfo": prepareBatchObj,
+        "donotexe": generateExe.donotexe,
+        "scenarioFlag": false,
+        "isExecuteNow": false,
+        "emailNotificationSender": "avoassure-alerts@avoautomation.com",
+        "emailNotificationReciever": null,
+        "isNotifyOnExecutionCompletion": true,
+        "isEmailNotificationEnabled": false,
+        "execType": false,
+        "type":"CALM"
+    }
+    }
+    return executionProfile;
+  }
