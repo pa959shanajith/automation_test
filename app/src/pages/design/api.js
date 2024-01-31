@@ -1709,26 +1709,4 @@ export const insertScreen = arg => {
         .catch(error=>reject(error));
     });
 }
-export const fetch_git_exp_details = async(data) => {
-    try{
-        const res = await axios(url+'/fetch_git_exp_details', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data,
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session"){
-            RedirectPage(navigate)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }
-        if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.MINDMAP.ERR_FETCH_DATA}
-    }
-}
+

@@ -16,7 +16,7 @@ import { moduleList } from '../designSlice';
 
 const GitDropdown = (props) => {
   const dropdownOptions = [
-    { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit-icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
+         { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit_icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
     { label: 'Version History', value: 'version_history', icon: <img src="static/imgs/Version_icon.svg" alt="Version History" style={{ marginRight: '1rem' }} /> },
   ];
   const [showToken, setShowToken] = useState(false);
@@ -179,7 +179,8 @@ const GitDropdown = (props) => {
             onChange={handleDropdownChange}
             className='p-inputtext-sm'
             optionLabel="label"
-            placeholder={<img src="static/imgs/GitIcon.svg" alt="Git Icon" className="dropdown-image" />}
+            // app\public\static\imgs\Git_icon.svg
+            placeholder={<img src="static/imgs/Git_icon.svg" alt="Git Icon" className="dropdown-image" />}
             itemTemplate={(option) => (
               <div>
                 {renderIcon(option.icon)}
