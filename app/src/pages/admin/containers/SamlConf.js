@@ -7,6 +7,7 @@ import { FileUpload } from "primereact/fileupload";
 import { getSAMLConfig, manageSAMLConfig } from '../api';
 import "../styles/SamlConf.scss";
 import { Toast } from 'primereact/toast';
+import { Dropdown } from "primereact/dropdown";
 
 
 const SamlConf = () => {
@@ -24,7 +25,6 @@ const SamlConf = () => {
   const [selBox, setSelBox] = useState([])
   const [showDeleteModal, setshowDeleteModal] = useState(false)
   const toast = useRef();
-  const [charCheck , setCharCheck] = useState(false);
 
   useEffect(() => {
     setSamlEdit(false);
@@ -198,28 +198,10 @@ const SamlConf = () => {
   }
 
   const certInputClick = async (event) => {
-    console.log(event);
-    const files = event.files[0];
-    // const target = event && (event.srcElement || event.target) || null;
-    // const targetFile = target && target.files[0] || null;
-    // if (targetFile === null) return;
-    // var conf = (target.name.includes('ldap'))? $scope.ldapConf:$scope.samlConf;
-    setCertName(files);
+    const files = event?.files[0];
+    setCertName(event?.files[0]?.name);
     var certData = await updateCert(files);
     setCert(certData);
-  }
-
-  const closeModal = () => {
-    setshowDeleteModal(false);
-  }
-
-  const deleteModalButtons = () => {
-    return (
-      <div>
-        <button id="deleteGlobalModalButton" onClick={() => { samlConfManage("delete"); setshowDeleteModal(false); }} type="button" className="btn-default btnGlobalYes btn-right" >Yes</button>
-        <button type="button" onClick={() => { setshowDeleteModal(false); samlReset(); }} className="btn-default">No</button>
-      </div>
-    )
   }
 
   const updateSamlServerName = (value) => {
@@ -229,10 +211,18 @@ const SamlConf = () => {
 
   return (
     <div className="grid saml_container">
-      <div id="page-taskName"><span>{(samlEdit === false) ? "Create SAML Configuration" : "Edit SAML Configuration"}</span></div>
+
+      <div id="page-taskName">{ 
+        (samlEdit === false) ? <span>"Create SAML Configuration"</span>:
+          <div id="page-taskName flex flex-row">
+            <i className="m-2 pi pi-arrow-left" onClick={() =>  setSamlEdit(false)} />
+            <span> "Edit SAML Configuration" </span>
+          </div>
+      }
+      </div>
 
       <div className="col-6 lg:col-6 xl:col-6 md:col-6 sm:col-12">
-        <AvoInput
+        {(samlEdit === false) ? <AvoInput
           autoComplete="off"
           htmlFor="servername"
           labelTxt="Server Name"
@@ -244,7 +234,19 @@ const SamlConf = () => {
           setInputTxt={updateSamlServerName}
           inputType="lablelRowReqInfo"
           charCheck={nameErrBorder}
-        />
+        /> : <>
+          <label className='serverNamelabel' style={{ paddingLeft: '0.7rem' }}>Server Name</label>
+          <Dropdown data-test="confServer"
+            id="confServer"
+            className='w-full p-inputtext-sm'
+            value={name}
+            options={selBox}
+            onChange={(e) => { setName(e.target.value); samlGetServerData(e.target.value); }}
+            // optionLabel="name"
+            // disabled={confExpired === server}
+            placeholder='Select server'
+          />
+        </>}
         <AvoInput
           htmlFor="singleSign"
           labelTxt="Single Sign On URL"
@@ -269,20 +271,27 @@ const SamlConf = () => {
           inputType="lablelRowReqInfo"
           charCheck={idpErrBorder}
         />
+        <div className="flex flex-row pb-3 align-items-center	">
+          <FileUpload
+            name="cert file"
+            multiple={false}
+            auto
+            mode="basic"
+            customUpload={true}
+            accept=".cer,.crt,.cert,.pem"
+            uploadHandler={certInputClick}
+          />
+          <label className="pl-2 serverNamelabel">{certName}</label>
+        </div>
 
-        <FileUpload
-          name="cert file"
-          multiple={false}
-          auto
-          mode="basic"
-          customUpload={true}
-          accept=".cer,.crt,.cert,.pem"
-          uploadHandler={certInputClick}
-          className="pb-3"
-        />
         <div className="flex flex-row gap-3">
-          <Button label="Edit" size="small" onClick={() => { setSamlEdit(true); samlEditClick(); }} ></Button>
-          <Button label="Create" size="small" onClick={() => {samlConfManage("create")}} />
+          {samlEdit === false ? <>
+            <Button label="Edit" size="small" onClick={() => { setSamlEdit(true); samlEditClick(); }} ></Button>
+            <Button label="Create" size="small" onClick={() => { samlConfManage("create") }} />
+          </> : <>
+            <Button label="Update" size="small" onClick={() => { samlConfManage("update") }} disabled={name === ''} ></Button>
+            <Button label="Delete" size="small" onClick={() => { samlConfDelete() }} disabled={name === ''} ></Button>
+          </>}
         </div>
       </div>
     </div>
