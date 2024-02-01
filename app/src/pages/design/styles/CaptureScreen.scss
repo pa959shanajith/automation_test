@@ -123,11 +123,6 @@
   }
 }
 
-.card_modal {
-  margin: 0 !important;
-  padding-bottom: 1rem !important;
-}
-
 
 
 .btn-capture-single {
@@ -1205,4 +1200,79 @@
 .panel_head2{
   position: relative;
   right: 4rem;
+}
+
+.capture_card_modal {
+  display: flex;
+  width: 100%;
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+.capture_card{
+  display: flex;
+  flex-direction: column;
+  padding:15px;
+  font-family: "Open Sans";
+  width: 20%;
+  gap: 2vh;
+  border-right: 1px solid #e2e2ed;
+}
+.capture_card_top_section{
+  display: flex;
+  justify-content: center;
+}
+.capture_card_header{
+  margin-right: 10px;
+  text-align: center;
+  font-size: 1vw;
+}
+.capture_card_info_wrapper{
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 15px;
+}
+.capture_card_info_img{
+  width: 100%;
+}
+.capture_card_bottom_section{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.capture_bottom_btn{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding:5px;
+  cursor: pointer;
+}
+.capture_bottom_btn_img_wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+}
+.capture_bottom_btn_img{
+  width: 100%;
+}
+.capture_bottom_heading{
+  text-align: center;
+  font-size: 1vw;
+}
+.expandCollapseIcon{
+  width: 100%;
+}
+.expandCollapseIconWrapper{
+  cursor: pointer;
+  width: 20px;
+  position: absolute;
+  right:0;
+  bottom:0
+}
+.import_export{
+  position: relative;
 }
