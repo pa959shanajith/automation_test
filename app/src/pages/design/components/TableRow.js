@@ -306,7 +306,7 @@ const TableRow = (props) => {
                 keyword !== "" &&
                 props.keywordData[objType][keyword] &&
                 props.keywordData[objType][keyword].description !== undefined
-                ? props.keywordData[objType][keyword].description
+                ? !props.arrow?props.keywordData[objType][keyword].description:keyword
                 : keyword
               : "Show All",
           tooltip:
@@ -350,7 +350,7 @@ const TableRow = (props) => {
                 keyword !== "" &&
                 props.keywordData[objType][keyword] &&
                 props.keywordData[objType][keyword].description !== undefined
-                ? props.keywordData[objType][keyword].description
+                ? !props.arrow?props.keywordData[objType][keyword].description:keyword
                 : keyword
               : "Show All",
           tooltip:
