@@ -260,7 +260,6 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.get('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
@@ -756,6 +755,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
 		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+
+		// Create Multiple Ldap Users
+		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMultipleLdapUsers);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);
