@@ -32,7 +32,7 @@ const GitVersionHistory = (props) => {
   const [desProjectId, setDesProjectId] = useState('');
   const [hasTestsuite, setHasTestsuite] = useState(false);
   const [importPop, setImportPop] = useState(false);
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const toast = useRef(null);
   const moduleListed = useSelector(state => state.design.moduleList);
   const initProj = useSelector(state => state.design.selectedProj);
@@ -43,11 +43,11 @@ const GitVersionHistory = (props) => {
   const [defaultProjectId, setDefaultProjectId] = useState(null);
   const userInfo = userInfo1 || userInfoFromRedux;
   const [versionname, setVersionname] = useState("");
-   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
   if (localStorageDefaultProject) {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
- 
+
   useEffect(() => {
     (async () => {
       const projectList = await fetchProjects({ readme: "projects" });
@@ -140,30 +140,6 @@ const GitVersionHistory = (props) => {
           datetime: item.modifiedon,
           Comments: item.commitmessage,
           Status: item.gittask,
-          SelectDestination: (
-            <React.Fragment>
-              <div className='desination_cls'>
-                <Dropdown
-                  data-test="projectSelect"
-                  className='projectSelect'
-                  value={initProj}
-                  options={projectList.map(e => ({ label: e[1].name, value: e[1].id }))}
-                  onChange={(e) => handleProjectSelecte(e.value)}
-                  placeholder="Select a Project"
-                  panelFooterTemplate={panelFooterTemplate}
-                  itemTemplate={customItemTemplate}
-                />
-                <Button
-                  data-test="git-restore"
-                  label="Restore"
-                  title="restore"
-                  onClick={() => handleRestore()}
-                  className='restore_cls'
-                //disabled={isButtonDisabled}
-                />
-              </div>
-            </React.Fragment>
-          ),
         }));
         setData(mappedData);
       } catch (error) {
@@ -249,30 +225,59 @@ const GitVersionHistory = (props) => {
   };
 
   var projectList = Object.entries(prjList)
-  const handleProjectSelecte = async (proj) => {
+
+  const handleProjectSelecte = (proj) => {
     console.log("setSourceProjectId", initProj)
     setSourceProjectId(initProj);
+    (async () => {
+      try {
         var reqForNewModule = {
-      "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
-    }
-    var firstModld = await getModules(reqForNewModule)
-    if (firstModld.length > 0) {
-      toast.current.show({
-        severity: 'error',
-        summary: 'Error Message',
-        detail: '  Project which has no test suite.',
-      });
-      setIsButtonDisabled(true);
-      console.log("project have a test suite");
+          "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
+        }
+        var firstModld = await getModules(reqForNewModule)
+        if (firstModld.length > 0) {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error Message',
+            detail: '  Project which has no test suite.',
+          });
+          setIsButtonDisabled(true);
+          console.log("project have a test suite");
 
-    }
-    else {
-      setIsButtonDisabled(false);
-      // setDesProjectId(proj)
-    }
-    setDesProjectId(proj)
-    console.log("setDesProjectIdpppppp", proj);
+        }
+        else {
+          setDesProjectId(proj);
+          setIsButtonDisabled(false);
+          // setDesProjectId(proj)
+        }
+      } catch (error) {
+        // Handle errors that occurred during the asynchronous operation
+        console.error("An error occurred:", error);
       }
+    })()
+
+    // Call the async function
+    // myAsyncFunction();
+    //     var reqForNewModule = {
+    //   "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
+    // }
+    // var firstModld = await getModules(reqForNewModule)
+    // if (firstModld.length > 0) {
+    //   toast.current.show({
+    //     severity: 'error',
+    //     summary: 'Error Message',
+    //     detail: '  Project which has no test suite.',
+    //   });
+    //   setIsButtonDisabled(true);
+    //   console.log("project have a test suite");
+
+    // }
+    // else {
+    //   setIsButtonDisabled(false);
+    //   // setDesProjectId(proj)
+    // }
+    console.log("setDesProjectIdpppppp", proj);
+  }
   const customItemTemplate = (option) => {
     const icon = hasTestsuite ? <img src="static/imgs/Testsuite.svg" alt="Testsuite" /> : <img src="static/imgs/NoTestsuite.svg" alt="NoTestsuite" />;
     return (
@@ -286,12 +291,38 @@ const GitVersionHistory = (props) => {
   const handleCloseDialog = () => {
     setVisible(false);
   };
+
+  const bodyTemplate = () => {
+    return (<React.Fragment>
+      <div className='desination_cls'>
+        <Dropdown
+          data-test="projectSelect"
+          className='projectSelect'
+          value={ sourceProjectId ? sourceProjectId : initProj }
+          options={projectList.map(e => ({ label: e[1].name, value: e[1].id }))}
+          onChange={(e) => handleProjectSelecte(e.value)}
+          placeholder="Select a Project"
+          panelFooterTemplate={panelFooterTemplate}
+          itemTemplate={customItemTemplate}
+        />
+        <Button
+          data-test="git-restore"
+          label="Restore"
+          title="restore"
+          onClick={(e) => handleRestore(e)}
+          className='restore_cls'
+        //disabled={isButtonDisabled}
+        />
+      </div>
+    </React.Fragment>)
+  }
   return (
     <div className="import_cls">
       <DataTable value={data}>
         {columns.map((col, i) => (
           <Column key={col.field} field={col.field} header={col.header} />
         ))}
+        <Column field="Actions" body={bodyTemplate} />
       </DataTable>
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       {isCreateProjectVisible && <div>
