@@ -39,54 +39,22 @@ const GitVersionHistory = (props) => {
   let userInfo1 = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo);
   const prjList = useSelector(state => state.design.projectList);
-  const showGeniusDialog = useSelector((state) => state.progressbar.showGenuisWindow);
   const [defaultProjectId, setDefaultProjectId] = useState(null);
   const userInfo = userInfo1 || userInfoFromRedux;
   const [versionname, setVersionname] = useState("");
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  const [projectListDropdown, setProjectListDropdown] = useState([]);
   if (localStorageDefaultProject) {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
 
-  useEffect(() => {
-    (async () => {
-      const projectList = await fetchProjects({ readme: "projects" });
-      setProjectsDetails(projectList);
-      const arrayNew = projectList.map((element, index) => {
-        const lastModified = DateTimeFormat(element.releases[0].modifiedon);
-        return {
-          key: index,
-          projectName: element.name,
-          progressStep: element.progressStep,
-          modifiedName: element.firstname,
-          modifieDateProject: element.releases[0].modifiedon,
-          modifiedDate: lastModified,
-          createdDate: element.releases[0].createdon,
-          appType: convertIdIntoNameOfAppType(element.type),
-          projectId: element._id,
-          projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
-        }
-      });
-      const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
-      const selectedProject = sortedProject.find(project => project.projectId === defaultProjectId);
-      if (selectedProject) {
-        localStorage.setItem('DefaultProject', JSON.stringify(selectedProject));
-        dispatch(loadUserInfoActions.setDefaultProject(selectedProject));
-      }
-      if (!showGeniusDialog) {
-        setProjectList(sortedProject);
-      }
-    })();
-  }, [showGeniusDialog]);
-  const filteredProjects = getProjectLists.length > 0 ? getProjectLists.filter((project) =>
-    project.projectName.toLowerCase().includes(searchProjectName.toLowerCase())
-  ) : [];
-
-  useEffect(() => {
-    if (filteredProjects && filteredProjects.length > 0) {
-      setDefaultProjectId(filteredProjects[0].projectId);
-    }
-  }, []);
+  const columns = [
+    { field: 'sno', header: 'Sno' },
+    { field: 'version', header: 'Version' },
+    { field: 'datetime', header: 'datetime' },
+    { field: 'Comments', header: 'Comments' },
+    { field: 'Status', header: 'Status' },
+  ];
 
   const DateTimeFormat = (inputDate) => {
     const providedDate = new Date(inputDate);
@@ -128,6 +96,45 @@ const GitVersionHistory = (props) => {
     }
     return output;
   }
+  
+  useEffect(() => {
+    (async () => {
+      const projectList = await fetchProjects({ readme: "projects" });
+      setProjectsDetails(projectList);
+      const projectListForDropdown = [];
+      const arrayNew = projectList.map((element, index) => {
+        const lastModified = DateTimeFormat(element.releases[0].modifiedon);
+        projectListForDropdown.push({"name": element.name, "id": element._id})
+        return {
+          key: index,
+          projectName: element.name,
+          progressStep: element.progressStep,
+          modifiedName: element.firstname,
+          modifieDateProject: element.releases[0].modifiedon,
+          modifiedDate: lastModified,
+          createdDate: element.releases[0].createdon,
+          appType: convertIdIntoNameOfAppType(element.type),
+          projectId: element._id,
+          projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
+        }
+      });
+      setProjectListDropdown(projectListForDropdown);
+      const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
+      console.log("sortedProject", sortedProject);
+    })();
+  }, []);
+
+  const filteredProjects = getProjectLists.length > 0 ? getProjectLists.filter((project) =>
+    project.projectName.toLowerCase().includes(searchProjectName.toLowerCase())
+  ) : [];
+
+  useEffect(() => {
+    if (filteredProjects && filteredProjects.length > 0) {
+      setDefaultProjectId(filteredProjects[0].projectId);
+    }
+  }, []);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -139,7 +146,8 @@ const GitVersionHistory = (props) => {
           version: item.version,
           datetime: item.modifiedon,
           Comments: item.commitmessage,
-          Status: item.gittask,
+          status: item.gittask,
+          selectedProject: "",          
         }));
         setData(mappedData);
       } catch (error) {
@@ -167,18 +175,8 @@ const GitVersionHistory = (props) => {
   const displayError = (error) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: error, life: 2000 })
   }
-  const columns = [
-    { field: 'sno', header: 'Sno' },
-    { field: 'version', header: 'Version' },
-    { field: 'datetime', header: 'datetime' },
-    { field: 'Comments', header: 'Comments' },
-    { field: 'Status', header: 'Status' },
-    { field: 'SelectDestination', header: 'SelectDestination' }
-  ];
 
   const handleRestore = async () => {
-    console.log("sourceProjectId@@", sourceProjectId)
-    console.log("desProjectId@@", desProjectId)
     var data = await importGitMindmap({
       "appType": props.appType,
       "expProj": sourceProjectId,
@@ -224,8 +222,6 @@ const GitVersionHistory = (props) => {
     setBlockui({ show: false });
   };
 
-  var projectList = Object.entries(prjList)
-
   const handleProjectSelecte = (proj) => {
     console.log("setSourceProjectId", initProj)
     setSourceProjectId(initProj);
@@ -251,33 +247,16 @@ const GitVersionHistory = (props) => {
           // setDesProjectId(proj)
         }
       } catch (error) {
-        // Handle errors that occurred during the asynchronous operation
         console.error("An error occurred:", error);
       }
     })()
 
-    // Call the async function
-    // myAsyncFunction();
-    //     var reqForNewModule = {
-    //   "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
-    // }
-    // var firstModld = await getModules(reqForNewModule)
-    // if (firstModld.length > 0) {
-    //   toast.current.show({
-    //     severity: 'error',
-    //     summary: 'Error Message',
-    //     detail: '  Project which has no test suite.',
-    //   });
-    //   setIsButtonDisabled(true);
-    //   console.log("project have a test suite");
-
-    // }
-    // else {
-    //   setIsButtonDisabled(false);
-    //   // setDesProjectId(proj)
-    // }
-    console.log("setDesProjectIdpppppp", proj);
   }
+ 
+  const handleCloseDialog = () => {
+    setVisible(false);
+  };
+
   const customItemTemplate = (option) => {
     const icon = hasTestsuite ? <img src="static/imgs/Testsuite.svg" alt="Testsuite" /> : <img src="static/imgs/NoTestsuite.svg" alt="NoTestsuite" />;
     return (
@@ -288,18 +267,14 @@ const GitVersionHistory = (props) => {
     );
   };
 
-  const handleCloseDialog = () => {
-    setVisible(false);
-  };
-
-  const bodyTemplate = () => {
+  const bodyTemplate = (rowData) => {
     return (<React.Fragment>
       <div className='desination_cls'>
         <Dropdown
           data-test="projectSelect"
           className='projectSelect'
           value={ sourceProjectId ? sourceProjectId : initProj }
-          options={projectList.map(e => ({ label: e[1].name, value: e[1].id }))}
+          options={projectListDropdown}
           onChange={(e) => handleProjectSelecte(e.value)}
           placeholder="Select a Project"
           panelFooterTemplate={panelFooterTemplate}
@@ -311,7 +286,7 @@ const GitVersionHistory = (props) => {
           title="restore"
           onClick={(e) => handleRestore(e)}
           className='restore_cls'
-        //disabled={isButtonDisabled}
+          disabled={rowData.selectedProject !== "" ? false : true}
         />
       </div>
     </React.Fragment>)

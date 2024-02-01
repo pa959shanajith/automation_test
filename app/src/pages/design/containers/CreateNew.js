@@ -5,7 +5,7 @@ import SaveMapButton from '../components/SaveMapButton';
 import Toolbarmenu from '../components/ToolbarMenu';
 import ModuleListSidePanel from '../components/ModuleListSidePanel';
 import CanvasNew from './CanvasNew';
-//import FolderView from './FolderView';
+import FolderView from './FolderView';
 import ExportMapButton from '../components/ExportMapButton';
 import { ClickFullScreen, ClickSwitchLayout, parseProjList } from './MindmapUtils';
 import { ScreenOverlay, setMsg } from '../../global';
@@ -43,6 +43,8 @@ const CreateNew = ({ importRedirect }) => {
     let Proj = reduxDefaultselectedProject;
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    const handleTypeOfViewMap = useSelector(state=>state.design.typeOfViewMap)
+
 
     const [selectedView, setSelectedView] = useState({ code: 'mindMapView', name: <div><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div> });
     const handleViewsDropDown = (view) => {
@@ -71,7 +73,7 @@ const CreateNew = ({ importRedirect }) => {
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/folderViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Folder View</h5></div>, code: 'folderView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
-        { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/tableViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Table View</h5></div>, code: 'tableView' },
+        { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/tableViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Table View</h5></div>, code: 'tableView', disabled: true },
     ];
 
     if (!userInfo) userInfo = userInfoFromRedux;
@@ -177,22 +179,12 @@ const CreateNew = ({ importRedirect }) => {
         setLoading(false)
         toast.current.show({ severity: 'error', summary: 'Error', detail: error, life: 2000 })
     }
-    return (
-        <>
-            {/* { redirectTo && <Navigate data-test="redirectTo" to={redirectTo} />} */}
-            <Fragment>
-                <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-                {(blockui.show) ? <ScreenOverlay content={blockui.content} /> : null}
-                {(delSnrWarnPop) ? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} /> : null}
-                {(!loading) ?
-                    <div className='mp__canvas_container'>
 
-                        <div style={{ display: 'flex', height: '95%', width: 'auto' }}>
-                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
-                        </div>
-                        <div className='canvas_topbar'>
-                            <div className='mp__toolbar__container'>
-                                <div className="mr-3">
+    const TopDropdowns = () => {
+        return (
+            <div className={`${handleTypeOfViewMap ==='folderView' ? "canvas_topbar_in_folderview": "canvas_topbar"}`}>
+                            <div className='mp__toolbar__container '>
+                                <div className="mr-3 ml-4">
                                     <Dropdown 
                                         className={'w-full md:w-12rem p-inputtext-sm'} 
                                         value={selectedView}
@@ -215,9 +207,36 @@ const CreateNew = ({ importRedirect }) => {
                                 {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
                             </div>
                         </div>
-                        <div id='mp__canvas' className='mp__canvas'>
+        )
+    }
+    return (
+        <>
+            {/* { redirectTo && <Navigate data-test="redirectTo" to={redirectTo} />} */}
+            <Fragment>
+                <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+                {(blockui.show) ? <ScreenOverlay content={blockui.content} /> : null}
+                {(delSnrWarnPop) ? <DeleteScenarioPopUp setBlockui={setBlockui} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} /> : null}
+                {(!loading) ?
+                    <div className='mp__canvas_container'>
+                        {(handleTypeOfViewMap ==='folderView') && <div className='folderViewMain'>
+                            <div className='flex flex-row'>
+                                <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/> 
+                                <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> 
+                            </div>
+                            <FolderView setBlockui={setBlockui}/></div>}
+                        {(handleTypeOfViewMap ==='tableView') && <h1>hello i am Table view</h1>}
+                        
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '95%', width: 'auto' }}>
+                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
+                            
+                        </div>
+                        <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> </>}
+
+                        
+
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <div id='mp__canvas' className='mp__canvas'>
                             {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
-                                <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
+                                <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
                                 : <Fragment>
                                     <ExportMapButton />
                                     <SaveMapButton disabled={true} />
@@ -228,8 +247,8 @@ const CreateNew = ({ importRedirect }) => {
                                     : <Fragment>
                                         <SaveMapButton disabled={true} />
                                     </Fragment>)}
-                        </div>
-                    </div> : null
+                        </div>}
+            </div> : null
                 }
             </Fragment>
         </>
