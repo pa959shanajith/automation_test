@@ -828,8 +828,8 @@ setPreventDefaultModule(true);
         return(
           <div className="EachScenarioNameBox" >
             <div className="ScenarioName" ><div className='sceNme_Icon'><img src="static/imgs/ScenarioSideIconBlue.png" alt="modules" />
-              <h4>{e.sceName}</h4><div className="modIconSce"><h5>(<img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName})</h3></h5></div>
-                <div className="projIconSce"><h5>(<img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName})</h3></h5></div>
+              <h4>{e.sceName}</h4><div className="modIconSce"><h5><img src="static/imgs/moduleIcon.png" alt="modules" /><h3>{e.modName}</h3></h5></div>
+                <div className="projIconSce"><h5><img src="static/imgs/projectsideIcon.png" alt="modules" /><h3>{e.projName}</h3></h5></div>
                 </div><Button icon="pi pi-times" onClick={() => { deleteScenarioselected(idx.rowIndex); }} rounded text severity="danger" aria-label="Cancel" /></div>
           </div>
         )
@@ -1086,7 +1086,7 @@ setPreventDefaultModule(true);
                         : null}
                       <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
                       <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
-                      {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} /> : null}
+                      {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} projectName={projectInfo.projectName} projectID={projectInfo.projectId}/> : null}
                       <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
                       <img className={`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
                     </>

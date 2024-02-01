@@ -27,7 +27,7 @@ exports.prepareSchedulingRequest = async (session, body) => {
     let timeValue = body.executionData.batchInfo[0].time;
     let parentId = body.executionData.batchInfo[0].parentId ? body.executionData.batchInfo[0].parentId : 0;
     let endAfter = body.executionData.batchInfo[0].endAfter ? body.executionData.batchInfo[0].endAfter : 0;
-    let scheduleThrough = body.executionData.batchInfo[0].scheduleThrough ? body.executionData.batchInfo[0].scheduleThrough : "agent";
+    let scheduleThrough = body.executionData.batchInfo[0].scheduleThrough ? body.executionData.batchInfo[0].scheduleThrough : "Any agent";
     let startDate = (recurringStringOnHoverValue === "One Time") ? (+ new Date(new Date(new Date().getFullYear()), new Date(new Date().getMonth()), new Date(new Date().getDate()), new Date(new Date().getHours()), new Date(new Date().getMinutes()))).toString() : (body.executionData.batchInfo[0].startDate ? body.executionData.batchInfo[0].startDate : body.executionData.batchInfo[0].timestamp)
     if (!poolid || poolid === "") poolid = constants.EMPTYPOOL
     var invokinguser = {

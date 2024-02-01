@@ -686,6 +686,7 @@ export const getFunctionalReportsDevops = async(configurekey, executionListId) =
                     'configurekey': configurekey,
                     'executionListId': executionListId,
                     "type":"allmodules",
+                    "cycleId":''
                 }
             },
             credentials: 'include'
@@ -744,7 +745,7 @@ export const getOpenfetchScenarioInfoDevOps = async(executionIds) => {
             },
             data: {
                 // "param": "reportStatusScenarios_ICE",
-                "executionId":[executionIds]
+                "executionId": executionIds
             },
             credentials: 'include'
         });

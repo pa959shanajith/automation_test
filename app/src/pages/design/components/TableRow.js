@@ -143,7 +143,7 @@ const TableRow = (props) => {
                     setKeyword(props.testCase.keywordVal);
                     setSelectedOptions({value:props.testCase.keywordVal, label:!props.arrow?props.testCase.keywordVal === '' ?
                     props.getKeywords(props.testCase.custname).obType !== null?
-                    keywordList !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords].description !== undefined?
+                    keywordList !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords]?.description !== undefined?
                     props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords].description:keywordList[0] :
                     props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal]?.description:
                     props.testCase.custname !== "OBJECT_DELETED"?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description !== undefined?

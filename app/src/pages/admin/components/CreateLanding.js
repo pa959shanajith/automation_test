@@ -242,17 +242,7 @@ const CreateLanding = (props) => {
         }
 
     }
-    const firstNameChange = (value) => {
-        dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(value));
-        { (firstname === value || value === props?.editUserData?.firstName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
-    }
-
-    const lastNameChange = (value) => {
-        dispatch(AdminActions.UPDATE_INPUT_LASTNAME(value));
-        { (firstname === value || value === props?.editUserData?.lastName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false) }
-    }
-
-
+   
     const selectConfigurationOnchange = (event) => {
         props.click();
         props.selectUserType({ type: event.target.value });
@@ -261,6 +251,16 @@ const CreateLanding = (props) => {
         setFilterListSearchUser([]);
         setSelectedLdapUserListTemp([]);
         setSelectSearchUser('');
+    }
+
+    const firstNameChange = (value) => {
+        dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(value));
+        {(firstname === value || value === props?.editUserData?.firstName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false)}
+    }
+
+    const lastNameChange = (value) => { 
+        dispatch(AdminActions.UPDATE_INPUT_LASTNAME(value));
+        {(firstname === value || value === props?.editUserData?.lastName) ? props.setUpdatedInfo(true) : props.setUpdatedInfo(false)}
     }
 
     return (
@@ -398,7 +398,7 @@ const CreateLanding = (props) => {
                                 <InputText
                                     data-test="email"
                                     value={email}
-                                    onChange={(event) => { props.emailChange(event.target.value.toLowerCase()) }}
+                                    onChange={(event) => {props.emailChange(event.target.value.toLowerCase())}}
                                     name="email"
                                     id="email"
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
@@ -414,7 +414,7 @@ const CreateLanding = (props) => {
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="firstname" id="firstname" value={firstname}
-                                    onChange={(event) => { firstNameChange(event.target.value) }}
+                                    onChange={(event) => {firstNameChange(event.target.value)}}
                                     maxLength="100"
                                     placeholder="Enter First Name" />
                             </div>
@@ -424,7 +424,7 @@ const CreateLanding = (props) => {
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.lastnameAddClass ? 'inputErrorBorder' : ''}`}
                                     type="text"
                                     name="lastname" id="lastname" value={lastname}
-                                    onChange={(event) => { lastNameChange(event.target.value) }}
+                                    onChange={(event) => {lastNameChange(event.target.value)}}
                                     maxLength="100"
                                     placeholder="Enter Last Name" />
                             </div>

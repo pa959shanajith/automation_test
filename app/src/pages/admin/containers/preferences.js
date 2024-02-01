@@ -43,8 +43,11 @@ const Privileges = () => {
                         sortMode="single" 
                         sortField="area.name" 
                         sortOrder={1} 
-                        tableStyle={{ width: '69rem', padding:'1rem' }}
-                        showGridlines>
+                        tableStyle={{ width: '69rem', paddingLeft:'1rem' }}
+                        showGridlines
+                        scrollable
+                        scrollHeight="35rem"
+                        >
                 <Column field="area.name" header="Area"></Column>
                 <Column field="features" header="Features"></Column>
                 <Column field="admin" header="Admin" body={CustomCellRenderer}></Column>

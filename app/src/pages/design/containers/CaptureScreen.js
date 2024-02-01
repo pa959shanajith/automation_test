@@ -364,6 +364,13 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
   }
 
+  const toastWarn = (warnMessage) => {
+    if (warnMessage.CONTENT) {
+        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+  }
+
   const onSave = (e, confirmed) => {
 
     let continueSave = true;
@@ -678,6 +685,7 @@ const elementTypeProp =(elementProperty) =>{
     // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
     setSaveDisable(false);
+    setMasterCapture(true);
   }
   // {console.log(captureData[0].selectall)}
 
@@ -756,6 +764,7 @@ const elementTypeProp =(elementProperty) =>{
                 footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
               : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+              setMasterCapture(false);
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
           } else { console.error(resp); addMore.current = true; }
@@ -810,23 +819,23 @@ const elementTypeProp =(elementProperty) =>{
               if (data === "Invalid Session") {
                   return RedirectPage(history);
               } else if (data === "unavailableLocalServer") {
-                  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                  toastError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
               } else if (data === "scheduleModeOn") {
-                  setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                  toastWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
-                  setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));
-              } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+              } else toastError(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
           })
           .catch(error => {
               setOverlay("");
               ResetSession.end();
               console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-              setMsg(MSG.SCRAPE.ERR_OPERATION);
+              toastError(MSG.SCRAPE.ERR_OPERATION);
           });
       }
   } 
@@ -1145,7 +1154,7 @@ else{
         <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
         </h4>
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
+          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable}>Add more</button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1160,7 +1169,7 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
+        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1678,7 +1687,7 @@ const footerSave = (
   };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
-  
+  const AddElement = capturedDataToSave.every(item => item.isCustom === true);
 
 
      const isWebApp = NameOfAppType.appType === "Web";
@@ -1882,7 +1891,7 @@ const screenOption = screenData?.map((folder) => ({
                   {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
                   <p>Add Element</p>
                 </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
+                <span className={`insprint_auto ${!isWebApp || AddElement ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
                   <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
                   {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
 
@@ -2644,7 +2653,12 @@ const LaunchApplication = props => {
           }})
       }
     }
-
+    const handleCheckingMobileClient_ICE_MW = ()=>{
+        checkingMobileClient_ICE().then(data=>{
+          if(data === false){
+            setcheckingMobileClient_ICEResponse(true)
+          }})
+    }
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
            <div className="flex flex-wrap gap-3">
@@ -2763,9 +2777,14 @@ const LaunchApplication = props => {
     }
 
     const mobileWeb = {
-        'content': <div className="ss__mblweb_inputs">    
-            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler} name="mobWebInput1" /> 
-            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
+        'content': <div className="ss__mblweb_inputs mbl_dialog">    
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum}  onChange={(e) => { slNumHandler(e); handleCheckingMobileClient_ICE_MW();}} name="mobWebInput1"  /> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" /> 
+            <div>
+                  {CheckingMobileClient_ICEResponse &&
+                    <span  className='lable_mw'>Required packages for mobile testing in Avo Assure client folder are missing.If it is android <a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> or if it is ios <a href="https://downloads.avoassure.ai/driver/AvoAssure_iOSMobileDependencies.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                  }
+                </div>
         </div>,
 
         'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,
