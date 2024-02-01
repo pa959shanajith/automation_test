@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { fetch_git_exp_details } from '../../admin/api';
+import { fetch_git_exp_details } from '../../design/api';
 import { fetchProjects } from "../../landing/api";
 import { importGitMindmap } from '../api';
 import { Button } from 'primereact/button';
@@ -11,7 +11,7 @@ import 'primeicons/primeicons.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getModules, getScreens, updateTestSuiteInUseBy } from '../api';
-import { screenData, moduleList, selectedModuleReducer, selectedProj, selectedModulelist, dontShowFirstModule } from '../designSlice'
+import { screenData, moduleList, selectedModuleReducer, selectedProj } from '../designSlice'
 import CreateProject from '../../landing/components/CreateProject';
 import { convertIdIntoNameOfAppType } from "../../design/components/UtilFunctions";
 import { ResetSession, Messages as MSG } from '../../global';
@@ -28,12 +28,11 @@ const GitVersionHistory = (props) => {
   const [projectsDetails, setProjectsDetails] = useState([]);
   const [getProjectLists, setProjectList] = useState([]);
   const [searchProjectName, setSearchProjectName] = useState("");
-  const [sourceProjectId, setSourceProjectId] = useState(null);
-  const [desProjectId, setDesProjectId] = useState(null);
+  const [sourceProjectId, setSourceProjectId] = useState('');
+  const [desProjectId, setDesProjectId] = useState('');
   const [hasTestsuite, setHasTestsuite] = useState(false);
   const [importPop, setImportPop] = useState(false);
-  const [error, setError] = useState('')
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
   const toast = useRef(null);
   const moduleListed = useSelector(state => state.design.moduleList);
   const initProj = useSelector(state => state.design.selectedProj);
@@ -44,12 +43,11 @@ const GitVersionHistory = (props) => {
   const [defaultProjectId, setDefaultProjectId] = useState(null);
   const userInfo = userInfo1 || userInfoFromRedux;
   const [versionname, setVersionname] = useState("");
-  // if(!userInfo) userInfo = userInfoFromRedux; 
-  // else userInfo = userInfo ;
-  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
   if (localStorageDefaultProject) {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
+ 
   useEffect(() => {
     (async () => {
       const projectList = await fetchProjects({ readme: "projects" });
@@ -161,7 +159,7 @@ const GitVersionHistory = (props) => {
                   title="restore"
                   onClick={() => handleRestore()}
                   className='restore_cls'
-                 //disabled={isButtonDisabled}
+                //disabled={isButtonDisabled}
                 />
               </div>
             </React.Fragment>
@@ -203,8 +201,8 @@ const GitVersionHistory = (props) => {
   ];
 
   const handleRestore = async () => {
-    console.log("sourceProjectId@@",sourceProjectId)
-    console.log("desProjectId@@",desProjectId)
+    console.log("sourceProjectId@@", sourceProjectId)
+    console.log("desProjectId@@", desProjectId)
     var data = await importGitMindmap({
       "appType": props.appType,
       "expProj": sourceProjectId,
@@ -252,58 +250,29 @@ const GitVersionHistory = (props) => {
 
   var projectList = Object.entries(prjList)
   const handleProjectSelecte = async (proj) => {
-    console.log("setSourceProjectId",initProj)
+    console.log("setSourceProjectId", initProj)
     setSourceProjectId(initProj);
-    var reqForOldModule = {
-      tab: "createTab",
-      projectid: initProj,
-      version: 0,
-      cycId: null,
-      modName: "",
-      moduleid: localStorage.getItem('OldModuleForReset')
-    }
-    var moduledataold = await getModules(reqForOldModule)
-    if (userInfo?.username === moduledataold.currentlyInUse) {
-      await updateTestSuiteInUseBy("Web", localStorage.getItem('OldModuleForReset'), localStorage.getItem('OldModuleForReset'), userInfo?.username, false, true)
-    }
-    var reqForNewModule = {
+        var reqForNewModule = {
       "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
     }
     var firstModld = await getModules(reqForNewModule)
     if (firstModld.length > 0) {
-           toast.current.show({
+      toast.current.show({
         severity: 'error',
         summary: 'Error Message',
         detail: '  Project which has no test suite.',
       });
-      //setDesProjectId(proj)
-        setIsButtonDisabled(true);
+      setIsButtonDisabled(true);
+      console.log("project have a test suite");
 
-      //      var reqForFirstModule = {
-      //   tab: "createTab",
-      //   projectid: proj,
-      //   version: 0,
-      //   cycId: null,
-      //   modName: "",
-      //   moduleid: firstModld[0]?._id
-      // }
-      // var firstModDetails = await getModules(reqForFirstModule)
-      // if (!firstModDetails.currentlyInUse.length > 0) {
-      //   await updateTestSuiteInUseBy("Web", firstModld[0]._id, "123", userInfo?.username, true, false)
-      //   setHasTestsuite(true)
-      //   setIsButtonDisabled(false);
-      // } else {
-      //   setHasTestsuite(false);
-      // }
     }
     else {
       setIsButtonDisabled(false);
-     // setDesProjectId(proj)
+      // setDesProjectId(proj)
     }
-     setDesProjectId(proj)
-     console.log("setDesProjectIdpppppp",proj);
-  // selectProj(proj)
-  }
+    setDesProjectId(proj)
+    console.log("setDesProjectIdpppppp", proj);
+      }
   const customItemTemplate = (option) => {
     const icon = hasTestsuite ? <img src="static/imgs/Testsuite.svg" alt="Testsuite" /> : <img src="static/imgs/NoTestsuite.svg" alt="NoTestsuite" />;
     return (
@@ -313,36 +282,6 @@ const GitVersionHistory = (props) => {
       </div>
     );
   };
-
-  const selectProj = async (proj) => {
-    setBlockui({ show: true, content: 'Loading Modules ...' })
-    dispatch(dontShowFirstModule(false))
-    dispatch(selectedProj(proj))
-    const defaultProjectData = {
-      ...(JSON.parse(localStorageDefaultProject)),
-      projectId: proj,
-      projectName: prjList[proj]?.name,
-      appType: prjList[proj]?.apptypeName,
-      projectLevelRole: prjList[proj]?.projectLevelRole
-    };
-
-    localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-    dispatch(moduleList([]))
-    dispatch(selectedModuleReducer({}))
-    var moduledata = await getModules({ "tab": "endToend", "projectid": proj, "moduleid": null })
-    if (moduledata.error) { displayError(moduledata.error); return; }
-    var screendata = await getScreens(proj)
-    if (screendata.error) { displayError(screendata.error); return; }
-    setModList(moduledata)
-    dispatch(moduleList(moduledata))
-    dispatch(selectedModulelist([]))
-    dispatch(screenData(screendata));
-    if (screendata) dispatch(screenData(screendata))
-    // if(SearchInp){
-    //     SearchInp.current.value = ""
-    // }
-    setBlockui({ show: false })
-  }
 
   const handleCloseDialog = () => {
     setVisible(false);
