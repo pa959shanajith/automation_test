@@ -1446,7 +1446,7 @@ const DesignModal = (props) => {
                 await createKeyword({
                     'name': inputKeywordName,
                     'objecttype': customkeyword,
-                    'apptype': 'web',
+                    'apptype': props.appType,
                     'code': inputEditor,
                     'elementtype': selectedType,
                     'language': langSelect,
@@ -1454,7 +1454,7 @@ const DesignModal = (props) => {
 
                 })
                 setOverlay('Updating the list ')
-                let keywordData = await DesignApi.getKeywordDetails_ICE("Web")
+                let keywordData = await DesignApi.getKeywordDetails_ICE(props.appType)
 
                 let sortedKeywordList = {};
                 for (let object in keywordData) {
