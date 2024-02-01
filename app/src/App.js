@@ -146,7 +146,9 @@ const TabCheck = (setBlockui) => {
   // add eventlistener to session storage
   window.addEventListener("storage", storage_Handler, false);
   // set tab UUID in session storage
-  localStorage["tabUUID"] = window.name;
+  if (!(window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/reports') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile') || window.location.pathname.includes('/dashboard'))) {
+    localStorage["tabUUID"] = window.name;
+  }
 }
 
 export default App;

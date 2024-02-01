@@ -198,6 +198,7 @@ exports.debugTestCase_ICE = function (req, res) {
                 mySocket.emit("debugTestCase", dataToIce.responsedata);
 										function result_debugTestCase_listener(message) {
 											data = message;
+											mySocket.removeListener('result_debugTestCase', result_debugTestCase_listener);
 											//LB: make sure to send recieved data to corresponding user
 											
 											try {

@@ -230,6 +230,7 @@
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
+  height: 8rem;
 }
 
 .card_modal {
@@ -262,7 +263,7 @@
   font-weight: 500;
   font-size: 14px;
   padding: 0 0.8rem;
-  top: 1rem;
+  top: 3%;
   cursor: pointer;
 }
 .disabled {
@@ -277,7 +278,7 @@
   font-family: 'Open Sans';
   font-size: 14px;
   padding: 0 0.8rem;
-  top: 1rem;
+  // top: 1rem;
 }
 
 // .upgrade_auto {
@@ -637,15 +638,25 @@
     font-size: 16px;
     font-family: 'Open sans';
     font-weight: bold;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: -1rem;
+    min-width: 13rem;
   }
 
   .info__btn_insprint {
     cursor: pointer;
     height: 11%;
-    width: 5%;
-    left: 5%;
+    width: 8%;
+    left: 93%;
     position: relative;
     bottom: 21%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    // margin-left: 12.1rem;
+    bottom: 0.6rem;
+    transform: translate(-50%, -50%);
   }
   .add_obj_insprint {
     .p-dialog-header {
@@ -677,9 +688,9 @@
   }
 
   .upgrade_auto {
-    right: 1rem;
+    // right: 1rem;
     float: left;
-    padding-right: 2rem;
+    // padding-right: 2rem;
     position: relative;
     text-align: center;
     font-family: 'Open Sans';
@@ -696,12 +707,22 @@
     opacity: 0.4;
   }
   .info__btn_upgrade {
-    bottom: 21%;
+    // bottom: 21%;
+    // cursor: pointer;
+    // height: 11%;
+    // left: 4%;
+    // position: relative;
+    // width: 4%;
     cursor: pointer;
     height: 11%;
     // left: 4%;
     position: relative;
-    width: 4%;
+    bottom: 21%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    bottom: 0.6rem;
+    transform: translate(-50%, -50%);
   }
   .add_obj_upgrade {
     .p-dialog-header {
@@ -787,7 +808,7 @@
   // opacity: 0.4;
 
   .insprint__text {
-    position: relative;
+    // position: relative;
     top: 0rem;
     left: 0.5rem;
     font-size: 16px;
@@ -835,10 +856,15 @@
   .info__btn_utility {
     cursor: pointer;
     height: 11%;
-    left: 23%;
-    position: relative;
-    bottom: 22%;
     width: 9%;
+    left: 93%;
+    position: relative;
+    bottom: 21%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    bottom: 0.6rem;
+    transform: translate(-50%, -50%);
   }
 }
 
@@ -851,13 +877,14 @@
   cursor: pointer;
 
   .insprint__text {
-    position: relative;
+    // position: relative;
     top: 0rem;
     right: 0rem;
     font-size: 16px;
     font-family: "Open sans";
     cursor: pointer;
     font-weight: bold;
+    margin-right: 2rem;
   }
 
   .insprint_auto {
@@ -869,7 +896,7 @@
     font-weight: 500;
     font-size: 14px;
     padding: 0 0.8rem;
-    top: 1rem;
+    top: 3%;
     right: 0.65rem;
     cursor: pointer;
   }
@@ -885,16 +912,28 @@
     font-family: 'Open Sans';
     font-size: 14px;
     padding: 0 0.8rem;
-    top: 1rem;
+    // top: 1rem;
   }
 
   .info__btn_create {
-    bottom: 22%;
-    cursor: pointer;
+    // bottom: 22%;
+    // cursor: pointer;
+    // height: 11%;
+    // left: 9%;
+    // position: relative;
+    // width: 8%;
     height: 11%;
-    left: 9%;
+    width: 9%;
+    left: 93%;
     position: relative;
-    width: 8%;
+    bottom: 21%;
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    // margin-left: 12.1rem;
+    bottom: 0.6rem;
+    transform: translate(-50%, -50%);
   }
   .map_obj {
     height: 4vh;

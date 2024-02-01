@@ -158,15 +158,16 @@ exports.initScraping_ICE = function (req, res) {
 					mySocket.emit(dataToIce["emitAction"], dataToIce.data);
 				}
 				dataToIce.username = icename;
-				function scrape_listener(message) {
-					var data = message;
-					//LB: make sure to send recieved data to corresponding user
-					mySocket.removeListener('scrape', scrape_listener);
-					value = data;
-					logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
-					res.send(value);
-				}
-				mySocket.on("scrape", scrape_listener);
+				// function scrape_listener(message) {
+				// 	var data = message;
+				// 	//LB: make sure to send recieved data to corresponding user
+				// 	mySocket.removeListener('scrape', scrape_listener);
+				// 	value = data;
+				// 	logger.info("Sending "+reqAction+" scraped objects from initScraping_ICE");
+				// 	res.send(value);
+				// }
+				// mySocket.on("scrape", scrape_listener);
+				myserver.resMap[clientName][icename] = res;
 			} else {
 				logger.error("Error occurred in the service initScraping_ICE: Socket not Available");
 				var flag = "unavailableLocalServer";
@@ -450,14 +451,15 @@ exports.userObjectElement_ICE = function (req, res) {
 					dataToIce = {"emitAction": "webscrape", "username" : icename, "data": props};
 				}
 				mySocket.emit(dataToIce["emitAction"], dataToIce.data);
-				function userObjectElement_ICE_listener(message) {
-					var data = message;
-						mySocket.removeListener('scrape', userObjectElement_ICE_listener);						
-						value = data;
-						logger.info("Sending objects");
-						res.send(value);	
-				}
-				mySocket.on("scrape",userObjectElement_ICE_listener);
+				// function userObjectElement_ICE_listener(message) {
+				// 	var data = message;
+				// 		mySocket.removeListener('scrape', userObjectElement_ICE_listener);						
+				// 		value = data;
+				// 		logger.info("Sending objects");
+				// 		res.send(value);	
+				// }
+				// mySocket.on("scrape",userObjectElement_ICE_listener);
+				myserver.resMap[clientName][icename] = res;
 				logger.info("Successfully updated userdefined object");
 			} else {
 				logger.error("Error occurred in the service initScraping_ICE: Socket not Available");

@@ -260,6 +260,7 @@ export function getStepIcon (stepKeyword) {
     else if (emailKeywords().includes(keyword)) iconName = "tsi_email_kw.png";
     else if (sapKeywords().includes(keyword)) iconName = "tsi_sap_kw.png";
     else if (oebsKeywords().includes(keyword)) iconName = "ic-desktop.png";
+    else if (desktopkeywords().includes(keyword)) iconName = "getelementcolor.png";
 
     return iconName ? "static/imgs/"+iconName : "";
 }
@@ -463,5 +464,10 @@ function sapKeywords () {
 function oebsKeywords () {
     return [
         'switchtoframe', 'closeframe', 'togglemaximize', 'toggleminimize'
+    ]
+}
+function desktopkeywords () {
+    return [
+       'getelementcolor'
     ]
 }
