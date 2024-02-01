@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-								var redisStore = require('connect-redis')(sessions);
+										var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -162,7 +162,7 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 						}
-												return next();
+																		return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -285,6 +285,7 @@ if (cluster.isMaster) {
 		app.get('/sap-calm-testautomation/api/v1/testcases/executionhistory',ALM.Execution_History);
 		app.post('/saveSAP_ALMDetails_ICE',auth.protect, ALM.saveSAP_ALMDetails_ICE);
 		app.get('/fetchALM_Testcases',auth.protect,ALM.fetchALM_Testcases);
+		app.post('/viewALM_MappedList_ICE', auth.protect, ALM.viewALM_MappedList_ICE);
 		app.use(csrf({
 		cookie: true
 		}));

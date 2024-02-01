@@ -611,3 +611,22 @@ exports.fetchALM_Testcases = async function (req,res) {
     }
     return executionProfile;
   }
+
+  exports.viewALM_MappedList_ICE = async (req, res) => {
+    // console.log(args);
+	const fnName = "viewALM_MappedList_ICE";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+            var inputs = {
+                "userid": userid,
+                "query": "almdetails"
+            };
+		const result = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+		if (result == "fail") res.send('fail');
+		else res.send(result);
+	} catch (exception) {
+		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		res.send("fail");
+	}
+};
