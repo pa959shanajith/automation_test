@@ -24,7 +24,18 @@ exports.create_ALM_Testcase = async function (req, res) {
         inputs['query'] = "alm_create_testcase";
         inputs['username'] = req.session.username;
         var current_url =`${req.protocol}://${req.get('host')}/testcases`;
-        inputs['url'] = current_url
+        inputs['url'] = current_url;
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString();
+        inputs['variants'] = [{
+          "id": "VAR01",
+          "name": "Data Variant 1",
+          "description": "Simple data variant for simple scenario",
+          "language": "string",
+          "lastModifiedBy": "John Doe",
+          "lastModifiedAt": formattedDate,
+          "url": `${req.protocol}://${req.get('host')}/datavariant/VAR01`,
+        }];
         logger.info("making an call to DAS to save the request details to db");
         const result = await utils.fetchData(inputs, "/ALM_createtestcase", "alm_create_testcase", true);
         if (result &&  result[1].statusCode !== 200) {
@@ -35,7 +46,7 @@ exports.create_ALM_Testcase = async function (req, res) {
             });
         }
         emit_data['testcaseId'] = result[0].rows || ''
-        socket_io.emit('messageFromServer',emit_data);
+        // socket_io.emit('messageFromServer',emit_data);
         logger.info("info : emitted socket connection with testcaseid and those details saved in db");
         res.status(201).send({  "testCaseId": result[0].rows || '',"url": `${req.protocol}://${req.get('host')}/sap-calm-testautomation/api/v1/testcases/${result[0].rows}` });
  
@@ -454,6 +465,7 @@ exports.fetchALM_Testcases = async function (req,res) {
 
       // Create Execution Profile
       const createProfileDoc = await generateExeProfile(req.body);
+      createProfileDoc.executionData.testcaseRefId = flag && mappedDetails[0].testcaseId && mappedDetails[0].testcaseId.length ? mappedDetails[0].testcaseId[0] : '';
       const fnName = "storeConfigureKey";
       logger.info("Inside UI Service: " + fnName);
 
