@@ -41,6 +41,7 @@ const initialState = {
     mappedPair: [],
     selectedAvoproject:'',
     mappedTree:[],
+    almavomapped: [],
     showOverlay:"",
     checkedTCPhaseIds: [],
     checkedTcIds: [],
@@ -147,6 +148,9 @@ export const settingSlice=createSlice({
         mappedTree:(state,action) => {
             state.mappedTree =  action.payload
         },
+        almavomapped:(state,action) => {
+            state.almavomapped =  action.payload
+        },
         showOverlay:(state,action) =>{
             state.showOverlay =  action.payload
         },
@@ -222,6 +226,7 @@ export const {
     mappedPair,
     selectedAvoproject,
     mappedTree,
+    almavomapped,
     showOverlay,
     zephyrLogin,
     resetZephyrLogin,

@@ -83,7 +83,7 @@ const Settings =() =>{
             <div className="card_container">
               <div className="flex flex-column" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
-                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}>  jira, Zephyr,Azure DevOps, ALM, Qtest integration can be done</p>
+                  <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}> Jira, Zephyr, Azure DevOps, ALM, Qtest & Cloud ALM integration can be done</p>
                 </span>
                 <Button className="manageProj_btn" size="small" label='Manage Integrations' disabled={isQualityEngineer} onClick={handleOpenDialog} ></Button>
                 {Integrations}
