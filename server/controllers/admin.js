@@ -2656,6 +2656,63 @@ exports.getDetails_Zephyr = async (req, res) => {
 	}
 
 };
+
+/** 
+* @function : getDetails_Testrail
+* @description : the function is responsible for getting the saved credentials for a respective client.
+				It calls DAS and gets the credentials and sends the same to FE.
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : Incase of failure
+			 A String with fail or empty message with statusCode => 500
+            Incase of success
+			 An object with url,username and apikey with statusCode => 200
+
+*/
+exports.getDetails_Testrail = async(req,res) => {
+	try{
+		const actionName = "getDetails_Testrail";
+
+		// add into the info log
+		logger.info("Inside UI service: " + actionName);
+
+		// get userId from session
+		const userId = "659bc2372833ce0bd02d25da";
+
+		let inputs = {
+			userId: userId
+		};
+
+		// call DAS service to get the data.
+		const result = await utils.fetchData(inputs, "admin/getDetails_TestRail", actionName);
+		
+		let response 
+
+		let statusCode = 500
+
+		// handle all the possible responses from DAS
+		if(result == 'fail') {
+			response = 'fail'
+		} else if(result == 'empty') {
+			response = 'empty'
+		} else {
+			statusCode = 200
+			response = {
+				url : result.url,
+				username : result.username,
+				apiKey : result.API_Key
+			}
+		}
+
+		// return the response
+		return res.status(statusCode).json(response)
+	}catch (exception) {
+		logger.error("Exception in the service getDetails_Testrail: %s", exception);
+		return res.status(500).send("fail");
+	}
+}
+
+
 exports.getDetails_Azure= async (req, res) => {
 	const actionName = "getDetails_Azure";
 	logger.info("Inside UI service: " + actionName);
@@ -2747,6 +2804,69 @@ exports.manageZephyrDetails = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+/** 
+* @function : manageTestrailDetails
+* @description : the function is responsible for logging into the Testrail,
+               it takes the payload from front end and calls the DAS and returns the response to FE.
+* @param : TestRailUrl:
+		   Url of the test rail, comes in body.
+* @param : TestRailUsername :
+           User name of the test rail, comes in body.
+* @param : TestRailToken :
+	       Token for test rail, comes in body.
+* @param : action : 
+           Create or Update, comes in body.
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : A String of success or fail with respective status code
+             200 => success
+			 500 => fail
+*/
+ 
+exports.manageTestrailDetails = async (req, res) => {
+	try {
+	  const actionName = "manageTestrailDetails";
+	
+	  // add into the info log
+	  logger.info("Inside UI service: " + actionName);
+	  
+	  // get userId from session
+	  const userId = "659bc2372833ce0bd02d25da";
+	  
+	  // get remaining data from body
+	  let { TestRailUrl, TestRailUsername, TestRailToken, action } = req.body;
+	  
+	  // using fetchData function to call DAS service.
+	  const result = await utils.fetchData(
+		{
+		  TestRailUrl: TestRailUrl,
+		  TestRailUsername: TestRailUsername,
+		  TestRailToken: TestRailToken,
+		  action: action,
+		  userId: userId,
+		},
+		"admin/manageTestRailDetails",
+		actionName
+	  );
+	
+	  // set the appropriate status code on the basis of response
+	  let statusCode 
+	  if(result == 'fail') {
+		statusCode = 500
+	  } else {
+		statusCode = 200
+	  }
+	  
+	  // return the response
+	  return res.status(statusCode).send(result);
+	} catch (exception) {
+	  // add the error message into the error log
+	  logger.error("Exception in the service manageTestrailDetails: %s", exception);
+	  return res.status(500).send("fail");
+	}
+  };
+
 exports.manageAzureDetails = async (req, res) => {
 	const actionName = "manageAzureDetails";
 	logger.info("Inside UI service: " + actionName);

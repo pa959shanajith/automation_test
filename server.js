@@ -248,7 +248,6 @@ if (cluster.isMaster) {
 		var browserstack = require('./server/controllers/browserstack');
 		var generateAI = require('./server/controllers/generateAI');
 		
-
 		// No CSRF token
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
@@ -484,6 +483,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
 		var zephyr = require('./server/controllers/zephyr');
+		var testrail = require('./server/controllers/testrail');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -492,7 +492,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
 		var SauceLab = require('./server/controllers/sauceLab');
-var browserstack = require('./server/controllers/browserstack');
+        var browserstack = require('./server/controllers/browserstack');
 
 
 
@@ -583,8 +583,10 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Testrail',auth.protect, admin.getDetails_Testrail)
 		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageTestrailDetails', auth.protect,admin.manageTestrailDetails);
 		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
@@ -709,7 +711,16 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
 		app.post('/excelToZephyrMappings', auth.protect, zephyr.excelToZephyrMappings);
-		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
+
+		// Testrail Plugin
+		app.post('/getProjectsTestrail_ICE',auth.protect, testrail.getProjects_Testrail);
+		app.post('/getSuitesTestrail_ICE',auth.protect, testrail.getSuites_Testrail);
+		app.post('/getTestcasesTestrail_ICE',auth.protect, testrail.getTestcases_Testrail);
+		app.post('/saveTestrailMapping',testrail.saveMapping_Testrail)
+		app.post('/viewTestrailMappedList',testrail.viewMappedDetails_Testrail)
+		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
+		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
+		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);
 		app.post('/APG_OpenFileInEditor', auth.protect, flowGraph.APG_OpenFileInEditor);
