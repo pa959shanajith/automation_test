@@ -112,7 +112,7 @@ const IceProvisionForm = (props) => {
 				props.createUserDialogHide();
 			})();
 		}
-		else if (type === 'inhouse') {
+		else if (type === 'inhouse' || type === "saml") {
 			(async () => {
 				props.toast.current.clear()
 				setIcenameErrBorder(false);
@@ -252,7 +252,7 @@ const IceProvisionForm = (props) => {
 					</DataTable>
 				</div>
 			</div>}
-			{type === 'inhouse' && <div className="col-xs-9" style={{ width: "83%" }}>
+			{(type === 'inhouse'|| type === "saml") && <div className="col-xs-9" style={{ width: "83%" }}>
 				<div className='flex flex-column pb-4'>
 					<label className="pb-2 font-medium" title="Token Name">Avo Assure Client Name</label>
 					<div className="flex flex-row">

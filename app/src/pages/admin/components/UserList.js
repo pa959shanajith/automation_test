@@ -7,7 +7,7 @@ import '../styles/UserList.scss';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
-import { Footer, ModalContainer } from '../../global';
+import { Footer, ModalContainer, Messages as MSG } from '../../global';
 import CreateUser from './CreateUser';
 import { AdminActions } from '../adminSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -90,32 +90,58 @@ const UserList = (props) => {
         </div>
     );
 
+    const editRowData = (userId) => {
+        (async () => {
+            // setLoading("Fetching User details...");
+        try{
+            const data = await getUserDetails("userid", userId);
+            if(data.error){props.toastError(data.error);return;}
+            else {
+                setLoading(false);
+                const uType = data.type;
+                dispatch(AdminActions.UPDATE_DATA(data));
+                // dispatch(AdminActions.UPDATE_ADDROLES,{});
+                dispatch(AdminActions.UPDATE_TYPE(uType));
 
-    const editRowData = (rowData) => {
-        dispatch(AdminActions.UPDATE_INPUT_USERNAME(rowData.userName));
-        dispatch(AdminActions.UPDATE_INPUT_LASTNAME(rowData.lastName));
-        dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(rowData.firstName));
-        dispatch(AdminActions.UPDATE_USERID(rowData.userId));
-        dispatch(AdminActions.UPDATE_USERIDNAME(rowData.userId + ";" + rowData.userName));
-        dispatch(AdminActions.UPDATE_INPUT_EMAIL(rowData.email));
-        dispatch(AdminActions.UPDATE_USERROLE(rowData.roleId));
-        setEditUserData(rowData);
+                dispatch(AdminActions.UPDATE_INPUT_USERNAME(data.username));
+                dispatch(AdminActions.UPDATE_INPUT_LASTNAME(data.lastname));
+                dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(data.firstname));
+                dispatch(AdminActions.UPDATE_USERID(data.userid));
+                dispatch(AdminActions.UPDATE_USERIDNAME(data.userid + ";" + data.username));
+                dispatch(AdminActions.UPDATE_INPUT_EMAIL(data.email));
+                dispatch(AdminActions.UPDATE_USERROLE(data.role));
+                
+                data.addrole.forEach((e) => dispatch(AdminActions.ADD_ADDROLE, e));
+                // dispatch({type:actionTypes.UPDATE_FTYPE,payload:  (uType==="inhouse")? "Default":((uType==="oidc")? "OpenID":uType.toUpperCase())});
+
+                if (data.type !== "inhouse") {
+                    var confserver = data.server;
+                    dispatch(AdminActions.UPDATE_SERVER(data.server));
+                    dispatch(AdminActions.UPDATE_LDAP_USER(data.ldapuser || ''));
+                }
+            }  
+        }catch(error){
+            setLoading(false);
+            props.toastError(MSG.ADMIN.ERR_FETCH_USER_DETAILS);
+        }
+        })();
     }
-
     const editHandler = (event, rowData) => {
         if(rowData.userId !== userInfo?.user_id){
-            editRowData(rowData);
+            editRowData(rowData.userId);
             setShowDeleteConfirmPopUp(true);
             dispatch(AdminActions.EDIT_USER(false));
         }
         else event.preventDefault();
     }
+    
+
     const actionBodyTemplate = (rowData) => {
         return (
             <div className='flex flex-row' style={{justifyContent:"center", gap:"0.5rem"}}>
                 <img src="static/imgs/ic-edit.png" alt="editUserIcon"
                     style={{ height: "20px", width: "20px" }}
-                    className="edit__usericon" onClick={() => { editRowData(rowData); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
+                    className="edit__usericon" onClick={() => { editRowData(rowData.userId); dispatch(AdminActions.EDIT_USER(true)); setEditUserDialog(true) }}
                 />
                 {rowData.userId === userInfo?.user_id && <Tooltip target=".edit__usericon__disabled" content='Action not allowed' position='bottom'></Tooltip>}
                 <img
@@ -152,10 +178,10 @@ const UserList = (props) => {
                 scrollable
                 scrollHeight='60vh'
                 showGridlines>
-                <Column field="userName" header="User Name" style={{ width: '20%' }}></Column>
-                <Column field="firstName" header="First Name" style={{ width: '20%' }}></Column>
-                <Column field="lastName" header="Last Name" style={{ width: '20%' }}></Column>
-                <Column field="email" header="Email" className='table_email'></Column>
+                <Column field="userName" header="User Name" style={{ width: '20%' }} bodyClassName={"ellipsis-column"}></Column>
+                <Column field="firstName" header="First Name" style={{ width: '20%' }} bodyClassName={"ellipsis-column"}></Column>
+                <Column field="lastName" header="Last Name" style={{ width: '20%' }} bodyClassName={"ellipsis-column"}></Column>
+                <Column field="email" header="Email" className='table_email' bodyClassName={"ellipsis-column"}></Column>
                 <Column field="role" header="Role" style={{ width: '20%' }}></Column>
                 <Column header="Actions" body={actionBodyTemplate} headerStyle={{ width: '10%', minWidth: '8rem' }} ></Column>
             </DataTable>

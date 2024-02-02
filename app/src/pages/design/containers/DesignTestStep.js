@@ -1,7 +1,18 @@
+import AceEditor from "react-ace";
+import "ace-builds";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/worker-javascript";
+
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools";
+import 'ace-builds/src-noconflict/ext-error_marker';
+import 'ace-builds/webpack-resolver';
+
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserDetails, getNotificationGroups } from '../api';
+import { getUserDetails, getNotificationGroups, createKeyword } from '../api';
 import { Messages as MSG,ScreenOverlay,RedirectPage,ResetSession } from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
@@ -22,9 +33,18 @@ import DetailsDialog from "../components/DetailsDialog";
 import PasteStepDialog from "../components/PasteStepDialog";
 import SelectMultipleDialog from "../components/SelectMultipleDialog";
 import { Checkbox } from 'primereact/checkbox';
+import { RadioButton } from "primereact/radiobutton";
+//import AceEditor from 'react-ace';
 
+
+import { mode, style } from 'd3';
+import AvoInput from '../../../globalComponents/AvoInput';
+import ReactAce from "react-ace/lib/ace";
+import { Icon } from "@mui/material";
 
 const DesignModal = (props) => {
+
+    const pgmLang = useRef();
     const toast = useRef();
     const headerCheckRef = useRef();
     const navigate = useNavigate();
@@ -71,8 +91,25 @@ const DesignModal = (props) => {
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
     const [arrow, setArrow] = useState(false);
+    const [customkeyword, setCustomKeyWord] = useState(false);
+    const [stepOfCustomKeyword, setStepOfCustomKeyword] = useState(0);
+    const [langSelect, setLangSelect] = useState('javascript');
+    const [inputKeywordName, setInputKeywordName] = useState('');
+    const [inputEditor, setInputEditor] = useState("");
+    const [customTooltip, setCustomTooltip] = useState("");
+    const customKeyToast = useRef();
     let runClickAway = true;
-    
+    const [selectedType, setSelectedType] = useState("Specific");
+    const [checked, setChecked] = useState(false);
+    // const [keywordtypes,setKeywordtypes] = useState("Specific")
+
+    const handleAceEditor = (e) => {
+        setInputEditor(e)
+    }
+    const onSelectLanguage = (e) => {
+        setLangSelect(e.target.value);
+
+    }
 
     // Function to remove duplicates based on a specified property (e.g., 'name')
     const removeDuplicates = (arr, property) => {
@@ -1162,7 +1199,7 @@ const DesignModal = (props) => {
     
             // Create a new array with updated test cases
             let updatedTestCases = testCaseUpdate.testCases.map((testCase, i) => {
-                if (i === rowIdx) {
+                if (i == rowIdx) {
                     let updatedTestCase = {...testCases[rowIdx]};
                     return updatedTestCase;
                 }
@@ -1359,6 +1396,12 @@ const DesignModal = (props) => {
                                     rowChange={rowChange} keywordData={keywordList} 
                                     testcaseDetailsAfterImpact={props.testcaseDetailsAfterImpact}
                                     impactAnalysisDone={props.impactAnalysisDone} arrow={arrow}
+                                    setCustomKeyWord={setCustomKeyWord}
+                                    setStepOfCustomKeyword={setStepOfCustomKeyword}
+                                    setInputKeywordName={setInputKeywordName}
+                                    setCustomTooltip={setCustomTooltip}
+                                    setLangSelect={setLangSelect}
+                                    setInputEditor={setInputEditor}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1384,10 +1427,119 @@ const DesignModal = (props) => {
         }
     setExpandedRows(_expandedRow)
     }
+    
+    const approvalOnClick = async () => {
+
+        if (inputKeywordName === '') {
+            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+        }
+
+        else if (inputEditor === '') {
+            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+        }
+        else {
+            try {
+                setCustomKeyWord(false)
+
+                setOverlay('Creating the Kewyord')
+
+                await createKeyword({
+                    'name': inputKeywordName,
+                    'objecttype': customkeyword,
+                    'apptype': props.appType,
+                    'code': inputEditor,
+                    'elementtype': selectedType,
+                    'language': langSelect,
+                    'tooltip': customTooltip
+
+                })
+                setOverlay('Updating the list ')
+                let keywordData = await DesignApi.getKeywordDetails_ICE(props.appType)
+
+                let sortedKeywordList = {};
+                for (let object in keywordData) {
+                    let firstList = [];
+                    let secondList = [];
+                    for (let keyword in keywordData[object]) {
+                        if (keywordData[object][keyword]['ranking']) {
+                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
+                                [keyword]: keywordData[object][keyword]
+                            });
+                        } else {
+                            secondList.push(({
+                                [keyword]: keywordData[object][keyword]
+                            }));
+                        }
+                    };
+                    // console.log('firstList', firstList);
+                    // console.log('secondList', secondList);
+                    secondList = [...firstList, ...secondList];
+                    // console.log('secondList2', secondList);
+
+                    let keyWordObject = {};
+                    // secondList = secondList.forEach((keyword) => {
+                    //     keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0]
+                    // });
+
+                    for (let keyword of secondList) {
+                        if (keyword && Object.keys(keyword)[0] && Object.values(keyword)[0])
+                            keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0];
+                        // console.log('Object.keys(keyword)[0]', Object.keys(keyword)[0]);
+                        // console.log('Object.values(keyword)[0]', Object.values(keyword)[0]);
+                    }
+                    // console.log('keyWordObject', keyWordObject);
+                    // sortedKeywordList[object] = secondList.reduce((kerwordobjects, currentKeyword) => {
+                    //     return ({...kerwordobjects, [Object.keys(currentKeyword)[0]]: Object.values(currentKeyword)[0]})
+                    // }, {});
+                    // console.log('sortedKeywordList[object]', sortedKeywordList[object]);
+                    // sortedKeywordList[object] = { ...secondList };
+                    sortedKeywordList[object] = keyWordObject;
+                }
+                toast.current.show({ severity: 'success', summary: 'Success', detail: MSG.DESIGN.SUCC_CUSTOMKEY_ENTERED.CONTENT, life: 3000 })
+                setKeywordList(sortedKeywordList);
+                setStepSelect({ edit: false, check: [stepOfCustomKeyword], highlight: [] })
+                setOverlay('')
+                setCustomTooltip("")
+                setInputEditor('');
+                setInputKeywordName('');
+                setLangSelect('javascript');
+                setSelectedType("Specific")
+            } catch (error) {
+
+                toast.current.show({ severity: "error", summary: 'Error', detail: MSG.DESIGN.ERR_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+                console.error("Error: Failed to communicate with the server ::::", error)
+
+            }
+        }
+        setInputKeywordName('');
+        setCustomTooltip("");
+        setLangSelect('javascript');
+        setInputEditor('');
+        setChecked(false);
+    }
+
+    const createCustomeKeywordFooter = () => <>
+        <Button
+            data-test="cancelButton"
+            label="Debug"
+            style={{padding: '0.5rem 1rem' }}
+            text
+        >
+        </Button>
+        <Button
+            data-test="createButton"
+            label={"save keyword"}
+            onClick={approvalOnClick}
+            style={{padding: '0.5rem 1rem' }}
+        >
+
+        </Button>
+    </>
+
     return (
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
-        <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+        <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
             <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
@@ -1439,6 +1591,94 @@ const DesignModal = (props) => {
                         </div>
                     </div>
                 </div>
+            </Dialog>
+            
+            {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
+            <Dialog maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setInputKeywordName(''); setCustomTooltip("");setChecked(false);setLangSelect('javascript'); }} footer={<div>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                <div className="flex flex-column gap-3">
+                    <div className="flex flex-row gap-1 md:gap-4 xl:gap-8">
+                        <div className="flex flex-row gap-2 align-items-center" style={{  marginTop: "1rem" }}>
+                            <label htmlFor='isGeneric' className="pb-2 font-medium" style={{ marginTop: "0.3rem" }}>Type: </label><div>I want it to be Generic</div>
+                            <Checkbox required checked={checked} value={"Generic"} onChange={(e) => { setChecked(e.checked); setSelectedType(e.value) }} />
+                        </div>
+                        <div className="flex flex-row align-items-center gap-2">
+                            <label htmlFor='firstName' className="pb-2 font-medium " style={{  marginTop: "1rem" }}>Name:</label>
+                            <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
+                                className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
+                                type="text"
+                                style={{ width: '150%' }}
+                                placeholder="Enter custom key"
+                                inputTxt={inputKeywordName} 
+                                setInputTxt={setInputKeywordName} 
+
+                                />
+                        </div>
+                        <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-medium " style={{  marginTop: "1rem" }}>Tooltip: </label>
+                            <AvoInput htmlFor="keywordtooltip" maxLength="100"
+                                className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
+                                type="text"
+                                style={{ width: '160%' }}
+                                placeholder="Enter short description"
+                                
+                                inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-row gap-3">
+                    <div className="buildtype_container" style={{ overflow: 'hidden' }}>
+                        <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
+
+                            <div className="flex align-items-center" >
+                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
+                            </div>
+                            <div className="flex align-items-center"  >
+                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div className='languageEditor'>
+
+                    <AceEditor
+                        mode={langSelect}
+
+                        name="editor"
+                        //value={this.props.data}
+                        theme="monokai"
+                        fontSize={14}
+
+
+                        onChange={handleAceEditor}
+                        editorProps={{ $blockScrolling: true }}
+                        style={{ width: "100%" }}
+                        value={inputEditor}
+                        //   onValidate={(annotations)=>{
+                        //     console.log(annotations);
+                        //   }}
+
+                        setOptions={{
+                            enableSnippets: true,
+                            showLineNumbers: true,
+                            tabSize: 3,
+                            useWorker: true,
+                            highlightActiveLine: true,
+                            behavioursEnabled: true,
+                            showPrintMargin: false,
+                            hScrollBarAlwaysVisible: false,
+                            vScrollBarAlwaysVisible: false,
+                            enableBasicAutocompletion: true,
+                            enableLiveAutocompletion: true,
+                        }}
+
+                    />
+                </div>
+
             </Dialog>
         </>
     )

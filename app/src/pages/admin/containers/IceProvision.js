@@ -57,7 +57,7 @@ const IceProvision = (props) => {
   return (
     <div className="ip_container">
       <div className="ip-content_wrapper">
-        {(type === "inhouse"|| type === 'ldap') && <IceProvisionForm defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
+        {(type === "inhouse"|| type === 'ldap'||type === 'saml') && <IceProvisionForm defaultICE={defaultICE} refreshIceList={refreshIceList} setRefreshIceList={setRefreshIceList}
           op={op} setOp={setOp} runProvisionsIce={runProvisionsIce} selectProvisionType={selectProvisionType}
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist} token={token}
           setToken={setToken} icename={icename} setIcename={setIcename} userid={userid} setUserid={setUserid}

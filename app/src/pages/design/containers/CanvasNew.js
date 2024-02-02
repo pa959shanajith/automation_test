@@ -32,7 +32,7 @@ import { Column } from 'primereact/column';
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from 'primereact/dropdown';
-import { highlightScrapElement_ICE } from '../../design/api'
+import { highlightScrapElement_ICE,saveTag } from '../../design/api'
 import MapElement from '../components/MapElement';
 import { ContextMenu } from 'primereact/contextmenu'
 import { AnalyzeScenario, deletedNodes } from '../designSlice';
@@ -47,6 +47,8 @@ import '../styles/ActionPanelObjects.scss'
 import { transformDataFromTreetoJourney,createNodeForJourneyView, deleteNodeForJourneyView,moveNodeEndForJourney,moveNodeBeginForJourney, pasteNodeData } from './MindmapUtilsForOthersView';
 import DesignTestStepsGroups from './DesignTestStepsGroups';
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
+import { Card } from '@mui/material';
+import { AutoComplete } from 'primereact/autocomplete';
 
 /*Component Canvas
   use: return mindmap on a canvas
@@ -176,6 +178,14 @@ const CanvasNew = (props) => {
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
+    const[visibleTag,setVisibleTag]=useState(false);
+    const [newTag, setNewTag] = useState('');
+    const [tags, setTags] = useState({});
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const inputRef = useRef(null);
+
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
   const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
@@ -398,7 +408,36 @@ const CanvasNew = (props) => {
       value: userInfo?.licensedetails.AGS === false,
       msg: "You do not have access for Avo Genius"
     }
+    const showToast = (severity, summary) => {
+      toast.current.show({ severity, summary, life: 3000 });
+    };
+   
+      const handleSaveTags = async () => {
+        setLoading(true);
+        const filteredTags = tags[fetchingDetails._id].filter(tag => tag !== null && tag !== undefined);
+        const data = {
+            testscenarioId: fetchingDetails["_id"],
+            tag: filteredTags,
+        };
+        const response = await saveTag(data);
+        setLoading(false);
+          setNewTag(''); 
+          // setTags(tagdata);
+          if(response==="pass"){
+            setTags(tags)
+            // console.log("tagsinsave",tags)
+          }else{
+            setTags('')
+          }
+           
+          setVisibleTag(false) 
+      };
+      const handleDialogHide = () => {
+        setVisibleTag(false)
+        setInputValue('');
     
+      };
+
     const menuItemsModule = [
         { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
@@ -425,6 +464,7 @@ const CanvasNew = (props) => {
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
       { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
       { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -433,7 +473,7 @@ const CanvasNew = (props) => {
         { label: 'Add Test Steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
         { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
-        { label: 'Element Reposiotry',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
+        { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
@@ -512,6 +552,96 @@ const CanvasNew = (props) => {
         toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
       }
     }
+
+    const handleInputTagChange = (e) => {
+      setInputValue(e.target.value);
+      setSuggestions(alltag.filter(tag => tag.toLowerCase().includes(e.target.value.toLowerCase())));
+      setShowSuggestions(true);
+    };
+    const handleSuggestionSelect = (e) => {
+      setInputValue(e.value);
+      setShowSuggestions(false);
+    };
+  
+ 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleAddTag();
+    }
+  };
+  const handleAddTag = () => {
+    if (inputValue.trim() !== '') {
+      const updatedTags = [...tags[fetchingDetails._id], inputValue];
+     
+      if (tags[fetchingDetails._id].includes(inputValue)) {
+        showToast('error', 'Tag already exists');
+      } else {
+        setTags({ ...tags, [fetchingDetails._id]: updatedTags });
+        for (let i = 0; i < dNodes[0].children.length; i++) {
+          if (dNodes[0].children[i]._id === fetchingDetails._id) {
+            const data = { ...dNodes[0].children[i], tag: updatedTags };
+            dNodes[0].children[i] = data; 
+          }
+        }
+        setInputValue('');
+      }
+    }
+  };
+ 
+  const handleRemoveTag = (indexToRemove) => {
+    const updatedTags = tags[fetchingDetails._id].filter((_, index) => index !== indexToRemove);
+  setTags({ ...tags, [fetchingDetails._id]: updatedTags });
+    for (let i = 0; i < dNodes[0].children.length; i++) {
+          if (dNodes[0].children[i]._id === fetchingDetails._id) {
+            const data = { ...dNodes[0].children[i], tag: updatedTags };
+            dNodes[0].children[i] = data; 
+          }
+        }
+  };  
+
+  const renderTags = () => {
+    return (
+      <div >
+        {tags[fetchingDetails._id].map((tag, index) => (
+          <div key={index} className="chiptag">
+            {tag}
+            <button
+             className="closebutton"
+              onClick={() => handleRemoveTag(index)}
+            >
+              &#10006;
+            </button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+ 
+  useEffect(() => {
+    if (fetchingDetails && fetchingDetails.parent && fetchingDetails.parent.children) {
+      const tagData = {};
+      fetchingDetails.parent.children.forEach((testCase) => {
+        tagData[testCase._id] = testCase.tag || [];
+      });
+      setTags(tagData);
+    }
+  }, [fetchingDetails]);
+  
+
+  const alltag=fetchingDetails && fetchingDetails?.parent?.tag?.map(taglist=>{
+    return taglist
+  })
+  
+    const handleTags = async() => {
+      
+      if (toastData !== true) {
+        setVisibleTag(true);
+        d3.select('#' + box).classed('node-highlight', false);
+      } else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save Mindmap before proceeding', life: 2000 });
+      }
+    };
+
     const createMultipleNode = (e,mnode)=>{
         setMultipleNode(false)
         if (mnode.length === 0){
@@ -1756,6 +1886,12 @@ const footerContentScreen =(
       <button className='save__btn__cmp' onClick={()=>{clickAnalyzeScenario(browserName);setVisibleScenarioAnalyze(false)}}>Start</button>
     </div>
   )
+  // functions for tag a testcase 
+  const footerContentTag=(
+    <div>
+            <Button label="Save"  className="savetag" onClick={handleSaveTags} /> 
+        </div>
+  ) 
   const updateObjects = (tab) => {
     let scenarioImpact=[...scenraioLevelImpactedData]
     let scenarioComparisionData=[]
@@ -2525,6 +2661,65 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
           </span>
         </div>
       </Dialog>
+        <div className='tagtestcase'>
+          <Dialog
+            className='Tag_dialog'
+            // header={<span className="tagheader">tag a testcase</span>}
+            header="Tag a Testcase"
+            visible={visibleTag}
+            style={{ width: '35vw', maxHeight: '20vw', overflow: "auto", contentStyle: { background: 'blue' } }}
+            footer={footerContentTag}
+            onHide={handleDialogHide}
+          >
+            {/* <DialogHeader className="tag-header">Tag a Testcase</DialogHeader> */}
+            <div className='Tag_dialog'>
+              <div style={{ maxHeight: '10%', overflow: 'auto' }}>
+                <div className='tag-input'>
+                  <div className="card flex justify-content-center">
+                    <div className="flex flex-column gap-2">
+                      <div className='tagname'>Tags</div>
+                      <div>
+                        <AutoComplete
+                          id="username"
+                          className='inputtag'
+                          value={inputValue}
+                          suggestions={suggestions}
+                          completeMethod={(e) => setSuggestions(alltag.filter(tag => tag.toLowerCase().includes(e.query.toLowerCase())))}
+                          onChange={(e) => handleInputTagChange(e)}
+                          onSelect={(e) => handleSuggestionSelect(e)}
+                          onFocus={() => setShowSuggestions(true)}
+                          placeholder="Enter a tag name"
+                          onKeyDown={handleKeyDown}
+
+                        >
+                          {/* <img src="static/imgs/tag.svg" alt="Tag Icon" className="tagplace" /> */}
+                        </AutoComplete>
+                      </div>
+                    </div>
+                    <img src="static/imgs/Add_icon.svg" onClick={handleAddTag} className='plus'></img>
+                  </div>
+                </div>
+                <Card className='tagcards'>
+                  <div className="p-mt-2 cardstag">
+                    {fetchingDetails && fetchingDetails._id && tags[fetchingDetails._id]?.length > 0 ? (
+                      renderTags()
+                    ) : (
+                      <div>
+                        <img src="static/imgs/tagimg.png" className='cardimg'></img>
+                        <p className='tagtitle'>No tags available.</p>
+                      </div>
+                    )
+                    }
+                  </div>
+
+                </Card>
+                {fetchingDetails && fetchingDetails._id && tags[fetchingDetails._id]?.length === 0 && (
+                  <p className='taginstruction'>Provide a tag name and press enter to tag your testcase.</p>
+                )}
+              </div>
+            </div>
+          </Dialog>
+        </div>
              <ConfirmDialog />
              <ConfirmDialog visible={deletedElements.visible} className='newlyelement__footer' onHide={() => setDeletedElements({visible:false,tab:null})} message="Are you sure you want to delete selected element(s)?" 
              header="Delete Element Confirmation"acceptClassName= 'p-button-danger'

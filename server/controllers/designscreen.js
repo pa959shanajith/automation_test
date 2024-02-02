@@ -899,8 +899,8 @@ exports.launchAndServerConnectSAPGenius_ICE = function (req, res) {
 		var clientName=utils.getClientName(req.headers.host);
 		username=req.session.username;
 		icename = undefined
-		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
-		mySocket = myserver.allSocketsMap[clientName][icename];	
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
@@ -940,8 +940,8 @@ exports.startScrapingSAPGenius_ICE = function (req, res) {
 		var clientName=utils.getClientName(req.headers.host);
 		username=req.session.username;
 		icename = undefined
-		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
-		mySocket = myserver.allSocketsMap[clientName][icename];	
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];	
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
@@ -980,8 +980,8 @@ exports.stopScrapingSAPGenius_ICE = function (req, res) {
 		var clientName=utils.getClientName(req.headers.host);
 		username=req.session.username;
 		icename = undefined
-		if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
-		mySocket = myserver.allSocketsMap[clientName][icename];	
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];	
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , icename);
