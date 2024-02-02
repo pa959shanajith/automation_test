@@ -372,7 +372,7 @@ export const rasa_prompt_model = (data) => {
         })
         .then(res=>{
             if (res.status === 200){
-                resolve(res.data);
+                resolve({data:res.data});
             }
             else{
                 reject(res.status)

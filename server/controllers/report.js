@@ -1651,24 +1651,24 @@ exports.reportAnalysis = async (req, res) => {
                 "profileid": req.body.profileid || "",
                 "moduleid": req.body.moduleId || "",
                 "scenarioid": req.body.scenarioId || ""
-            }
+            },
+            "host": req.headers.host
         }
 
         
-        const result = await utils.fetchData(inputs, "/rasa_prompt_model");
+        const result = await utils.fetchData(inputs, "/rasa_prompt_model","",true);
 
-        if (result &&  result.status !== 200) {
+
+        if (result &&  result[1].statusCode !== 200) {
             logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
             return res.status(result.status).json({
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
         logger.info("defects fetched successfully");
-        res.status(200).send({ success: true, data: result && result.data && result.data.length  ? result.data: [], 
-            start_time:result && result.start_time ? result.start_time:'' ,
-            end_time:result && result.end_time ? result.end_time:'',
-            type:result && result._type,
-            message: 'data found' });
+        res.status(200).send({ 
+            data:JSON.parse(result[0].rows) || []
+         });
 
     } catch (error) {
         logger.error('Error:', error);

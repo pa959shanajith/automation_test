@@ -427,19 +427,20 @@
 .question_div{
     .p-inputtext{
         width: 72%;
-        margin-left: 1rem;
+        // margin-left: 1rem;
         margin-top: 1rem;
-        margin-bottom: 1rem;
     }
 
 }
-.question_btn{
-    .p-button{
-    position: relative;
-    left: 60rem;
-    bottom: 4rem;
-    }
-}
+// .question_btn{
+//     .p-button{
+//     position: relative;
+//     left: 60rem;
+//     bottom: 4rem;
+//     }
+// }
+
+
 
 
 //  @media screen and (max-width: 768px) {
@@ -458,7 +459,196 @@
 //     }
 .datatable{
     .p-datatable{
-        margin-top: -3rem !important;
+        margin-top: -1rem !important;
+    }
+}
+.datatable-1{
+    .p-datatable{
+        margin-top: -1rem !important;
+        width: 65rem!important;
+    }
+}
+.datatable-1,
+.datatable {
+    .p-datatable-thead {
+        background: rgb(124, 123, 123) !important;
     }
 }
 
+// .container{
+//     display: flex;
+//     gap: 1rem;
+//     margin-top: -2rem;
+//     margin-left:1rem;
+// }
+
+.left-pane{
+    margin-left: 1rem;
+}
+
+    
+.nomsg-label{
+    margin-left: 24rem;
+    font-size: 1.5rem;
+}
+.text-type{
+    margin-left: 5rem;
+}
+.sum-1{
+    font: $f6_semibold; 
+}
+.card_chart{
+    .p-card{
+    width:39.5rem
+    }
+}
+.card-trend{
+    .p-component{
+    margin-left: 1rem;
+    margin-right: 2rem;
+    margin-top: -1rem;
+    }
+}
+.card-trend{
+    // height: 25rem;
+    width: 68rem;
+    margin-left: 1rem;
+}
+.chart-tabs{
+    margin-top: -2rem;
+    margin-bottom: 2rem;
+}
+
+ .container-promptbase {
+      max-width: 1500px;
+    //   margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem; /* Add some spacing between elements */
+    }
+
+    .question_div {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .question_btn {
+      align-self: flex-end; /* Align the button to the right */
+    }
+  
+  .date-div-container {
+    display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: space-between;
+  }
+  .date-div11 {
+    width: 100%; /* Full width on small screens, adjust as needed */
+  }
+  .summary {
+    margin-bottom: 1rem;
+    font: $f6_semibold;
+  }
+  
+  .chart-table-container {
+    display: flex;
+    // flex-direction: column;
+    gap: 2rem;
+    // height: 23rem;
+    overflow: auto;
+    flex-wrap: wrap;
+    margin-top: -1rem;
+    margin-left: 1.5rem;
+   
+  }
+
+  .table-card{
+    width: 25rem;
+    // height: 24rem; /* Full width on small screens, adjust as needed */
+  }
+  .chart-card {
+    width: 40rem;
+    // height: 24rem;
+  }
+
+  .chart-tabs {
+    margin-bottom: 1rem;
+    .p-tabmenu{
+        height: 3rem;
+    }
+  }
+
+//   .chart-container {
+//     width: 100%;
+//   }
+
+  .right-pane {
+    width: 100%;
+  }
+
+  @media (min-width: 1000px) {
+    .container-promptbase {
+        min-width: 1000px; 
+        height: 100%;/* Adjust this value based on your design */
+      }
+    .question_div {
+      flex-direction: row;
+    }
+    .chart-table-container{
+        height: 58%;
+
+    }
+
+    .table-card {
+        height: 100%; /* Use 100% to fill the height of its parent */
+      }
+      
+      .datatable {
+        height: 100%; /* Use 100% to fill the height of its parent */
+      }
+      .chart-card{
+        height: 100%;
+      }
+
+      .chart-container{
+        height: 64%;
+      }
+
+
+
+      .card-trend{
+        height: 100%;
+      }
+
+ 
+
+    .date-div11 {
+      width: 48%; /* Adjust the width as needed for larger screens */
+    }
+
+    // .table-card, .chart-card {
+    //   width: 30rem /* Adjust the width as needed for larger screens */
+    // }
+  }
+
+  .table-container {
+    width: 68rem;
+    margin-left: 1rem;
+    margin-top: -1rem;
+    height: 22rem;
+    overflow: auto;
+  }
+  
+  .text-container {
+    margin-top: 20px;
+  }
+  
+  .chart-container {
+    // margin-top: 20px;
+  }
+  .sum-div{
+    margin-top: -0.5rem;
+    margin-left: 1rem;
+  }
+  
