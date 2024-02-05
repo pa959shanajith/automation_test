@@ -35,10 +35,8 @@ exports.getProjects_Testrail = function (req, res) {
 
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
-    console.log(myserver)
-    console.log(myserver.allSocketsICEUser)
-    console.log(myserver.allSocketsICEUser[clientName])
-    let username = 'muzammil';
+    
+    let username = req.session.username;
 
     let name;
 
@@ -129,7 +127,7 @@ exports.getSuites_Testrail = async (req, res) => {
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
 
-    let username = 'muzammil';
+    let username = req.session.username;
 
     let name;
 
@@ -209,7 +207,7 @@ exports.getTestcases_Testrail = async (req, res) => {
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
 
-    let username = 'muzammil';
+    let username = req.session.username;
 
     let name;
 
@@ -290,7 +288,7 @@ exports.getTestPlans_Testrail = async(req,res) => {
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
 
-    let username = 'muzammil';
+    let username = req.session.username;
 
     let name;
 
@@ -366,7 +364,7 @@ exports.getSuiteAndRunInfo_Testrail = async(req,res) => {
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
 
-    let username = 'muzammil';
+    let username = req.session.username
     let name;
 
     // check if the socket connection is established with ice.
@@ -438,7 +436,7 @@ exports.saveMapping_Testrail = async (req, res) => {
         }
 
         const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", 'saveMapping_Testrail');
-
+        console.log(result)
         if(result == 'fail') {
             res.send('fail')
         } else {
@@ -459,7 +457,7 @@ exports.viewMappedDetails_Testrail = async(req,res) => {
   try{
     // Add into the info log
     logger.info("Inside UI service: viewMappedDetails_Testrail");
-    const userid = '659bc2372833ce0bd02d25da';
+    const userid = req.session.userid;
 		const inputs = {
 			"userid": userid,
 			"query": "TestrailDetails"

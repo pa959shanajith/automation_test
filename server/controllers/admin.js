@@ -2688,24 +2688,20 @@ exports.getDetails_Testrail = async(req,res) => {
 		
 		let response 
 
-		let statusCode = 500
-
 		// handle all the possible responses from DAS
 		if(result == 'fail') {
-			response = 'fail'
+			return res.send('fail')
 		} else if(result == 'empty') {
-			response = 'empty'
+			return res.send('empty')
 		} else {
-			statusCode = 200
 			response = {
 				url : result.url,
 				username : result.username,
 				apiKey : result.API_Key
 			}
+			return res.send(response)
 		}
 
-		// return the response
-		return res.status(statusCode).json(response)
 	}catch (exception) {
 		logger.error("Exception in the service getDetails_Testrail: %s", exception);
 		return res.status(500).send("fail");
