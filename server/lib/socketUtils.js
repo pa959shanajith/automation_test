@@ -67,7 +67,7 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                     report_result["testSuiteDetails"] = execReq["suitedetails"]
                     if (resultData.userTerminated) result = "UserTerminate";
                     if (execType == "API") result = [d2R, status, resultData.testStatus];
-                    if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
+                    if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected && execType == 'ACTIVE') { // This block is only for active mode
                         notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                     } else if (resSent) {
                         queue.Execution_Queue.add_pending_notification("", report_result, username);

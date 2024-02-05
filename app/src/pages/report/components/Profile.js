@@ -27,6 +27,7 @@ const Profile = () => {
   const [selectedExe, setSelectedExe] = useState(0);
   const location = useLocation();
   const downloadRef = useRef(null);
+  const [scenarioName, setScenarioName] = useState("")
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -686,6 +687,7 @@ const Profile = () => {
                       className="pi pi-download"
                       onClick={(e) => {
                         setDownloadId(item?._id);
+                        setScenarioName(item?.scenarioname)
                         downloadRef.current.toggle(e);
                       }}
                     ></i>
@@ -1059,7 +1061,7 @@ const Profile = () => {
     else {
       let a = document.createElement("a");
       a.href = URL.createObjectURL(filedata);
-      a.download = downloadId;
+      a.download = SS ? `${scenarioName}_screenshots` : scenarioName;
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(a.href);
