@@ -27,7 +27,7 @@ import { Button } from 'primereact/button';
 */
 
 const TableRow = (props) => {
-  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor} =props;
+  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions} =props;
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
@@ -364,8 +364,54 @@ const TableRow = (props) => {
               : "",
         };
         return option;
-      });
+      }
+      );
 
+      const handleOption = () => {
+        var optionKeyword_2 = keywordList?.slice(startIndex,keywordList.length).map((keyword, i) => {
+          const option = {
+            value: i < keywordList.length ? keyword : "show all",
+            isCode: i < keywordList.length
+              ? props.keywordData[objType] &&
+                keyword !== "" &&
+                props.keywordData[objType][keyword] &&
+                props.keywordData[objType][keyword].hasOwnProperty("code") === false
+                ? ""
+                : props.keywordData[objType][keyword].code
+              : "",
+            language: i < keywordList.length
+              ? props.keywordData[objType] &&
+                keyword !== "" &&
+                props.keywordData[objType][keyword] &&
+                props.keywordData[objType][keyword].hasOwnProperty("code") !== false
+                ? props.keywordData[objType][keyword].language
+                : ""
+              : "",
+            label: i < keywordList.length
+              ? props.keywordData[objType] &&
+                keyword !== "" &&
+                props.keywordData[objType][keyword] &&
+                props.keywordData[objType][keyword].description !== undefined
+                ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
+                : keyword
+              : "Show All",
+            tooltip: i < keywordList.length
+              ? props.keywordData[objType] &&
+                keyword !== "" &&
+                props.keywordData[objType][keyword] &&
+                props.keywordData[objType][keyword].tooltip !== undefined
+                ? props.keywordData[objType][keyword].tooltip
+                : keyword
+              : "",
+          };
+          return option;
+        });
+        setAlloptions(optionKeyword_2);
+      };
+      useEffect(() => {
+        handleOption();
+      }, [keywordList, props.keywordData, objType, props.arrow]);
+      
 // Depending on objname, optionKeyword will have different values.
 
         const optionElement = objList?.map((object, i) => ({
