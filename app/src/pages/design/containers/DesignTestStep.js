@@ -101,6 +101,9 @@ const DesignModal = (props) => {
     let runClickAway = true;
     const [selectedType, setSelectedType] = useState("Specific");
     const [checked, setChecked] = useState(false);
+    const [AllOptions , setAlloptions] = useState('');
+    const [isNameValid, setIsNameValid] = useState(false);
+    const [isSpaceError, setIsSpaceError] = useState(false);
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
 
     const handleAceEditor = (e) => {
@@ -1352,6 +1355,16 @@ const DesignModal = (props) => {
         setHeaderCheck(event.target.checked);
         headerCheckRef.current.indeterminate = false;
     }
+
+    useEffect(() => {
+        if (inputKeywordName && AllOptions.length > 0) {
+          const isExist = AllOptions.some(option => option.value.toLowerCase() === inputKeywordName.toLowerCase());
+          setIsNameValid(isExist);
+        } else {
+          setIsNameValid(false);
+        }
+    }, [inputKeywordName, AllOptions]);
+    console.log(isSpaceError,'space',isNameValid);
     const rowExpansionTemplate = (data) => {
         function handleArrow(){
             setArrow(!arrow)
@@ -1361,6 +1374,7 @@ const DesignModal = (props) => {
                 toast.current.show({severity:'success', summary: 'Success', detail:'Old keywords has been changed to New keywords', life: 5000})
             }
         }
+     
         return (<>
             <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <div className="p-1 dataTableChild">
@@ -1402,6 +1416,7 @@ const DesignModal = (props) => {
                                     setCustomTooltip={setCustomTooltip}
                                     setLangSelect={setLangSelect}
                                     setInputEditor={setInputEditor}
+                                    setAlloptions={setAlloptions}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1520,17 +1535,11 @@ const DesignModal = (props) => {
 
     const createCustomeKeywordFooter = () => <>
         <Button
-            data-test="cancelButton"
-            label="Debug"
-            style={{padding: '0.5rem 1rem' }}
-            text
-        >
-        </Button>
-        <Button
             data-test="createButton"
             label={"save keyword"}
             onClick={approvalOnClick}
             style={{padding: '0.5rem 1rem' }}
+            disabled={isNameValid}
         >
 
         </Button>
@@ -1594,15 +1603,17 @@ const DesignModal = (props) => {
             </Dialog>
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
-            <Dialog maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setInputKeywordName(''); setCustomTooltip("");setChecked(false);setLangSelect('javascript'); }} footer={<div>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
-                <div className="flex flex-column gap-3">
-                    <div className="flex flex-row gap-1 md:gap-4 xl:gap-8">
-                        <div className="flex flex-row gap-2 align-items-center" style={{  marginTop: "1rem" }}>
+            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setInputKeywordName(''); setCustomTooltip("");setChecked(false);setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
+                    <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
+                        <div className="flex flex-row gap-2 align-items-center">
                             <label htmlFor='isGeneric' className="pb-2 font-medium" style={{ marginTop: "0.3rem" }}>Type: </label><div>I want it to be Generic</div>
                             <Checkbox required checked={checked} value={"Generic"} onChange={(e) => { setChecked(e.checked); setSelectedType(e.value) }} />
                         </div>
+                        <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
-                            <label htmlFor='firstName' className="pb-2 font-medium " style={{  marginTop: "1rem" }}>Name:</label>
+                            <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
+                            <div className="flex" style={{flexDirection:"column"}}>
                             <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
@@ -1610,17 +1621,31 @@ const DesignModal = (props) => {
                                 placeholder="Enter custom key"
                                 inputTxt={inputKeywordName} 
                                 setInputTxt={setInputKeywordName} 
-
+                                isNameValid={isNameValid}
+                                setIsSpaceError={setIsSpaceError}
+                                nameInput='name'
+                                isSpaceError={isSpaceError}
                                 />
+                                </div>
+                                </div>
+                                <div className="flex" style={{flexDirection:'column',paddingLeft:'3.5rem'}}>
+
+                                {isNameValid && <small id="username-help" style={{color:'red'}}>
+                                  *keyword already exists
+                                </small>}
+                                {isSpaceError && <small id="username-help" style={{color:'red'}}>
+                                  *space not allowed
+                                </small>}
+                                </div>
+                        
                         </div>
                         <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
-                            <label htmlFor='TooltipNamme' className="pb-2 font-medium " style={{  marginTop: "1rem" }}>Tooltip: </label>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-medium ">Tooltip: </label>
                             <AvoInput htmlFor="keywordtooltip" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
-                                
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
                             />
                         </div>
