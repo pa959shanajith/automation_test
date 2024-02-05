@@ -83,7 +83,10 @@ const ElementRepository = (props) => {
             else if(screens === "no orderlist present") {
               setScreenData([]);
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
-            else setScreenData(screens.screenList);
+            else {
+              setScreenData(screens.screenList);
+              setScreenId(false);
+            }
         } catch (error) {
             console.error('Error fetching User list:', error);
         }
@@ -295,8 +298,6 @@ const handleAccordionNameEdit = (index, newName) => {
 
     elementVals.find(v => v.key === key).value = value;
 
-
-    console.log(elementVals)
   };
   const textEditor = (options) => {
     return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
