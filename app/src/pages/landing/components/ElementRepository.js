@@ -87,7 +87,6 @@ const ElementRepository = (props) => {
               setScreenData(screens.screenList);
               setScreenId(false);
             }
-            console.log("value is set to true")
         } catch (error) {
             console.error('Error fetching User list:', error);
         }
@@ -299,8 +298,6 @@ const handleAccordionNameEdit = (index, newName) => {
 
     elementVals.find(v => v.key === key).value = value;
 
-
-    console.log(elementVals)
   };
   const textEditor = (options) => {
     return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
