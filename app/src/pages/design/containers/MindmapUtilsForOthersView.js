@@ -927,9 +927,6 @@ const getChildUpdate = (data, item) => {
         for (let i = 0; i < children.length; i++) {
             const child = children[i];
 
-            if(child.id === item.children[0].id){
-                child.children = item.parent.children[0].children
-            }
             if (child.id === item.id) {
                 // Update logic goes here
                 // For example, you can update child properties
