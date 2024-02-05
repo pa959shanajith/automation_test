@@ -335,7 +335,7 @@ class TestSuiteExecutor {
         const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
-        
+        execReq.execType = execType;
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
             // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
