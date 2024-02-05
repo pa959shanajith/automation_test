@@ -37,7 +37,6 @@ module.exports.Execution_Queue = class Execution_Queue {
     static key_list = {}
     static synchronous_execution_report = {}
     static agent_list = {}
-    static execReqs = []
     // executon queue initialisation
     static queue_init() {
         logger.info("Initializing Execution Queues")
