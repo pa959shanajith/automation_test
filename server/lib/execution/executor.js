@@ -388,7 +388,7 @@ class TestSuiteExecutor {
                         const testsuite = execReq.suitedetails[testsuiteIndex];
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
-                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1 && queue.Execution_Queue.execReqs !== 0) {
+                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1 && queue.Execution_Queue.execReqs.length !== 0) {
                             notifications.notify("report", { testsuite: queue.Execution_Queue.execReqs, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType, hostName: host });
                             queue.Execution_Queue.execReqs = [];
                         }
