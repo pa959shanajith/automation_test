@@ -38,11 +38,15 @@ const FolderView = (props) => {
     const [editingOfTC, setEditingOfTC] = useState(true);
     const [valueOfRenamingTC, setValueOfRenamingTC] = useState(null);
     const [renamingTC, setRenamingTC] = useState(true);
+    const [valueOfRenamingTSG, setValueOfRenamingTSG] = useState(null);
+    const [renamingTSG, setRenamingTSG] = useState(true);
+    const [handlingMultiTCrenamingTOSave, setHandlingMultiTCrenamingTOSave] = useState([])
+    const [handlingMultiTSGRenamingTOSave, setHandlingMultiTSGRenamingTOSave] = useState([])
     const toast = useRef(null);
     const operationOnSuites = useRef(null);
     const operationOnCases = useRef(null);
     const operationOnTestSteps = useRef(null);
-    moduledataForTree = [];
+    let moduledataForTree = [];
 
     // Assuming `moduleLists` and `childComponents` are defined somewhere before this code
     const onlyNormalSuites = moduleLists.filter(mod => mod.type === 'basic');
@@ -135,7 +139,7 @@ const FolderView = (props) => {
         moduledataForTree.unshift(newObject);
     }
 
-    let moduledataForTree;
+    // let moduledataForTree;
 
 
     const onExpandOfNode = async (event) => {
@@ -198,34 +202,35 @@ const FolderView = (props) => {
             }
 
         }
+        if (event.node.data[0]?.layer === "layer_1") {
+            let suitId = event.node.data[0]?.testSuitId;
+            //key of opened (toggled) suit
+            let key = event.node.key
+            var req = {
+                tab: "createTab",
+                projectid: proj,
+                version: 0,
+                cycId: null,
+                modName: "",
+                moduleid: suitId
+            }
+            try {
+                var res = await getModules(req)
 
-        let suitId = event.node.data[0]?.testSuitId;
-        //key of opened (toggled) suit
-        let key = event.node.key
-        var req = {
-            tab: "createTab",
-            projectid: proj,
-            version: 0,
-            cycId: null,
-            modName: "",
-            moduleid: suitId
+            }
+            catch (error) {
+                console.log("error while fetching getModules", error)
+            }
+
+
+            // Call the function to update the data
+            const modifiedData = transformDataFromTreetoFolder(res);
+            setModifiedDataToChange(modifiedData);
         }
-        try {
-            var res = await getModules(req)
+        // const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
 
-        }
-        catch (error) {
-            console.log("error while fetching getModules", error)
-        }
-
-
-        // Call the function to update the data
-        const modifiedData = transformDataFromTreetoFolder(res);
-        setModifiedDataToChange(modifiedData);
-        const testCases = handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps)
-
-        setTestCaseVar(testCases)
-        dispatch(selectedScreenOfStepSlice(testCases))
+        // setTestCaseVar(testCases)
+        // dispatch(selectedScreenOfStepSlice(testCases))
         // setChildComponents(testCases)
 
 
@@ -237,7 +242,7 @@ const FolderView = (props) => {
     };
     // context Menu function
     const menuItemsTestSuite = [
-        { label: 'Add Testcase', icon: <img src="static/imgs/add-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { addNewTestCase(); } },
+        { label: 'Add Testcase', icon: <img src="static/imgs/add-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { dispatch(typeOfOprationInFolder({ addNewTestCase: true })) } },
         { label: 'Add Multiple Testcases', icon: <img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { label: 'Debug', icon: <img src="static/imgs/Execute-icon.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { separator: true },
@@ -251,34 +256,34 @@ const FolderView = (props) => {
         { label: 'Debug', icon: <img src="static/imgs/Execute-icon.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { label: 'Impact Analysis ', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { separator: true },
-        { label: 'Rename', icon: <img src="static/imgs/edit-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { setValueOfRenamingTC(""); setRenamingTC(true); handleRenamingTC(); } },
+        { label: 'Rename', icon: <img src="static/imgs/edit-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { setRenamingTC(true); handleRenamingTC(); } },
         { label: 'Delete', icon: <img src="static/imgs/delete-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
 
     ];
     const menuItemsTestStepGroup = [
-        { label: 'Rename', icon: <img src="static/imgs/edit-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
+        { label: 'Rename', icon: <img src="static/imgs/edit-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { setRenamingTC(true); handleRenamingTSG(); } },
         { label: 'Delete', icon: <img src="static/imgs/delete-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
 
     ];
 
-    const addNewTestCase = () => {
-        const newTestCaseElement = {
-            key: null,
-            label: [
-                <img src="static/imgs/node-scenarios.svg" alt="TestCase" />,
-                <div></div>,
-            ],
-            data: [{
-                testCaseName: null,
+    // const addNewTestCase = () => {
+    //     const newTestCaseElement = {
+    //         key: null,
+    //         label: [
+    //             <img src="static/imgs/node-scenarios.svg" alt="TestCase" />,
+    //             <div></div>,
+    //         ],
+    //         data: [{
+    //             testCaseName: null,
 
-                addTestCase: true
-            }],
-            children: [],
-        };
-        setTestCaseVar([...testCaseVar, newTestCaseElement]);
-        dispatch(selectedScreenOfStepSlice([...testCaseVar, newTestCaseElement]));
+    //             addTestCase: true
+    //         }],
+    //         children: [],
+    //     };
+    //     setTestCaseVar([...testCaseVar, newTestCaseElement]);
+    //     dispatch(selectedScreenOfStepSlice([...testCaseVar, newTestCaseElement]));
 
-    }
+    // }
 
     async function receivingfullTreeDataOnClickOfMoreButton() {
         // let reNamingInput = <div><InputText className='inputOfTS'
@@ -350,6 +355,11 @@ const FolderView = (props) => {
 
 
     }
+
+
+    function handleRenameFun() {
+        handleRenamingTC()
+    }
     let recievingRenamingData;
     function handleRenameFun (){
         handleRenamingTC()
@@ -358,9 +368,9 @@ const FolderView = (props) => {
         const selectedTCToRename = passSelectedTSforRenaming?.node
         const keyTS = selectedTCToRename?.key?.slice(0, 1)
         const renamingTCIndex = selectedTCToRename?.key?.slice(2 - 3);
-        //    setValueOfRenamingTC(selectedTCToRename.data[0].testCaseName)
+        setValueOfRenamingTC(selectedTCToRename.data[0].testCaseName)
         setRenamingTC(true);
-        setValueOfRenamingTC(null)
+        // setValueOfRenamingTC(null)
         const renameTC = [
             <img src="static/imgs/node-scenarios.svg" alt="modules" />,
             <div style={{
@@ -377,7 +387,6 @@ const FolderView = (props) => {
                         handleRenameFun()
                         setRenamingTC(false);
                         setValueOfRenamingTC(e.target.value);
-                        
                     }
                 }}
                 autoFocus
@@ -385,16 +394,70 @@ const FolderView = (props) => {
         ];
         if (valueOfRenamingTC !== null) {
             recievingRenamingData = valueOfRenamingTC;
-            dispatch(typeOfOprationInFolder({ reNamingOfTestCase: [valueOfRenamingTC, renamingTCIndex] }))
+            setHandlingMultiTCrenamingTOSave([...handlingMultiTCrenamingTOSave, { id: selectedTCToRename.data[0].testCaseId, name: valueOfRenamingTC }])
+            // dispatch(typeOfOprationInFolder({ reNamingOfTestCase: [valueOfRenamingTC, renamingTCIndex] }))
+
+            setValueOfRenamingTC(null)
         };
         let pushingInputToTC = [];
-        pushingInputToTC.push(handlingTreeOfTestSuite(selectedTCToRename?.key, modifiedDataToChange, operationOnCases, operationOnTestSteps, renameTC, recievingRenamingData))
+        pushingInputToTC.push(handlingTreeOfTestSuite(selectedTCToRename?.key, modifiedDataToChange, operationOnCases, operationOnTestSteps, renameTC, recievingRenamingData, selectedTCToRename))
         setChildComponents({ ...childComponents, [keyTS]: pushingInputToTC })
+    }
+    function handleTSGRenameFun() {
+        // setRenamingTSG(false);
+        handleRenamingTSG()
+    }
+    let recievingRenamingDataTSG;
+    function handleRenamingTSG() {
+        const selectedTSGToRename = passSelectedTSforRenaming?.node
+        const keyTS = selectedTSGToRename?.key?.slice(0, 1)
+        const renamingTSGIndex = selectedTSGToRename?.key?.slice(2 - 3);
+        //    setValueOfRenamingTSG(selectedTSGToRename.data[0].testCaseName)
+        setRenamingTSG(true);
+        // setValueOfRenamingTC(null)
+        const renameTSG = [
+            <img src="static/imgs/testStepGroup.png" alt="modules" />,
+            <div style={{
+                width: '10rem',
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+            }}> {renamingTSG ? <> <InputText className='inputOfTC'
+                value={valueOfRenamingTSG}
+                // placeholder=""
+                onChange={(e) => setValueOfRenamingTSG(e.target.value)}
+                onBlur={() => { if (valueOfRenamingTSG?.length > 0) { setRenamingTSG(false); } }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        handleTSGRenameFun()
+                        setRenamingTSG(false);
+                        setValueOfRenamingTSG(e.target.value);
+
+
+                    }
+                }}
+                autoFocus
+            /> </> : valueOfRenamingTSG}</div>, <Button onMouseDownCapture={(e) => { operationOnCases.current.show(e) }} className='buttonForMoreTestCases' label="..." text />
+        ];
+        if (valueOfRenamingTSG !== null) {
+            recievingRenamingDataTSG = valueOfRenamingTSG;
+            setHandlingMultiTSGRenamingTOSave([...handlingMultiTSGRenamingTOSave, { id: selectedTSGToRename.data[0].testStepGroupId, name: valueOfRenamingTSG }])
+            // dispatch(typeOfOprationInFolder({ reNamingOfTestCase: [valueOfRenamingTC, renamingTCIndex] }))
+
+            setValueOfRenamingTSG(null)
+        };
+        let pushingInputToTSG = [];
+        pushingInputToTSG.push(handlingTreeOfTestSuite(selectedTSGToRename?.key, modifiedDataToChange, operationOnCases, operationOnTestSteps, renameTSG, recievingRenamingDataTSG, selectedTSGToRename))
+        setChildComponents({ ...childComponents, [keyTS]: pushingInputToTSG })
+
     }
     useEffect(() => {
         if (!renamingTC) { handleRenamingTC() }
 
     }, [renamingTC])
+    useEffect(() => {
+        if (!renamingTSG) { handleRenamingTSG() }
+
+    }, [renamingTSG])
 
 
     return (

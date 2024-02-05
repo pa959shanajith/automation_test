@@ -6,6 +6,7 @@ import { Card } from 'primereact/card';
 import { BreadCrumb } from 'primereact/breadcrumb';
 import { Button } from 'primereact/button';
 import { DataView } from 'primereact/dataview';
+import { screenData, typeOfOprationInFolder, selectedScreenOfStepSlice, } from '../designSlice';
 import { Rating } from 'primereact/rating';
 import { Tag } from 'primereact/tag';
 import CaptureModal from '../containers/CaptureScreenForFolderView';
@@ -16,6 +17,7 @@ import { InputText } from 'primereact/inputtext';
 import { transformDataFromTreetoFolder } from './MindmapUtilsForOthersView';
 
 const FolderViewRightContainer = (props) => {
+    const dispatch = useDispatch();
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [createnew, setCreateNew] = useState(false)
@@ -25,6 +27,8 @@ const FolderViewRightContainer = (props) => {
     const [valueOfNewAddedstepGrp, setValueOfNewAddedstepGrp] = useState(null)
     const [editingOfStep, setEditingOfStep] = useState(true)
     const [parentScreenData, setParentScreenData] = useState(null);
+    const [showTCList, setShowTCList] = useState([]);
+    const [selectedTSToAddnewTC, setSelectedTSToAddnewTC] = useState('');
     const eventsOfFolder = useSelector(state => state.design.typeOfOprationInFolder);
     const selectedScreen = useSelector(state => state.design.selectedScreenOfStepSlice);
     const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
@@ -38,9 +42,35 @@ const FolderViewRightContainer = (props) => {
     }
     useEffect(() => {
         if (eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1") {
-            handlingSelectedNode()
+            if (selectedTSToAddnewTC !== eventsOfFolder?.onSelect?.data[0]?.testSuitId) {
+                handlingSelectedNode()
+            }
         }
     }, [eventsOfFolder?.onSelect])
+    useEffect(() => {
+        if (eventsOfFolder.addNewTestCase === true) {
+            handleAddnewTestCases()
+            // setValueOfNewAddedCase(null)
+        }
+    }, [eventsOfFolder.addNewTestCase === true])
+    useEffect(() => {
+        if (eventsOfFolder.createNewTestSuit !== null) {
+            if (eventsOfFolder.createNewTestSuit.length) {
+                modifyingStepGroupToParentAndSaveFun()
+            }
+        }
+        if (eventsOfFolder.reNamingOfTS !== null) {
+            if (eventsOfFolder.reNamingOfTS[0].length) {
+                handleRenamingNodes()
+            }
+        }
+        if (eventsOfFolder.reNamingOfTestCase !== null) {
+            if (eventsOfFolder.reNamingOfTestCase[0].length) {
+                handleRenamingNodes()
+            }
+        }
+    }, [eventsOfFolder.createNewTestSuit, eventsOfFolder.reNamingOfTS, eventsOfFolder.reNamingOfTestCase]);
+
     const eventLayer = eventsOfFolder.onSelect?.data[0]?.layer
     const handlingBreadCrumb = () => {
         let itemsOf = [];
@@ -60,6 +90,7 @@ const FolderViewRightContainer = (props) => {
     }
     async function handlingSelectedNode() {
         if (eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1") {
+            setSelectedTSToAddnewTC(eventsOfFolder?.onSelect?.data[0]?.testSuitId)
             let suitID = eventsOfFolder?.onSelect?.data[0]?.testSuitId
             var req = {
                 tab: "createTab",
@@ -77,7 +108,37 @@ const FolderViewRightContainer = (props) => {
                 console.log("error while fetching getModules", error)
             }
             const modifiedData = transformDataFromTreetoFolder(res);
+            setShowTCList(modifiedData.children);
         }
+        // if (eventsOfFolder.addNewTestCase === true) {
+        //     const newTCData = {
+
+        //     }
+        //     showTCList.push(newTCData)
+        //     // setShowTCList(...showTCList,newTCData)
+        // }
+
+
+    }
+    function handleAddnewTestCases() {
+        // if (eventsOfFolder.addNewTestCase === true && editing === true) {
+        let newTCData = { newTC: true }
+        setShowTCList([...showTCList, newTCData])
+        // }
+
+    }
+    function handleAddedTC() {
+        if (valueOfNewAddedCase !== null && valueOfNewAddedCase.length) {
+            let addedNewTCName = { name: valueOfNewAddedCase }
+            let tempListOfNewTC = [...showTCList];
+            const data = tempListOfNewTC.splice(tempListOfNewTC.length - 1, 1, addedNewTCName);
+            setShowTCList(tempListOfNewTC)
+            setValueOfNewAddedCase(null)
+            setEditing(true);
+        }
+    }
+    function passingTSGDataTolist() {
+
 
     }
     const items = handlingBreadCrumb();
@@ -119,19 +180,6 @@ const FolderViewRightContainer = (props) => {
 
             data.id = 0;
             data.display_name = data.name
-            for (let cases = 0; cases < data?.children?.length; cases++) {
-                //here every TestCases will looped
-                for (let steps = 0; steps < data.children[cases].children.length; steps++) {
-                    //here every TestStepGroup looped for screen 
-                    let parentScreen = []
-                    parentScreen = data.children[cases].children[steps].parent;
-                    parentScreen.parent.id = data?.children[cases].id;
-                    data.children[cases].children[steps] = parentScreen;
-                    // setStepKey(steps)
-                }
-
-                data.children[cases] = data?.children[cases]
-            }
             if (eventsOfFolder.onSelect.data[0].layer === 'layer_2') {
                 const findingIndexOfTCToAddTSG = data.children.findIndex((e) => e._id === selectedTCForAddingTSG._id)
                 let TSuitChild = data.children;
@@ -263,25 +311,11 @@ const FolderViewRightContainer = (props) => {
     //     setParentScreenData(data);
 
     // }
-    useEffect(() => {
-        if (eventsOfFolder.createNewTestSuit !== null) {
-            if (eventsOfFolder.createNewTestSuit.length) {
-                modifyingStepGroupToParentAndSaveFun()
-            }
-        }
-        if (eventsOfFolder.reNamingOfTS !== null) {
-            if (eventsOfFolder.reNamingOfTS[0].length) {
-                handleRenamingNodes()
-            }
-        }
-        if (eventsOfFolder.reNamingOfTestCase !== null) {
-            if (eventsOfFolder.reNamingOfTestCase[0].length) {
-                handleRenamingNodes()
-            }
-        }
-    }, [eventsOfFolder.createNewTestSuit, eventsOfFolder.reNamingOfTS, eventsOfFolder.reNamingOfTestCase]);
 
 
+    function handleSaveButton() {
+
+    }
 
     return (
         <div className='folderViewRightMaincontainer'>
@@ -296,21 +330,27 @@ const FolderViewRightContainer = (props) => {
                         <div className='childOfSuites'>
 
                             {eventsOfFolder?.onSelect?.data[0]?.layer === "layer_1" ? (
-                                selectedScreen?.map((e, i) => {
+                                // {console.log("showTCList",showTCList)}
+                                showTCList.map((e, i) => {
                                     return (
                                         <div className='testCaseList'>
                                             <img className='testCaseImg' src="static/imgs/node-scenarios.svg" alt="node-scenarios" />
-                                            {e?.data[0]?.addTestCase === true && editing === true ?
+
+                                            {eventsOfFolder.addNewTestCase === true && editing === true && e.newTC === true ?
                                                 <InputText className='inputOfCase' value={valueOfNewAddedCase}
-                                                    placeholder="enterNewTestCaseName"
-                                                    onChange={(e) => { setValueOfNewAddedCase(e.target.value); }}
-                                                    onBlur={() => { if (valueOfNewAddedCase.length > 0) { { setEditing(false); } } }}
+                                                    // placeholder=" "
+                                                    onChange={(e) => { setValueOfNewAddedCase(e.target.value) }}
+                                                    onBlur={() => { if (valueOfNewAddedCase !== null && valueOfNewAddedCase.length > 0) { { setEditing(false); } } }}
                                                     // Handle click outside the input
                                                     onKeyDown={(e) => {
                                                         if (e.key === 'Enter') {
                                                             setEditing(false)
                                                             setValueOfNewAddedCase(e.target.value);
+                                                            dispatch(typeOfOprationInFolder({ addNewTestCase: false }))
                                                             modifyingStepGroupToParentAndSaveFun()
+                                                            handleAddedTC()
+
+                                                            // modifyingStepGroupToParentAndSaveFun()
                                                             // addNewTestCase()
                                                         }
                                                         else {
@@ -319,19 +359,49 @@ const FolderViewRightContainer = (props) => {
                                                         }
                                                     }}
                                                     autoFocus /> : null}
-                                            {e?.data[0]?.addTestCase === true && editing === false ? <h3 className='testCaseTxt' key={i}>{valueOfNewAddedCase}</h3> : <h3 className='testCaseTxt' key={i}>{e?.data[0]?.testCaseName}</h3>}</div>
+                                            {eventsOfFolder.addNewTestCase === false && editing === false && e.newTC === true ? <h3 className='testCaseTxt' key={i}>{valueOfNewAddedCase}</h3> : <h3 className='testCaseTxt' key={i}>{e.name}</h3>}</div>
                                     )
 
 
-                                })) : null}
+                                }
+                                    // showTCList.map((e, i) => {
+                                    //     return(
+                                    //         <h3 className='testCaseTxt' key={i}>{e.name}</h3>
+                                    //     )
+                                    // }
+                                )) : null}
                             {eventsOfFolder?.onSelect?.data[0]?.layer === "layer_2" ? (
                                 <>
 
                                     {eventsOfFolder.onSelect.children.map((stepGrp, i) => (
                                         <div className='testCaseList' key={i}>
                                             <img className='testCaseImg' src="static/imgs/testStepGroup.png" alt="testStepGroup" />
-                                            <h3 className='testCaseTxt'>{stepGrp?.data[0]?.testStepGroupName}</h3>
+                                            {/* {eventsOfFolder?.addNewTestStepGroup === true && editingOfStep === true && e.newTSG === true ?
+                                                <InputText className='inputOfCase' value={valueOfNewAddedstepGrp}
+                                                    // placeholder=" "
+                                                    onChange={(e) => { setValueOfNewAddedstepGrp(e.target.value) }}
+                                                    onBlur={() => { if (valueOfNewAddedstepGrp !== null && valueOfNewAddedstepGrp.length > 0) { { setEditingOfStep(false); } } }}
+                                                    // Handle click outside the input
+                                                    onKeyDown={(e) => {
+                                                        ``
+                                                        if (e.key === 'Enter') {
+                                                            setEditingOfStep(false)
+                                                            setValueOfNewAddedstepGrp(e.target.value);
+                                                            dispatch(typeOfOprationInFolder({ addNewTestStepGroup: false }))
+                                                            // modifyingStepGroupToParentAndSaveFun()
+                                                            handleAddedTC()
 
+                                                            // modifyingStepGroupToParentAndSaveFun()
+                                                            // addNewTestCase()
+                                                        }
+                                                        else {
+                                                            // setValueOfNewAddedCase(e.target.value);
+                                                            // modifyingStepGroupToParent(); 
+                                                        }
+                                                    }}
+                                                    autoFocus /> : null}
+                                            {eventsOfFolder.addNewTestStepGroup === false && editingOfStep === false && e.newTSG === true ? <h3 className='testCaseTxt' key={i}>{valueOfNewAddedstepGrp}</h3> : <h3 className='testCaseTxt' key={i}>{stepGrp?.data[0]?.testStepGroupName}</h3>} */}
+                                            <h3 className='testCaseTxt'>{stepGrp?.data[0]?.testStepGroupName}</h3>
                                         </div>
                                     ))}
                                     {eventsOfFolder?.addNewTestStepGroup === true ? (
@@ -341,7 +411,7 @@ const FolderViewRightContainer = (props) => {
                                                     <img className='testCaseImg' src="static/imgs/testStepGroup.png" alt="testStepGroup" />
                                                     <InputText className='inputOfStepGrp'
                                                         value={valueOfNewAddedstepGrp}
-                                                        placeholder="enterNewTestStepGroup"
+                                                        // placeholder="enterNewTestStepGroup"
                                                         onChange={(e) => setValueOfNewAddedstepGrp(e.target.value)}
                                                         onBlur={() => { if (valueOfNewAddedstepGrp?.length > 0) setEditingOfStep(false); }}
                                                         onKeyDown={(e) => {
@@ -388,6 +458,7 @@ const FolderViewRightContainer = (props) => {
                                 //     </div>
                                 // </div> 
                                 : null}</div>}
+                    <Button onClick={() => handleSaveButton()} className="saveButton" label='Save' />
                     <SaveMapButton setBlockui={props.setBlockui} createnew={createnew} verticalLayout={verticalLayout} dNodesFolder={parentScreenData} />
                     {/* <Button style={{width:'7rem',height:"3rem"}} className=""  label="cancel" />
                                 <Button style={{width:'7rem',height:"3rem"}}className=""  label="save" /> */}
