@@ -7,6 +7,7 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
         const iceExecReq=resultData.execReq;
+        const username = userInfo.username;
             if (!status) { // This block is for report data
                 if ("accessibility_reports" in resultData) {
                     const accessibility_reports = resultData.accessibility_reports
@@ -73,7 +74,7 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                         queue.Execution_Queue.add_pending_notification("", report_result, username);
                     }
                 } catch (ex) {
-                    logger.error("Exception while returning execution status from function " + fnName + ": %s", ex);
+                    logger.error("Exception while returning execution status from function result_executeTestSuite: %s", ex);
                 }
             }
    
