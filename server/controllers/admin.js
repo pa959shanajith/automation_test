@@ -1829,7 +1829,7 @@ exports.provisionICE = async (req, res) => {
 			    lastname: tokeninfo.lastName,
 				username: tokeninfo.username,
 			}
-			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData, hostName: req.headers.host});
 		}
 		res.send(result);
 	} catch (exception) {
@@ -2198,7 +2198,8 @@ exports.manageNotificationChannels = async (req, res) => {
 			action: action,
 			name: (conf.name || "").trim(),
 			channel: (conf.channel || "").trim(),
-			provider: (conf.provider || "").trim()
+			provider: (conf.provider || "").trim(),
+			host: req.headers.host
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete","enable","disable"].indexOf(action) == -1) {
@@ -2250,6 +2251,7 @@ exports.getNotificationChannels = async (req, res) => {
 		const channel = req.body.channel;
 		const args = req.body.args;
 		let inputs = { action };
+		inputs.host = req.headers.host;
 		if (action != "list") {
 			inputs.name = args;
 			inputs.channel = channel;

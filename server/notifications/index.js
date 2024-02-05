@@ -6,11 +6,12 @@ const notfEvents = ["test", "report", "userUpdate", "schedule", "iceAssign", "pr
 const channels = {};
 const preferences = {};
 
-module.exports.initalize = async () => {
+module.exports.initalize = async (hostName) => {
 	const fnName = "initalizeNotification";
 	const inputs = {
 		action: "list",
-		filter: "active"
+		filter: "active",
+		host: hostName
 	};
 	const chList = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
 	if (chList == "fail") return logger.error("Failed to initialize notification module");
@@ -50,6 +51,13 @@ module.exports.test = async (channel, data, conf) => {
 }
 
 module.exports.notify = async (event, data, channel) => {
+
+	// initilize the email object if channels are empty
+	if (Object.keys(channels).length === 0) {
+		const hostName = data["hostName"];
+		await this.initalize(hostName);
+	}
+
 	if (!notfEvents.includes(event)) {
 		logger.error("Unable to send notification for Event: '"+event+"', No such event exists.")
 		return {error: { msg: "Notification event "+event+" not found", code: "UNKNOWN_EVENT"}};
@@ -79,6 +87,16 @@ module.exports.notify = async (event, data, channel) => {
 		} catch (e) {
 			logger.error("Error occured while sending "+ch+" notification, Error: "+e);
 			return {error: { msg: "Error occured while sending "+ch+" notification", code: "SEND_ERROR"}};
+		}
+	}
+
+	// destroying all the email object once mail is sent
+	if (Object.keys(channels).length !== 0) {
+		for (const key in channels) {
+			if (key == "email" && channels.hasOwnProperty(key)) {
+				await channels[key].destroy();
+				delete channels[key];
+			}
 		}
 	}
 };

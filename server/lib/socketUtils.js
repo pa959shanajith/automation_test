@@ -47,6 +47,7 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                         }
                         // testsuite.reportData[scenarioIndex] = reportItem;
                         testsuite.reportData.push(reportItem);
+                        queue.Execution_Queue.execReqs.push(testsuite);
                     }
                 } catch (ex) {
                     logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
