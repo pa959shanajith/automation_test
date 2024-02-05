@@ -83,7 +83,11 @@ const ElementRepository = (props) => {
             else if(screens === "no orderlist present") {
               setScreenData([]);
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
-            else setScreenData(screens.screenList);
+            else {
+              setScreenData(screens.screenList);
+              setScreenId(false);
+            }
+            console.log("value is set to true")
         } catch (error) {
             console.error('Error fetching User list:', error);
         }
