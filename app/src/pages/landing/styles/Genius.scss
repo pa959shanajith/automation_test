@@ -361,3 +361,24 @@ bottom: 1rem;
 left: 25rem;
 cursor: no-drop !important;
 }
+
+.migrate-help-btn {
+  padding: 0 !important;
+  color: #6c757d !important;
+}
+
+.migrate-help-ol {
+  margin-left: 15px;
+}
+
+.migrate-sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+}
+
+.migrate-sidebar-icon {
+  width: 100%;
+}

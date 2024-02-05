@@ -104,6 +104,7 @@ const CaptureModal = (props) => {
   const [idx, setIdx] = useState(0);
   const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
   let NameOfAppType = projectAppType
+  const imageRef0 = useRef(null);
   const imageRef1 = useRef(null);
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
@@ -1857,6 +1858,32 @@ const screenOption = screenData?.map((folder) => ({
         {
           typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
             <div className="capture_card_modal">
+              {/* Select From Repository */}
+              <div className="capture_card">
+                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  {/* <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Add Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Map Element</p>
+                  </div> */}
+                  {/* <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} className="w-full" /> */}
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                </div>}
+              </div>
               {/* In Sprint Automation */}
               <div className="capture_card">
                 <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
@@ -1865,7 +1892,7 @@ const screenOption = screenData?.map((folder) => ({
                 <div className="capture_card_top_section">
                   <h4 className="capture_card_header">In Sprint Automation</h4>
                   <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img insprintToolTip" ref={imageRef1} onMouseEnter={() => handleMouseEnter("insprint")} onMouseLeave={() => handleMouseLeave("insprint")} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                    <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">

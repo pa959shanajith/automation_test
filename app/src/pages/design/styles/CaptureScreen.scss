@@ -772,7 +772,7 @@
   flex-direction: column;
   padding:15px;
   font-family: "Open Sans";
-  width: 20%;
+  width: 17%; 
   gap: 2vh;
   border-right: 1px solid #e2e2ed;
 }
@@ -833,4 +833,14 @@
 }
 .import_export{
   position: relative;
+}
+.repo_dropdown{
+  font-family: "Open Sans";
+}
+.dropdown_container{
+  max-width: 100%;
+}
+.dropdown_container > div > span {
+  // color: initial;
+  font-size: 1vw;
 }
