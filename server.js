@@ -260,7 +260,6 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
 		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
@@ -285,7 +284,7 @@ if (cluster.isMaster) {
 		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
 		app.post('/save_testcase',generateAI.save_GenTestcases);
 		app.post('/fetch_git_exp_details',auth.protect, mindmap.fetch_git_exp_details);
-		
+		app.post('/saveTag', mindmap.saveTag);
 
 		app.use(csrf({
 		cookie: true
@@ -626,6 +625,8 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/debugTestCase_ICE', auth.protect, design.debugTestCase_ICE);
 		app.post('/getKeywordDetails_ICE', auth.protect, design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', auth.protect, design.getTestcasesByScenarioId_ICE);
+		app.post('/createKeyword', auth.protect, design.createKeyword);
+		
 		//Webservices APIs
 		app.post('/execRequest', auth.protect, design.executeRequest);
 		app.post('/oauth2', auth.protect, design.oAuth2auth);
@@ -755,6 +756,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
 		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+
+		// Create Multiple Ldap Users
+		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMultipleLdapUsers);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

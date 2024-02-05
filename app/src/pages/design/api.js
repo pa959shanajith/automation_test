@@ -1774,6 +1774,25 @@ export const stopScrapingSAPGenius_ICE = screenViewObject => {
         .catch(err => reject(err))
     });
 }
+export const createKeyword = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/createKeyword", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
 export const saveTag = async(tagsData) => {
     try{
         const res = await axios(url+'/saveTag', {

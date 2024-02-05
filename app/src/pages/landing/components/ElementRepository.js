@@ -59,6 +59,7 @@ const ElementRepository = (props) => {
   const refreshRepository = useSelector((state) => state.landing.updateElementRepository);
   const [updatePastedData, setUpdatPastedData] = useState(false);
   const [updateDeleteCurrentElements, setUpdateDeleteCurrentElements] = useState(false);
+  const [deleteScreens, setDeleteScreens] = useState(false);
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -82,7 +83,10 @@ const ElementRepository = (props) => {
             else if(screens === "no orderlist present") {
               setScreenData([]);
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
-            else setScreenData(screens.screenList);
+            else {
+              setScreenData(screens.screenList);
+              setScreenId(false);
+            }
         } catch (error) {
             console.error('Error fetching User list:', error);
         }
@@ -254,7 +258,9 @@ const handleAccordionNameEdit = (index, newName) => {
       setContextMenuModel([
         {
           label: 'Paste',
-          icon: 'pi pi-paste',
+          icon: <img
+                 src="static/imgs/paste_icon.svg"
+                />,
           command: () => pasteRow(accordionId),
         },
       ]);
@@ -268,7 +274,9 @@ const handleAccordionNameEdit = (index, newName) => {
         },
         {
           label: 'Paste',
-          icon: 'pi pi-paste',
+          icon: <img
+                  src="static/imgs/paste_icon.svg"
+                />,
           command: () => pasteRow(accordionId),
         },
       ]);
@@ -290,8 +298,6 @@ const handleAccordionNameEdit = (index, newName) => {
 
     elementVals.find(v => v.key === key).value = value;
 
-
-    console.log(elementVals)
   };
   const textEditor = (options) => {
     return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
@@ -489,27 +495,13 @@ const handleAccordionNameEdit = (index, newName) => {
 
 
 const handleSave = (value, cellValue, customFlag = '') => {
-  // let localScrapeItems = screenData.map((screen)=>{
-  //    if(screen["_id"] === value){
-  //     return screen.related_dataobjects;
-  //    }
-  // });
+  const filteredScreens = screenData.filter((screenitem) => { return screenitem.related_dataobjects.find((element) => element._id === value)});
+  const localScrapeItems = [];
+  filteredScreens.forEach(item => {
+    console.log(item.related_dataobjects)
+    localScrapeItems.push(item.related_dataobjects);
+  });
 
-  // const screenWithObject = screenData.find(screen => {
-  //   return screen.related_dataobjects && screen.related_dataobjects.find(obj => obj._id === value);
-  // });
-
-  // if (screenWithObject) {
-  //   const foundObject = screenWithObject.related_dataobjects.find(obj => obj._id === value);
-
-  //   console.log(foundObject);}
-  console.log(screenData);
-
-
-  const filteredScreens = screenData.filter((screenitem) => { return screenitem.related_dataobjects.some((element) => element._id === value)});
-  console.log(filteredScreens)
-  const localScrapeItems = filteredScreens.map((screen) =>{ return screen.related_dataobjects});
-  // let updNewScrapedData = { ...newScrapedCapturedData };
   let objId = "";
   let isCustom = false;
   let obj = null;
@@ -519,8 +511,11 @@ const handleSave = (value, cellValue, customFlag = '') => {
         if (item["_id"] === value) {
           item.title = cellValue;
           item.custname = cellValue;
-          // Additional conditions and updates can be added here
-          if (objId) obj = { ...item["_id"], custname: cellValue };
+          objId = item["_id"];
+          if (item["_id"]) {
+            const id = item["_id"];
+            obj = {id,custname: cellValue };
+          }
         }
       }
     }
@@ -528,18 +523,8 @@ const handleSave = (value, cellValue, customFlag = '') => {
         if (scrapeItem["_id"] === value) {
           scrapeItem.title = cellValue;
           scrapeItem.custname=cellValue
-          // if (customFlag) {
-          //   scrapeItem.tag = cellValue.tag;
-          //   scrapeItem.url = cellValue.url;
-          //   scrapeItem.xpath = cellValue.xpath;
-          //   scrapeItem.editable = true;
-          // }
-          // objId = scrapeItem.objId;
-          // isCustom = scrapeItem.isCustom;
-          // console.log("mainScrapedData.view[scrapeItem.objIdx]", mainScrapedData.view[scrapeItem.objIdx]);
-          if (objId) obj = { ...scrapeItem["_id"], custname: cellValue };
-          // else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedCapturedData?.view[scrapeItem.objIdx], custname: cellValue }
-          // else only if customFlag is true
+          if (scrapeItem["_id"]) obj = {...scrapeItem["_id"],custname: cellValue };
+          
         };
       }
   }
@@ -550,11 +535,29 @@ const handleSave = (value, cellValue, customFlag = '') => {
     modifiedDict[objId] = obj;
     setModified(modifiedDict);
   }
-  // else if (!isCustom) setNewScrapedData(updNewScrapedData);
-  // if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
-  // setScrapeItems(localScrapeItems);
-  // setSaveDisable(false);
 }
+
+  useEffect(()=>{
+    if(modified.length>0){
+    let modifiedObjects = Object.values(modified);
+    let params = {
+      'modifiedObj': modifiedObjects,
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'renameElenemt',
+    }
+  
+    scrapeApi.updateScreen_ICE(params)
+      .then(response =>  {
+        if (response == "Success") {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element name changed successfully', life: 5000 });
+          dispatch(loadUserInfoActions.updateElementRepository(true));
+      }
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+      }
+    })}
+  },[modified])
 
 
 const onCellEditComplete = (e) => {
@@ -758,7 +761,7 @@ const saveScreens = (screenDetails) => {
     })
   }
 
-const deleteScreens = (index, screenDetails)=>{
+const deleteScreen = (index, screenDetails)=>{
     // const allScreenData = [...screenData]
     const updatedScreenData = screenData.filter(screen => screen._id !== screenDetails._id);
       setScreenData(updatedScreenData);
@@ -816,7 +819,7 @@ const deleteScreens = (index, screenDetails)=>{
                   "name": screenDetails.name,
                   "projectId": defaultselectedProject.projectId
                 })}} className='edit-text'/>
-                <Button label="Delete" severity="danger" onClick={()=>deleteScreens(index,screenDetails)} className='delete-text'/>
+                <Button label="Delete" severity="danger" onClick={(e)=>{e.stopPropagation();setDeleteScreens(true)}} className='delete-text'/>
                 
               </div>
               </>)}
@@ -841,6 +844,14 @@ const deleteScreens = (index, screenDetails)=>{
               <Column field="actions" header="Actions" body={(rowData)=>renderActionsCell(screenDetails,rowData)} headerStyle={{ justifyContent: "center"}}/>
               {/* <Column field="age" header="Age"></Column> */}
             </DataTable>
+            <AvoConfirmDialog
+              visible={deleteScreens}
+              onHide={() => setDeleteScreens(false)}
+              showHeader={false}
+              message="Are you sure you want to delete the repository"
+              icon="pi pi-exclamation-triangle"
+              accept={()=>deleteScreen(index,screenDetails)} />
+
             <AvoConfirmDialog
               visible={deleteElements}
               onHide={() => setDeleteElements(false)}

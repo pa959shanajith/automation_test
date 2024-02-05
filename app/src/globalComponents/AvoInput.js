@@ -13,7 +13,11 @@ const AvoInput = ({
   setInputTxt,
   customClass = "",
   icon = null,
-  charCheck = false
+  charCheck = false,
+  isNameValid,
+  setIsSpaceError,
+  nameInput,
+  isSpaceError,
 }) => {
   const [touched, setTouched] = useState(false);
   const inputJsx = (
@@ -37,8 +41,10 @@ const AvoInput = ({
         <InputText
           {...(htmlFor && { id: htmlFor })}
           placeholder={placeholder}
+          className={`${(isNameValid || isSpaceError) && 'p-invalid'}`}
           value={inputTxt}
           onInput={(e) => {
+            const inputValue = e.target.value;
             if (e.target.value === '') {
               setInputTxt('');
             } else {
@@ -47,7 +53,17 @@ const AvoInput = ({
               return;
             }
           }
+          if(nameInput && nameInput == 'name'){
+            if (/\s/.test(inputValue)) {
+              setInputTxt(inputValue.trim()); 
+              setIsSpaceError(true);
+            } else {
+              setIsSpaceError(false);
+              setInputTxt(inputValue); 
+            }
+          }else{
             setInputTxt(e.target.value);
+          }
           }}
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}

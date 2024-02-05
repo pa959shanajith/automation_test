@@ -152,7 +152,8 @@ const Messages={
         ERR_FILE_FORMAT: {"CONTENT":"Please Check the file format you have uploaded.", "VARIANT": VARIANT.ERROR},
         ERR_JSON_IMPORT: {"CONTENT":"Incorrect JSON imported. Please check the contents.", "VARIANT": VARIANT.ERROR},
         ERR_TC_JSON_IMPORT: {"CONTENT":"Failed to Import Test Steps JSON.", "VARIANT": VARIANT.ERROR},
-        
+        ERR_CUSTOMKEY_NOT_ENTERED:{"CONTENT":"Failed to communicate with the server", "VARIANT": VARIANT.ERROR},
+
         SUCC_TC_SAVE: {"CONTENT":"Test Steps saved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_DEBUG: {"CONTENT":"Debug completed successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TC_IMPORT: {"CONTENT":"Test Steps Json imported successfully.", "VARIANT": VARIANT.SUCCESS},
@@ -160,11 +161,15 @@ const Messages={
         SUCC_TASK_REASSIGN: {"CONTENT":"Task Reassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_APPROVED: {"CONTENT":"Task Approved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SUBMIT: {"CONTENT":"Task Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
-        
+        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"Keyword Created successfully.Sent for approval", "VARIANT": VARIANT.SUCCESS},
+
         WARN_DELETED_TC_FOUND: {"CONTENT":"Deleted objects found in some teststeps, Please delete or modify those steps.", "VARIANT": VARIANT.WARNING},
         WARN_DELETE: {"CONTENT":"No steps to Delete.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_STEP: {"CONTENT":"Select steps to delete.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_STEP_DEL: {"CONTENT":"Select step to edit.", "VARIANT": VARIANT.WARNING},
+        WARN_DROPDOWN_SELECTED_NOT_ENTERED:{"CONTENT":"Select the type", "VARIANT": VARIANT.WARNING},
+        WARN_CUSTOMKEY_NOT_ENTERED:{"CONTENT":"Keyword cannot be empty", "VARIANT": VARIANT.WARNING},
+        WARN_ACE_EDITOR_NOT_ENTERED:{"CONTENT":"Editor cannot be empty", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_STEP_COPY: {"CONTENT":"Select step to copy.", "VARIANT": VARIANT.WARNING},
         WARN_NO_TC_PASTE: {"CONTENT":"No Test Steps to Paste. Please Copy Test Step(s) before Pasting.", "VARIANT": VARIANT.WARNING},
         WARN_DIFF_PROJTYPE: {"CONTENT":"Project Type is not same.", "VARIANT": VARIANT.WARNING},
