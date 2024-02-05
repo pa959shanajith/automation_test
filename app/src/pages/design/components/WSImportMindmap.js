@@ -151,8 +151,8 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         //   setDisplayCreateModule(false);
          
           const newModule={
-            key:modulesdata[modulesdata.length-1]._id,
-            text:modulesdata[modulesdata.length-1].name
+            key:response,
+            text:data['CollectionName']
           }
           setSelectedModule(newModule)
           // var moduledata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.key : "", "moduleid": [selectedModule.key], cycId: null })
