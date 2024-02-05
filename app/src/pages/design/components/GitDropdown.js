@@ -194,7 +194,7 @@ const GitDropdown = (props) => {
       <Dialog
         header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configurations'}
         visible={dialogVisible}
-        style={{ width: '58vw', height: '85vh' }}
+        style={ selectedImage === 'commit' ? { width: "50vw",  height: '85vh'} : { width: "58vw",  height: '85vh' }}
         onHide={() => setDialogVisible(false)}
         footer={selectedImage === 'commit' ? commitFooter : selectedImage === 'version_history' ? ' ' : dialogFooter}
         className='gitVersion_dialog Git-config_cls'

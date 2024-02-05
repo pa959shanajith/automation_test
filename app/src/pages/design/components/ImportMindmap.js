@@ -361,7 +361,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         { name: 'Select Import Format', code: 'NY', value:'def-val', disabled:true },
         { name: 'Multi Test Suite Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'excel'},
         { name: 'Single test Suite Structure only - Excel(.xls,.xlsx)', code: 'RM', value:'xls'},
-        { name:'Git',code:'GT',value:'git'},
+        // { name:'Git',code:'GT',value:'git'},
         { name: 'Structure only - Json (.json)', code: 'LDN', value:'json' },
         { name: 'Complete Test Suite(S) (.zip)', code: 'IST', value:'zip' }
     ]

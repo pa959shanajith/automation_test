@@ -170,7 +170,7 @@ const UserList = (props) => {
                     </>}
                 width={{ width: "5rem" }}
             />
-            <DataTable value={data} editMode="row" size='normal'
+            <DataTable value={data} editMode="row" size='small'
                 loading={loading}
                 globalFilter={globalFilter}
                 header={header}

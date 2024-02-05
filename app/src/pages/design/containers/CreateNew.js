@@ -194,16 +194,18 @@ const CreateNew = ({ importRedirect }) => {
                                         placeholder={<div style={{display:"flex", alignItems:"center", height:"1rem"}}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
                                     />                                    
                                 </div>
-                                <GitDropdown
-                                        toastError={toastError}
-                                        toastSuccess={toastSuccess}
-                                        toastWarn={toastWarn}
-                                        appType={Proj.appType}
-                                        projectName={Proj.projectName}
-                                        projectId={Proj.projectId}
-                                        userId={userInfo.user_id}
-                                        toast={toast}
-                                />
+                                <div className='git_configuration_dropdown'>
+                                    <GitDropdown
+                                            toastError={toastError}
+                                            toastSuccess={toastSuccess}
+                                            toastWarn={toastWarn}
+                                            appType={Proj.appType}
+                                            projectName={Proj.projectName}
+                                            projectId={Proj.projectId}
+                                            userId={userInfo.user_id}
+                                            toast={toast}
+                                    />
+                                </div>
                                 {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
                             </div>
                         </div>
@@ -231,8 +233,6 @@ const CreateNew = ({ importRedirect }) => {
                             
                         </div>
                         <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> </>}
-
-                        
 
                         {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <div id='mp__canvas' className='mp__canvas'>
                             {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?

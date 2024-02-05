@@ -7,9 +7,8 @@ import { importGitMindmap } from '../api';
 import { Button } from 'primereact/button';
 import { Toast } from "primereact/toast";
 import { Dropdown } from 'primereact/dropdown';
-import 'primeicons/primeicons.css';
+import { Tooltip } from 'primereact/tooltip';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { getModules, getScreens, updateTestSuiteInUseBy } from '../api';
 import { screenData, moduleList, selectedModuleReducer, selectedProj } from '../designSlice'
 import CreateProject from '../../landing/components/CreateProject';
@@ -44,6 +43,8 @@ const GitVersionHistory = (props) => {
   const [versionname, setVersionname] = useState("");
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
   const [projectListDropdown, setProjectListDropdown] = useState([]);
+  const [allProjectlist, setAllProjectlist] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
   if (localStorageDefaultProject) {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
@@ -52,8 +53,8 @@ const GitVersionHistory = (props) => {
     { field: 'sno', header: 'Sno' },
     { field: 'version', header: 'Version' },
     { field: 'datetime', header: 'datetime' },
-    { field: 'Comments', header: 'Comments' },
-    { field: 'Status', header: 'Status' },
+    { field: 'comments', header: 'Comments' },
+    { field: 'status', header: 'status' },
   ];
 
   const DateTimeFormat = (inputDate) => {
@@ -96,7 +97,7 @@ const GitVersionHistory = (props) => {
     }
     return output;
   }
-  
+
   useEffect(() => {
     (async () => {
       const projectList = await fetchProjects({ readme: "projects" });
@@ -104,7 +105,7 @@ const GitVersionHistory = (props) => {
       const projectListForDropdown = [];
       const arrayNew = projectList.map((element, index) => {
         const lastModified = DateTimeFormat(element.releases[0].modifiedon);
-        projectListForDropdown.push({"name": element.name, "id": element._id})
+        projectListForDropdown.push({ "name": element.name, "id": element._id })
         return {
           key: index,
           projectName: element.name,
@@ -120,6 +121,7 @@ const GitVersionHistory = (props) => {
       });
       setProjectListDropdown(projectListForDropdown);
       const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
+      setAllProjectlist(sortedProject);
       console.log("sortedProject", sortedProject);
     })();
   }, []);
@@ -134,7 +136,7 @@ const GitVersionHistory = (props) => {
     }
   }, []);
 
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,20 +144,23 @@ const GitVersionHistory = (props) => {
         const jsonData = await fetch_git_exp_details(props.projectId);
         setVersionname(jsonData[0].version);
         const mappedData = jsonData.map((item, index) => ({
+          key: index,
           sno: index + 1,
           version: item.version,
           datetime: item.modifiedon,
-          Comments: item.commitmessage,
+          comments: item.commitmessage,
           status: item.gittask,
-          selectedProject: "",          
+          selectedProject: {},
         }));
         setData(mappedData);
+        setDataLoading(false);
       } catch (error) {
         toast.current.show({
           severity: 'error',
           summary: 'Error Message',
           detail: ' Please select a Project which has no test suite.',
         });
+        setDataLoading(false);
       }
     };
     fetchData();
@@ -176,75 +181,99 @@ const GitVersionHistory = (props) => {
     toast.current.show({ severity: 'error', summary: 'Error', detail: error, life: 2000 })
   }
 
-  const handleRestore = async () => {
-    var data = await importGitMindmap({
-      "appType": props.appType,
-      "expProj": sourceProjectId,
-      "gitVersion": versionname,
-      "projectId": desProjectId,
-      "projectName": props.projectName
-    });
-    if (data.error) {
-      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
-      ; return;
-    }
-    else if (data === "InProgress") { Toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-    else if (data === "dupMod") { Toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-    else if (data === "dupSce") { Toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-    else if (data === "appType") { Toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DIFF_APP_TYPE.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-    else toast.current.show({ severity: 'success', summary: 'Success', detail: ' testsuites Restored sucessfully  ', life: 3000 });
+  const handleRestore = (rowdata) => {
+    (async () => {
+      let rowSelectedProject = allProjectlist.find(projectdetails => {
+        if (projectdetails.projectId === rowdata.selectedProject.id) {
+          return projectdetails
+        }
+      })
+      ResetSession.start();
+      let data = await importGitMindmap({
+        "appType": rowSelectedProject.appType,
+        "expProj": sourceProjectId,
+        "gitVersion": rowdata.version,
+        "projectId": rowdata.selectedProject.id,
+        "projectName": rowdata.selectedProject.name
+      });
+      if (data.error) {
+        // toast.current.show({ severity: 'error', summary: 'Error', detail: data.error, life: 3000 });
+        if (data.error === "No entries") {
+          displayError(data.error); ResetSession.end();
+          return;
+        }
+        else {
+          displayError(data.error.CONTENT);
+        }
+        ResetSession.end();
+        return;
+      }
+      else if (data === "InProgress") { toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
+      else if (data === "dupMod") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
+      else if (data === "dupSce") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
+      else if (data === "appType") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DIFF_APP_TYPE.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
 
-    var req = {
-      "tab": "tabCreate",
-      "projectid": desProjectId,
-      "moduleid": null,
-      "query": "modLength"
-    };
-    var res = await getModules(req);
-    var Screen = await getScreens(desProjectId);
+      var req = {
+        "tab": "tabCreate",
+        "projectid": rowdata.selectedProject.id,
+        "moduleid": null,
+        "query": "modLength"
+      };
+      var res = await getModules(req);
+      var Screen = await getScreens(rowdata.selectedProject.id);
 
-    if (Screen.error) {
-      displayError(Screen.error);
-      ResetSession.end();
-      return;
-    }
-    setTimeout(function () {
-      dispatch(moduleList(res));
-      setImportPop(false);
-    }, 100);
+      if (Screen.error) {
+        displayError(Screen.error);
+        ResetSession.end();
+        return;
+      }
+      setTimeout(function () {
+        dispatch(moduleList(res));
+        setImportPop(false);
+      }, 100);
 
-    if (res.error) {
-      displayError(res.error.CONTENT);
-      ResetSession.end();
-      return;
-    }
-    var importData = res;
-    setBlockui({ show: false });
+      if (res.error) {
+        displayError(res.error.CONTENT);
+        ResetSession.end();
+        return;
+      }
+      toast.current.show({ severity: 'success', summary: 'Success', detail: ' Testsuites Restored sucessfully  ', life: 3000 });
+      // var importData = res;
+      setBlockui({ show: false });
+    })()
   };
 
-  const handleProjectSelecte = (proj) => {
-    console.log("setSourceProjectId", initProj)
+  const handleProjectSelect = (proj, rowData) => {
+    let rowdatacopy = { ...rowData }
+    rowdatacopy.selectedProject = proj;
+    let newRowData = [];
     setSourceProjectId(initProj);
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].key === rowData.key) {
+        newRowData.push(rowdatacopy);
+      } else {
+        newRowData.push(data[i]);
+      }
+    }
     (async () => {
       try {
         var reqForNewModule = {
-          "tab": "tabCreate", "projectid": proj, "moduleid": null, "query": "modLength"
+          "tab": "tabCreate", "projectid": proj.id, "moduleid": null, "query": "modLength"
         }
         var firstModld = await getModules(reqForNewModule)
         if (firstModld.length > 0) {
           toast.current.show({
             severity: 'error',
             summary: 'Error Message',
-            detail: '  Project which has no test suite.',
+            detail: 'Please select a Project which has no test suite.',
           });
           setIsButtonDisabled(true);
-          console.log("project have a test suite");
-
         }
         else {
+
           setDesProjectId(proj);
           setIsButtonDisabled(false);
-          // setDesProjectId(proj)
+          setData(newRowData);
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -252,18 +281,21 @@ const GitVersionHistory = (props) => {
     })()
 
   }
- 
+
   const handleCloseDialog = () => {
     setVisible(false);
   };
 
   const customItemTemplate = (option) => {
     const icon = hasTestsuite ? <img src="static/imgs/Testsuite.svg" alt="Testsuite" /> : <img src="static/imgs/NoTestsuite.svg" alt="NoTestsuite" />;
-    return (
-      <div className="custom-dropdown-item">
+    return (<>
+      <div className={`git-config-custom-dropdown-item`}>
         {icon}
-        <span className="project-name">{option.label}</span>
+      <Tooltip target={`.project-name${option.name}`} content={option.name} position='bottom-center' />
+        <span className={`project-name${option.name}`}>{option.name}</span>
       </div>
+    </>
+
     );
   };
 
@@ -271,20 +303,22 @@ const GitVersionHistory = (props) => {
     return (<React.Fragment>
       <div className='desination_cls'>
         <Dropdown
+          filter
           data-test="projectSelect"
           className='projectSelect'
-          value={ sourceProjectId ? sourceProjectId : initProj }
+          value={rowData.selectedProject}
           options={projectListDropdown}
-          onChange={(e) => handleProjectSelecte(e.value)}
+          onChange={(e) => handleProjectSelect(e.value, rowData)}
           placeholder="Select a Project"
           panelFooterTemplate={panelFooterTemplate}
           itemTemplate={customItemTemplate}
+          optionLabel="name"
         />
         <Button
           data-test="git-restore"
           label="Restore"
           title="restore"
-          onClick={(e) => handleRestore(e)}
+          onClick={() => handleRestore(rowData)}
           className='restore_cls'
           disabled={rowData.selectedProject !== "" ? false : true}
         />
@@ -293,7 +327,14 @@ const GitVersionHistory = (props) => {
   }
   return (
     <div className="import_cls">
-      <DataTable value={data}>
+      <DataTable value={data}
+        loading={dataLoading}
+        size={"Normal"}
+        emptyMessage={"No results found"}
+        showGridlines
+        scrollable
+        scrollHeight="383px"
+        virtualScrollerOptions={{ itemSize: 46 }}  >
         {columns.map((col, i) => (
           <Column key={col.field} field={col.field} header={col.header} />
         ))}
