@@ -2044,17 +2044,17 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
             dNodes[uNix] = new_obj_data_for_uNix_1
         }else{
             if(lt === true && dNodes[pi].type === 'teststepsgroups'){
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
-                getChildUpdate(dNodes, newObject)
-                dNodes[pi] = newObject;
+                const newObjecttc = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObjecttc)
+                dNodes[pi] = newObjecttc;
             }else if(dNodes[pi].type === 'teststepsgroups'){
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, parent:dNodes[pi].parent.parent , children:[dNodes[uNix]]}}] };
                 getChildUpdate(dNodes, newObject)
                 dNodes[pi] = newObject;
             }else{
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
-                getChildUpdate(dNodes, newObject)
-                dNodes[pi] = newObject;
+                const newObjectsc = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObjectsc)
+                dNodes[pi] = newObjectsc;
             }
         
         }
