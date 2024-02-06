@@ -246,7 +246,7 @@ io.on('connection', async socket => {
 		var clientName=utils.getClientName(host);
 		const notifySocMap = socketMapNotify[clientName];
 		const resSent = true;
-		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent);
+		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent,socket);
 	});
 
 	socket.on("scrape", async (message)=>{
