@@ -83,7 +83,7 @@ module.exports.notify = async (event, data, channel) => {
 			return error;
 		}
 		try {
-			channels[ch].send(msg, receivers);
+			await channels[ch].send(msg, receivers);
 		} catch (e) {
 			logger.error("Error occured while sending "+ch+" notification, Error: "+e);
 			return {error: { msg: "Error occured while sending "+ch+" notification", code: "SEND_ERROR"}};
