@@ -1,9 +1,8 @@
-const mySocket = require('./socket')
 var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
 let execInfo = undefined;
 
-const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
+const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent,mySocket)=>
 {
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
