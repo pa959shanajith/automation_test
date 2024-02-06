@@ -247,8 +247,8 @@ const checkchildrentask = (childNode, children_flag) => {
     return children_flag;
 }
 
-const recurseDelParent = (d,d1, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) => {
-    if (d.children) d.children.forEach((e) => { recurseDelParent(d1,e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
+const recurseDelParent = (d, d1, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) => {
+    if (d.children) d.children.forEach((e) => { recurseDelParent(d1, e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
     if (d.state === "deleted") return;
     if (d._id) {
         var parentid = d.parent._id;
@@ -338,7 +338,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                             ...child.parent.data,
                             id: child.parent.id ? child.parent.id : parentId,
                             parent: child.parent ? child.data.parent : null,
-                            children:[{...child.data,id: child.id ? child.id : generateId(parentId, childIdx + 1)}] // Use the parent's ID as the unique identifier
+                            children: [{ ...child.data, id: child.id ? child.id : generateId(parentId, childIdx + 1) }] // Use the parent's ID as the unique identifier
                         }
                     };
 
@@ -354,7 +354,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                 ...d.data,
                 x: d.x,
                 y: d.y,
-                id: d.id?d.id:idx,
+                id: d.id ? d.id : idx,
                 parent: d.parent ? d.data.parent ? {
                     ...d.data.parent,
                 } : {
@@ -818,7 +818,6 @@ export const moveNodeEndForJourney = (pi, dNodes, dLinks, linkDisplay, temp, ver
     let f;
     let g;
     let h;
-    console.log(dNodes[0])
     if (dNodes[pi].type === 'teststepsgroups') {
         for (let d = 0; d < dNodes.length; d++) {
             if (dNodes[d].children.length > 0 && dNodes[d].children[0].name === dNodes[pi].name) {
@@ -987,7 +986,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         state: 'created',
         path: '',
         name: nNext[pt][0] === 'Scenario' ? tempName : tempName,
-        parent: nNext[pt][0] === 'Scenario' ? dNodes[pi] :  {
+        parent: nNext[pt][0] === 'Scenario' ? dNodes[pi] : {
             id: uNix,
             children: [],
             y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
@@ -1034,7 +1033,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     x: dNodes[pi].children[0].x,
                     y: dNodes[pi].children[0].y,
                     children: [...dNodes[pi].children],
-                    parent:{...dNodes[uNix].parent, parent:dNodes[pi].parent.parent, children:[{...dNodes[uNix],id:dNodes[pi].children[0].id}]}
+                    parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [{ ...dNodes[uNix], id: dNodes[pi].children[0].id }] }
                 }]
             };
 
@@ -1046,8 +1045,8 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             const new_obj_data_for_uNix = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
             dNodes[uNix] = new_obj_data_for_uNix
         } else {
-            if(dNodes[pi].type === 'teststepsgroups'){
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent,parent:dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent:{...dNodes[pi].parent, children:[{...dNodes[pi].parent.children[0],children:[dNodes[uNix]]},dNodes[uNix]]} };
+            if (dNodes[pi].type === 'teststepsgroups') {
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent: { ...dNodes[pi].parent, children: [{ ...dNodes[pi].parent.children[0], children: [dNodes[uNix]] }, dNodes[uNix]] } };
                 getChildUpdate(dNodes, newObject)
                 const new_obj_data_for_uNix = newObject.children[0]
                 dNodes[uNix] = new_obj_data_for_uNix
@@ -1186,22 +1185,22 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
     //     setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
     //     return;
     // }
-    if(dNodes[sid].type==='teststepsgroups'){
-        if(dNodes[sid].children.length>0){
+    if (dNodes[sid].type === 'teststepsgroups') {
+        if (dNodes[sid].children.length > 0) {
             dNodes[sid].children = []
         }
-        if(dNodes[sid].parent.children.length>1){
-            for(let w = 0; w<dNodes[sid].parent.children.length;w++){
-                if(dNodes[sid].parent.children[w]._id === dNodes[sid]._id){
+        if (dNodes[sid].parent.children.length > 1) {
+            for (let w = 0; w < dNodes[sid].parent.children.length; w++) {
+                if (dNodes[sid].parent.children[w]._id === dNodes[sid]._id) {
                     recurseDelChild(dNodes[sid].parent.children[w], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
-                }else{
+                } else {
                     recurseDelChild(dNodes[sid].parent.children[w], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
                 }
-            } 
-        }else{
-            recurseDelParent(dNodes[sid].parent,dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+            }
+        } else {
+            recurseDelParent(dNodes[sid].parent, dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
         }
-    }else{
+    } else {
         recurseDelChild(dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
     }
     for (var j = dLinks.length - 1; j >= 0; j--) {
@@ -1211,7 +1210,7 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
             break;
         }
     }
-    if(p.children !== null){
+    if (p.children !== null) {
         p.children.some((d, i) => {
             if (d.id === sid) {
                 p.children.splice(i, 1);
@@ -1230,12 +1229,12 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
                     if (child.children[0].id === dNodes[sid].id) {
                         if (child.children.length > 0) {
                             child.children = child.children[0].children;
-                            if(child.parent.children.length>1){
+                            if (child.parent.children.length > 1) {
                                 child.parent.children = [child]
-                            }else{
+                            } else {
                                 child.parent.children[0].children = child.children
-                            }  
-                        }else{
+                            }
+                        } else {
                             child.children = [];
                             child.parent.children[0].children = [];
                         }
@@ -1551,25 +1550,25 @@ export function restructureData(data) {
                                         });
 
                                         // Update the child
-                                        const data = parentToUpdate.children.some((child1)=>child1.name !== child.name)
-                                        if(data){
-                                            parentToUpdate.children.push({
-                                                ...child,
-                                                children: [],
-                                                type: 'testcases',
-                                            });
-                                        }  
-                                    });
-                                } else {
-                                    // Add the new child
-                                    const data = parentToUpdate.children.some((child1)=>child1.name !== child.name)
-                                        if(data){
+                                        const data = parentToUpdate.children.some((child1) => child1.name !== child.name)
+                                        if (data) {
                                             parentToUpdate.children.push({
                                                 ...child,
                                                 children: [],
                                                 type: 'testcases',
                                             });
                                         }
+                                    });
+                                } else {
+                                    // Add the new child
+                                    const data = parentToUpdate.children.some((child1) => child1.name !== child.name)
+                                    if (data) {
+                                        parentToUpdate.children.push({
+                                            ...child,
+                                            children: [],
+                                            type: 'testcases',
+                                        });
+                                    }
                                 }
                             }
                         });
@@ -1784,15 +1783,29 @@ export function transformDataFromTreetoFolder(data) {
     return fullData;
 }
 // to show tree structure data when clicked on suite to show its child case and stepgroup
-export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps, renameTC, recievingRenamingData) {
+export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps, renameTC, recievingRenamingData, selectedTSGInfo) {
     let keyForRenamingTC;
-    if (renameTC && renameTC?.length) {
-        keyForRenamingTC = key;
-        key = key.slice(0, 1)
-        const keyTCForModifiedData = keyForRenamingTC.slice(2 - 3)
-        //    if(valueOfRenamingTC !== null){
-        modifiedData.children[keyTCForModifiedData].name = recievingRenamingData;
-        // }
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_2') {
+        if (renameTC && renameTC?.length) {
+            keyForRenamingTC = key;
+            key = key.slice(0, 1)
+            const keyTCForModifiedData = keyForRenamingTC.slice(2 - 3)
+            //    if(valueOfRenamingTC !== null){
+
+            modifiedData.children[keyTCForModifiedData].name = recievingRenamingData;
+            // }
+        }
+    }
+    let keyForRenamingTSG;
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_3') {
+        const renameTSG = renameTC;
+        if (renameTSG && renameTSG?.length) {
+            keyForRenamingTSG = key;
+            key = key.slice(0, 1)
+            const keyOfTC = keyForRenamingTSG.slice(2, 3)
+            const keyTSGForModifiedData = keyForRenamingTSG.slice(3 - 4)
+            modifiedData.children[keyOfTC].children[keyTSGForModifiedData].name = recievingRenamingData;
+        }
 
     }
     const testCases = [];
@@ -1835,12 +1848,24 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
             children: children,
         });
     }
-    if (renameTC && renameTC?.length) {
-        const indexToRenameTC = keyForRenamingTC
-        const TSIndex = indexToRenameTC.slice(0, 1);
-        const TCIndex = indexToRenameTC.slice(2 - 3);
-        testCases[TCIndex].label = renameTC
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_2') {
+        if (renameTC && renameTC?.length) {
+            const indexToRenameTC = keyForRenamingTC
+            const TSIndex = indexToRenameTC.slice(0, 1);
+            const TCIndex = indexToRenameTC.slice(2 - 3);
+            testCases[TCIndex].label = renameTC
 
+        }
+    }
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_3') {
+        const renameTSG = renameTC
+        if (renameTSG && renameTSG?.length) {
+            const indexToRenameTSG = keyForRenamingTSG
+            const TCIndex = indexToRenameTSG.slice(2, 3);
+            const TSGIndex = indexToRenameTSG.slice(3 - 4);
+            testCases[TCIndex].children[TSGIndex].label = renameTC
+
+        }
     }
 
     return (testCases);
@@ -1935,7 +1960,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
         ...obj[0],
         parent: {
             ...obj[0].parent,
-            childIndex:dNodes[pi].type === 'scenarios'? 1 : dNodes[pi].children.length>0? dNodes[pi].children[0].parent.parent.childIndex:dNodes[pi].parent.childIndex
+            childIndex: dNodes[pi].type === 'scenarios' ? 1 : dNodes[pi].children.length > 0 ? dNodes[pi].children[0].parent.parent.childIndex : dNodes[pi].parent.childIndex
         }
     }
     if (lt === true) {
@@ -1959,7 +1984,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                     if (level === 1) {
                         node.y = node.y + 150
                     }
-                    if(lt === true && node.children.length>0 && node.children[0]._id === obj[0]._id){
+                    if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                         node.children = obj[0].children
                     }
                     if (node.children && node.children.length > 0) {
@@ -2013,7 +2038,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 if (level === 1) {
                     node.y = node.y + 150
                 }
-                if(lt === true && node.children.length>0 && node.children[0]._id === obj[0]._id){
+                if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                     node.children = obj[0].children
                 }
                 if (node.children && node.children.length > 0) {
@@ -2056,7 +2081,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 getChildUpdate(dNodes, newObject)
                 dNodes[pi] = newObject;
             }
-        
+
         }
 
     }
