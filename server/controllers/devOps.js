@@ -355,7 +355,8 @@ exports.sendMailOnExecutionStart = async (req, res) => {
 		const inputs = {
 			action: config.action,
 			name: config.args,
-			channel: config.channel
+			channel: config.channel,
+			host: req.headers.host
 		};
 		
 		const result = await utils.fetchData(inputs, "admin/getNotificationChannels", fnName);
@@ -372,6 +373,7 @@ exports.sendMailOnExecutionStart = async (req, res) => {
 			executionData.recieverEmailAddress = req.body.recieverEmailAddress;
 			executionData.profileName = req.body.profileName;
 			executionData.startDate = req.body.startDate;
+			executionData.hostName = req.headers.host;
 
 			await notifications.notify("onExecutionStart", executionData, rawConf.channel);
 			return res.status(200).send("pass");

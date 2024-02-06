@@ -1,13 +1,15 @@
 const mySocket = require('./socket')
 var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
+let execInfo = undefined;
 
-module.exports.result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
+const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
 {
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
         const iceExecReq=resultData.execReq;
         const username = userInfo.username;
+        var reportType = "accessiblityTestingOnly";
             if (!status) { // This block is for report data
                 if ("accessibility_reports" in resultData) {
                     const accessibility_reports = resultData.accessibility_reports
@@ -48,9 +50,10 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                         }
                         // testsuite.reportData[scenarioIndex] = reportItem;
                         testsuite.reportData.push(reportItem);
+                        execInfo = testsuite.reportData;
                     }
                 } catch (ex) {
-                    logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
+                    logger.error("Exception in the function insertreportquery: %s", ex);
                     if (reportType != "accessiblityTestingOnly") notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, profileName: execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
                     await this.updateExecutionStatus([executionid], { status: "fail" });
                 }
@@ -78,4 +81,13 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                 }
             }
    
+}
+
+const getExecInfo = () => {
+    return execInfo;
+}
+
+module.exports = {
+    result_executeTestSuite: result_executeTestSuite,
+    getExecInfo: getExecInfo
 }
