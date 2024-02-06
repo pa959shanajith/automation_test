@@ -75,7 +75,7 @@ const GitCommit = (props) => {
             <label>Version <span className='text-red-500'>*</span></label>
             <InputText
                 value={versionName}
-                onChange={(e) => {props.versionChange(e.target.value); setVersionName(e.target.value);}}
+                onChange={(e) => {props.versionChange(e.target.value.trim()); setVersionName(e.target.value.trim());}}
                 className='w-full md:w-20rem p-inputtext-sm mb-2'
                 placeholder="Enter version name"
             ></InputText>

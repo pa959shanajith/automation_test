@@ -30,7 +30,6 @@ const GitVersionHistory = (props) => {
   const [sourceProjectId, setSourceProjectId] = useState('');
   const [desProjectId, setDesProjectId] = useState('');
   const [hasTestsuite, setHasTestsuite] = useState(false);
-  const [importPop, setImportPop] = useState(false);
   const dispatch = useDispatch();
   const toast = useRef(null);
   const moduleListed = useSelector(state => state.design.moduleList);
@@ -45,6 +44,7 @@ const GitVersionHistory = (props) => {
   const [projectListDropdown, setProjectListDropdown] = useState([]);
   const [allProjectlist, setAllProjectlist] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [restorebtnDisable, setRestorebtnDisable] = useState(true);
   if (localStorageDefaultProject) {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
@@ -183,63 +183,77 @@ const GitVersionHistory = (props) => {
 
   const handleRestore = (rowdata) => {
     (async () => {
-      let rowSelectedProject = allProjectlist.find(projectdetails => {
-        if (projectdetails.projectId === rowdata.selectedProject.id) {
-          return projectdetails
+      try {
+        var reqForNewModule = {
+          "tab": "tabCreate", "projectid": rowdata.selectedProject.id, "moduleid": null, "query": "modLength"
         }
-      })
-      ResetSession.start();
-      let data = await importGitMindmap({
-        "appType": rowSelectedProject.appType,
-        "expProj": sourceProjectId,
-        "gitVersion": rowdata.version,
-        "projectId": rowdata.selectedProject.id,
-        "projectName": rowdata.selectedProject.name
-      });
-      if (data.error) {
-        // toast.current.show({ severity: 'error', summary: 'Error', detail: data.error, life: 3000 });
-        if (data.error === "No entries") {
-          displayError(data.error); ResetSession.end();
-          return;
+        var firstModld = await getModules(reqForNewModule)
+        if (firstModld.length > 0) {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error Message',
+            detail: 'Please select a Project which has no test suite.',
+          });
+          setIsButtonDisabled(true);
         }
         else {
-          displayError(data.error.CONTENT);
+          setRestorebtnDisable(true);
+          let rowSelectedProject = allProjectlist.find(projectdetails => {
+            if (projectdetails.projectId === rowdata.selectedProject.id) {
+              return projectdetails
+            }
+          })
+          ResetSession.start();
+          let data = await importGitMindmap({
+            "appType": rowSelectedProject.appType,
+            "expProj": sourceProjectId,
+            "gitVersion": rowdata.version,
+            "projectId": rowdata.selectedProject.id,
+            "projectName": rowdata.selectedProject.name
+          });
+          if (data.error) {
+            // toast.current.show({ severity: 'error', summary: 'Error', detail: data.error, life: 3000 });
+            if (data.error === "No entries") {
+              displayError(data.error); ResetSession.end();
+              return;
+            }
+            else {
+              displayError(data.error.CONTENT);
+            }
+            ResetSession.end();
+            return;
+          }
+          else if (data === "InProgress") { toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); setRestorebtnDisable(false); return; }
+          else if (data === "dupMod") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); setRestorebtnDisable(false); return; }
+          else if (data === "dupSce") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); setRestorebtnDisable(false); return; }
+          else if (data === "appType") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DIFF_APP_TYPE.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); setRestorebtnDisable(false); return; }
+
+          var req = {
+            "tab": "tabCreate",
+            "projectid": rowdata.selectedProject.id,
+            "moduleid": null,
+            "query": "modLength"
+          };
+          var res = await getModules(req);
+          var Screen = await getScreens(rowdata.selectedProject.id);
+
+          if (Screen.error) {
+            displayError(Screen.error);
+            ResetSession.end();
+            return;
+          }
+          if (res.error) {
+            displayError(res.error.CONTENT);
+            ResetSession.end();
+            return;
+          }
+          toast.current.show({ severity: 'success', summary: 'Success', detail: ' Testsuites Restored sucessfully  ', life: 3000 });
+          setRestorebtnDisable(false);
+          setBlockui({ show: false });
         }
-        ResetSession.end();
-        return;
+      } catch (error) {
+        console.error("An error occurred:", error);
       }
-      else if (data === "InProgress") { toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.MINDMAP.WARN_IMPORT_INPROGRESS.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-      else if (data === "dupMod") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_MOD_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-      else if (data === "dupSce") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DUPLI_ZIP_SCE_DATA.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-      else if (data === "appType") { toast.current.show({ severity: 'error', summary: 'Error', detail: MSG.MINDMAP.ERR_DIFF_APP_TYPE.CONTENT, life: 2000 }); setBlockui({ show: false, content: '' }); ResetSession.end(); return; }
-
-      var req = {
-        "tab": "tabCreate",
-        "projectid": rowdata.selectedProject.id,
-        "moduleid": null,
-        "query": "modLength"
-      };
-      var res = await getModules(req);
-      var Screen = await getScreens(rowdata.selectedProject.id);
-
-      if (Screen.error) {
-        displayError(Screen.error);
-        ResetSession.end();
-        return;
-      }
-      setTimeout(function () {
-        dispatch(moduleList(res));
-        setImportPop(false);
-      }, 100);
-
-      if (res.error) {
-        displayError(res.error.CONTENT);
-        ResetSession.end();
-        return;
-      }
-      toast.current.show({ severity: 'success', summary: 'Success', detail: ' Testsuites Restored sucessfully  ', life: 3000 });
-      // var importData = res;
-      setBlockui({ show: false });
     })()
   };
 
@@ -270,7 +284,7 @@ const GitVersionHistory = (props) => {
           setIsButtonDisabled(true);
         }
         else {
-
+          setRestorebtnDisable(false);
           setDesProjectId(proj);
           setIsButtonDisabled(false);
           setData(newRowData);
@@ -291,7 +305,7 @@ const GitVersionHistory = (props) => {
     return (<>
       <div className={`git-config-custom-dropdown-item`}>
         {icon}
-      <Tooltip target={`.project-name${option.name}`} content={option.name} position='bottom-center' />
+        <Tooltip target={`.project-name${option.name}`} content={option.name} position='bottom-center' />
         <span className={`project-name${option.name}`}>{option.name}</span>
       </div>
     </>
@@ -320,7 +334,7 @@ const GitVersionHistory = (props) => {
           title="restore"
           onClick={() => handleRestore(rowData)}
           className='restore_cls'
-          disabled={rowData.selectedProject !== "" ? false : true}
+          disabled={restorebtnDisable}
         />
       </div>
     </React.Fragment>)
