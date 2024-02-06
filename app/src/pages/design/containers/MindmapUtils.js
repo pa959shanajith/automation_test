@@ -753,7 +753,7 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
         let f;
         if (dNodes[pi].type === 'testcases'){
             for(let d = 0; d<dNodes.length; d++){
-                if(dNodes[d].name === dNodes[pi].parent.name){
+                if(dNodes[d].id === dNodes[pi].parent.id){
                     f = d
                     break
                 }
@@ -1183,18 +1183,33 @@ export const ClickFullScreen = (setFullScreen) => {
     use:  parses input value to list of project props
 */
 
-export const parseProjList = (res) =>{
+export const parseProjList = (res) => {
     var proj = {};
-    res.projectId.forEach((e,i) => {
-        proj[res.projectId[i]]= {
-            'apptype': res.appType[i],
-            'name': res.projectName[i],
-            'apptypeName':res.appTypeName[i],
-            'id': res.projectId[i],
-            'releases':res.releases[i],
-            'domains':res.domains[i],
-            'projectLevelRole':res.projectlevelrole[0][i]["assignedrole"]
-        };
-    });
-    return proj
-}
+
+    if (
+        res.projectId &&
+        res.appType &&
+        res.projectName &&
+        res.appTypeName &&
+        res.releases &&
+        res.domains &&
+        res.projectlevelrole &&
+        Array.isArray(res.projectlevelrole[0])
+    ) {
+        res.projectId.forEach((e, i) => {
+            proj[res.projectId[i]] = {
+                'apptype': res.appType[i],
+                'name': res.projectName[i],
+                'apptypeName': res.appTypeName[i],
+                'id': res.projectId[i],
+                'releases': res.releases[i],
+                'domains': res.domains[i],
+                'projectLevelRole': res?.projectlevelrole[0][i]["assignedrole"]
+            };
+        });
+    } else {
+        proj = {}
+    }
+
+    return proj;
+};

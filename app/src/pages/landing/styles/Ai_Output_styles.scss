@@ -1,0 +1,157 @@
+ //styling for Gen_AI output
+ .Review_testcase .Recommended_button{
+    border: 1px solid #6366f1;
+    padding: 12px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    background-color: #fff;
+
+}
+
+.Review_testcase .input_text{
+  margin: 15px 25px;
+
+}
+.Review_testcase .input_text .p-inputtext  {
+margin-right: 10px;
+}
+.Review_testcase .save_cls {
+    width: '6rem';
+     margin-left:'55rem';
+}
+
+.btn_cls:hover {
+  background-color:rgb(191, 212, 239);
+  color:rgb(34, 36, 37);
+}
+button:active {
+  background-color: blue;
+  color:aliceblue;
+}
+.card .default_cls  .default_inner_cls{
+  background-color: #fff!important;
+  border: 2px solid #6366f1;
+  /* height: auto; */
+  position: relative;
+  /* width: 58vw; */
+  text-align: center;
+  padding: 20px 0px;
+    }
+
+.card .default_cls {
+padding: 12px 0px;
+}
+
+.hypen_cls{
+  text-align: center;
+  height: auto;
+  width: 100%;
+ 
+}
+.hypen_cls button{
+width: 350px;
+  
+}
+.hypen_cls :hover {
+  background-color:rgb(191, 212, 239);
+  color:rgb(34, 36, 37);
+}
+.card-data {
+   width: 45%;
+    height: 22rem;
+    overflow-y: scroll;
+    border: 1px solid #6366f1;
+    margin: 5px;
+
+}
+.Review_testcase .card-group {
+  border: 1px solid rgb(204, 204, 204);
+  margin: 5px;
+  display:flex;
+  flex-direction: row;
+  background-color: #fff !important;
+}
+.icon-genarate {
+  position:relative;
+  top: 0px;
+  margin:10px;
+  border:1px solid #6366f1;
+  background-color: #CCC;
+
+}
+.dropdown_cls::placeholder {
+  color:  #6366f1;
+}
+  .dropdown_cls {
+  border-color:  #6366f1;
+}
+.checkbox-container .tooltip{
+  border-bottom: none !important;
+}
+.Review_testcase input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+ .Review_testcase .checkbox-container {
+  margin-bottom: 10px;
+}
+
+.Review_testcase label {
+  display: flex;
+  align-items: center;
+}
+
+.summary-container {
+  width: auto; 
+  white-space: nowrap;
+  overflow: hidden;
+   
+}
+
+.summary {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin; 
+  scrollbar-color: #ccc transparent; 
+}
+.summary::-webkit-scrollbar {
+  width: 6px;
+}
+
+.summary::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+.summary::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tooltip {
+  position: relative;
+  //display: inline-block;
+  cursor: pointer;
+  border: none !important;
+}
+.tooltip:hover .summary {
+  visibility: visible;
+  opacity: 1;
+}
+
+  .summary {
+    border: 2px solid #ccc;
+    background-color:#000;
+    border-radius: 6px;
+    color: #ccc;
+    left: 40%;
+    margin-left: -75px;
+    opacity: 0;
+    padding: 5px;
+    position: absolute;
+    transition: opacity .3s;
+    visibility: hidden;
+    width: auto;
+    z-index: 1;
+    height: auto;
+    white-space: wrap;
+}

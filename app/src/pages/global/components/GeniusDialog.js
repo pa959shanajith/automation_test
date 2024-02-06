@@ -28,7 +28,7 @@ const GeniusDialog = () => {
   const geniusHeader = (
     <div className="flex flex-wrap justify-content-between">
        <div>{small?null:geniusMigrate?"Non Avo To Avo migration":"Avo Genius"}</div>
-      <Button className="migrate-help-btn" icon="pi pi-question-circle" text onClick={() => setVisibleRight(true)}/>
+      {geniusMigrate && <Button className="migrate-help-btn" icon="pi pi-question-circle" text onClick={() => setVisibleRight(true)}/>}
     </div>
   )
   return <>
@@ -38,10 +38,10 @@ const GeniusDialog = () => {
           <h2>Migration Steps:</h2>
           <img className="migrate-sidebar-icon" src="static/imgs/genius_migration.svg" alt="genius migration SVG Image" />
           <ol className="migrate-help-ol" type="1">
-            <li>Upon clicking "Start Migration"</li>
-            <li>The Avo Genius Application will open.</li>
-            <li>Start Your Script.</li>
-            <li>Avo Genius will initiate the migration process, transferring Non-Avo Automation to Avo.</li>
+            <li>Fill up the project details and click on Start Migration.</li>
+            <li>When the Avo Genius window opens, run the automation scripts that needs to be converted.</li>
+            <li>Use Stop button on Avo Genius window once automation scripts are run and Save Data.</li>
+            <li>Close Avo Genius and navigate to Design Studio of the project created to view the scripts.</li>
           </ol>
         </div>
       </Sidebar>

@@ -4,23 +4,37 @@ import '../styles/ProjectOverview.scss';
 import Analysis from './Analysis';
 import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
+import CustomKeyword from './CustomKeyword';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
+import ElementRepository from './ElementRepository';
+import AiTestcase from './Aitestcase';
 
 const ProjectOverview = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const [elementRepository, setElementRepository] = useState(false);
     let defaultselectedProject = reduxDefaultselectedProject;
+    const [overlay, setOverlay] = useState(null);
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
     if (localStorageDefaultProject) {
         defaultselectedProject = JSON.parse(localStorageDefaultProject);
     }
+
+    const handleElementRepository = () =>{
+        setElementRepository(true);
+        setOverlay("Loading Element Repository")
+    }
     const items = [
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
+        { label: 'Element Repository', command: ()=>handleElementRepository()},
+        { label: 'AI Testcase' },
+        { label: 'Capabalities'},
     ];
+    
 
     return (
         <div className="surface-100 OverviewSection">
@@ -43,6 +57,9 @@ const ProjectOverview = (props) => {
             {activeIndex === 0 && <ProjectCreation validateProjectLicense={props.validateProjectLicense} toastError={props.toastError} toastSuccess={props.toastSuccess} />}
             {activeIndex === 1 && <Analysis />}
             {activeIndex === 2 && <Settings />}
+            {activeIndex === 3 && <ElementRepository setOverlay={setOverlay} overlay={overlay}/>}
+            {activeIndex === 4 && <AiTestcase/>}
+            {activeIndex === 5 && <CustomKeyword toastError={props.toastError} toastSuccess={props.toastSuccess} toastWarn={props.toastWarn}/>}
         </div>
     )
 }

@@ -515,3 +515,18 @@ exports.getTestcasesByScenarioId_ICE = async (req, res) => {
         res.status(500).send("fail");
 	}
 };
+exports.createKeyword = async (req, res) => {
+	const fnName = "createKeyword";
+	logger.info("Inside UI service: " + fnName);
+    try {
+		const inputs = req.body.data;
+		// Query 1 fetching the objecttype,keywords basked on projecttypename
+		const result = await utils.fetchData(inputs, "design/createKeyword", fnName);
+		if (result == "fail") return res.send("Server data rendering failed: Fail");
+
+		res.send("Pass");
+	} catch (exception) {
+		logger.error("Error occurred in design/"+fnName+":", exception);
+        res.status(500).send("fail");
+	}
+};

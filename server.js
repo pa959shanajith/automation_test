@@ -246,6 +246,8 @@ if (cluster.isMaster) {
 		var admin = require('./server/controllers/admin');
         var designscreen = require('./server/controllers/designscreen');
 		var browserstack = require('./server/controllers/browserstack');
+		var generateAI = require('./server/controllers/generateAI');
+		
 
 		// No CSRF token
 		app.post('/moduleLevel_ExecutionStatus',report.moduleLevel_ExecutionStatus);
@@ -262,8 +264,8 @@ if (cluster.isMaster) {
 		app.post('/execAutomation',suite.execAutomation);
 		app.post('/getAgentTask',suite.getAgentTask);
 		app.post('/setExecStatus',suite.setExecStatus);
-		app.post('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
@@ -279,6 +281,14 @@ if (cluster.isMaster) {
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.get('/devopsReports/viewReport', report.viewReport);
+		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
+		app.get('/getall_uploadfiles',report.getall_uploadfiles);
+		app.post('/getjira_json',report.getJiraJSON_ICE)
+		app.post('/generate_testcase',generateAI.generateTestcase);
+		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
+		app.post('/save_testcase',generateAI.save_GenTestcases);
+		app.post('/saveTag', mindmap.saveTag);
+
 		app.use(csrf({
 		cookie: true
 		}));
@@ -600,6 +610,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);
 		app.post('/getScrapeDataScreenLevel_ICE', auth.protect, designscreen.getScrapeDataScreenLevel_ICE);
 		app.post('/updateScreen_ICE', auth.protect, designscreen.updateScreen_ICE);
+		app.post('/insertScreen', auth.protect, designscreen.insertScreen);
 		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
@@ -607,6 +618,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
 		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
+		app.post('/launchAndServerConnectSAPGenius_ICE', auth.protect, designscreen.launchAndServerConnectSAPGenius_ICE);
+		app.post('/startScrapingSAPGenius_ICE', auth.protect, designscreen.startScrapingSAPGenius_ICE);
+		app.post('/stopScrapingSAPGenius_ICE', auth.protect, designscreen.stopScrapingSAPGenius_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
@@ -614,6 +628,8 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/debugTestCase_ICE', auth.protect, design.debugTestCase_ICE);
 		app.post('/getKeywordDetails_ICE', auth.protect, design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', auth.protect, design.getTestcasesByScenarioId_ICE);
+		app.post('/createKeyword', auth.protect, design.createKeyword);
+		
 		//Webservices APIs
 		app.post('/execRequest', auth.protect, design.executeRequest);
 		app.post('/oauth2', auth.protect, design.oAuth2auth);
@@ -743,6 +759,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
 		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+
+		// Create Multiple Ldap Users
+		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMultipleLdapUsers);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

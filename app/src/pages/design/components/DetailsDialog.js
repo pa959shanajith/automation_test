@@ -52,11 +52,11 @@ const DetailsDialog = ({setShow,show,setIdx, onSetRowData, TCDetails, idx}) => {
         onSetRowData({rowIdx: idx, operation: "details", details: TCDetail === "" ? "" : JSON.stringify(TCDetail)});
         setShow(false);
     }
-    const footerDetails = () => {
-        <>
-            <Button data-test="d__ddbtn" onClick={onReset} label='Reset'/>
-            <Button data-test="d__ddbtn" onClick={onSave} label='Save'/>
-        </>
+    const footerDetails = () =>{
+        return(<>
+        <Button data-test="d__ddbtn" onClick={onReset} label='Reset'/>
+        <Button data-test="d__ddbtn" onClick={onSave} label='Save'/>
+        </>)
     }
     return (
         <div className="d__details_container" data-test="d__ddc">

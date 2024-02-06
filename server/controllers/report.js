@@ -344,7 +344,9 @@ exports.connectJira_ICE = function(req, res) {
                                 "emitAction": "jiralogin",
                                 "username": icename,
                                 "action": req.body.action,
-                                "inputs": inputs
+                                "inputs": inputs,
+                                "project_selected":"jiralogin",
+                                "itemType":"jiralogin"
                             };
                             mySocket.emit("jiralogin", req.body.action, inputs, dataToIce.project_selected, dataToIce.itemType);
                             function jira_login_3_listener( message) {
@@ -1511,69 +1513,71 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 		return res.status(500).send("fail");
 	}
 };
-
-exports.reportAnalysis = async (req, res) => {
-    logger.info("Inside report analysis service ");
+exports.uploadGeneratefile = async (req, res) => {
+    logger.info("Inside UI service: uploadGeneratefile");
     try {
-         if ( !req.body.projectid || !req.body.userid) {
+         // Validate request data
+         if (!req.file || !req.body.name || !req.body.email || !req.body.projectname || !req.body.organization) {
             return res.status(400).json({ error: 'Bad request: Missing required data' });
         }
         var inputs = {
-            "query": "api_profilelevel_execution_analysis",
-            "projectid": req.body.projectid,
-            "userid": req.body.userid,
-            "start_time": req.body.start_time || '',
-            "end_time": req.body.end_time || ''
+            "query": "uploadGeneratefile",
+            "file": req.file,
+            "name": req.body.name,
+            "email": req.body.email,
+            "project": req.body.projectname,
+            "organization": req.body.organization,
+            "type": req.body.type
         };
-        const result = await utils.fetchData(inputs, "/profileLevel_ExecutionStatus", "api_profilelevel_execution_analysis", true);
+        const result = await utils.fetchData(inputs, "upload/generateAIfile", "uploadGeneratefile", true);
 
+        // Check if an error response was received
         if (result &&  result[1].statusCode !== 200) {
-            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
             return res.status(result[1].statusCode).json({
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
-        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [],
-            start_time:result && result[0].start_time ? result[0].start_time:'' ,
-            end_time:result && result[0].end_time ? result[0].end_time:'', message: 'data found' });
 
+        // If everything is successful, return a success response
+        res.status(200).json({ success: true, message: 'File uploaded successfully' });
     } catch (error) {
         logger.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+
 }
 
+ 
 
-  exports.moduleLevel_ExecutionStatus = async function (req, res) {
-
-    logger.info("Inside report analysis module service ");
+exports.getall_uploadfiles = async (req, res) => {
+    logger.info("Inside UI service: getall_uploadfiles");
     try {
-         if ( !req.body.execlistid || !req.body.start_time || !req.body.end_time) {
-            return res.status(400).json({ error: 'Bad request: Missing required data' });
+         // Validate request data
+         if (!req.query.email) {
+            return res.status(400).json({ error: 'Bad request: Missing required params' });
         }
         var inputs = {
-            "query": "api_modulelevel_execution_analysis",
-            "execlistid": req.body.execlistid,
-            "start_time": req.body.start_time,
-            "end_time": req.body.end_time
+            "query": "getall_uploadfiles",
+            "email": req.query.email,
         };
-        const result = await utils.fetchData(inputs, "/moduleLevel_ExecutionStatus", "api_modulelevel_execution_analysis", true);
+        const result = await utils.fetchData(inputs, "upload/getallUploadFiles", "getall_uploadfiles", true);
 
+        // Check if an error response was received
         if (result &&  result[1].statusCode !== 200) {
-            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
             return res.status(result[1].statusCode).json({
-                error: result[1].statusMessage || 'Unknown error',
+                error: result[2].error || 'Unknown error',
             });
         }
-        logger.info("modules fetched successfully");
-        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
 
+        // If everything is successful, return a success response
+        res.status(200).json({ data:result[0].rows , msg: result[0]['message'] });
     } catch (error) {
         logger.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
   };
+
+
 
   
   exports.teststepLevel_ExecutionStatus = async function (req, res) {
@@ -1675,3 +1679,175 @@ exports.reportAnalysis = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
   };
+
+
+exports.getJiraJSON_ICE = function (req, res) {
+    logger.info("Inside UI service: getJiraJSON_ICE");
+    try {
+        logger.info("Inside UI service: connectJira_ICE");
+        var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
+        var username=req.session.username;
+        var icename = undefined
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+        mySocket = myserver.allSocketsMap[clientName][icename];
+        if (req.body.action == 'getJiraJSON' ) { //Login to Jira for mapping screen
+            var jiraurl = req.body.url;
+            var jirausername = req.body.username;
+            var jirapwd = req.body.password;
+             if (!validateData(jiraurl, "empty") && !validateData(jirausername, "empty") && !validateData(jirapwd, "empty")) {
+                //var inputs = [jiraurl,jirausername,jirapwd];
+                var inputs = {
+                    "jira_serverlocation": jiraurl,
+                    "jira_uname": jirausername,
+                    "jira_pwd": jirapwd
+                };
+                
+                try {
+                    logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+                    logger.debug("ICE Socket requesting Address: %s", icename);
+                        if(mySocket != undefined) {
+                            logger.info("Sending socket request for jira_login to cachedb");
+                            mySocket.emit("jiralogin", req.body.action, inputs, {
+                                'project':req.body.project,
+                                'key':req.body.key
+                            }, req.body.itemType);
+                            var count = 0;
+
+                            function jira_login_5_listener(message) {
+                                var data = message;
+                                mySocket.removeListener("Jira_testcases_json", jira_login_5_listener);
+                                    
+                                    var resultData = data;
+                                    if (count == 0) {
+                                        if (resultData != "Fail" && resultData != "Invalid Url" && resultData != "Invalid Credentials") {
+                                            logger.info('Jira: Login successfully.');
+                                        } else {
+                                            logger.error('Jira: Login Failed.');
+                                        }
+                                        // const temp_json_dir = process.cwd();
+                                        // const filePath = `${temp_json_dir}/userstories.json`
+                                        // // Save the JSON data to a file
+                                        // fs.writeFileSync(filePath, JSON.stringify(resultData, null, 4));
+                                        //     res.setHeader('Content-disposition', 'attachment; filename=userstories.json');
+                                        // res.setHeader('Content-type', 'application/json');
+                                        // // Send the file as a response
+                                        // res.download(filePath, (err) => {
+                                        //     if (err) {
+                                        //         console.error(err);
+                                        //         res.status(500).json({ error: 'Download failed' });
+                                        //     }
+                                        //     // Delete the temporary file after it has been sent
+                                        //     fs.unlinkSync(filePath);
+                                        // });
+                                        res.send(resultData);
+                                        count++;
+                                    }
+                                    
+                            }
+                            mySocket.on("Jira_testcases_json", jira_login_5_listener);
+                        } else {
+                                flag = "unavailableLocalServer";
+                                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Socket not Available");
+                                res.send(flag);
+                        }
+                } catch (exception) {
+                    logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
+                }
+            } else {
+                logger.error("Error occurred in the service connectJira_ICE - loginToJira: Invalid inputs");
+                res.send("Fail");
+            }}
+
+    } catch (exception) {
+        logger.error(exception.message);
+        res.send("fail");
+    }
+};
+exports.getGenarate_testcase = async (req, res) => {
+    const fnName = "getReportsData_ICE";
+    try {
+        let reportInputData = req.bo.reportsInputData;
+        if (reportInputData.type == 'allmodules') {
+            logger.info("Inside UI service: " + fnName + " - allmodules");
+            let inputs = {
+                "query": "getAlltestSuites",
+                "id": reportInputData.cycleId
+            };
+            if(reportInputData['configurekey'] && reportInputData['cycleId'] == ''){
+                inputs = {
+                    "query": "getAlltestSuitesDevops",
+                    "data": reportInputData
+                }
+            }
+            const result1 = await utils.fetchData(inputs, "reports/getAllSuites_ICE", fnName)
+            if (result1 == "fail") return res.send("fail");
+            return res.send({ rows: result1 });
+        }
+    } catch (exception) {
+        logger.error("Error occurred in "+fnName+". Error: " + exception.message);
+        res.status(500).send("fail");
+    }
+}
+
+exports.moduleLevel_ExecutionStatus = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.execlistid || !req.body.start_time || !req.body.end_time) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_modulelevel_execution_analysis",
+            "execlistid": req.body.execlistid,
+            "start_time": req.body.start_time,
+            "end_time": req.body.end_time
+        };
+        const result = await utils.fetchData(inputs, "/moduleLevel_ExecutionStatus", "api_modulelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("modules fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  exports.reportAnalysis = async (req, res) => {
+    logger.info("Inside report analysis service ");
+    try {
+         if ( !req.body.projectid || !req.body.userid) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_profilelevel_execution_analysis",
+            "projectid": req.body.projectid,
+            "userid": req.body.userid,
+            "start_time": req.body.start_time || '',
+            "end_time": req.body.end_time || ''
+        };
+        const result = await utils.fetchData(inputs, "/profileLevel_ExecutionStatus", "api_profilelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("testcases generated successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [],
+            start_time:result && result[0].start_time ? result[0].start_time:'' ,
+            end_time:result && result[0].end_time ? result[0].end_time:'', message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}

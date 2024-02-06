@@ -32,6 +32,8 @@ import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
+import { Dropdown } from 'primereact/dropdown';
+import { getScreens } from '../../landing/api';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -98,7 +100,7 @@ const CaptureModal = (props) => {
   const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
   const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
   const [identifierModified, setIdentifierModiefied] = useState(false);
-  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
+  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectId"] });
   const [idx, setIdx] = useState(0);
   const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
   let NameOfAppType = projectAppType
@@ -121,6 +123,13 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
   let AppTypeElementIdentifier;
+  const showCaptureScreen = useSelector((state) => state.landing.openCaptureScreen);
+  const [selectedScreen, setSelectedScreen] = useState(null);
+  const [screenData, setScreenData] = useState([]);
+  const [elementRepo, setElementRepo] = useState(false);
+  const [parentId, setParentId] = useState(null);
+  const [screenChange, setScreenChange] = useState(false);
+  const [selectedFolderValue,setSelectedFolderValue] = useState([]);
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
 
@@ -133,7 +142,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
 
   useEffect(() => {
     fetchScrapeData()
-  }, [parentData])
+  }, [parentData,parentId])
   useEffect(()=>{
     let browserName = (function (agent) {        
 
@@ -263,7 +272,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     setInputValue('');
   };
 
-  const parentScreen = props.fetchingDetails["parent"]["children"];
+  const parentScreen = showCaptureScreen?"":props.fetchingDetails["parent"]["children"];
   useEffect(() => {
     const parentScreenId = () => {
       for (let i = 0; i < parentScreen.length; i++) {
@@ -499,10 +508,11 @@ const elementTypeProp =(elementProperty) =>{
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
+      let Id = parentId !== null?parentId:parentData.id
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, parentData.id, parentData.projectId, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -681,19 +691,33 @@ const elementTypeProp =(elementProperty) =>{
     for (let scrapeItem of scrapeItemsL) {
       if (!Array.isArray(scrapeItem)) {
         if (!scrapeItem.objId) {
-          if (scrapeItem.isCustom){ views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+          if (scrapeItem.isCustom){ 
+            views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid() });
         }else {
              const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
           if (foundItem) {
-            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid()});
           }}
           // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-          orderList.push(scrapeItem.tempOrderId);
+          orderList.push(scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid())
         }
-        else orderList.push(scrapeItem.objId);
+        else {
+          if(parentId !== null){
+            const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+            if (foundItem) {
+              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+            }
+            orderList.push(scrapeItem.objId);
+  
+          }else{
+             orderList.push(scrapeItem.objId);
+          }
+          
+        }
       }
 
     }
+    setParentId(null);
     // const newdeleted=deleted.filter(element=>element!==undefined)
 
     let params = {
@@ -1113,7 +1137,7 @@ else{
   const headerTemplate = (
     <>
       <div>
-        <h5 className='dailog_header1'>Capture Elements</h5>
+      <h5 className='dailog_header1'>Element Reposiotry</h5>
         {props.testSuiteInUse?<img src="static/imgs/view_only_access_icon.svg"alt="viewonlyaccess" style={{height:'25px',position:'absolute',left:'13rem',top:'0.5rem'}} title="Read Only Access"/>:null}
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
@@ -1746,6 +1770,74 @@ const elementValuetitle=(rowdata)=>{
   )
  }
 
+
+ useEffect(() => {
+  (async () => {
+      try {
+          let params = {
+            param : "globalRepo",
+            projectId :  NameOfAppType.projectId
+          }
+
+          const screens = await getScreens(params);
+          if(screens === 'fail') {
+            setScreenData([]);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
+          else if(screens === "no orderlist present") {
+            setScreenData([]);
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+          else setScreenData(screens.screenList);
+      } catch (error) {
+          console.error('Error fetching User list:', error);
+      }
+  })();
+}, [NameOfAppType.projectId]);
+
+ const handleScreenChange = (e) => {
+  setSelectedFolderValue(e.value)
+  // const selectedFolderValue = e.value;
+  // setSelectedScreen(selectedFolderValue);
+
+  if(captureData.length > 0){
+    setScreenChange(true);
+  }
+
+  // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+  else{
+  setSelectedScreen(e.value);
+  setParentId(e.value.id);
+  // fetchScrapeData();
+  setSaveDisable(false);
+  setElementRepo(true);
+  }
+  // addMore.current = true;
+  // let newData = capturedDataToSave;
+  // newData.push(...selectedFolderValue.related_dataobjects)
+  // setCapturedDataToSave(newData);
+  // // setCaptureData(newData);
+  // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+
+};
+
+const confirmScreenChange = () => {
+  // Proceed with screen change using selectedFolderValue from state
+  setSelectedScreen(selectedFolderValue);
+  setParentId(selectedFolderValue.id);
+  // fetchScrapeData();
+  setSaveDisable(false);
+  setElementRepo(true);
+  // Hide confirmation dialog
+  // setDisplayConfirmation(false);
+};
+
+const screenOption = screenData?.map((folder) => ({
+  label: folder.name,
+  id:folder["_id"],
+  related_dataobjects: folder.related_dataobjects,
+  orderlist:folder.orderlist,
+  parent:folder.parent
+}));
+
   return (
     <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -1756,6 +1848,27 @@ const elementValuetitle=(rowdata)=>{
       {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
             <div className="action_panelCard">
+            {!showPanel && <div className='utility__block'>
+                  <div className='panel_head1'>
+                  <p className='insprint__text'>Select from repository</p> </div>
+                  </div> }
+                {showPanel && <div className='utility__block'>
+                  <p className='insprint__text'>Select from repository</p>
+                  {/* <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/> */}
+                  <span className="insprint_auto">
+                    {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
+                    <p className='text-600'>PDF Utility</p> */}
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
+                      placeholder={<h5 style={{color:'gray', fontSize:'19px'}}>{parentData.name}</h5>} className="w-full md:w-10rem repo__dropdown" />
+                      {/* <select value={selectedScreen} defaultValue={showCaptureScreen?parentData.name:""} onChange={handleScreenChange} placeholder="Select screen">
+                        {screenOption.map(option => (
+                          <option key={option._id} value={option._id}>{option.label}</option>
+                        ))}
+                    </select> */}
+                  </span>
+                </div>
+                }
               {!showPanel && <div className='insprint__block1'>
                 <div>
                 <p className='insprint__text1'>In Sprint Automation</p></div>
@@ -1811,7 +1924,7 @@ const elementValuetitle=(rowdata)=>{
                   <a href='docs.avoautomation.com'>Learn More</a>
                 </div>)} */}
               </div>}
-              {!showPanel && <div className='utility__block'>
+              {/* {!showPanel && <div className='utility__block'>
                 <div className='panel_head1'>
                 <p className='insprint__text text-500'>Capture from PDF</p> </div>
                 </div> }
@@ -1823,12 +1936,7 @@ const elementValuetitle=(rowdata)=>{
                   <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
                   <p className='text-600'>PDF Utility</p>
                 </span>
-                {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Capture from PDF</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)} */}
-              </div>}
+              </div>} */}
 
               {!showPanel && <div className='createManual__block'>
                 <div className='panel_head2'>
@@ -1935,6 +2043,13 @@ const elementValuetitle=(rowdata)=>{
           </Dialog>
         </div>
       </Dialog>
+      <AvoConfirmDialog
+        visible={screenChange}
+        onHide={() => setScreenChange(false)}
+        showHeader={false}
+        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        icon="pi pi-exclamation-triangle"
+        accept={confirmScreenChange} />
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         

@@ -354,6 +354,10 @@ module.exports.initListeners = mySocket => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_testcases", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
 	});
+	mySocket.on("Jira_testcases_json", value => {
+		const dataToNode = JSON.stringify({"username": username, "onAction": "Jira_testcases_json", "value": value});
+		server_pub.publish("ICE2_" + username, dataToNode);
+	});
 
 	mySocket.on("result_executeTestSuite", value => {
 		const dataToNode = JSON.stringify({"username": username, "onAction": "result_executeTestSuite", "value": value});
