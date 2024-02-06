@@ -407,7 +407,7 @@ class TestSuiteExecutor {
                     if (!status) {
                         if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
                     }
-                    if(!iceExecReq || mySocket.listenerCount("result_executeTestSuite") == 1) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent);
+                    if(!iceExecReq || mySocket.listenerCount("result_executeTestSuite") == 1) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent,mySocket);
                 });
             
             
