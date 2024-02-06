@@ -391,6 +391,9 @@ class TestSuiteExecutor {
                         execReq.suitedetails[testsuiteIndex].reportData = reportData;
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
+                        if (testsuiteIndex === execReq.testsuiteIds.length - 1) {
+                            if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
+                        }
                         if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1) {
                             notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType, hostName: host });
                         }
