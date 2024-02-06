@@ -242,26 +242,6 @@ const ElementRepository = (props) => {
     .catch(error => console.log(error))
   };
 
-// const handleAccordionNameEdit = (index, newName) => {
-//   const updatedScreenData = [...screenData];
-//   updatedScreenData[index].name = newName;
-//   // setScreenData(updatedScreenData);
-
-//   let params ={
-//     projectid: defaultselectedProject.projectId,
-//     name: newName,
-//     param : 'update',
-//     screenid: updatedScreenData[index]["_id"]
-//   }
-  
-//   insertScreen(params)
-//   .then(response =>  {
-//     if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
-//     else if(response === "invalid session") return RedirectPage(history);
-//     else setScreenData(updatedScreenData);
-//   })
-//   .catch(error => console.log(error))
-// };
 
 const handleAccordionNameEdit = (index,e) => {
   if(e.key === 'Enter'){
