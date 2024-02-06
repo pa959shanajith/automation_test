@@ -15,12 +15,14 @@ import * as scrapeApi from '../../design/api';
 import { v4 as uuid } from 'uuid';
 import { insertScreen } from '../../design/api';
 import { Tag } from 'primereact/tag';
-import { ScreenOverlay } from '../../global';
+import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
+import { useNavigate } from 'react-router-dom';
 
 
 const ElementRepository = (props) => {
+  const history = useNavigate();
   const [copiedRow, setCopiedRow] = useState(null);
   const contextMenuRef = useRef(null);
   const [contextMenuModel, setContextMenuModel] = useState([]);
@@ -60,6 +62,8 @@ const ElementRepository = (props) => {
   const [updatePastedData, setUpdatPastedData] = useState(false);
   const [updateDeleteCurrentElements, setUpdateDeleteCurrentElements] = useState(false);
   const [deleteScreens, setDeleteScreens] = useState(false);
+  const [overlay, setOverlay] = useState(null);
+  const [screenRename,SetScreenRename] =  useState("");
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -76,6 +80,7 @@ const ElementRepository = (props) => {
               projectId :  defaultselectedProject.projectId
             }
 
+            setOverlay("Fetching Repository Details...")
             const screens = await getScreens(params);
             if(screens === 'fail') {
               setScreenData([]);
@@ -83,11 +88,14 @@ const ElementRepository = (props) => {
             else if(screens === "no orderlist present") {
               setScreenData([]);
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+            else if(screens === "invalid session") return RedirectPage(history);
             else {
+              setOverlay("")
               setScreenData(screens.screenList);
               setScreenId(false);
             }
         } catch (error) {
+          setOverlay("")
             console.error('Error fetching User list:', error);
         }
     })();
@@ -119,10 +127,15 @@ const ElementRepository = (props) => {
     scrapeApi.updateScreen_ICE(params)
     .then(response =>  {
         if(copiedRow!==null){
-        if (response == "Success") {
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
-        setUpdatPastedData(true);
-   }}})
+        if (response === "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to paste the Data.', life: 5000 });
+        else if(response === "invalid session") return RedirectPage(history);
+        else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
+          setUpdatPastedData(true);
+        }
+        
+        
+  }})
    .catch(error => console.log(error))
     }
     // Use params as needed
@@ -214,37 +227,62 @@ const ElementRepository = (props) => {
     }
     insertScreen(params)
     .then(response =>  {
-      if (response == "Success") {
+      if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
+      else if(response === "invalid session") return RedirectPage(history);
+      else {
         setScreenData([...screenData, newScreen]);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
-    }
-    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen saved successfully.', life: 5000 });
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Reposiotry added and saved.', life: 5000 });
+      }
+
+    
   })
     
     .catch(error => console.log(error))
   };
 
-const handleAccordionNameEdit = (index, newName) => {
-  const updatedScreenData = [...screenData];
-  updatedScreenData[index].name = newName;
-  // setScreenData(updatedScreenData);
 
+const handleAccordionNameEdit = (index,e) => {
+  if(e.key === 'Enter'){
+ 
+  // setScreenData(updatedScreenData);
+  const updatedScreenData = [...screenData];
+
+  const previousName = updatedScreenData[index].name;
+
+    if (screenRename.trim() === '') {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Screen name cannot be empty!', life: 5000 });
+      SetScreenRename(previousName);
+      return;
+    }
+ 
   let params ={
     projectid: defaultselectedProject.projectId,
-    name: newName,
+    name: screenRename,
     param : 'update',
     screenid: updatedScreenData[index]["_id"]
   }
-  
+ 
   insertScreen(params)
   .then(response =>  {
-    if (response == "Success") {
-      setScreenData(updatedScreenData);
-  }
-})
+    if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
+    else if(response === "invalid session") return RedirectPage(history);
+    else{
+      SetScreenRename("")
+      setEditingIndex(null)
+    }
+  })
   .catch(error => console.log(error))
 };
+}
+
+const handleChangeScreenName=(index,e)=>{
+  SetScreenRename(e.target.value)
+  const updatedScreenData = [...screenData];
+  updatedScreenData[index].name = e.target.value;
+  setScreenData(updatedScreenData);
+}
 
 
 
@@ -436,27 +474,18 @@ const handleAccordionNameEdit = (index, newName) => {
           // console.log(hasFlagTrue)
       // Move the return statement outside the forEach loop
       return (
-        <div>
+        <div className='flex flex-row justify-content-evenly'>
           {defaultselectedProject.appType === "Web" ? (
-            <button
-              onClick={() => {
-                setSelectedCapturedElement(selectedElement);
-                openElementProperties(rowData);
-              }}
-            >
-              <img
-                src="static/imgs/ic-edit.png"
-                alt="Edit Icon"
-                style={{ height: "20px", width: "20px" }}
-                className="edit__icon"
-              />
-            </button>
-          ) : null}
-  
-          <img
-            src="static/imgs/ic-delete-bin.png"
-            style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-            className="delete__icon"
+            <div>
+              <i className="pi pi-pencil"
+                onClick={() => {
+                  setSelectedCapturedElement(selectedElement);
+                  openElementProperties(rowData);
+                }}></i>
+          </div>) : null}
+          <div>
+          <i
+            className='pi pi-trash'
             onClick={() => {
               if (result.length>0) {
                 setResusedDeleteElement(true);
@@ -469,6 +498,7 @@ const handleAccordionNameEdit = (index, newName) => {
               }
             }}
           />
+          </div>
         </div>
       );
     }
@@ -538,7 +568,7 @@ const handleSave = (value, cellValue, customFlag = '') => {
 }
 
   useEffect(()=>{
-    if(modified.length>0){
+    if (Object.keys(modified).length > 0) {
     let modifiedObjects = Object.values(modified);
     let params = {
       'modifiedObj': modifiedObjects,
@@ -550,11 +580,11 @@ const handleSave = (value, cellValue, customFlag = '') => {
     scrapeApi.updateScreen_ICE(params)
       .then(response =>  {
         if (response == "Success") {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element name changed successfully', life: 5000 });
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element renamed.', life: 5000 });
           dispatch(loadUserInfoActions.updateElementRepository(true));
       }
       else {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to rename the element, try again!', life: 5000 });
       }
     })}
   },[modified])
@@ -751,11 +781,11 @@ const saveScreens = (screenDetails) => {
     scrapeApi.deleteScenario(params)
       .then(response =>  {
         if (response == "success") {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen deleted successfully', life: 5000 });
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Rpository deleted.', life: 5000 });
       }
       
       else {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to delet the repository, try again!', life: 5000 });
       }
       dispatch(loadUserInfoActions.updateElementRepository(true));
     })
@@ -776,6 +806,7 @@ const deleteScreen = (index, screenDetails)=>{
   return (
     <>
     {/* {props.overlay && <ScreenOverlay content={props.overlay} />} */}
+    {overlay && <ScreenOverlay content={overlay} />}
     <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
     <div className='element-repository'>
       {screenData?.length === 0 ? 
@@ -802,7 +833,8 @@ const deleteScreen = (index, screenDetails)=>{
                       // // onChange={(e) => handleAccordionNameEdit(index, e.target.value)}
                       // onChange={(e) => setValue(e.target.value === null || e.target.value === undefined ? '' : e.target.value)}
                       value={screenDetails.name}
-                      onChange={(e) =>  handleAccordionNameEdit(index, e.target.value)}
+                      onChange={(e) =>handleChangeScreenName(index,e) }
+                      onKeyDown={(e)=>handleAccordionNameEdit(index,e)}
                       onBlur={() => {setEditingIndex(null);
                       setValue('');}}
                       style={{height: '2.3rem', top:'-1.1rem'}}
@@ -848,7 +880,7 @@ const deleteScreen = (index, screenDetails)=>{
               visible={deleteScreens}
               onHide={() => setDeleteScreens(false)}
               showHeader={false}
-              message="Are you sure you want to delete the repository"
+              message="Are you sure you want to delete the repository?"
               icon="pi pi-exclamation-triangle"
               accept={()=>deleteScreen(index,screenDetails)} />
 
@@ -856,7 +888,7 @@ const deleteScreen = (index, screenDetails)=>{
               visible={deleteElements}
               onHide={() => setDeleteElements(false)}
               showHeader={false}
-              message="Are you sure you want to delete the element"
+              message="Are you sure you want to delete the element?"
               icon="pi pi-exclamation-triangle"
               accept={()=>handleDeleteRow(selectedCapturedElement,screenDetails)} />
               {reusedDeleteElement && <Dialog visible={reusedDeleteElement} header='Confirmation' onHide={()=>setResusedDeleteElement(false)} footer={<>
