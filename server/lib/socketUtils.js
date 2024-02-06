@@ -1,9 +1,8 @@
-const mySocket = require('./socket')
 var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
 let execInfo = undefined;
 
-const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
+const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent,mySocket)=>
 {
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
@@ -66,14 +65,14 @@ const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invok
                     report_result["status"] = status
                     report_result["configurekey"] = execReq["configurekey"]
                     report_result["configurename"] = execReq["configurename"]
-                    if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
-                    if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                     report_result["testSuiteDetails"] = execReq["suitedetails"]
                     if (resultData.userTerminated) result = "UserTerminate";
                     if (execType == "API") result = [d2R, status, resultData.testStatus];
                     if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected && execType == 'ACTIVE') { // This block is only for active mode
                         notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                     } else if (resSent) {
+                        if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+                        if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                         queue.Execution_Queue.add_pending_notification("", report_result, username);
                     }
                 } catch (ex) {
