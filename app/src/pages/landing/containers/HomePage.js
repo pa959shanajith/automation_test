@@ -19,11 +19,11 @@ const HomePage = () => {
     if(!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo ;
 
-    useEffect(() => {
-        if (window.localStorage['navigateScreen'] !== "landing") {
-            RedirectPage(navigate, { reason: "screenMismatch" });
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (window.localStorage['navigateScreen'] !== "landing") {
+    //         RedirectPage(navigate, { reason: "screenMismatch" });
+    //     }
+    // }, []);
 
     useEffect(() => {
         if ( userInfo?.rolename === "Quality Manager") {

@@ -7,7 +7,7 @@ import { Paginator } from 'primereact/paginator';
 import "../styles/CloudALMContent.scss";
 import { useSelector, useDispatch } from 'react-redux';
 import { Tree } from 'primereact/tree';
-import { getProjectsMMTS } from '../../design/api';
+import { getProjectsMMTS, readTestSuite_ICE } from '../../design/api';
 import { viewALM_MappedList_ICE } from '../../settings/api';
 import { Messages as MSG, setMsg } from '../../global';
 import { enableSaveButton, mappedPair, almavomapped } from "../settingSlice";
@@ -42,7 +42,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
     };
 
     const handleClick = (calmTestId, calmTestname) => {
-        setSelectedNodes({ calmTestId, calmTestname }); 
+        setSelectedNodes({ calmTestId, calmTestname });
     };
 
     useEffect(() => {
@@ -85,7 +85,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
         setUpdatedTreeData((updatedTreeData) => updatedDataCopy);
     }, [selectedNodes?.calmTestId])
 
-    const handleSync = () => {
+    const handleSync = async () => {
         let scenarioIdDetails = [];
         let popupMsg = false;
         let scenarioIdsList = [];
@@ -113,13 +113,23 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                 name: scenarioIdsGroup[key]?.map((data) => data.name)
             };
 
+            const reqObject = [{
+                "releaseid": "r1",
+                "cycleid": "643f8b543f8ee3f7fe70823a",
+                "testsuiteid": testSuiteId[0],
+                "testsuitename": key,
+            }]
+
+            const fetchTestSuiteId = await readTestSuite_ICE(reqObject);
+
             const obj = {
                 "projectId": projectDetails.projectId, // avo proj id
                 "projectName": projectDetails.projectName, // avo proj name
-                "testsuiteid": testSuiteId[0], // avo test suite id
+                "testsuiteid": fetchTestSuiteId[testSuiteId[0]]['testsuiteid'] || '', // avo test suite id
                 "testsuitename": key, // avo test suite
                 "testscenarioids": avoTestCaseDetails._id, // avo test case id of mentioned above
                 "scenarioname": avoTestCaseDetails.name, // avo test case name of mentioned above
+                "mindmapid": testSuiteId[0],
                 "getparampaths": [
                     ""
                 ],
