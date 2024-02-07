@@ -908,7 +908,7 @@ const deleteScreen = (index, screenDetails)=>{
       {showCaptureElement && <CaptureModal fetchingDetails={{
                 "_id": screenDetails["_id"],
                 "name": screenDetails.name,
-                "projectId":defaultselectedProject.projectId
+                "projectID":defaultselectedProject.projectId
               }} visibleCaptureElement={showCaptureElement} setVisibleCaptureElement={setShowCaptureElement}/>}
       <ContextMenu style={{height: '5.5rem'}} ref={contextMenuRef} model={contextMenuModel} />
       {"Web"?

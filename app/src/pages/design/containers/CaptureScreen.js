@@ -34,6 +34,7 @@ import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -1845,6 +1846,207 @@ const screenOption = screenData?.map((folder) => ({
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
+      {showCaptureScreen ?
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
+      {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
+          <Card className='panel_card'>
+            <div className="action_panelCard">
+            {!showPanel && <div className='utility__block'>
+                  <div className='panel_head1'>
+                  <p className='insprint__text'>Select from repository</p> </div>
+                  </div> }
+                {showPanel && <div className='utility__block'>
+                  <p className='insprint__text'>Select from repository</p>
+                  {/* <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                  <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/> */}
+                  <span className="insprint_auto">
+                    {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
+                    <p className='text-600'>PDF Utility</p> */}
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
+                      placeholder={<h5 style={{color:'gray', fontSize:'19px'}}>{parentData.name}</h5>} className="w-full md:w-10rem repo__dropdown" />
+                      {/* <select value={selectedScreen} defaultValue={showCaptureScreen?parentData.name:""} onChange={handleScreenChange} placeholder="Select screen">
+                        {screenOption.map(option => (
+                          <option key={option._id} value={option._id}>{option.label}</option>
+                        ))}
+                    </select> */}
+                  </span>
+                </div>
+                }
+              {!showPanel && <div className='insprint__block1'>
+                <div>
+                <p className='insprint__text1'>In Sprint Automation</p></div>
+                </div>}
+            {showPanel && <div className='insprint__block'>
+                <p className='insprint__text'>In Sprint Automation</p>
+                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
+                <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
+                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
+                  {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
+                  <p>Add Element</p>
+                </span>
+                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
+                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
+                  {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
+
+                  <p>Map Element</p>
+                </span>
+                {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
+                {/* {isInsprintHovered &&
+               
+                (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>InSprint Automation</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a>Learn More</a>
+                </div>)
+                } */}
+              </div>}
+              {!showPanel && <div className='upgrade__block'>
+                <div className='panel_head'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                </div>
+                </div> }
+
+              {showPanel && <div className='upgrade__block'>
+                <p className='insprint__text'>Upgrade Analyzer</p>
+                <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
+                  <img className='add_obj_upgrade' src="static/imgs/compare_object_icon.svg" ></img>
+                  {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
+                  <p>Compare Element</p>
+                </span>
+                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                  <img className='map_obj_upgrade' src="static/imgs/replace_object_icon.svg" ></img>
+                  {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
+                  <p>Replace Element</p>
+                </span>
+                {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>Upgrade Analyzer</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a href='docs.avoautomation.com'>Learn More</a>
+                </div>)} */}
+              </div>}
+              {/* {!showPanel && <div className='utility__block'>
+                <div className='panel_head1'>
+                <p className='insprint__text text-500'>Capture from PDF</p> </div>
+                </div> }
+               {showPanel && <div className='utility__block'>
+                <p className='insprint__text text-500'>Capture from PDF</p>
+                <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
+                <span className="insprint_auto">
+                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
+                  <p className='text-600'>PDF Utility</p>
+                </span>
+              </div>} */}
+
+              {!showPanel && <div className='createManual__block'>
+                <div className='panel_head2'>
+                <p className='insprint__text'>Create Manually</p> </div>
+                </div>}
+
+              {showPanel && <div className='createManual__block'>
+                <p className='insprint__text'>Create Manually</p>
+                <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
+                <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
+                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
+                  <img className='map_obj' src="static/imgs/create_object_icon.svg"></img>
+                  <p>Create Element</p>
+                </span>
+                {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
+                  <h3>Create Manually</h3>
+                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
+                  <a>Learn More</a>
+                </div>)} */}
+              </div>}
+
+              {showPanel && <div className='imp_exp__block'>
+                <span className='insprint_auto'>
+                  <span className='import__block' onClick={() => setShowObjModal("importModal")}>
+                    <img className=' pi-file-import add_obj_import' src="static/imgs/Import_new_icon_grey.svg"  />
+                    {/* <i className="pi pi-file-import add_obj_import "  ></i> */}
+                    <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
+                    <p className='imp__text'>Import Screen</p>
+                  </span>
+                  <span className="export__block"  onClick={handleExportClick}>
+                    <img  className="add_obj_export" src="static/imgs/Export_new_icon_grey.svg" />
+                    {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
+                    <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
+                    <p className='imp__text'>Export Screen</p>
+
+                  </span>
+                </span>
+              </div>}
+                <div style={{ display: 'flex'}}>
+                  <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow icon-tooltip' : 'pi pi-chevron-circle-down down_arrow icon-tooltip'} style={{ fontSize: '1rem'}}></i>
+                  </span>
+                </div>
+            </div>
+
+          </Card>
+        </div>
+        :null}
+
+
+        <div className='card'>
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          <DataTable
+            size="small"
+            editMode="cell"
+            className='datatable__col'
+            value={captureData}
+            dragHandleIcon="pi pi-bars"
+            resizableColumns
+            reorderableRows
+            onRowReorder={handleRowReorder}
+            showGridlines
+            selectionMode={"single"}
+            selection={selectedCapturedElement}
+            onSelectionChange={onRowClick}
+            headerCheckboxToggleAllDisabled={false}
+            emptyMessage={showEmptyMessage ? emptyMessage : null} 
+            columnResizeMode="expand"
+            scrollable
+            scrollHeight="383px"
+            virtualScrollerOptions={{ itemSize: 46 }} 
+            tableStyle={{ minWidth: '50rem' }}
+          >
+            {/* editMode="cell"
+            onCellEdit={(e) => handleCellEdit(e)} */}
+            {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
+            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
+            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
+              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
+              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
+              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+              bodyClassName={"ellipsis-column"}
+              body={renderElement}
+            >
+            </Column>
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
+            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+          </DataTable>
+              }
+          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?(screenshotData.isIris?'491px':'392px'):typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':typesOfAppType==="MobileApp"?'490px':""}}>
+                <div className="screenshot_pop__content" >
+                 <div className="scrsht_outerContainer" id="ss_ssId">
+                  <div data-test="ssScroll" className="ss_scrsht_insideScroll">
+                    { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
+                    { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                  </div>
+                 </div>
+                </div>
+            </div>
+          </Dialog>
+        </div>
+      </Dialog>:
+      <div>
       {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
       {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
           <Card className='panel_card'>
@@ -2043,6 +2245,7 @@ const screenOption = screenData?.map((folder) => ({
             </div>
           </Dialog>
         </div>
+        </div>}
       {/* </Dialog> */}
       <AvoConfirmDialog
         visible={screenChange}
