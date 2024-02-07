@@ -61,7 +61,7 @@ const IceProvisionList = (props) => {
 	const refreshIceList = async () => {
 		setLoading("Loading...");
 		setSearchTasks("");
-		const data = await fetchICE(props.edit.userId);
+		const data = await fetchICE(props.edit.userid);
 		if (data.error) { displayError(data.error); return; }
 		setLoading(false);
 		data.sort((a, b) => a.icename.localeCompare(b.icename));
@@ -188,7 +188,7 @@ const IceProvisionList = (props) => {
 		<Fragment>
 			{loading ? <ScreenOverlay content={loading} /> : null}
 
-			<div className="col-xs-9 form-group-ip adminForm-ip" style={{ paddingTop: "64px", width: "60rem" }}>
+			<div className="col-xs-9 form-group-ip adminForm-ip" style={{ width: "60rem" }}>
 				<div className="containerWrap">
 					<div className="sessionHeading-ip" data-toggle="collapse" data-target="#activeUsersToken-x">
 						<h4 onClick={() => { setShowList(!showList); }}>Avo Assure Client Provisions</h4>
