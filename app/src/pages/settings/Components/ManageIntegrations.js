@@ -19,7 +19,7 @@ import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree,enableSaveButton
+    selectedAvoproject, mappedTree,enableSaveButton, almavomapped
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -542,23 +542,38 @@ const ManageIntegrations = ({ visible, onHide }) => {
     }
 
     const callCalmSaveButton = async () => {
+        // Saving/Mapping API's
         if (mappedData && Object.keys(mappedData).length) {
             const response = await api.saveSAP_ALMDetails_ICE(mappedData);
             if (response.error) {
                 setToast("error", "Error", response.error);
-            }
-            else if (response === "unavailableLocalServer")
-                setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
-            else if (response === "scheduleModeOn")
+            } else if (response === "scheduleModeOn")
                 setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-            else if (response.message) {
-                callViewMappedFiles('');
-                setToast("success", "Success", 'Testes mapped successfully');
+            else if (response.status == 201 || response.status == 200 || response.message.length > 0) {
+                setToast("success", "Success", 'Tests mapped successfully!');
             }
         }
         else {
             setToast("info", "Info", 'Please sync atleast one map');
         }
+
+        // Fetching mapped API's again
+        const fetchMappedDetails = async () => {
+            try {
+                const getModulesData = await api.viewALM_MappedList_ICE({
+                    user_id: localStorage.userInfo.user_id,
+                    action: "viewALM_MappedList_ICE"
+                });
+        
+                if (getModulesData && getModulesData.length > 0) {
+                    dispatchAction(almavomapped(getModulesData));
+                }
+            } catch (error) {
+                console.error("Error fetching mapped details:", error);
+            }
+        };
+
+        fetchMappedDetails();
     }
 
     const callViewMappedFiles = async (saveFlag) => {

@@ -7,150 +7,152 @@ import { Paginator } from 'primereact/paginator';
 import "../styles/CloudALMContent.scss";
 import { useSelector, useDispatch } from 'react-redux';
 import { Tree } from 'primereact/tree';
-import * as api from '../../design/api';
+import { getProjectsMMTS } from '../../design/api';
+import { viewALM_MappedList_ICE } from '../../settings/api';
 import { Messages as MSG, setMsg } from '../../global';
-import { enableSaveButton, mappedPair } from "../settingSlice";
+import { enableSaveButton, mappedPair, almavomapped } from "../settingSlice";
 import { InputText } from 'primereact/inputtext';
+import { v4 as uuid } from 'uuid';
 
 const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTestCaseData }) => {
     // states
     const [currentCalmPage, setCurrentCalmPage] = useState(1);
     const [selectedNodes, setSelectedNodes] = useState({});
     const [avoSelected, setAvoSelected] = useState([]);
-    const [rows, setRows] = useState([]);
     const [calmFilterValue, setCalmFilterValue] = useState("");
     const [avoFilterValue, setAvoFilterValue] = useState("");
     const [treeData, setTreeData] = useState([]);
+    const [updatedTreeData, setUpdatedTreeData] = useState([]);
     const [almTestcases, setAlmTestcases] = useState([]);
 
     // selectors/redux
     const dispatch = useDispatch();
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const almavomappedData = useSelector((state) => state.setting.almavomapped);
 
     // constants, variables
     const calmItemsPerPage = 10;
+    const _uuid = uuid();
     const projectDetails = JSON.parse(localStorage.getItem("DefaultProject"));
     const startIndex = (currentCalmPage - 1) * calmItemsPerPage;
     const endIndex = Math.min(startIndex + calmItemsPerPage, almTestcases.length);
-    const mappedTestcasesData = [
-        {
-            "_id": "6593e8ff6921aa8860e8a81c",
-            "host": "localhost:8443",
-            "parentid": [
-                "41",
-                "41"
-            ],
-            "projectid": [
-                3,
-                3
-            ],
-            "query": "saveZephyrDetails_ICE",
-            "releaseid": [
-                5,
-                5
-            ],
-            "testid": [
-                "32",
-                "79"
-            ],
-            "testname": [
-                "Testcase1",
-                "Testcase4"
-            ],
-            "testscenarioid": [
-                "6592684a36fe1f9ecc0e159e"
-            ],
-            "testscenarioname": [
-                "TestCase1"
-            ],
-            "treeid": [
-                "22",
-                "22"
-            ],
-            "type": "Zephyr"
-        },
-        {
-            "_id": "65b1e9b8dc9eedd5f8115f34",
-            "host": "localhost:8443",
-            "parentid": [
-                "41"
-            ],
-            "projectid": [
-                3
-            ],
-            "query": "saveZephyrDetails_ICE",
-            "releaseid": [
-                5
-            ],
-            "reqdetails": [
-                []
-            ],
-            "testid": [
-                "32"
-            ],
-            "testname": [
-                "Testcase1"
-            ],
-            "testscenarioid": [
-                "65a91c770dc128a754a1adf4",
-                "65a91ca30dc128a754a1adfc",
-                "65a91c900dc128a754a1adf8"
-            ],
-            "testscenarioname": [
-                "TestCase0",
-                "TestCase2",
-                "TestCase1"
-            ],
-            "treeid": [
-                "22"
-            ],
-            "type": "Zephyr"
-        }
-    ];
-
-
 
     const onCALMPageChange = event => {
         setCurrentCalmPage(event.page + 1);
     };
 
-    const handleClick = (id, name) => {
-        setSelectedNodes({ id, name });
-    }
+    const handleClick = (calmTestId, calmTestname) => {
+        setSelectedNodes({ calmTestId, calmTestname }); 
+    };
+
+    useEffect(() => {
+        const _viewMappedDetails = almavomappedData?.filter((data) => data.projectname === reduxDefaultselectedProject.projectName).filter((details) => {
+            if (details.testid[0] === selectedNodes?.calmTestId) {
+                return details;
+            }
+        });
+        const updatedDataCopy = [...updatedTreeData];
+
+        _viewMappedDetails.forEach((details) => {
+            if (details.testscenarioid.length > 0) {
+                details.testscenarioid.map((data) => {
+                    updatedDataCopy.map((updatedData) => {
+                        if (updatedData._id === data) {
+                            updatedData.children.push({
+                                testcaseType: "children",
+                                _id: details.testid[0],
+                                name: details.testname[0]
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        updatedDataCopy?.forEach((updatedData) => {
+            const uniqueChildren = [];
+            if (updatedData?.children?.length > 0) {
+                const idSet = new Set();
+                updatedData.children.forEach((child) => {
+                    if (!idSet.has(child._id)) {
+                        uniqueChildren.push(child);
+                        idSet.add(child._id);
+                    }
+                });
+            }
+            updatedData.children = uniqueChildren.filter((child) => child._id == selectedNodes.calmTestId);
+        });
+        setUpdatedTreeData((updatedTreeData) => updatedDataCopy);
+    }, [selectedNodes?.calmTestId])
 
     const handleSync = () => {
-        let scenarioId = [];
+        let scenarioIdDetails = [];
         let popupMsg = false;
+        let scenarioIdsList = [];
+        let batchDetails = [];
         if (avoSelected.length === 0) {
             popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
         }
 
-        const data = treeData.map((item) => {
+        const data = updatedTreeData?.map((item) => {
             if (avoSelected.includes(item._id)) {
-                scenarioId.push(item._id);
-                return { ...item, checked: true, children: [{ ...selectedNodes, testcaseType: "children" }] }
+                scenarioIdDetails.push({ _id: item._id, name: item.name, testSuite: item.testSuite });
+                scenarioIdsList.push(item._id);
+                return { ...item, checked: true, children: [{ _id: selectedNodes.calmTestId, name: selectedNodes.calmTestname, testcaseType: "children" }] }
             } else {
                 return { ...item, checked: false }
             }
         });
+
+        const scenarioIdsGroup = Object.groupBy(scenarioIdDetails, (arr) => arr?.testSuite?.name);
+
+        for (let key in scenarioIdsGroup) {
+            const testSuiteId = scenarioIdsGroup[key]?.map((data) => data.testSuite?._id);
+            const avoTestCaseDetails = {
+                _id: scenarioIdsGroup[key]?.map((data) => data._id),
+                name: scenarioIdsGroup[key]?.map((data) => data.name)
+            };
+
+            const obj = {
+                "projectId": projectDetails.projectId, // avo proj id
+                "projectName": projectDetails.projectName, // avo proj name
+                "testsuiteid": testSuiteId[0], // avo test suite id
+                "testsuitename": key, // avo test suite
+                "testscenarioids": avoTestCaseDetails._id, // avo test case id of mentioned above
+                "scenarioname": avoTestCaseDetails.name, // avo test case name of mentioned above
+                "getparampaths": [
+                    ""
+                ],
+                "conditioncheck": [
+                    0
+                ],
+                "accessibilityParameters": [
+                    []
+                ]
+            };
+
+            batchDetails = [...batchDetails, obj];
+        };
 
         const mappedData = {
             "mappedDetails": [
                 {
                     "projectId": projectDetails.projectId,
                     "projectName": projectDetails.projectName,
-                    "scenarioId": scenarioId,
+                    "scenarioId": scenarioIdsList, // selected avo testcase ids
                     "itemType": "Test Case",
-                    "testCaseName": [selectedNodes.name],
-                    "testcaseId": [selectedNodes.id]
+                    "testCaseName": [selectedNodes.calmTestname], // selected calm test case name
+                    "testcaseId": [selectedNodes.calmTestId] // selected calm test case id
                 }
             ],
+            batchDetails,
+            "configurekey": _uuid,
             "action": "saveSAP_ALMDetails_ICE"
         };
 
         setTreeData(data);
         if (popupMsg) setMsg(popupMsg);
-        setSelectedNodes([]);
+        setSelectedNodes({});
         setAvoSelected([]);
         dispatch(enableSaveButton(true));
         dispatch(mappedPair(mappedData));
@@ -178,105 +180,86 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                     checked={avoSelected.includes(node._id)}
                     onChange={(e) => handleNode(e, node)}
                 />
-                <span className="scenario_label">{node.name}</span>
+                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
     };
 
-    // const handleUnSyncmappedData = async (items, testname) => {
-    //     let filteredRows = [];
-    //     for (let singleRow of rows) {
-    //         const testCaseIdData = [];
-    //         const testCaseNamesData = [];
-    //         let unsyncedTestId;
-    //         for (let testidIdx in singleRow.testid) {
-    //             if (singleRow.testid[testidIdx] !== unsyncedTestId) {
-    //                 testCaseIdData.push(singleRow.testid[testidIdx]);
-    //                 testCaseNamesData.push(singleRow.testCaseNames[testidIdx]);
-    //             }
-    //         }
-    //         if (testCaseIdData.length > 0)
-    //             filteredRows.push({
-    //                 ...singleRow,
-    //                 testid: testCaseIdData,
-    //                 testCaseNames: testCaseNamesData
-    //             });
-    //     }
-    //     setRows(filteredRows);
-    // };
-
     const handleFilter = (filterText, type) => {
-        console.log("filterText", filterText);
-        if (filterText.length) {
-            if (type == "calm") {
+        if (filterText.length > 0) {
+            if (type === "calm") {
                 setAlmTestcases((prevAlmTestcases) => allCalmTestCaseData.filter(almTestcase =>
                     almTestcase.name.toLowerCase().includes(filterText.toLowerCase())
                 ));
                 setCalmFilterValue(filterText);
-            } else if (type == "avo") {
-                setTreeData((treeData) => treeData.filter(treenode =>
+            } else if (type === "avo") {
+                setUpdatedTreeData(() => treeData.filter(treenode =>
                     treenode.name.toLowerCase().includes(filterText.toLowerCase())
-                ))
+                ));
                 setAvoFilterValue(filterText);
             }
-        };
+        } else {
+            setUpdatedTreeData(treeData);
+            setAlmTestcases(allCalmTestCaseData);
+            setCalmFilterValue("");
+            setAvoFilterValue("");
+        }
     };
 
     useEffect(() => {
-        setAlmTestcases(allCalmTestCaseData);
-    }, [allCalmTestCaseData]);
-
-    useEffect(() => {
         const fetchAvoModules = async () => {
-            const req = {
-                tab: "createTab",
-                projectid: projectDetails.projectId,
-                version: 0,
-                cycId: null,
-                modName: "",
-                moduleid: null
-            };
+            const getModulesData = await getProjectsMMTS(projectDetails.projectId);
+            const testCasesList = getModulesData[0].mindmapList?.flatMap(({ scenarioList, ...rest }) => (
+                scenarioList.map(scenario => ({
+                    ...scenario,
+                    children: [],
+                    checked: false,
+                    testcaseType: "parent",
+                    testSuite: {
+                        ...rest
+                    }
+                }))
+            ));
 
-            const getModulesData = await api.getModules(req);
-            const defaultTreeData = [];
-
-            getModulesData.map((element) => {
-                if (element.type !== "endtoend") {
-                    defaultTreeData.push({ ...element, "children": [], "checked": false, "testcaseType": "parent" });
-                }
-            });
-            setTreeData(defaultTreeData);
+            setUpdatedTreeData(() => testCasesList);
         };
 
         fetchAvoModules();
     }, []);
 
-    // useEffect(() => {
-    //     let totalCounts = 0;
-    //     let mappedScenarios = 0;
-    //     let mappedTests = 0;
-    //     let tempRow = [];
+    useEffect(() => {
+        const { user_id } = JSON.parse(localStorage.getItem("userInfo")) || "";
 
-    //     mappedTestcasesData.forEach(mappedTestcase => {
-    //         totalCounts = totalCounts + 1;
-    //         mappedScenarios = mappedScenarios + mappedTestcase?.testscenarioname.length;
-    //         mappedTests = mappedTests + mappedTestcase?.testname.length;
-    //         tempRow.push({
-    //             'testCaseNames': mappedTestcase?.testname,
-    //             'scenarioNames': mappedTestcase?.testscenarioname,
-    //             'mapId': mappedTestcase?._id,
-    //             'scenarioId': mappedTestcase?.testscenarioid,
-    //             'testid': mappedTestcase?.testid,
-    //             "reqDetails": mappedTestcase?.reqdetails
-    //         });
-    //     });
-    //     setRows(tempRow);
-    // }, []);
+        const fetchMappedDetails = async () => {
+            try {
+                const getModulesData = await viewALM_MappedList_ICE({
+                    user_id,
+                    action: "viewALM_MappedList_ICE"
+                });
+
+                if (getModulesData && getModulesData.length > 0) {
+                    dispatch(almavomapped(getModulesData));
+                }
+            } catch (error) {
+                console.error("Error fetching mapped details:", error);
+            }
+        };
+
+        fetchMappedDetails();
+    }, []);
+
+
+
+
+    useEffect(() => {
+        setAlmTestcases(allCalmTestCaseData);
+        setUpdatedTreeData(treeData);
+    }, [allCalmTestCaseData, treeData]);
 
     return (
         <TabView className='tab__cls' activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
-            <TabPanel header="Mapping" className='flex'>
+            <TabPanel header="Mapping" className='flex alignItems'>
                 <div id='cardsDiv'>
                     <Card className='column calm_cards' style={{ justifyContent: "space-between" }}>
                         <div className='calmTestCasesCard'>
@@ -291,7 +274,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                                 {
                                     almTestcases.length > 0 ? (
                                         almTestcases.slice(startIndex, endIndex).map((data, i) => (
-                                            <span key={i} className={`test_tree_nodes ${selectedNodes.name == data.name && "selected"} leafId`} title={data.name} onClick={(e) => handleClick(data._id, data.name)}>
+                                            <span key={i} className={`test_tree_nodes ${selectedNodes.calmTestId == data._id && "selected"} leafId`} title={data.name} onClick={(e) => handleClick(data._id, data.name)}>
                                                 {data.name}
                                             </span>
                                         ))
@@ -317,9 +300,9 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                             </span>
                         </div>
                         {
-                            Boolean(treeData) &&
+                            updatedTreeData.length > 0 &&
                             <div className="avotest__data">
-                                <Tree value={treeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={treeCheckboxTemplate} className="avoProject_tree" />
+                                <Tree value={updatedTreeData} selectionMode="multiple" selectionKeys={selectedNodes} nodeTemplate={treeCheckboxTemplate} className="avoProject_tree" />
                             </div>
                         }
                     </Card>

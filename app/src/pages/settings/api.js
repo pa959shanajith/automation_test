@@ -762,3 +762,24 @@ export const saveSAP_ALMDetails_ICE  = async(data) => {
         })
     })
 }
+
+export const viewALM_MappedList_ICE = async (data) => {
+    return new Promise((resolve, reject) => {
+        axios(url + "/viewALM_MappedList_ICE", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            data,
+        }).then(res => {
+            if (res.status === 200 || res.status == 201) {
+                resolve(res.data);
+            }
+            else {
+                reject(res.status);
+            }
+        }).catch(err => {
+            reject(err);
+        })
+    })
+}
