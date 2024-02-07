@@ -64,8 +64,8 @@ const IceProvision = (props) => {
           tokeninfoIcename={tokeninfoIcename} setTokeninfoIcename={setTokeninfoIcename} tokeninfoToken={tokeninfoToken}
           setTokeninfoToken={setTokeninfoToken} toastError={props.toastError} toastSuccess={props.toastSuccess}
           toast={props.toast} ldapIceProvisionUserList={props.ldapIceProvisionUserList} createUserDialogHide={props.createUserDialogHide}/>}
-        {(type === "inhouse" && editUser) ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
-          userConfig={props.userConfig}
+        {( editUser && (type === "inhouse" || type === 'ldap' || type === 'saml' )) ? <IceProvisionList defaultICE={defaultICE} setDefaultICE={setDefaultICE}
+          userConfig={props.userConfig }
           refreshIceList={refreshIceList} selectProvisionType={selectProvisionType} setOp={setOp}
           setSelectProvisionType={setSelectProvisionType} icelist={icelist} setIcelist={setIcelist}
           token={token} setToken={setToken} icename={icename} setIcename={setIcename} userid={userid}

@@ -76,6 +76,10 @@ const CreateLanding = (props) => {
     }
 
     useEffect(() => {
+        setServerName(server)
+    }, [server !== "" && editUser])
+
+    useEffect(() => {
         let newRolesList = [...primaryRoles, { name: "Quality Manager & Admin", value: "ManagerWithadmin" }]
         setPrimaryRoles(newRolesList);
     }, []);
@@ -105,11 +109,11 @@ const CreateLanding = (props) => {
     }
 
     const selectServerHandler = (event) => {
-        setServerName(event.value);
-        dispatch(AdminActions.UPDATE_SERVER(event.target.value.name));
+        setServerName(event.target.value);
+        dispatch(AdminActions.UPDATE_SERVER(event.target.value));
         if (type === "ldap") {
             dispatch(AdminActions.UPDATE_LDAP_FETCH("import"));
-            props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName: event.target.value.name });
+            props.ldapSwitchFetch({ userConf_ldap_fetch: "import", serverName: event.target.value });
         }
 
     }
@@ -288,11 +292,11 @@ const CreateLanding = (props) => {
                             <Dropdown data-test="confServer"
                                 id="confServer"
                                 className='w-full md:w-20rem p-inputtext-sm'
-                                value={serverName}
+                                value={serverName }
                                 options={confServerList}
                                 onChange={(e) => selectServerHandler(e)}
-                                optionLabel="name"
-                                // disabled={confExpired === server}
+                                // optionLabel="name"
+                                disabled={editUser}
                                 placeholder='Select server'
                             />
                         </div>
@@ -300,7 +304,7 @@ const CreateLanding = (props) => {
                     }
                 </div>
 
-                {(type === "ldap") ?
+                {(type === "ldap" && !editUser) ?
                     <>
                         <div className='flex flex-row pl-2 gap-2 pt-2'>
                             <div className="server_list_ldap card">
@@ -376,7 +380,7 @@ const CreateLanding = (props) => {
                     </>
                     : null
                 }
-                {(type === "inhouse" || type === "saml") ?
+                {(type === "inhouse" || type === "saml" || (type === "ldap" && editUser)) ?
                     <>
                         <div className='flex flex-row justify-content-between pl-2 pb-2'>
                             <div className="flex flex-column">
@@ -404,6 +408,7 @@ const CreateLanding = (props) => {
                                     className={`w-full md:w-20rem p-inputtext-sm ${props.emailAddClass ? 'inputErrorBorder' : ''}`}
                                     maxLength="100"
                                     placeholder="Enter Email Id"
+                                    disabled={editUser && (type === "ldap" || type === "saml")}
                                 />
                             </div>
                         </div>
@@ -416,7 +421,9 @@ const CreateLanding = (props) => {
                                     name="firstname" id="firstname" value={firstname}
                                     onChange={(event) => { firstNameChange(event.target.value) }}
                                     maxLength="100"
-                                    placeholder="Enter First Name" />
+                                    placeholder="Enter First Name"
+                                    disabled={editUser && (type === "ldap" || type === "saml")}
+                                    />
                             </div>
                             <div className='flex flex-column'>
                                 <label htmlFor='lastname' className="pb-2 font-medium">Last Name <span style={{ color: "#d50000" }}>*</span></label>
@@ -426,7 +433,9 @@ const CreateLanding = (props) => {
                                     name="lastname" id="lastname" value={lastname}
                                     onChange={(event) => { lastNameChange(event.target.value) }}
                                     maxLength="100"
-                                    placeholder="Enter Last Name" />
+                                    placeholder="Enter Last Name" 
+                                    disabled={editUser && (type === "ldap" || type === "saml")}
+                                    />
                             </div>
                         </div>
                     </> : null}
