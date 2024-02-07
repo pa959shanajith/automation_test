@@ -291,12 +291,12 @@ export const fetchAvoAgentAndAvoGridList = async(props) => {
     }
 }
 
-export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused) => {
+export const getGeniusData = async(data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused,migrationData) => {
     try{
         const res = await axios(url+'/getGeniusData', {
             method: 'POST',
             credentials: 'include',
-            data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused}
+            data:{data, snr_data,isAlreadySaved,completeScenraioDetials,scrnreused,migrationData}
         });
         if(res.status===200 && res.data !== "fail"){            
             return res.data;
