@@ -164,7 +164,7 @@ exports.resetPassword = async (req, res) => {
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
       if (status == "fail" || status == "forbidden") return res.send("fail");
       else {
-        notifications.notify("userUpdate", {field: "password", user: userData.user});
+        notifications.notify("userUpdate", {field: "password", user: userData.user, hostName: req.headers.host});
         return res.send(status);
       }
     }
@@ -218,7 +218,7 @@ exports.resetPassword = async (req, res) => {
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
 		else {
-			notifications.notify("userUpdate", {field: "password", user: userData.user});
+			notifications.notify("userUpdate", {field: "password", user: userData.user, hostName: req.headers.host});
 			res.send(status);
 		}
 	} catch (exception) {

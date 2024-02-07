@@ -239,14 +239,14 @@ io.on('connection', async socket => {
 		const data = message;
 		const resultData = data;
 		const execReq=resultData.execReq;
-		const execType = resultData.execType;
+		const execType = execReq?execReq.execType:undefined;
 		const userInfo=execReq?resultData.execReq.userInfo:undefined;
 		const invokinguser =userInfo? userInfo.invokingusername:undefined;
 		const host = invokinguser ?userInfo.host:{};
 		var clientName=utils.getClientName(host);
 		const notifySocMap = socketMapNotify[clientName];
 		const resSent = true;
-		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent);
+		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent,socket);
 	});
 
 	socket.on("scrape", async (message)=>{

@@ -318,7 +318,7 @@ class TestSuiteExecutor {
                 }
                 suite.reportData.push(reportItem);
             };
-            notifications.notify("report", { ...suite, user: userInfo, status, suiteStatus: "fail" });
+            notifications.notify("report", { ...suite, user: userInfo, status, suiteStatus: "fail", hostName: userInfo.host});
         }
         await this.updateExecutionStatus(executionIds, { status: "fail" });
     };
@@ -335,7 +335,7 @@ class TestSuiteExecutor {
         const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
-        
+        execReq.execType = execType;
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
             // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
@@ -345,6 +345,7 @@ class TestSuiteExecutor {
         }
         else{
             var socket = require('../socket');
+            const socketUtils = require("../socketUtils.js")
             var mySocket;
             var clientName=utils.getClientName(host);
             execReq.userInfo = userInfo;
@@ -386,14 +387,19 @@ class TestSuiteExecutor {
                     } else if (status === "finished") {
                         const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
                         const testsuite = execReq.suitedetails[testsuiteIndex];
+                        const reportData = socketUtils.getExecInfo();
+                        execReq.suitedetails[testsuiteIndex].reportData = reportData;
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
-                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1)
-                            notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
+                        if (testsuiteIndex === execReq.testsuiteIds.length - 1) {
+                            if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
+                        }
+                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1) {
+                            notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType, hostName: host });
+                        }
                     }
                 });
                 mySocket.on("result_executeTestSuite", async (message)=>{
-                    let socketUtils = require("../socketUtils.js")
                     const data = message;
                     const event = "return_status_executeTestSuite";
                     const resultData = data;
@@ -401,7 +407,10 @@ class TestSuiteExecutor {
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
                     const iceExecReq=resultData.execReq;
-                    if(!iceExecReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent);
+                    if (!status) {
+                        if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
+                    }
+                    if(!iceExecReq || mySocket.listenerCount("result_executeTestSuite") == 1) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent,mySocket);
                 });
             
             
@@ -491,6 +500,7 @@ class TestSuiteExecutor {
             'userid':'267ad96f374e4b06344f039c',
             'username':dataFromIce.exce_data.agentname,
         }
+        userInfo.host = dataFromIce.hostName;
         logger.info("Inside " + fnName + " function");
         const username = userInfo.username;
         const invokinguser = userInfo.invokingusername;
@@ -551,7 +561,7 @@ class TestSuiteExecutor {
                 await _this.updateExecutionStatus([executionid], { endtime: data.endTime, status: exeStatus });
                 if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
                 if (reportType != "accessiblityTestingOnly")
-                    notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
+                    notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, hostName: dataFromIce.hostName});
             }
         } else if (event == "result_executeTestSuite") {
             if (!status) { // This block is for report data
@@ -597,7 +607,7 @@ class TestSuiteExecutor {
                     }
                 } catch (ex) {
                     logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-                    if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag});
+                    if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, hostName: dataFromIce.hostName});
                     await this.updateExecutionStatus([executionid], { status: "fail" });
                 }
             } else { // This block will trigger when resultData.status has "success or "Terminate"
