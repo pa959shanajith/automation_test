@@ -1575,8 +1575,112 @@ exports.getall_uploadfiles = async (req, res) => {
         logger.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+  };
 
-}
+
+
+  
+  exports.teststepLevel_ExecutionStatus = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.executionid ) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "teststep_execution_analysis",
+            "executionid": req.body.executionid
+        };
+        const result = await utils.fetchData(inputs, "/teststepLevel_ExecutionStatus", " teststep_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("testcase fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  exports.defect_analysis = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.projectid || !req.body.userid ) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_defect_execution_analysis",
+            "projectid": req.body.projectid,
+            "userid": req.body.userid,
+            // "allflag":req.body.allflag,
+            "start_time": req.body.start_time || '',
+            "end_time": req.body.end_time || ''
+        };
+        const result = await utils.fetchData(inputs, "/defect_analysis", " api_defect_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("defects fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], 
+            start_time:result && result[0].start_time ? result[0].start_time:'' ,
+            end_time:result && result[0].end_time ? result[0].end_time:'',
+            message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  exports.rasa_prompt_model = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+        var inputs = {
+            "projectid": req.body.projectid,
+            "sender": req.body.sender,//"64e86e9f94d8d4c4811f1a9c",69a42e17-d4b1-41a7-8c4b-5ac69a7dcfad
+            "roleid": req.body.roleid, // 5db0022cf87fdec084ae49aa (Lead), 5db0022cf87fdec084ae49ab (Manager)
+            "message": req.body.message,
+            "metadata": {
+                "profileid": req.body.profileid || "",
+                "moduleid": req.body.moduleId || "",
+                "scenarioid": req.body.scenarioId || ""
+            },
+            "host": req.headers.host
+        }
+
+        
+        const result = await utils.fetchData(inputs, "/rasa_prompt_model","",true);
+
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result.status).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("defects fetched successfully");
+        res.status(200).send({ 
+            data:JSON.parse(result[0].rows) || []
+         });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
 exports.getJiraJSON_ICE = function (req, res) {
     logger.info("Inside UI service: getJiraJSON_ICE");
     try {
@@ -1683,5 +1787,67 @@ exports.getGenarate_testcase = async (req, res) => {
     } catch (exception) {
         logger.error("Error occurred in "+fnName+". Error: " + exception.message);
         res.status(500).send("fail");
+    }
+}
+
+exports.moduleLevel_ExecutionStatus = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.execlistid || !req.body.start_time || !req.body.end_time) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_modulelevel_execution_analysis",
+            "execlistid": req.body.execlistid,
+            "start_time": req.body.start_time,
+            "end_time": req.body.end_time
+        };
+        const result = await utils.fetchData(inputs, "/moduleLevel_ExecutionStatus", "api_modulelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("modules fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  exports.reportAnalysis = async (req, res) => {
+    logger.info("Inside report analysis service ");
+    try {
+         if ( !req.body.projectid || !req.body.userid) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_profilelevel_execution_analysis",
+            "projectid": req.body.projectid,
+            "userid": req.body.userid,
+            "start_time": req.body.start_time || '',
+            "end_time": req.body.end_time || ''
+        };
+        const result = await utils.fetchData(inputs, "/profileLevel_ExecutionStatus", "api_profilelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("testcases generated successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [],
+            start_time:result && result[0].start_time ? result[0].start_time:'' ,
+            end_time:result && result[0].end_time ? result[0].end_time:'', message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
