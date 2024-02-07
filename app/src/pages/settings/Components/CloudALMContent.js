@@ -275,12 +275,12 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                         <div className='calmTestCasesCard'>
                             <div className='column'>
                                 <div className='flex' id='projectName'>
-                                    <p>ALM Testcases:</p>
-                                    <span className="p-input-icon-left">
-                                        <i className="pi pi-search" />
-                                        <InputText onChange={(e) => handleFilter(e.target.value, "calm")} value={calmFilterValue} placeholder="Search testcase" />
-                                    </span>
+                                    <p className='text-bold'>ALM Testcases:</p>
                                 </div>
+                                <span className="p-input-icon-left" style={{ width: "100%", marginBottom: "15px" }}>
+                                    <i className="pi pi-search" />
+                                    <InputText style={{ width: "100%" }} onChange={(e) => handleFilter(e.target.value, "calm")} value={calmFilterValue} placeholder="Search testcase" />
+                                </span>
                                 {
                                     almTestcases.length > 0 ? (
                                         almTestcases.slice(startIndex, endIndex).map((data, i) => (
@@ -302,13 +302,13 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                     </Card>
                     <Card className='column calm_cards'>
                         <div className='flex' id='projectName'>
-                            <p>AVO Project:</p>
-                            <p className="selected_projNameText">{reduxDefaultselectedProject.projectName}</p>
-                            <span className="p-input-icon-left">
-                                <i className="pi pi-search" />
-                                <InputText onChange={(e) => handleFilter(e.target.value, "avo")} value={avoFilterValue} placeholder="Search testcase" />
-                            </span>
+                            <p className='text-bold'>AVO Project:</p>
+                            <p className="selected_projNameText text-bold">{reduxDefaultselectedProject.projectName}</p>
                         </div>
+                        <span className="p-input-icon-left" style={{ width: "100%" }}>
+                            <i className="pi pi-search" />
+                            <InputText style={{ width: "100%" }} onChange={(e) => handleFilter(e.target.value, "avo")} value={avoFilterValue} placeholder="Search testcase" />
+                        </span>
                         {
                             updatedTreeData.length > 0 &&
                             <div className="avotest__data">

@@ -83,16 +83,25 @@
 }
 
 #projectName {
-    gap: 20px;
+    gap: 10px;
     align-items: center;
     margin-bottom: 10px;
+    width: fit-content;
 }
 
 .selected_projNameText {
-    overflow: hidden;
     text-transform: capitalize;
+    text-overflow: ellipsis;
 }
 
 .alignItems {
     align-items: center;
+}
+
+.text-bold {
+    font-weight: 600;
+}
+
+.p-card .p-card-content {
+    padding: 0 !important;
 }
