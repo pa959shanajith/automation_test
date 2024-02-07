@@ -2518,6 +2518,7 @@ exports.gitSaveConfig = async (req, res) => {
 		const gitUrl = data.gitUrl;
 		const gitUsername = data.gitUsername;
 		const gitEmail = data.gitEmail;
+		const gitbranch =data.gitBranch;
 		const inputs = {
 			"action":action,
 			"userId":userId,
@@ -2526,7 +2527,8 @@ exports.gitSaveConfig = async (req, res) => {
 			"gitAccToken": gitAccToken,
 			"gitUrl":gitUrl,
 			"gitUsername":gitUsername,
-			"gitEmail":gitEmail
+			"gitEmail":gitEmail,
+			"gitbranch":gitbranch
 		};
 		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
 		return res.send(result);
@@ -2553,7 +2555,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else {
 			let data = [];
-			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail']);
+			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail'], result['gitbranch']);
 			return res.send(data);
 		}
 	} catch (exception){

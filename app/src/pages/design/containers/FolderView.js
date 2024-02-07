@@ -507,7 +507,7 @@ const FolderView = (props) => {
                     </div>
                     <div className='treeE2E'>
                         <div className="card" style={{ alignItems: "center", display: "flex", justifyContent: "center" }}>
-                            <Card style={{ width: "21.5rem", height: "7rem" }}>
+                            <Card style={{ width: "21.5rem", height: "20vh" }}>
                                 {/* <Button label='Save' onClick={modifyingStepGroupToParent} /> */}
                             </Card>
                         </div>
