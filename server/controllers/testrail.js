@@ -35,7 +35,7 @@ exports.getProjects_Testrail = function (req, res) {
 
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
-    
+
     let username = req.session.username;
 
     let name;
@@ -79,7 +79,6 @@ exports.getProjects_Testrail = function (req, res) {
 
         // emit the information to ICE, to request the Project details data.
         mySocket.emit("testraillogin", testrailDetails);
-
         //ICE responds to the event and sends the above requested data
         function testraillogin_listener(data) {
           // remove the added listener once the task is done
@@ -201,53 +200,51 @@ exports.getTestcases_Testrail = async (req, res) => {
   try {
     // Add into the info log
     logger.info("Inside UI service: getTestcases_Testrail");
-
+ 
     let mySocket;
-
+ 
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
-
+ 
     let username = req.session.username;
-
+ 
     let name;
-
+ 
     // check if the socket connection is established with ice.
     if (
       myserver.allSocketsICEUser[clientName][username] &&
       myserver.allSocketsICEUser[clientName][username].length > 0
     )
       name = myserver.allSocketsICEUser[clientName][username][0];
-
+ 
     // Getting the details of the socket
     mySocket = myserver.allSocketsMap[clientName][name];
-
+ 
     if (mySocket != undefined && mySocket.connected) {
       logger.debug("ICE Socket requesting Address: %s", name);
-
+ 
       // get the details from request body
       let testrailAction = req.body.TestRailAction;
-      let projectId = req.body.projectId;
-      let suiteId = req.body.suiteId ? req.body.suiteId : null;
-
+      let runId = req.body.runId;
+   
       let testrailDetails = {
         testrailAction,
-        projectId,
-        suiteId,
+        runId,
       };
 
       // add into the info log
       logger.info("Sending socket request for testrailLogin to redis");
-
+ 
       // emit the information to ICE, to request the Project details data.
       mySocket.emit("testraillogin", testrailDetails);
-
+ 
       //ICE responds to the event and sends the above requested data
       function testraillogin_listener(data) {
         // remove the added listener once the task is done
         mySocket.removeListener("qcresponse", testraillogin_listener);
         res.send(data);
       }
-
+ 
       // Invoke the above function on qcresponse event
       mySocket.on("qcresponse", testraillogin_listener);
     } else {

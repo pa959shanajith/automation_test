@@ -188,6 +188,83 @@ export const getDetails_ZEPHYR = async() => {
     }
 }
 
+export const getDetails_Testrail = async () => {
+    try {
+        const { data, status } = await axios(url + '/getDetails_Testrail', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include'
+        });
+        
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        } else if (status === 200 && data !== "fail") {
+            return data;
+        } else if (status !== 200 || data == "fail") {
+            return data;
+        }
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_FETCH }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_FETCH }
+    }
+}
+
+export const getProjectPlans = async (projectPayload) => {
+    try {
+        const { data, status } = await axios(url + '/getProjectPlans', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: projectPayload
+        });
+        
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        } else if (status === 200 && data !== "fail") {
+            return data;
+        } else if (status !== 200 || data == "fail") {
+            return data;
+        }
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    }
+}
+
+export const getSuitesandRuns = async (payload) => {
+    try {
+        const { data, status } = await axios(url + '/getSuitesandRuns', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: payload
+        });
+        
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        } else if (status === 200 && data !== "fail") {
+            return data;
+        } else if (status !== 200 || data == "fail") {
+            return data;
+        }
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    }
+}
+
 /*  manageZephyrDetails
   api returns string "success" , "fail"
 */
@@ -214,6 +291,30 @@ export const manageZephyrDetails = async(action, userObj) => {
     }catch(err){
         console.error(err)
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
+    }
+}
+
+export const manageTestRailDetails = async (action, userObj) => {
+    try {
+        const { data, status } = await axios(url + '/manageTestrailDetails', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: { action, user: userObj },
+            credentials: 'include'
+        });
+
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(navigate)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        else if (status === 200 && data !== "fail") {
+            return data;
+        }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.INTEGRATION.ERR_LOGIN_AGAIN }
     }
 }
 
@@ -376,6 +477,56 @@ export const loginToZephyr_ICE = async(zephyrPayload) => {
 				zephyraction: "login"
             }
         });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const getProjectsTestrail_ICE = async(testRailPayload) => {
+    try{
+        const res = await axios(url+'/getProjectsTestrail_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: testRailPayload
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const getTestcases_Testrail = async(payload) => {
+    try{
+        const res = await axios(url+'/getTestcasesTestrail_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: payload
+        });
+
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
