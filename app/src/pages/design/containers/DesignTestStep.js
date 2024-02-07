@@ -624,7 +624,7 @@ const DesignModal = (props) => {
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,debuggerPoints)
             .then(data => {
                 setOverlay("");
                 ResetSession.end();
