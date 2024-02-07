@@ -49,6 +49,7 @@ import DesignTestStepsGroups from './DesignTestStepsGroups';
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
 import { Card } from '@mui/material';
 import { AutoComplete } from 'primereact/autocomplete';
+import NavigatetoCaptureDesign from './NavigatetoCaptureDesign';
 
 /*Component Canvas
   use: return mindmap on a canvas
@@ -185,6 +186,10 @@ const CanvasNew = (props) => {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [loading, setLoading] = useState(false);
     const inputRef = useRef(null);
+    const [visibleCaptureAndDesign,setVisibleCaptureAndDesign] = useState(false);
+    const [captureClick, setCaptureClick] = useState(false);
+    const [designClick, setDesignClick] = useState(false);
+
 
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -530,7 +535,8 @@ const CanvasNew = (props) => {
     }
     const handleCapture = () =>{
       if (toastData !== true){
-        setVisibleCaptureElement(true);
+        setVisibleCaptureAndDesign(true);
+        setCaptureClick(true);
         d3.select('#'+box).classed('node-highlight',false)
       }else{
         toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
@@ -546,7 +552,8 @@ const CanvasNew = (props) => {
     }
     const handleTestSteps = () => {
       if (toastData !== true){
-        setVisibleDesignStep(true);
+        setVisibleCaptureAndDesign(true);
+        setDesignClick(true);
         d3.select('#'+box).classed('node-highlight',false)
       }else{
         toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
@@ -2732,6 +2739,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
+            {visibleCaptureAndDesign && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick}/>}
             <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
