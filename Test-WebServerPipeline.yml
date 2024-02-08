@@ -1,11 +1,15 @@
 name: Test-WebServerPipeline
+
 trigger: none
+
 resources:
   pipelines:
   - pipeline: Test-WebServerPipeline
     source: Test-Parent-Pipeline
     trigger: true
+
 steps:
+
 - task: DownloadBuildArtifacts@1
   inputs:
     buildType: 'specific'
@@ -13,17 +17,23 @@ steps:
     pipeline: '182'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
-    artifactName: 'BranchName'
+    artifactName: 'dependencies'
     downloadPath: '$(System.ArtifactsDirectory)'
+
+- script: |
+    unzip -j $(Build.ArtifactStagingDirectory)/dependencies/dependencies.zip -d $(Build.ArtifactStagingDirectory)
+    rm -rf dependencies
+    ls $(System.ArtifactsDirectory)
 
 - checkout: git://$(System.TeamProject)/WebServer
   persistCredentials: true
   clean: true
   path: s/avoassure
+
 - task: CmdLine@2
   inputs:
     script: |
-      BranchName=$(cat $(System.ArtifactsDirectory)/BranchName/BranchName.txt)
+      BranchName=$(cat $(System.ArtifactsDirectory)/BranchName.txt)
       echo "Branch Name is:$BranchName"
       echo $(Build.SourceBranch)
       cd s/avoassure
@@ -70,6 +80,7 @@ steps:
   displayName: 'server part'
 
 - script: |
+   new_version=$(cat $(System.ArtifactsDirectory)/version.txt)
    echo "inside server"
    ls
    cd app
@@ -78,7 +89,7 @@ steps:
    ./node ./nodejs/bin/npm install --scripts-prepend-node-path
    ln -s node_modules/npm/bin/npm npm
    echo "creating app build"
-   export REACT_APP_VERSION=$(version).$(minor_version_no).$(PATCH_VERSION)
+   export REACT_APP_VERSION=$(new_version)
    echo $PATCH_VERSION
    echo $REACT_APP_VERSION
    echo $REACT_APP_VERSION > version.txt
@@ -105,4 +116,3 @@ steps:
   displayName: 'Publish Pipeline Artifact'
   inputs:
     targetPath: '$(Build.ArtifactStagingDirectory)/webserver.zip'
-
