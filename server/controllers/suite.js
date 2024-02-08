@@ -244,6 +244,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 						executionData.targetUser = targetUser;
 						//Get profile data and add to queue
 						var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
+						if(makeReq.status == "fail") return res.send({status:"fail",error:makeReq.error});
 						result["message"] = makeReq["message"] + "\n" + result["message"];
 					}
 					result["status"] = "Success";
@@ -259,6 +260,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		userInfo.icename = targetUser;
 		if (Array.isArray(targetUser)) targetUser = "";
 		var makeReq = await makeRequestAndAddToQueue(batchExecutionData,targetUser,userInfo,poolid);
+		if(makeReq.status == "fail") return res.send({status:"fail",error:makeReq.error});
 		Object.assign(result,makeReq);
 	}
 	if(makeReq.error=== "None"){

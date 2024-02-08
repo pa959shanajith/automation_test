@@ -950,7 +950,7 @@ const onPageAvoChange = (event) => {
                                             <div className="dropdown-map_azure">
                                                 <Dropdown value={selectedProject} onChange={(e) => {onProjectChange(e);setSecondOption("")}} options={projectDetails} optionLabel="name"
                                                     placeholder="Select Project" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_project1" />
-                                                <Dropdown value={secondOption} onChange={(e) => handleSecondOptionChange(e)} options={issueTypes} optionLabel="name"
+                                                <Dropdown value={secondOption} disabled={disableIssue} onChange={(e) => handleSecondOptionChange(e)} options={issueTypes} optionLabel="name"
                                                     placeholder="Select Work Items" style={{ width: '11rem', height: '2.5rem' }} className="dropdown_release1" />
                                                 {/* {secondOption && secondOption.name === 'TestPlans' && (
                                                     <Dropdown value={selectedTestplan} onChange={(e) => handleTestSuite(e)} options={testPlansDropdown} optionLabel="name"
