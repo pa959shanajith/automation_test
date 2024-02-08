@@ -158,48 +158,48 @@ const CreateProject = (props) => {
 
   const applicationLicenseCheck = {
     webLicense :{
-      value: userInfo?.licensedetails?.WEBT,
+      value:String(userInfo?.licensedetails?.WEBT) === "false",
       msg: 'You do not have access to create WEB project'
     },
     sapLicense : {
-      value: userInfo?.licensedetails?.ETSAP,
+      value: String(userInfo?.licensedetails?.ETSAP) === "false",
       msg: 'You do not have access to create SAP project'
     },
     oebsLicense : {
-      value: userInfo?.licensedetails?.ETOAP,
+      value:String(userInfo?.licensedetails?.ETOAP) === "false",
       msg: 'You do not have access to create OEBS project'
     },
     desktopLicense : {
-      value: userInfo?.licensedetails?.DAPP,
+      value: String(userInfo?.licensedetails?.DAPP) === "false",
       msg: 'You do not have access to create Desktop project'
     },
     webserviceLicense :{
-      value: userInfo?.licensedetails?.APIT,
+      value: String(userInfo?.licensedetails?.APIT) === "false",
       msg: 'You do not have access to create Webservice project'
     },
     mainframeLicense : {
-      value: userInfo?.licensedetails?.MF,
+      value: String(userInfo?.licensedetails?.MF) === "false",      
       msg: 'You do not have access to create Mainframe project'
     },
     mobilewebLicense : {
-      value: userInfo?.licensedetails?.MOBT,
+      value: String(userInfo?.licensedetails?.MOBT) === "false",
       msg: 'You do not have access to create MobileWeb project'
     },
     mobileAppLicense  : {
-      value: userInfo?.licensedetails?.MOBT,
+      value: String(userInfo?.licensedetails?.MOBT) === "false",
       msg: 'You do not have access to create MobileApplication project'
     }
   }
 
   const apps = [
-    { name: 'Web', code: 'Web', image: 'static/imgs/Web.svg', disabled: !applicationLicenseCheck.webLicense.value ,title: applicationLicenseCheck.webLicense.msg },
-    { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg', disabled: !applicationLicenseCheck.sapLicense.value ,title:applicationLicenseCheck.sapLicense.msg},
-    { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg', disabled: !applicationLicenseCheck.oebsLicense.value ,title:applicationLicenseCheck.oebsLicense.msg},
-    { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png', disabled: !applicationLicenseCheck.desktopLicense.value,title:applicationLicenseCheck.desktopLicense.msg},
-    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/WebService.png', disabled: !applicationLicenseCheck.webserviceLicense.value, title:applicationLicenseCheck.webserviceLicense.msg},
-    { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png', disabled: !applicationLicenseCheck.mainframeLicense.value,title:applicationLicenseCheck.mainframeLicense.msg},
-    { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png', disabled: !applicationLicenseCheck.mobilewebLicense.value , title:applicationLicenseCheck.mobilewebLicense.msg},
-    { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png', disabled: !applicationLicenseCheck.mobileAppLicense.value, title:applicationLicenseCheck.mobileAppLicense.msg},
+    { name: 'Web', code: 'Web', image: 'static/imgs/Web.svg', disabled: applicationLicenseCheck.webLicense.value ,title: applicationLicenseCheck.webLicense.msg },
+    { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg', disabled: applicationLicenseCheck.sapLicense.value ,title:applicationLicenseCheck.sapLicense.msg},
+    { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg', disabled: applicationLicenseCheck.oebsLicense.value ,title:applicationLicenseCheck.oebsLicense.msg},
+    { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png', disabled: applicationLicenseCheck.desktopLicense.value,title:applicationLicenseCheck.desktopLicense.msg},
+    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/WebService.png', disabled: applicationLicenseCheck.webserviceLicense.value, title:applicationLicenseCheck.webserviceLicense.msg},
+    { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png', disabled: applicationLicenseCheck.mainframeLicense.value,title:applicationLicenseCheck.mainframeLicense.msg},
+    { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png', disabled: applicationLicenseCheck.mobilewebLicense.value , title:applicationLicenseCheck.mobilewebLicense.msg},
+    { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png', disabled: applicationLicenseCheck.mobileAppLicense.value, title:applicationLicenseCheck.mobileAppLicense.msg},
     // { name: 'System Application', code: 'System',value:'5db0022cf87fdec084ae49b5', image: 'static/imgs/System_application.svg' },
   ];
   const appTypes = [
