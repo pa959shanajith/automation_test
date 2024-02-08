@@ -175,6 +175,8 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const batchExecutionData = req.body.executionData;
+	const steps = await utils.fetchData({'host':batchExecutionData.host,'executionData':batchExecutionData},"/hooks/validateExecutionSteps")
+	if(steps.status == "fail") return res.send({status:"fail",error:steps.message});
 	if(batchExecutionData.executionEnv == 'saucelabs') {
 		batchExecutionData.sauce_username = batchExecutionData.saucelabDetails.SaucelabsUsername;
 		batchExecutionData.sauce_access_key = batchExecutionData.saucelabDetails.Saucelabskey;
