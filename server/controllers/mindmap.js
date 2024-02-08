@@ -1700,7 +1700,6 @@ exports.importDefinition = async (req, res) => {
 				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 				var socket = require('../lib/socket');
 				var mySocket;
-				var clientName=utils.getClientName(host);
 				mySocket = socket.allSocketsMap[clientName][icename];
 				if(mySocket.connected){
 

@@ -1,12 +1,14 @@
-const mySocket = require('./socket')
 var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
+let execInfo = undefined;
 
-module.exports.result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent)=>
+const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent,mySocket)=>
 {
         const executionid = (resultData) ? resultData.executionId : "";
         const status = resultData.status;
         const iceExecReq=resultData.execReq;
+        const username = userInfo.username;
+        var reportType = "accessiblityTestingOnly";
             if (!status) { // This block is for report data
                 if ("accessibility_reports" in resultData) {
                     const accessibility_reports = resultData.accessibility_reports
@@ -47,9 +49,10 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                         }
                         // testsuite.reportData[scenarioIndex] = reportItem;
                         testsuite.reportData.push(reportItem);
+                        execInfo = testsuite.reportData;
                     }
                 } catch (ex) {
-                    logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
+                    logger.error("Exception in the function insertreportquery: %s", ex);
                     if (reportType != "accessiblityTestingOnly") notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, profileName: execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
                     await this.updateExecutionStatus([executionid], { status: "fail" });
                 }
@@ -62,19 +65,28 @@ module.exports.result_executeTestSuite = async(resultData,execReq,execType,userI
                     report_result["status"] = status
                     report_result["configurekey"] = execReq["configurekey"]
                     report_result["configurename"] = execReq["configurename"]
-                    if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
-                    if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                     report_result["testSuiteDetails"] = execReq["suitedetails"]
                     if (resultData.userTerminated) result = "UserTerminate";
                     if (execType == "API") result = [d2R, status, resultData.testStatus];
                     if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected && execType == 'ACTIVE') { // This block is only for active mode
                         notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
                     } else if (resSent) {
+                        if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
+                        if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
                         queue.Execution_Queue.add_pending_notification("", report_result, username);
                     }
                 } catch (ex) {
-                    logger.error("Exception while returning execution status from function " + fnName + ": %s", ex);
+                    logger.error("Exception while returning execution status from function result_executeTestSuite: %s", ex);
                 }
             }
    
+}
+
+const getExecInfo = () => {
+    return execInfo;
+}
+
+module.exports = {
+    result_executeTestSuite: result_executeTestSuite,
+    getExecInfo: getExecInfo
 }
