@@ -549,11 +549,12 @@
                                         }
 
                                     }
-
+                                                      
+                                                      
                                     .projIconSce {
                                         display: flex;
                                         width: 30%;
-                                        align-items: center;
+                                   align-items: center;
 
                                         h5 {
                                             display: flex;
@@ -561,8 +562,7 @@
                                             position: absolute;
                                             margin-left: 4rem;
 
-                                            img {
-
+*                                            img {
                                                 height: 15px;
                                                 width: 15px;
                                                 // margin-top: 3px;
@@ -578,6 +578,16 @@
                                                 text-overflow: ellipsis;
                                                 width: 7rem;
                                                 margin-top: 1px;
+                                                white-space:nowrap;
+                                               
+                                                &:hover {
+                                                    white-space: normal; 
+                                                    width: auto; 
+                                                    border:2px solid #c7c7c7;
+                                                    padding: 5px;
+                                                    margin-left: -75px;
+
+                                                }
                                             }
                                         }
 
