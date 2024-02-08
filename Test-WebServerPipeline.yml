@@ -89,7 +89,7 @@ steps:
    ./node ./nodejs/bin/npm install --scripts-prepend-node-path
    ln -s node_modules/npm/bin/npm npm
    echo "creating app build"
-   export REACT_APP_VERSION=$(new_version)
+   export REACT_APP_VERSION=$new_version
    echo $PATCH_VERSION
    echo $REACT_APP_VERSION
    echo $REACT_APP_VERSION > version.txt
