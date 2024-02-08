@@ -131,6 +131,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         let targetICE = EMPTYUSER;
         let projectid = "";
         let response = {}
+        const steps = await utils.fetchData({'host':batchExecutionData.host,'executionData':batchExecutionData},"/hooks/validateExecutionSteps")
+        if(steps.status == "fail") return {status:"fail",error:steps.message};
         response['status'] = "fail";
         response["message"] = "N/A"
         response['error'] = "None"
