@@ -229,7 +229,7 @@ const IceProvisionForm = (props) => {
 	return (
 		<Fragment>
 			{loading ? <ScreenOverlay content={loading} /> : null}
-			{type === 'ldap' && <div className='flex flex-column'>
+			{(type === 'ldap' && !editUser) && <div className='flex flex-column'>
 				<div className='pt-2 pb-2' style={{ alignSelf: 'self-end' }}>
 					<Button label='Generate to all' onClick={() => provisionsIce('')} size='small'></Button>
 				</div>
@@ -252,7 +252,7 @@ const IceProvisionForm = (props) => {
 					</DataTable>
 				</div>
 			</div>}
-			{(type === 'inhouse'|| type === "saml") && <div className="col-xs-9" style={{ width: "83%" }}>
+			{(type === 'inhouse'|| type === "saml" || (type === "ldap" && editUser)) && <div className="col-xs-9" style={{ width: "83%" }}>
 				<div className='flex flex-column pb-4'>
 					<label className="pb-2 font-medium" title="Token Name">Avo Assure Client Name</label>
 					<div className="flex flex-row">

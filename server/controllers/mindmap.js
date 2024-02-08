@@ -112,7 +112,8 @@ const getModule = async (d) => {
 		"projectid":d.projectid || null,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId || null,
-		"name":"getModules"
+		"name":"getModules",
+		"query":d.query || null
 	}
 	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
 };
@@ -1334,10 +1335,10 @@ exports.importGitMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const expProj = req.body.expProj;
-		const projectid = req.body.projectid;
+		const projectid = req.body.projectId;
 		// const gitname = req.body.gitname;
 		// const gitbranch = req.body.gitbranch;
-		const gitversion = req.body.gitversion;
+		const gitversion = req.body.gitVersion;
 		// var gitfolderpath = req.body.gitfolderpath;
 		var appType= req.body.appType;		
 		var projectName = req.body.projectName;
@@ -1347,10 +1348,10 @@ exports.importGitMindmap = async (req, res) => {
 		const inputs= {
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
-			"projectid": projectid,
+			"projectId": projectid,
 			// "gitname": gitname,
 			// "gitbranch": gitbranch,
-			 "gitversion": gitversion,
+			 "gitVersion": gitversion,
 			// "gitfolderpath": gitfolderpath,
 			"appType":appType,			
 			"projectName":projectName,
@@ -1740,6 +1741,24 @@ exports.importDefinition = async (req, res) => {
 	} catch (exception) {
         logger.error("Exception in the service importDefinition: %s", exception);
         res.send("Fail");
+    }
+};
+exports.fetch_git_exp_details = async (req, res) => {
+    const fnName = "fetch_git_exp_details";
+    logger.info("Inside UI service: " + fnName);
+    try {
+		
+        const projectId = req.body.projectId
+        const inputs= {"projectId":projectId}
+        const result = await utils.fetchData(inputs, "/git/fetch_git_exp_details", fnName);
+        if (result == "fail") {
+            return res.send('fail');}
+        else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
     }
 };
 exports.saveTag = async (req, res) => {

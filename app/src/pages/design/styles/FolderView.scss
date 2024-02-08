@@ -1,5 +1,5 @@
 .folderViewLeftContainer {
-    width: 23%;
+    width: 18%;
     height: 96%;
 
     // border:1px solid black;
@@ -17,7 +17,7 @@
 }
     .normalModuleSection {
         // border:1px solid red;
-        height: 60vh;
+        height: 55vh;
 
         .ModuleTitleAndPlusBtn {
             // border:1px solid green;
@@ -48,11 +48,11 @@
             justify-content: center;
 
             .p-input-icon-left {
-                width: 18rem;
+                // width: 18rem;
                 height: 2rem;
 
                 .p-component {
-                    width: 18rem;
+                    width: 17rem;
                     height: 1.9rem;
                 }
             }
@@ -86,7 +86,7 @@
 
                             .p-treenode-selectable {
                                 height: 2rem;
-                                width: 18rem;
+                                width: 12rem;
 
 
 
@@ -186,7 +186,7 @@
 
     .E2ESection {
         // border:1px solid red;
-        height: 25vh;
+        height: 28vh;
 
         .E2ETitleAndPlusBtn {
             // border:1px solid green;
@@ -205,11 +205,11 @@
             justify-content: center;
 
             .p-input-icon-left {
-                width: 18rem;
+                // width: 18rem;
                 height: 2rem;
 
                 .p-component {
-                    width: 18rem;
+                    width: 17rem;
                     height: 1.9rem;
                 }
             }

@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { getUserDetails } from '../api';
-import EditLanding from './EditLanding';
 import '../styles/UserList.scss';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -12,6 +10,8 @@ import CreateUser from './CreateUser';
 import { AdminActions } from '../adminSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
+import { getLDAPConfig, getSAMLConfig, getOIDCConfig, getUserDetails } from '../api';
+
 
 
 
@@ -99,10 +99,9 @@ const UserList = (props) => {
             else {
                 setLoading(false);
                 const uType = data.type;
+                setEditUserData(data);
                 dispatch(AdminActions.UPDATE_DATA(data));
-                // dispatch(AdminActions.UPDATE_ADDROLES,{});
                 dispatch(AdminActions.UPDATE_TYPE(uType));
-
                 dispatch(AdminActions.UPDATE_INPUT_USERNAME(data.username));
                 dispatch(AdminActions.UPDATE_INPUT_LASTNAME(data.lastname));
                 dispatch(AdminActions.UPDATE_INPUT_FIRSTNAME(data.firstname));
@@ -112,10 +111,60 @@ const UserList = (props) => {
                 dispatch(AdminActions.UPDATE_USERROLE(data.role));
                 
                 data.addrole.forEach((e) => dispatch(AdminActions.ADD_ADDROLE, e));
-                // dispatch({type:actionTypes.UPDATE_FTYPE,payload:  (uType==="inhouse")? "Default":((uType==="oidc")? "OpenID":uType.toUpperCase())});
 
                 if (data.type !== "inhouse") {
                     var confserver = data.server;
+                    dispatch(AdminActions.UPDATE_SERVER(""));
+                    dispatch(AdminActions.UPDATE_CONF_SERVER_LIST([]));
+                    let serverNameList = [];
+                    dispatch(AdminActions.UPDATE_NO_CREATE(false));
+                    // data.map(data => serverNameList.push(data.name))
+
+                    if (data.type === "ldap") {
+                        dispatch(AdminActions.UPDATE_LDAP({fetch: "map", user: ''}))
+                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
+                        setLoading("Fetching LDAP Server configurations...");
+                        var data1 = await getLDAPConfig("server");
+                        if(data1.error){props.toastError(data1.error);return;}
+                        setLoading(false);
+                        if (data1 === "empty") {
+                            props.toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
+                        } else {
+                            dispatch(AdminActions.UPDATE_NO_CREATE(false))
+                            data1.map(data => serverNameList.push(data.name))
+                        }
+                    }
+                    else if (data.type === "saml"){
+                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
+                        setLoading("Fetching SAML Server configurations...");
+                        data1 = await getSAMLConfig();
+                        if(data1.error){props.toastError(data1.error);return;}
+                        setLoading(false);
+                        if (data === "empty") {
+                            props.toastWarn(MSG.ADMIN.WARN_SAML_CINFIGURE);
+                        } else {
+                            dispatch(AdminActions.UPDATE_NO_CREATE(false))
+                            data1.map(data => serverNameList.push(data.name))
+                        }
+                    }
+                    else if (data.type === "oidc"){ 
+                        dispatch(AdminActions.UPDATE_NO_CREATE(true))
+                        setLoading("Fetching OpenID Server configurations...");
+                        data1 = await getOIDCConfig();
+                        if(data1.error){props.toastError(data1.error);return;}
+                        setLoading(false);
+                        if(data1 === "empty" ){
+                            props.toastWarn(MSG.ADMIN.WARN_OPENID_CONFIGURE);
+                        } else {
+                            dispatch(AdminActions.UPDATE_NO_CREATE(false))
+                            data1.map(data => serverNameList.push(data.name))
+                        }
+                    }
+                    if (!data1.some(function(e) { return e.name === confserver;})) {
+                        dispatch(AdminActions.UPDATE_CONF_SERVER_LIST_PUSH( {_id: '', name: confserver}));
+                        dispatch(AdminActions.UPDATE_CONF_EXP(confserver));
+                    }
+                    dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(serverNameList.sort()));
                     dispatch(AdminActions.UPDATE_SERVER(data.server));
                     dispatch(AdminActions.UPDATE_LDAP_USER(data.ldapuser || ''));
                 }
@@ -170,7 +219,7 @@ const UserList = (props) => {
                     </>}
                 width={{ width: "5rem" }}
             />
-            <DataTable value={data} editMode="row" size='normal'
+            <DataTable value={data} editMode="row" size='small'
                 loading={loading}
                 globalFilter={globalFilter}
                 header={header}
