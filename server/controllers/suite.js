@@ -175,8 +175,6 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 	const fnName = "ExecuteTestSuite_ICE"
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	const batchExecutionData = req.body.executionData;
-	const steps = await utils.fetchData({'host':batchExecutionData.host,'executionData':batchExecutionData},"/hooks/validateExecutionSteps")
-	if(steps.status == "fail") return res.send({status:"fail",error:steps.message});
 	if(batchExecutionData.executionEnv == 'saucelabs') {
 		batchExecutionData.sauce_username = batchExecutionData.saucelabDetails.SaucelabsUsername;
 		batchExecutionData.sauce_access_key = batchExecutionData.saucelabDetails.Saucelabskey;
@@ -246,6 +244,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 						executionData.targetUser = targetUser;
 						//Get profile data and add to queue
 						var makeReq = await makeRequestAndAddToQueue(executionData, targetUser, user, poolid);
+						if(makeReq.status == "fail") return res.send({status:"fail",error:makeReq.error});
 						result["message"] = makeReq["message"] + "\n" + result["message"];
 					}
 					result["status"] = "Success";
@@ -261,6 +260,7 @@ exports.ExecuteTestSuite_ICE = async (req, res) => {
 		userInfo.icename = targetUser;
 		if (Array.isArray(targetUser)) targetUser = "";
 		var makeReq = await makeRequestAndAddToQueue(batchExecutionData,targetUser,userInfo,poolid);
+		if(makeReq.status == "fail") return res.send({status:"fail",error:makeReq.error});
 		Object.assign(result,makeReq);
 	}
 	if(makeReq.error=== "None"){
