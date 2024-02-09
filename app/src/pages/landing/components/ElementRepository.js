@@ -851,7 +851,7 @@ const deleteScreen = (index, screenDetails)=>{
                   "name": screenDetails.name,
                   "projectId": defaultselectedProject.projectId
                 })}} className='edit-text'/>
-                <Button label="Delete" severity="danger" onClick={(e)=>{e.stopPropagation();setDeleteScreens(true)}} className='delete-text'/>
+                <Button label="Delete" severity="danger" onClick={(e)=>{e.stopPropagation();e.preventDefault();setDeleteScreens(true)}} className='delete-text'/>
                 
               </div>
               </>)}

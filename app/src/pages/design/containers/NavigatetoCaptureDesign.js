@@ -17,8 +17,15 @@ function NavigatetoCaptureDesign(params) {
     const [activeIndex, setActiveIndex] = useState(params.designClick?1:0);
 
     const tabChnage =(e) =>{
-       if(params.fetchingDetails['children'].length > 0){
-       setActiveIndex(e.index)
+       if(!params.designClick){
+            if(params.fetchingDetails['children'].length > 0){
+            setActiveIndex(e.index)
+        }
+     }
+       else {
+        if(params.fetchingDetails['parent']){
+            setActiveIndex(e.index)
+        }
        }
     }
     const headerTemplate = (
