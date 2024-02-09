@@ -62,7 +62,7 @@ const PromptBasedAnalysis = (props) => {
       console.log('Rasa data:', data);
       const summary = dynamicData.data.data._summary;
       setSummary(summary);
-
+      
       if (data?.table_data && data?.table_data.length > 0) {
         const dynamicColumns = Object.keys(data.table_data[0]).map((key) => ({
           field: key,
@@ -267,7 +267,7 @@ const PromptBasedAnalysis = (props) => {
   
         {rasaData && (dataType !== "text") && (
           <div className='sum-div'>
-            <h3 className='summary'> Summary: <span style={{ fontWeight: "400" }}> {summary} </span></h3>
+            <h3 className='summary-nlp'> Summary: <span style={{ fontWeight: "400" }}> {summary} </span></h3>
           </div>
         )}
   
