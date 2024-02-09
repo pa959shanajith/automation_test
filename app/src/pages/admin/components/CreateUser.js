@@ -59,6 +59,7 @@ const CreateUser = (props) => {
     const role = useSelector(state => state.admin.role);
     const server = useSelector(state => state.admin.server);
     const ldap = useSelector(state => state.admin.ldap);
+    const ldapEditUserDomainName = useSelector(state => state.admin.ldapEditUserDomainName);
     const userIdName = useSelector(state => state.admin.userIdName);
     const confExpired = useSelector(state => state.admin.confExpired);
     const confirmPassword = useSelector(state => state.admin.confirmPassword);
@@ -85,7 +86,9 @@ const CreateUser = (props) => {
 
     useEffect(() => {
         click();
-        dispatch(AdminActions.UPDATE_TYPE("inhouse"));
+        if(!editUser){
+            dispatch(AdminActions.UPDATE_TYPE("inhouse"))
+        }
     }, [currentTab === "users"]);
 
 
@@ -114,7 +117,7 @@ const CreateUser = (props) => {
             setAllRolesUpdate(allRolesList);
             if (editUser) setAdminCheck(props?.editUserData?.isAdmin);
         }
-    }, [allRoles.length > 0]);
+    }, [allRoles.length > 0, role !== ""]);
 
     const tabHeader = [
         { label: 'User Details', key: 'userDetails', text: 'User Details', disabled: ldapUserDetailsTabDisable},
@@ -185,7 +188,7 @@ const CreateUser = (props) => {
         };
         let ldapUserList = [];
         let ldapIceProvisionUserList = [];
-        if (uType === "ldap") {
+        if (uType === "ldap" && !editUser) {
             setLdapUserDetailsTabDisable(true);
             ldapFetchUsersData.forEach(user => {
                 let filteredUser =  ldapSelectedUserList.find( filteredUser => {
@@ -229,12 +232,12 @@ const CreateUser = (props) => {
 
         const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role};
 
-        if (uType === "ldap") userObj.ldapUser = ldap.user;
+        if (uType === "ldap" && editUser) userObj.ldapUser = ldapEditUserDomainName;
         setLoading(bAction.slice(0, -1) + "ing User...");
 
         (async () => {
             try {
-                if(uType !== "ldap"){
+                if(uType === "inhouse" || uType === "saml" || (uType === "ldap" && editUser)){
                     var data = await manageUserDetails(action, userObj );
                     if (data.error) { displayError(data.error); return; }
                     setLoading(false);
@@ -247,7 +250,7 @@ const CreateUser = (props) => {
                         if (action === "create") { 
                             setSelectedTab("avoAzzureClient") }
                         else {
-                            edit();
+                            if(!editUser) edit();
                             setSelectedTab("avoAzzureClient")
                         };
                         if (action === "delete") {
@@ -267,7 +270,7 @@ const CreateUser = (props) => {
                         props.toastWarn(MSG.CUSTOM("User with provided mail already exist",VARIANT.ERROR));
                     } else if (data === "fail") {
                         if (action === "create") click();
-                        else edit();
+                        else if(!editUser) edit();
                         props.toastError(MSG.CUSTOM("Failed to " + action + " user.", VARIANT.ERROR));
                     }
                     else if (/^2[0-4]{8}$/.test(data)) {
@@ -476,9 +479,10 @@ const CreateUser = (props) => {
         if (data === "empty") {
             props.toastWarn(MSG.ADMIN.WARN_LDAP_CONFIGURE);
         } else {
+            let serverNameList = [];
             dispatch(AdminActions.UPDATE_NO_CREATE(false));
-            data.sort((a, b) => a.name.localeCompare(b.name));
-            dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data));
+            data.map(data => serverNameList.push(data.name))
+            dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(serverNameList.sort()));
         }
     }
 
@@ -492,9 +496,10 @@ const CreateUser = (props) => {
             if (data === "empty") {
                 props.toastWarn(MSG.ADMIN.WARN_SAML_CONFIGURE);
             } else {
+                let serverNameList = [];
                 dispatch(AdminActions.UPDATE_NO_CREATE(false));
-                data.sort();
-                dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data))
+                data.map(data => serverNameList.push(data.name))
+                dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(serverNameList.sort()))
             }
         })()
     }
@@ -509,9 +514,10 @@ const CreateUser = (props) => {
             if (data === "empty") {
                 props.toastWarn(MSG.ADMIN.WARN_OPENID_CONFIGURE);
             } else {
+                let serverNameList = [];
                 dispatch(AdminActions.UPDATE_NO_CREATE(false))
-                data.sort((a, b) => a.name.localeCompare(b.name));
-                dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(data))
+                data.map(data => serverNameList.push(data.name))
+                dispatch(AdminActions.UPDATE_CONF_SERVER_LIST(serverNameList.sort()))
             }
         })()
     }
@@ -622,6 +628,7 @@ const CreateUser = (props) => {
     }
 
     const createUserDialogHide = () => {
+        dispatch(AdminActions.UPDATE_TYPE("inhouse"));
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(""));
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(""));
         dispatch(AdminActions.UPDATE_USERROLE(""));
@@ -700,7 +707,7 @@ const CreateUser = (props) => {
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
                             <Fragment>
-                                <div className='flex flex-row justify-content-between pl-2 pb-2' >
+                                <div className='flex flex-row pl-2 pb-2' style={{gap:"4.5rem"}} >
                                     <div className="flex flex-column">
                                         <label htmlFor="username" className="pb-2 font-medium">Password <span style={{ color: "#d50000" }}>*</span></label>
                                         <div className="p-input-icon-right">
@@ -752,7 +759,7 @@ const CreateUser = (props) => {
                             : null
                         }
 
-                        {type !== "ldap" && <div className="flex flex-row items-center">
+                        { (type === "inhouse" || type === "saml" || (type === "ldap" && editUser)) && <div className="flex flex-row items-center">
                             <div className="flex flex-column">
                                 <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Primary Role <span style={{ color: "#d50000" }}>*</span></label>
                                 <Dropdown
@@ -772,7 +779,7 @@ const CreateUser = (props) => {
                             {roleDropdownValue === "5db0022cf87fdec084ae49ab" && (
                                 <div className="flex flex-column items-center secondaryRole_admin"> {/* Test Manager role ID */}
                                     <label htmlFor="admin_check" className="adminlable_header pb-3 font-medium">Secondary Role</label>
-                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => setAdminCheck(e.checked)} checked={adminCheck} />
+                                    <Checkbox inputId='admin_check' aria-label="admin_check" onChange={e => {setAdminCheck(e.checked); setUpdatedInfo(false)}} checked={adminCheck} />
                                     <label htmlFor="admin_check" className="ml-5 -mt-4">Admin</label>
                                 </div>
                             )}

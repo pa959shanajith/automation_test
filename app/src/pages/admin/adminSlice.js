@@ -21,6 +21,7 @@ const initialState = {
     allRoles: [],
     allAddRoles: [],
     server: "",
+    ldapEditUserDomainName: "",
     ldap: { fetch: "map", user: '' },
     confServerList: [],
     ldapAllUserList: [],
@@ -118,7 +119,7 @@ export const adminSlice = createSlice({
             state.ldapAllUserList = action.payload
         },
         UPDATE_LDAP_USER: (state, action) => {
-            state.ldap = { fetch: state.ldap.fetch, user: action.payload }
+            state.ldapEditUserDomainName =  action.payload ;
         },
         UPDATE_LDAP_FETCH: (state, action) => {
             state.ldap = { fetch: state.ldap.user, fetch: action.payload }
