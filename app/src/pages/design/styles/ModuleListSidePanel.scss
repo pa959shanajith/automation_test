@@ -33,14 +33,14 @@
     }
 
     .normalModule_main_container {
-        height: 66%;
+        height: 65.5%;
         border-top: 0.5px solid #c7c7c7;
         border-bottom: 0.5px solid #C7C7C7;
 
     }
 
     .E2E_main_container {
-        height: 30%;
+        height: calc(100% - 70%);
         border-bottom: 1px solid rgb(91, 89, 89);
     }
 
@@ -149,7 +149,7 @@
     }
 
     .NorModuleList {
-        max-height: 83.6%;
+        max-height: calc(100% - 17%);
         // border: 1px solid black;
         overflow-y: auto;
     }

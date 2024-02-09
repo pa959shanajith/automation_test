@@ -191,7 +191,8 @@ const CreateNew = ({ importRedirect }) => {
                                         onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
                                         options={views} 
                                         optionLabel="name"
-                                        placeholder={<div style={{display:"flex", alignItems:"center", height:"1rem"}}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
+                                        style={{height:'2rem'}}
+                                        placeholder={<div style={{display:"flex", alignItems:"center", height:"1rem", position:'relative', bottom:'0.2rem'}}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>}
                                     />                                    
                                 </div>
                                 <div className='git_configuration_dropdown'>
@@ -228,7 +229,7 @@ const CreateNew = ({ importRedirect }) => {
                             <FolderView setBlockui={setBlockui}/></div>}
                         {(handleTypeOfViewMap ==='tableView') && <h1>hello i am Table view</h1>}
                         
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '95%', width: 'auto' }}>
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
                             <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
                             
                         </div>

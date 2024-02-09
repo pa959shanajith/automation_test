@@ -1,7 +1,7 @@
 @import "../../global/styles/ColorVariables.scss";
 .mp__canvas{
     position: absolute;
-    top: 56px;
+    top: 30px;
     height: calc(100% - 30px);
     overflow: hidden;
     border: 1px solid transparent;
@@ -30,16 +30,17 @@
     right: 3rem;
 }
 .mp__canvas_container{
-    display: flex;
-    flex-direction: row;
     background: #f5f5f5;
+    display: flex;
     flex: 0 1 100%;
+    flex-direction: row;
     float: left;
     margin: 2px;
     min-width: 0;
-    position: relative;
-    width: 81rem;
+    position: absolute;
     top: 0;
+    width: 100vw;
+    height: 100vh;
 }
 
 .canvas_topbar{
@@ -47,7 +48,7 @@
     background-color: #e6e6fa;
     display: flex;
     flex-direction: row;
-    height: 8%;
+    height: 5%;
     width: 100%;
     gap: 1rem;
 }

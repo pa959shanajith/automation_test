@@ -458,7 +458,7 @@ const FolderViewRightContainer = (props) => {
                                 //     </div>
                                 // </div> 
                                 : null}</div>}
-                    <Button onClick={() => handleSaveButton()} className="saveButton" label='Save' />
+                    {/* <Button onClick={() => handleSaveButton()} className="saveButton" label='Save' /> */}
                     <SaveMapButton setBlockui={props.setBlockui} createnew={createnew} verticalLayout={verticalLayout} dNodesFolder={parentScreenData} />
                     {/* <Button style={{width:'7rem',height:"3rem"}} className=""  label="cancel" />
                                 <Button style={{width:'7rem',height:"3rem"}}className=""  label="save" /> */}
