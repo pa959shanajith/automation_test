@@ -2203,7 +2203,7 @@ const showToast = (severity, detail) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  disabled={projectInfo?.appType !== "Web"}
+                  // disabled={projectInfo?.appType !== "Web"}
                   checked={ radioButton_grid === "Execute with Avo Assure Agent/ Grid"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
@@ -2229,7 +2229,7 @@ Learn More '/>
                         setExecutingOn("ICE");
                       }}
                       checked={
-                        radioButton_grid === "Execute with Avo Assure Client" || projectInfo?.appType!=="Web"
+                        radioButton_grid === "Execute with Avo Assure Client"
                       }
                     />
                   </div>
