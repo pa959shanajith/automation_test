@@ -2014,7 +2014,7 @@ const screenOption = screenData?.map((folder) => ({
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             columnResizeMode="expand"
             scrollable
-            scrollHeight="383px"
+            scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
           >
@@ -2207,7 +2207,7 @@ const screenOption = screenData?.map((folder) => ({
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             columnResizeMode="expand"
             scrollable
-            scrollHeight="383px"
+            scrollHeight="370px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
           >
@@ -2252,7 +2252,7 @@ const screenOption = screenData?.map((folder) => ({
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
 
-            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1rem', marginRight:'5rem'}}>
+            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
                     <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} label="Add more" size='small' />

@@ -36,6 +36,7 @@
     }
     .p-dialog-content {
         overflow: unset;
+        padding-bottom: 0 !important;
     }
 }
 .groupsTabPosition{
@@ -46,15 +47,19 @@
     padding: 1rem;
 }
 .tabView_captureDesign{
-    left: 30rem;
+    left: 40%;
     position: absolute;
     top: 0rem;
+    background: transparent !important;
     .p-tabview-nav {
         height: 3rem;
 
         .p-tabview-nav-link {
             padding: 8px;
         }
+    }
+    .p-tabview .p-tabview-panels{
+        background: transparent !important;
     }
 }
 .captureDesign_dialog_div{

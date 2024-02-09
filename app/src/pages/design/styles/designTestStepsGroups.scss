@@ -36,6 +36,7 @@
     }
     .p-dialog-content {
         overflow: unset;
+        padding-bottom: 0 !important;
     }
 }
 .groupsTabPosition{
@@ -46,9 +47,10 @@
     padding: 1rem;
 }
 .tabViewHeader{
-    left: 30rem;
+    left: 40%;
     position: absolute;
     top: 0rem;
+    background: transparent !important;
     .p-tabview-nav {
         height: 3rem;
 
@@ -56,9 +58,15 @@
             padding: 8px;
         }
     }
+    .p-tabview .p-tabview-panels{
+        background: transparent !important;
+    }
 }
 .designGroup_dialog_div{
     .p-dialog-content {
         overflow: unset;
     }
+}
+.tabPanelforHeader{
+    background: transparent !important;
 }
