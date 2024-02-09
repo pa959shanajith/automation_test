@@ -2207,7 +2207,7 @@ const screenOption = screenData?.map((folder) => ({
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             columnResizeMode="expand"
             scrollable
-            scrollHeight="370px"
+            scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
           >
