@@ -581,6 +581,19 @@ export default function BasicDemo() {
       />
     );
   };
+  function getActualResult (status, tcDetails) {
+    let result = "";
+    if ( status === "Pass" ){
+        result = tcDetails.actualResult_pass || "As Expected";
+    }
+    else if ( status === "Fail" ) {
+        result = tcDetails.actualResult_fail || "Fail";
+    }
+    else if ( status === "Terminated" ) {
+        result = "Terminated";
+    }
+    return result;
+}
   const convertDataToTree = (data) => {
     const treeDataArray = [];
     for (let i = 0; i < data.length; i++) {
@@ -623,6 +636,7 @@ export default function BasicDemo() {
           }
         }
         modifiedChild.flag = modifiedChild.status;
+        modifiedChild.testcase_details = getActualResult(modifiedChild.status, modifiedChild.testcase_details)
         const statusIcon =
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
@@ -932,21 +946,26 @@ export default function BasicDemo() {
         >
           <Column
             field="slno"
-            header="S No."
+            header="#"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
-            header="Steps"
+            header="Step"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
-            header="Description"
+            header="Step Details"
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
+          />
+          <Column
+          field="testcase_details"
+          header="Remarks"
+          style={{ width: "10rem", padding: "0rem", textAlign: "center", wordWrap:'break-word' }}
           />
           <Column
             field="EllapsedTime"
@@ -1003,7 +1022,7 @@ export default function BasicDemo() {
           header={getTableHeader}
           className="ruleMap_table"
         >
-          <Column field="slno" header="Sl. No."></Column>
+          <Column field="slno" header="#"></Column>
           <Column field="description" header="Description"></Column>
           <Column field="status" header="Status"></Column>
           <Column field="impact" header="Impact"></Column>

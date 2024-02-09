@@ -15,11 +15,17 @@ function NavigatetoCaptureDesign(params) {
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [activeIndex, setActiveIndex] = useState(params.designClick?1:0);
+
+    const tabChnage =(e) =>{
+       if(params.fetchingDetails['children'].length > 0){
+       setActiveIndex(e.index)
+       }
+    }
     const headerTemplate = (
         <>
             <div>
                 <h5 className='header_Groups'>{params.fetchingDetails['name']}</h5>
-                <TabView className="tabView_captureDesign" activeIndex={activeIndex} onTabChange={(e) => {setActiveIndex(e.index)}} >
+                <TabView className="tabView_captureDesign" activeIndex={activeIndex} onTabChange={(e)=>tabChnage(e)} >
                     <TabPanel header="Element Repository"></TabPanel>
                     <TabPanel header="Design Test Steps"></TabPanel>
                 </TabView>

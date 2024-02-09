@@ -233,7 +233,7 @@ const ElementRepository = (props) => {
         setScreenData([...screenData, newScreen]);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Reposiotry added and saved.', life: 5000 });
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added and saved.', life: 5000 });
       }
 
     
