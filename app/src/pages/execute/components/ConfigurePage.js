@@ -468,8 +468,9 @@ headers = {
 try:
     response = requests.request("POST", url, headers=headers, data=payload, verify=False)
     response = response.json()
-    pretty_json = json.dumps(response, indent=4)
-    print(pretty_json)
+    print(f"status :            {response['status']}")
+    print(f"ReportLink :        {response['reportLink']}")
+    print(f"RunningStatusLink : {response['runningStatusLink']}")
     status = response["status"]
 
     if status == "pass":
