@@ -36,102 +36,104 @@ import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 
 const CaptureModal = (props) => {
-  const dispatch = useDispatch();
-  const history=useNavigate()
-  const toast = useRef();
-  const objValues = useSelector(state => state.design.objValue);
-  const typeOfView = useSelector(state=>state.design.typeOfViewMap)
-  const compareSuccessful = useSelector(state => state.design.compareSuccessful);
-  const compareFlag = useSelector(state=>state.design.compareFlag);
-  const [visible, setVisible] = useState(false);
-  const [visibleOtherApp, setVisibleOtherApp] = useState(false);
-  const [showCaptureData, setShowCaptureData] = useState([]);
-  const [showPanel, setShowPanel] = useState(true);
-  const [overlay, setOverlay] = useState(null);
-  const [isInsprintHovered, setIsInsprintHovered] = useState(false);
-  const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
-  const [isPdfHovered, setIsPdfHovered] = useState(false);
-  const [isCreateHovered, setIsCreateHovered] = useState(false);
-  const [currentDialog, setCurrentDialog] = useState(false);
-  const [rowClick, setRowClick] = useState(true);
-  const [selectedSpan, setSelectedSpan] = useState(null);
-  const [hoveredRow, setHoveredRow] = useState(null);
-  const [scrapeItems, setScrapeItems] = useState([]);
-  const [newScrapedData, setNewScrapedData] = useState({});
-  const [scrapedURL, setScrapedURL] = useState("");
-  const [mirror, setMirror] = useState({ scrape: null, compare: null });
-  const [orderList, setOrderList] = useState([]);
-  const [saved, setSaved] = useState({ flag: true });
-  const [mainScrapedData, setMainScrapedData] = useState({});
-  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
-  const [captureData, setCaptureData] = useState([]);
-  const certificateInfo = useSelector(state=>state.design.cert);
-  const [screenshotData, setScreenshotData] = useState([]);
-  const [endScrape, setEndScrape] = useState(false)
-  const [showObjModal, setShowObjModal] = useState(false);
-  const [showPop, setShowPop] = useState("");
-  const [capturedDataToSave, setCapturedDataToSave] = useState([]);
-  const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
-  const [masterCapture, setMasterCapture] = useState(false);
-  const [showNote, setShowNote] = useState(false);
-  const [screenshotY, setScreenshotY] = useState(null);
-  const [mirrorHeight, setMirrorHeight] = useState("0px");
-  const [dsRatio, setDsRatio] = useState(1);
-  const [highlight, setHighlight] = useState(false);
-  const appType = props.appType;
-  const [imageHeight, setImageHeight] = useState(0);
-  const [activeEye, setActiveEye] = useState(false);
-  const [showConfirmPop, setShowConfirmPop] = useState(false);
-  const [modified, setModified] = useState([]);
-  const [editingCell, setEditingCell] = useState(null);
-  const [deleted, setDeleted] = useState([]);
-  const[browserName,setBrowserName]=useState(null)
-  const [saveDisable,setSaveDisable] = useState(true);
-  //element properties states 
-  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
-  const [elementPropertiesVisible, setElementProperties] = useState(false);
-  // console.log("elementPropertiesVisible",elementPropertiesVisible)
-  const [elementValues, setElementValues] = useState([])
-  const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
-  const [regex, setRegex] = useState("")
-  const [moveCardUp, setMoveCardUp] = useState(false)
-  const [cardBottom, setCardBottom] = useState(null)
-  const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
-  const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
-  const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
-  const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
-  const [identifierModified, setIdentifierModiefied] = useState(false);
-  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectId"] });
-  const [idx, setIdx] = useState(0);
-  const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
-  let NameOfAppType = projectAppType
-  const imageRef1 = useRef(null);
-  const imageRef2 = useRef(null);
-  const imageRef3 = useRef(null);
-  const imageRef4 = useRef(null);
-const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
-  const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
-  const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [showEmptyMessage, setShowEmptyMessage] = useState(true);
-  const [irisObject, setIrisObject] = useState(null);
-  const [scrapeDataForIris,setScrapeDataForIris] = useState();
-  const [cordData, setCordData] = useState({});
-  const [irisScrapedData, setIrisScrapedData] = useState({});
-  let addMore = useRef(false);
-  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  let AppTypeElementIdentifier;
-  const showCaptureScreen = useSelector((state) => state.landing.openCaptureScreen);
-  const [selectedScreen, setSelectedScreen] = useState(null);
-  const [screenData, setScreenData] = useState([]);
-  const [elementRepo, setElementRepo] = useState(false);
-  const [parentId, setParentId] = useState(null);
-  if(!userInfo) userInfo = userInfoFromRedux; 
-  else userInfo = userInfo ;
-
+    const dispatch = useDispatch();
+    const history=useNavigate()
+    const toast = useRef();
+    const objValues = useSelector(state => state.design.objValue);
+    const typeOfView = useSelector(state=>state.design.typeOfViewMap)
+    const compareSuccessful = useSelector(state => state.design.compareSuccessful);
+    const compareFlag = useSelector(state=>state.design.compareFlag);
+    const [visible, setVisible] = useState(false);
+    const [visibleOtherApp, setVisibleOtherApp] = useState(false);
+    const [showCaptureData, setShowCaptureData] = useState([]);
+    const [showPanel, setShowPanel] = useState(true);
+    const [overlay, setOverlay] = useState(null);
+    const [isInsprintHovered, setIsInsprintHovered] = useState(false);
+    const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
+    const [isPdfHovered, setIsPdfHovered] = useState(false);
+    const [isCreateHovered, setIsCreateHovered] = useState(false);
+    const [currentDialog, setCurrentDialog] = useState(false);
+    const [rowClick, setRowClick] = useState(true);
+    const [selectedSpan, setSelectedSpan] = useState(null);
+    const [hoveredRow, setHoveredRow] = useState(null);
+    const [scrapeItems, setScrapeItems] = useState([]);
+    const [newScrapedData, setNewScrapedData] = useState({});
+    const [scrapedURL, setScrapedURL] = useState("");
+    const [mirror, setMirror] = useState({ scrape: null, compare: null });
+    const [orderList, setOrderList] = useState([]);
+    const [saved, setSaved] = useState({ flag: true });
+    const [mainScrapedData, setMainScrapedData] = useState({});
+    const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+    const [captureData, setCaptureData] = useState([]);
+    const certificateInfo = useSelector(state=>state.design.cert);
+    const [screenshotData, setScreenshotData] = useState([]);
+    const [endScrape, setEndScrape] = useState(false)
+    const [showObjModal, setShowObjModal] = useState(false);
+    const [showPop, setShowPop] = useState("");
+    const [capturedDataToSave, setCapturedDataToSave] = useState([]);
+    const [newScrapedCapturedData, setNewScrapedCapturedData] = useState([]);
+    const [masterCapture, setMasterCapture] = useState(false);
+    const [showNote, setShowNote] = useState(false);
+    const [screenshotY, setScreenshotY] = useState(null);
+    const [mirrorHeight, setMirrorHeight] = useState("0px");
+    const [dsRatio, setDsRatio] = useState(1);
+    const [highlight, setHighlight] = useState(false);
+    const appType = props.appType;
+    const [imageHeight, setImageHeight] = useState(0);
+    const [activeEye, setActiveEye] = useState(false);
+    const [showConfirmPop, setShowConfirmPop] = useState(false);
+    const [modified, setModified] = useState([]);
+    const [editingCell, setEditingCell] = useState(null);
+    const [deleted, setDeleted] = useState([]);
+    const[browserName,setBrowserName]=useState(null)
+    const [saveDisable,setSaveDisable] = useState(true);
+    //element properties states 
+    const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
+    const [elementPropertiesVisible, setElementProperties] = useState(false);
+    // console.log("elementPropertiesVisible",elementPropertiesVisible)
+    const [elementValues, setElementValues] = useState([])
+    const [isIdentifierVisible, setIsIdentifierVisible] = useState(false)
+    const [regex, setRegex] = useState("")
+    const [moveCardUp, setMoveCardUp] = useState(false)
+    const [cardBottom, setCardBottom] = useState(null)
+    const defaultIdentifier = [{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]
+    const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
+    const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
+    const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
+    const [identifierModified, setIdentifierModiefied] = useState(false);
+    const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectID"] });
+    const [idx, setIdx] = useState(0);
+    const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
+    let NameOfAppType = projectAppType
+    const imageRef1 = useRef(null);
+    const imageRef2 = useRef(null);
+    const imageRef3 = useRef(null);
+    const imageRef4 = useRef(null);
+  const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
+    const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
+    const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [showEmptyMessage, setShowEmptyMessage] = useState(true);
+    const [irisObject, setIrisObject] = useState(null);
+    const [scrapeDataForIris,setScrapeDataForIris] = useState();
+    const [cordData, setCordData] = useState({});
+    const [irisScrapedData, setIrisScrapedData] = useState({});
+    let addMore = useRef(false);
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    let AppTypeElementIdentifier;
+    const showCaptureScreen = useSelector((state) => state.landing.openCaptureScreen);
+    const [selectedScreen, setSelectedScreen] = useState(null);
+    const [screenData, setScreenData] = useState([]);
+    const [elementRepo, setElementRepo] = useState(false);
+    const [parentId, setParentId] = useState(null);
+    const [screenChange, setScreenChange] = useState(false);
+    const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
+  
   const localStorageDefaultProject = localStorage.getItem('DefaultProject');
   if (localStorageDefaultProject) {
     NameOfAppType = JSON.parse(localStorageDefaultProject);
@@ -1786,15 +1788,43 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
         })();
       }, [NameOfAppType.projectId]);
       
-       const handleScreenChange = (e) => {
-        const selectedFolderValue = e.value;
-        setSelectedScreen(selectedFolderValue);
+      const handleScreenChange = (e) => {
+        setSelectedFolderValue(e.value)
+        // const selectedFolderValue = e.value;
+        // setSelectedScreen(selectedFolderValue);
+      
+        if(captureData.length > 0){
+          setScreenChange(true);
+        }
+      
         // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+        else{
+        setSelectedScreen(e.value);
+        setParentId(e.value.id);
+        // fetchScrapeData();
+        setSaveDisable(false);
+        setElementRepo(true);
+        }
+        // addMore.current = true;
+        // let newData = capturedDataToSave;
+        // newData.push(...selectedFolderValue.related_dataobjects)
+        // setCapturedDataToSave(newData);
+        // // setCaptureData(newData);
+        // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+      
+      };
+      
+      const confirmScreenChange = () => {
+        // Proceed with screen change using selectedFolderValue from state
+        setSelectedScreen(selectedFolderValue);
         setParentId(selectedFolderValue.id);
         // fetchScrapeData();
         setSaveDisable(false);
         setElementRepo(true);
+        // Hide confirmation dialog
+        // setDisplayConfirmation(false);
       };
+      
       const screenOption = screenData?.map((folder) => ({
         label: folder.name,
         id:folder["_id"],
@@ -1802,6 +1832,8 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
         orderlist:folder.orderlist,
         parent:folder.parent
       }));
+      
+
     return (
         <>
      {overlay && <ScreenOverlay content={overlay} />}
@@ -2002,6 +2034,15 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
                     </div>
                 </Dialog>
             </div>
+            <AvoConfirmDialog
+        visible={screenChange}
+        onHide={() => setScreenChange(false)}
+        showHeader={false}
+        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        icon="pi pi-exclamation-triangle"
+        accept={confirmScreenChange} />
+        
+
             <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
