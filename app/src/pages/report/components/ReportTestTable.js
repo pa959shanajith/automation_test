@@ -33,6 +33,7 @@ import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
 import NetworkOperation from "./NetworkOperation";
+import { Tooltip } from 'primereact/tooltip';
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -627,7 +628,7 @@ export default function BasicDemo() {
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
             ? "static/imgs/fail.png"
-            : "static/imgs/treminated.png";
+            : "";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
@@ -792,14 +793,16 @@ export default function BasicDemo() {
             setVisibleScreenShot(image);
           }}
         >
-         <img src="static/imgs/view_screenshot_icon_before.svg" />
+        <Tooltip target=".screenshot" position="bottom" />
+         <img className="screenshot" src="static/imgs/ViewScreenshot.svg" data-pr-tooltip="View Screenshot" />
         </div>
       )}
       {getLink?.data?.Network_Data && (
       <div>
+        <Tooltip target=".Network_icon" position="bottom" />
         <img
-          className="plug_icon"
-          src="static/imgs/plug_icon.svg"
+          className="Network_icon"
+          src="static/imgs/Network_icon.svg" data-pr-tooltip="View Network Operation" 
               onClick={() => { setNewtorkDialog(true);
                  setNetworkData(getLink?.data?.Network_Data);
                   setDescription(reportData?.rows.filter((el) => el?.slno === getLink?.data?.slno)[0]?.StepDescription);
@@ -994,6 +997,8 @@ export default function BasicDemo() {
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
+          scrollable
+          scrollHeight="325px"
           // globalFilter={searchTest}
           header={getTableHeader}
           className="ruleMap_table"
@@ -1095,7 +1100,7 @@ export default function BasicDemo() {
         setVisible={setLogBug}
         onModalBtnClick={onLogBugBtnClick}
         content={
-          <div className="grid">
+          <div>
             <div className="flex  flex-row">
             <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
               <AvoDropdown
@@ -1124,7 +1129,8 @@ export default function BasicDemo() {
                 parentClass="flex flex-column"
               />
             </div>
-            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12 flex align-items-center">
+            <div className="col-12 lg:col-4 xl:col-4 md:col-4 sm:col-12">
+            <style>{`.p-multiselect-panel .p-multiselect-header {display: none !important;}`}</style>
               <AvoMultiselect
                 multiSelectValue={configureFeilds}
                 onMultiSelectChange={(e) => setConfigureFeilds(e.value)}
@@ -1133,6 +1139,8 @@ export default function BasicDemo() {
                 labelTxt="Configure Fields"
                 placeholder="Select configure fields"
                 required={true}
+                className="w-full md:w-20rem flex flex-column"
+                showSelectAll={false}
               />
             </div>
           </div>

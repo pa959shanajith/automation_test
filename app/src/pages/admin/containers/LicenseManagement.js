@@ -8,6 +8,7 @@ import { getAvailablePlugins } from "../api";
 function LicenseManagement() {
     const [licenseData, setLicenseData] = useState({});
     const [headerData1, setHeaderData1] = useState([]);
+    const [expandedRows, setExpandedRows] = useState(null);
     useEffect(()=>{
         (async()=>{
             const LicenseData = await getAvailablePlugins()
@@ -23,7 +24,9 @@ function LicenseManagement() {
                 setHeaderData1(Object.entries(LicenseData).map(([key, value])=>{
                     return{
                         License_Type:key,
-                        License_Status:value==="true"?"Enabled":value==="false"?"Disabled":value
+                        License_Status: typeof value === "object" ? "" : value==="true"?"Enabled":value==="false"?"Disabled":value,
+                        // to form single addon array of objects
+                        License_Extra: typeof value === "object" ? Object.entries(value).map(([key, value]) => ({ ...value, addOnName: key })) : []
                     }
                 }))
             }
@@ -38,6 +41,24 @@ function LicenseManagement() {
             Valid_To: licenseData.ExpiresOn
         }]
 
+    const allowExpansion = (rowData) => {
+        return rowData?.License_Extra && (rowData?.License_Extra?.length != 0);
+    };
+    // addon row expansion
+    const rowExpansionTemplate = (data) => {
+        return (
+            <div className="p-3">
+                {
+                    <DataTable value={data?.License_Extra}>
+                        <Column field="addOnName" header="Addons"></Column>
+                        <Column field="StartDate" header="Start Date"></Column>
+                        <Column field="EndDate" header="End Date"></Column>
+                        <Column field="Value" header="Value"></Column>
+                    </DataTable>
+                }
+            </div>
+        );
+    };
     return(
         <>
         <div className="card-outer">
@@ -56,7 +77,8 @@ function LicenseManagement() {
                 </div>
                 <div id="table-data-bottom" className="Features">
                 <h4>Avo Assure Features</h4>
-                    <DataTable  value={headerData1} className="licenseData1"  scrollable scrollHeight="40vh">
+                    <DataTable  value={headerData1} className="licenseData1"  scrollable scrollHeight="40vh" rowExpansionTemplate={rowExpansionTemplate} expandedRows={expandedRows} onRowToggle={(e) => setExpandedRows(e.data)}>
+                        {headerData1 && headerData1.filter(item=>item?.License_Type === "addons").length>0 &&<Column expander={allowExpansion}/>}
                         <Column field="License_Type" header="Feature "></Column>
                         <Column field="License_Status" header="Status"></Column>
                     </DataTable>

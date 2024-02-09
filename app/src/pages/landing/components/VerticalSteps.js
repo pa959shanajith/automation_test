@@ -1,4 +1,4 @@
-import React, { useState,useEffect} from 'react';
+import React, { useState,useEffect, useRef} from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -16,12 +16,15 @@ import { getProjectIDs } from "../api"
 import { selectedProj } from '../../design/designSlice';
 import { showGenuis } from '../../global/globalSlice';
 import { getModules,updateTestSuiteInUseBy } from '../../design/api'
+import { Toast } from 'primereact/toast';
+import { loadUserInfoActions } from '../LandingSlice';
 
 
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
 const VerticalSteps = (props) => {
     const dispatch= useDispatch ();
+    const toast = useRef();
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     let project = reduxDefaultselectedProject;
     const activeStep = reduxDefaultselectedProject.progressStep;
@@ -81,46 +84,52 @@ const VerticalSteps = (props) => {
     ];
 
   const handleNext = async(value) => {
-    if(value=== "Design Studio"){
-      dispatch(updateSteps(1))
-      navigate("/design");
-      var reqForOldModule={
+    const projectList = await getProjectIDs()
+    if(projectList.projectId.some((item)=>item === project.projectId)){
+      if(value=== "Design Studio"){
+        dispatch(updateSteps(1))
+        navigate("/design");
+        var reqForOldModule={
+          tab:"createTab",
+          projectid:project.projectId,
+          version:0,
+          cycId: null,
+          modName:"",
+          moduleid:null
+        }
+        
+        
+      var firstModld=await getModules(reqForOldModule)
+      if(firstModld.length>0){
+      var reqForFirstModule={
         tab:"createTab",
         projectid:project.projectId,
         version:0,
         cycId: null,
         modName:"",
-        moduleid:null
+        moduleid:firstModld[0]?._id
       }
-      
-      
-    var firstModld=await getModules(reqForOldModule)
-    if(firstModld.length>0){
-    var reqForFirstModule={
-      tab:"createTab",
-      projectid:project.projectId,
-      version:0,
-      cycId: null,
-      modName:"",
-      moduleid:firstModld[0]?._id
+      var firstModDetails=await getModules(reqForFirstModule)
+      if(!firstModDetails.currentlyInUse?.length>0)
+      await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
+        dispatch(selectedProj(project.projectId))
+      }}
+      else if(value==="Execute"){
+            dispatch(updateSteps(2))
+            navigate("/execute");
+            dispatch(selectedProj(project.projectId))
+      }
+      else if(value==="Report"){
+        dispatch(updateSteps(3))
+        navigate("/reports");
+      }
+      else if(value==="AVO Genius"){
+        openGen()
+      }
+    }else{
+      toast.current.show({severity:'warn', summary: 'Warning', detail:`${project.projectName} project unassign for you`, life: 3000}); 
+      dispatch(loadUserInfoActions.updatedProject(true))
     }
-    var firstModDetails=await getModules(reqForFirstModule)
-    if(!firstModDetails.currentlyInUse?.length>0)
-    await updateTestSuiteInUseBy("Web",firstModld[0]._id,"123",userInfo?.username,true,false)
-      dispatch(selectedProj(project.projectId))
-    }}
-    else if(value==="Execute"){
-          dispatch(updateSteps(2))
-          navigate("/execute");
-          dispatch(selectedProj(project.projectId))
-        }
-       else if(value==="Report"){
-              dispatch(updateSteps(3))
-              navigate("/reports");
-            }
-            else if(value==="AVO Genius"){
-              openGen()
-            }
 
   };
   const openGen=()=>{
@@ -132,6 +141,7 @@ const VerticalSteps = (props) => {
 
   return (
     <Card className='verticalcard' >
+      <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
       <h2 className= "GetStd">{(activeStep > 0) ? "Welcome Back !" : "Get Started"}</h2>
         <Box > 
         <Stepper  className='Stepper' activeStep = {activeStep} orientation="vertical">

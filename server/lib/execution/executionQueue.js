@@ -131,6 +131,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         let targetICE = EMPTYUSER;
         let projectid = "";
         let response = {}
+        const steps = await utils.fetchData({'host':batchExecutionData.host,'executionData':batchExecutionData},"/hooks/validateExecutionSteps")
+        if(steps.status == "fail") return {status:"fail",error:steps.message};
         response['status'] = "fail";
         response["message"] = "N/A"
         response['error'] = "None"
@@ -665,8 +667,10 @@ module.exports.Execution_Queue = class Execution_Queue {
         // let execution_Queue = await cache.get('execution_list');
 
         //Adding the reportLink in the response
-        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/reports/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
+        response['reportLink'] = req.protocol + "://" + (req.hostname) + "/devOpsReport?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         
+        // Adding the Running Status Link in the response 
+        response['runningStatusLink'] = req.protocol + "://" + (req.hostname) + "/runningStatus?" + "configurekey=" + req.body.key + "&" + "executionListId="+newExecutionListId
         if(gettingTestSuiteIds.executionData.executiontype == 'asynchronous'){
             response['status'] = "pass";
             return response;
@@ -906,6 +910,9 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             let dataFromIce = req.body,checkInCache = false;
             let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
+
+            // set host in dataFromIce
+            dataFromIce["hostName"] = req.headers.host;
             
             // To store the data from cache if key list is empty.
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -920,7 +927,8 @@ module.exports.Execution_Queue = class Execution_Queue {
                     this.key_list = JSON.parse(cacheData['execution_list']);
                 }
             }
-            let keyQueue = this.key_list[resultData.configkey];
+            let keyQueue = this.key_list[resultData.configkey] || [];
+            // console.log(keyQueue);
             let statusCount = 0;
             let updatedKeyQueue = [];
             if (dataFromIce.status == 'finished')
@@ -961,6 +969,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                     const executionData = await utils.fetchData(inputs, "devops/getExecutionListDetails", fnName);
 
                                     const excutionIds = dataFromCache.map((data) => data.executionId);
+                                    console.log(excutionIds)
                                     const fnName1 = "reportStatusScenario";
                                     const inputs1 = {
                                         "query": "executiondetails",
@@ -988,7 +997,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         reportExecutionData.reportData.push({ suiteDetails: suiteDetailsInfo });
                                     })
                                     if (executionData[0].executionData.isEmailNotificationEnabled === true) {
-                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough });
+                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough, hostName: req.headers.host });
                                     }
                                 }
                                 
@@ -1164,6 +1173,71 @@ module.exports.Execution_Queue = class Execution_Queue {
         }
 
         return response;
+    }
+
+    
+    static runningStatus = async(req, res)=>{
+        let fnName = 'runningStatus'
+        let response = {}
+        try {
+            //to add the key list if its empty,, from the cache
+            if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
+                //check whether cache data is present
+                // let cacheData = await cache.get('execution_list')
+                
+                //New Cache Implementation - deviding into clients
+                let cacheData = await executionListCache.gethmap(req.hostname)
+                if(cacheData === null || Object.keys(cacheData).length === 0 && cacheData.constructor === Object) {
+                    this.key_list = {};
+                } else {
+                    this.key_list = JSON.parse(cacheData['execution_list']);
+                }
+            }
+            let configureKey = req.query.configurekey,executionListId = req.query.executionListId;
+
+            if(this.key_list[configureKey]) {
+                let cnt = 0,total = 0,ip = 0;
+                for(let executions of this.key_list[configureKey]) {
+                        if(executions.length && executions[0]['executionListId'] == executionListId)
+                            {
+                                total = executions.length;
+                                for(let modules of executions) {
+                                    cnt+=(modules['status'] == 'COMPLETED');
+                                    ip+=(modules['status'] == 'IN_PROGRESS');
+                                }
+                            }
+                }
+                if(total){
+                    response['Completed'] = `${cnt} / ${total}` ;response['status'] = 'Inprogress';
+                    return response;
+                }
+                else {
+                    // Generate Report
+                    let inputs = {
+                        'configureKey':configureKey,
+                        'executionListId': executionListId
+                    }
+                    let executionIds = await utils.fetchData(inputs, "devops/getExecutionAndScenarioDetails", fnName)
+                    let responseFromGetReportApi = {};
+                    responseFromGetReportApi['Modules'] = [];
+                    responseFromGetReportApi['status'] = 'Completed';
+                    for(let executions of executionIds) {
+                        const data = await reportFunctions.getDevopsReport_API({
+                            'body':executions,
+                            'req': req
+                        });
+                        responseFromGetReportApi['Modules'].push(data);
+                    }
+                    res.send(responseFromGetReportApi)
+                }
+            } else {
+                res.send('Some Error Occured');
+            }
+
+        } catch (error) {
+            logger.error("Error occurred in runningStatus: "+error)
+            return res.send("fail")
+        }
     }
 }
 

@@ -5,6 +5,8 @@ const benchmarkRunTimes = uiConfig.benchmarkRuntimes;
 const pingTimer = uiConfig.pingTimer;
 const eula = uiConfig.showEULA;
 const httpsServer = require('./../../server').httpsServer;
+const validator = require('validator');
+
 //SOCKET CONNECTION USING SOCKET.IO
 const io = require('socket.io')(httpsServer, {
 	cookie: false,
@@ -21,6 +23,7 @@ let socketMapScheduling = {};
 let socketMapNotify = {};
 let iceUserMap = {};
 let iceIPMap = {};
+let resMap = {};
 module.exports = io;
 module.exports.allSocketsMap = socketMap;
 module.exports.allSocketsICEUser=userICEMap;
@@ -28,6 +31,7 @@ module.exports.allSocketsMapUI = socketMapUI;
 module.exports.allSchedulingSocketsMap = socketMapScheduling;
 module.exports.socketMapNotify = socketMapNotify;
 module.exports.allICEIPMap = iceIPMap;
+module.exports.resMap = resMap;
 
 var logger = require('../../logger');
 var utils = require('./utils');
@@ -81,7 +85,8 @@ io.on('connection', async socket => {
 		if (eulaFlag) {
 			const inputs = {
 				"icesession": icesession,
-				"query": 'connect'
+				"query": 'connect',
+				"host":socket.request.headers.host
 			};
 			const result = await utils.fetchData(inputs, "server/updateActiveIceSessions", "updateActiveIceSessions");
 			if (result == 'fail') {
@@ -89,14 +94,13 @@ io.on('connection', async socket => {
 			} else {
 				socket.send('connected', result.ice_check);
 				if (result.node_check === "allow") {
-					host = JSON.parse(icesession).host;
-					clientName=utils.getClientName(host);
 					if(socketMap[clientName] == undefined) socketMap[clientName] = {};
 					socketMap[clientName][icename] = socket;
 					if(userICEMap[clientName] == undefined) userICEMap[clientName] = {};
 					if(!userICEMap[clientName][result.username]) userICEMap[clientName][result.username] = []
+					if(resMap[clientName] == undefined) resMap[clientName] = {};
 					iceUserMap[icename] = result.username;
-					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username].push(icename);
+					if(!userICEMap[clientName][result.username].includes(icename)) userICEMap[clientName][result.username][0] = icename;
 					initListeners(socket);
 					logger.debug("%s is connected", icename);
 					logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
@@ -112,7 +116,7 @@ io.on('connection', async socket => {
 		}
 	}
 
-	httpsServer.setTimeout();
+	// httpsServer.setTimeout();
 
 	socket.on('getconstants', async () => socket.emit('update_screenshot_path', screenShotPath, benchmarkRunTimes, pingTimer, objectPredictionPath));
 
@@ -145,13 +149,7 @@ io.on('connection', async socket => {
 			if (socketMap[clientName][address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket (%s) : %s', reason, address);
-				delete socketMap[address];
-				if(address in iceUserMap){
-					let user = iceUserMap[address];
-					let index = userICEMap[user].indexOf(address);
-					userICEMap[user].splice(index,1);
-					delete iceUserMap[address];
-				}
+				delete socketMap[clientName][address];
 				module.exports.allSocketsMap = socketMap;
 				logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 				logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
@@ -218,6 +216,7 @@ io.on('connection', async socket => {
 	socket.on('ICE_status_change', async value => {
 		let queue = require("./execution/executionQueue")
 		var clientName= utils.getClientName(value.host);
+		username = value.icename ? 	value.icename : username;
 		if (value.connected){
 			const dataToExecute = JSON.stringify({"username" : username,"onAction" : "ice_status_change","value":value,"reqID":new Date().toUTCString()});
 			queue.Execution_Queue.triggerExecution(dataToExecute);
@@ -228,8 +227,33 @@ io.on('connection', async socket => {
 		}
 		if(iceIPMap[clientName] == undefined) iceIPMap[clientName] = {};
 		iceIPMap[clientName][username] = value.hostip;
+		if(socketMap[clientName][username] != socket){
+			socketMap[clientName][username] = socket;
+		}
 		cache.sethmap(username,value)
 	});
+
+	socket.on("result_executeTestSuite", async (message)=>{
+		let socketUtils = require("./socketUtils")
+		let executor = require("./execution/executor");
+		const data = message;
+		const resultData = data;
+		const execReq=resultData.execReq;
+		const execType = execReq?execReq.execType:undefined;
+		const userInfo=execReq?resultData.execReq.userInfo:undefined;
+		const invokinguser =userInfo? userInfo.invokingusername:undefined;
+		const host = invokinguser ?userInfo.host:{};
+		var clientName=utils.getClientName(host);
+		const notifySocMap = socketMapNotify[clientName];
+		const resSent = true;
+		if(execReq) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,executor.insertReport,notifySocMap,resSent,socket);
+	});
+
+	socket.on("scrape", async (message)=>{
+		logger.info("Sending objects");
+		resMap[clientName][username].send(message)
+	});
+
 });
 //SOCKET CONNECTION USING SOCKET.IO
 

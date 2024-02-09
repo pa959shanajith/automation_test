@@ -3,7 +3,7 @@ import {excelToMindmap, getProjectList, getModules,getScreens, importMindmap ,gi
 import {ModalContainer,ResetSession, Messages as MSG,setMsg, VARIANT, ScrollBar} from '../../global'
 import { parseProjList, getApptypePD, getJsonPd} from '../containers/MindmapUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import {setImportData,dontShowFirstModule,selectedModuleReducer} from '../designSlice';
+import {setImportData,dontShowFirstModule, SetCurrentId, moduleList} from '../designSlice';
 import PropTypes from 'prop-types';
 import '../styles/ImportMindmap.scss';
 import { Link } from 'react-router-dom';
@@ -16,13 +16,14 @@ import { Dropdown } from 'primereact/dropdown';
 
 
 
-const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop, toast}) => {
+const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMultiImport, importPop, toast,projectName, projectID}) => {
     const [projList,setProjList] = useState({})
     const [error,setError] = useState('')
     const [submit,setSubmit] = useState(false)
     const [disableSubmit,setDisableSubmit] = useState(true)
     const [mindmapData,setMindmapData] = useState([])
     const [gitExportDetails,setGitExportDetails] =useState([])
+    const [project, setProject] = useState({})
     
     useEffect(()=>{
         (async()=>{
@@ -31,6 +32,7 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
             if(res.error){displayError(res.error);return;}
             var data = parseProjList(res)
             setProjList(data)
+            setProject(data[projectID])
             setBlockui({show:false})
         })()
     },[]) 
@@ -40,13 +42,13 @@ const ImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMulti
         {/* <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/> */}
         <Dialog className='ImportDialog' header='Import Test Suite' onHide={()=>setImportPop(false)} visible={importPop} style={{ width: '50vw' }} footer={<Footer error={error} disableSubmit={disableSubmit} setSubmit={setSubmit}/>}>
             <Container submit={submit} setMindmapData={setMindmapData}mindmapData={mindmapData} setDisableSubmit={setDisableSubmit} setSubmit={setSubmit} displayError={displayError} setOptions={setOptions} projList={projList} setImportPop={setImportPop} setError={setError} setBlockui={setBlockui} isMultiImport={isMultiImport}
-             setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails} Toast={toast}/>
+             setGitExportDetails={setGitExportDetails} gitExportDetails={gitExportDetails} Toast={toast}  project={project}/>
         </Dialog>
     </>
     )
 }
 
-const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport,setGitExportDetails,gitExportDetails,Toast}) => {
+const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,setDisableSubmit,setError,setSubmit,submit,setOptions,setImportPop,isMultiImport,setGitExportDetails,gitExportDetails,Toast,project}) => {
     const dispatch = useDispatch()
     const ftypeRef = useRef()
     const uploadFileRef = useRef()
@@ -70,6 +72,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
     const [VersionItemValue, setVersionItemValue] = useState(null)
     const [ImportValue, setImportValue] = useState(null)
     const [projectImportId, setProjectImportId] = useState(null);
+    const prjList = useSelector(state=>state.design.projectList)
     const upload = (e) => {
         let  project = "";
         if(importType === 'zip'){
@@ -94,7 +97,7 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
         setImportType(e.value)        
         setFiledUpload(undefined)
         setDisableSubmit(true)
-        setProjectValue(null)
+        // setProjectValue(null)
         setError('')
         if(e.target.value==="zip"){ setUploadFileField(false); resetImportModule();}
         if (e.target.value==="git"){ resetImportModules();setComMsgRef("");
@@ -110,6 +113,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                 id = e.target.name[i].key
                 setProjectId(e.target.name[i].key);
             }
+        }
+        if(!e?.value){
+            setProjectValue(project.name)
+            setProjectId(project.id)
+            id=project.id
         }
         if(id) {
             var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
@@ -142,6 +150,11 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                   setProjectImportId(e.target.name[i].key);
               }
           }
+          if(!e?.value){
+            setProjectValue(project.name)
+            setProjectId(project.id)
+            id=project.id
+        }
           if(id) {
               var moduledata = await getModules({"tab":"tabCreate","projectid":id,"moduleid":null,"query":"modLength"})
               if (moduledata.length>0){
@@ -231,13 +244,13 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:projectImportId,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(data)?data[0]:data
+                        moduleid:null
                     }
                     var res = await getModules(req)
                     var Screen = await getScreens(projectImportId) 
                     if(Screen.error){displayError(Screen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(res))
+                        dispatch(moduleList(res))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
@@ -264,13 +277,13 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:mindmapData[0] !== undefined?mindmapData[mindmapData.length -1]["projectid"]:mindmapData.projectid !== undefined?mindmapData.projectid:mindmapData.projid,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(res)?res[0]:res
+                        moduleid:null
                     }
                     res = await getModules(req)
                     var zipScreen = await getScreens(req.projectid) 
                     if(zipScreen.error){displayError(zipScreen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(res))
+                        dispatch(moduleList(res))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
@@ -295,12 +308,12 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                         projectid:importproj,
                         version:0,
                         cycId: null,
-                        moduleid:Array.isArray(importexcel)?importexcel[0]:importexcel})
+                        moduleid:null})
                         if(excelModule.error){displayError(excelModule.error);ResetSession.end();return;}
                         var excelScreen = await getScreens(importproj) 
                         if(excelScreen.error){displayError(excelScreen.error);ResetSession.end();return;}
                         setTimeout(function() {
-                            dispatch(selectedModuleReducer(excelModule))
+                            dispatch(moduleList(excelModule))
                         setImportPop(false)
                         setOptions('importmodules')
                         // setBlockui({show:false})
@@ -319,12 +332,12 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                     projectid:projectId,
                     version:0,
                     cycId: null,
-                    moduleid:Array.isArray(res)?res[0]:res})
+                    moduleid:null})
                     if(dataModule.error){displayError(dataModule.error);ResetSession.end();return;}
                     var datascreen = await getScreens(projectId) 
                     if(datascreen.error){displayError(datascreen.error);ResetSession.end();return;}
                     setTimeout(function() {
-                        dispatch(selectedModuleReducer(dataModule))
+                        dispatch(moduleList(dataModule))
                     setImportPop(false)
                     setOptions('importmodules')
                     // setBlockui({show:false})
@@ -345,7 +358,8 @@ const Container = ({projList,setBlockui,setMindmapData,displayError,mindmapData,
                             setBlockui:setBlockui,
                             setOptions:setOptions,
                             setImportPop:setImportPop,
-                        changeImportType:changeImportType
+                        changeImportType:changeImportType,
+                            prjList:prjList
                         
                         })
 
@@ -805,7 +819,7 @@ const validate = ({ftypeRef,uploadFileRef,projRef,gitconfigRef,gitVerRef,sheetRe
 // imports all the data to mindmapCanvas by setting moduleData based on type
 // createnew should be true for all import except mm because nodes will be not created it will be revoked from saved data
 
-const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType}) =>{
+const loadImportData = async({importData,sheet,importType,importProj,dispatch,displayError,setBlockui,setImportPop,setOptions,changeImportType,prjList}) =>{
     var mindmapData = importData
     // console.log("ImportProj: " + importProj)
     // setBlockui({content:'Importing ...',show:true})
@@ -835,12 +849,24 @@ const loadImportData = async({importData,sheet,importType,importProj,dispatch,di
     //     var data = getJsonPd(res.data)
     //     mindmapData = {createnew:true,importData:{createdby:'file',data:data}}
     // }
+        const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+        const defaultProjectData = {
+            ...(JSON.parse(localStorageDefaultProject)), // Parse existing data from localStorage
+            projectId: importProj,
+            projectName: prjList[importProj]?.name,
+            appType: prjList[importProj]?.apptypeName,
+            projectLevelRole: prjList[importProj]?.projectLevelRole
+          };
+          
+        localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
+        
         var moduledata = await getModules({"tab":"tabCreate","projectid":importProj,"moduleid":null})
         if(moduledata.error){displayError(moduledata.error);return;}
         var screendata = await getScreens(importProj)
         if(screendata.error){displayError(screendata.error);return;}
         setTimeout(function() {
             dispatch(dontShowFirstModule(true))
+            dispatch(SetCurrentId(""))
             dispatch(setImportData({
                 selectProj : importProj,
                 selectModule : mindmapData,

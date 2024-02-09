@@ -1,0 +1,82 @@
+@import "../../global/styles/ColorVariables.scss";
+
+.barChart__container{
+    margin: 15px;
+}
+
+.barChart__linearChart, .barChart__linearChart_Shimmer{
+    display: flex;
+    height: 35px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.barChart__linearChart_Shimmer{
+    border-radius: 10px;
+}
+
+.barChart__bar{
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $whiteColor;
+    font-size: $avoFontMedium;
+    &:first-child{
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    &:last-child{
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+}
+
+.barChart__legends{
+    display: flex;
+    align-items: center;
+}
+
+.barChart__legendDot, .barChart__legendDot_Shimmer{
+    font-size: 15.5px;
+    width: fit-content;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    color:$whiteColor;
+    border-radius: 5px;
+    padding: 0 5px;
+    margin-right: 5px;
+}
+
+.barChart__legend_P { 
+    background-color: $seriousPass; 
+    color: $whiteColor;
+}
+.barChart__legend_F { 
+    background-color: $moderateFail; 
+    color: $whiteColor; 
+}
+.barChart__legend_I, .barChart__legend_NA { 
+    background-color: $incompleteStatus; 
+    color: $black 
+}
+.barChart__legend_T { 
+    background-color: $redError; 
+    color: $whiteColor 
+}
+
+.barChart__legendText{
+    font-family: Mulish;
+    font-style: normal;
+    font-weight: 600;
+    font-size: $avoFontNormal;
+    margin-right: 20px;
+    color: $greyishText;
+}
+
+.barChart__legendText_Shimmer{
+    height: 8px;
+    width: 20px;
+    margin-right: 20px;
+}

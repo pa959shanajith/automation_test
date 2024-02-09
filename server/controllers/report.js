@@ -866,9 +866,9 @@ exports.getDevopsReport_API = async (req) => {
     var statusCode = '500';
     logger.info("Inside UI service: " + fnName);
     try {
-        const execData = req.body.execution_data || {};
-		var executionId = execData.executionId || "";
-		var scenarioIds = execData.scenarioIds;
+        // const execData = req.body.execution_data || {};
+		var executionId = req.body._id || "";
+		var scenarioIds = req.body.scenariodetails;
 		var finalReport = [];
 		var tempModDict = {};
 		// const userInfo = await tokenAuth.tokenValidation(headerUserInfo);
@@ -921,7 +921,7 @@ exports.getDevopsReport_API = async (req) => {
         logger.info("Sending reports in the service %s", fnName);
         if (statusCode != "400") statusCode = '200';
         delete execResponse.error_message;
-        return finalReport;
+        return finalReport ? finalReport[0] : [];
     } catch (exception) {
         logger.error("Exception in the service %s - Error: %s", fnName, exception);
         return 'fail'
@@ -1404,6 +1404,16 @@ exports.getSuiteDetailsInExecution_ICE = async (req, res) => {
                 'suiteid': req.query.testsuiteid
             }
         }
+        else if ("testsuiteid" in req.body) {
+            inputs = {
+                'suiteid': req.body.testsuiteid
+            }
+        }
+        else if ("batchname" in req.body) {
+            inputs = {
+                'batchname': req.body.batchname
+            }
+        }
         else{
             inputs = ("batchname" in req.query)?{"batchname": req.query.batchname}:{"suiteid": req.query.testsuiteid}
         }
@@ -1444,7 +1454,7 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         var report = [];
         let inputs = {
             "query": "executiondetails",
-            "executionid": executionid,
+            "executionid": executionid[0],
         };
         const result = await utils.fetchData(inputs, "reports/reportStatusScenarios_ICE", fnName);
         if (result == "fail") return res.send("fail");

@@ -154,7 +154,7 @@ const GridBrowser = ({
               placeholder="Select Avo Grid"
               labelTxt="Avo Agent / Avo Grid"
               required={false}
-              disabled={typesOfAppType !== 'Web'}
+              // disabled={typesOfAppType !== 'Web'}
             />
           </div>
           <div className="avogrid_fields">
@@ -168,6 +168,7 @@ const GridBrowser = ({
               required={typesOfAppType !== 'Web'? false:true}
               disabled={(typesOfAppType !== 'Web')}
               labelForNotWebApp = {typesOfAppType !== 'Web'? true:false}
+              showSelectAll={true}
             />
           </div>
           <div>

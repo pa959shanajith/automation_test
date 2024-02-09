@@ -28,44 +28,10 @@
   gap: 10px;
 }
 
-.btn_clr {
-  position: relative;
-  top: 0.7rem;
-  width: 24% !important;
-  height: 1.7rem;
-  background: none;
-  border: none;
-  font-size: 12px;
-  font-family: 'Open Sans';
-
-}
-
-.btn_capture {
-  position: relative;
-  top: 0.7rem;
-  width: 24% !important;
-  height: 1.7rem;
-  background: #605BFF;
-  border: none;
-  color: white;
-  font-size: 12px;
-  font-family: 'Open Sans';
-  border-radius: 2px;
-}
-
 .footer__addmore {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-}
-
-.compare__content__adj {
-  height: 59%;
-  position: relative;
-  top: 10%;
-  border: 1px solid lightgray;
-  // height: 77%;
-  border-radius: 3px;
 }
 
 .recapture__note {
@@ -123,11 +89,6 @@
   }
 }
 
-.card_modal {
-  margin: 0 !important;
-
-}
-
 
 
 .btn-capture-single {
@@ -149,17 +110,6 @@
   float: right;
 }
 
-.card-table {
-  // overflow: auto;
-  // max-height: 24rem;
-  position: relative;
-  top: 1rem;
-
-  .p-datatable-table {
-    padding: 0 1.5rem !important;
-  }
-}
-
 .screen_btn {
   height: 4vh;
   position: relative;
@@ -176,18 +126,19 @@
 }
 
 .screen__name{
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 4rem;
-  position: relative;
-  bottom: 0.2rem;
-  font-family: 'Open Sans';
+    display: inline-block;
+    top: 0.2rem;
+    font-family: Open Sans;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 43rem;
 }
 
 .onHoverLeftIcon{
   position:relative;
-  right:16%;
+  right:1rem;
   font-size: 1.5rem;
   cursor: pointer !important;
      &:hover{
@@ -198,8 +149,6 @@
 }
 
 .onHoverRightIcon{
-  position: relative;
-  left: 3%;
   font-size: 1.5rem;
   cursor: pointer !important;
     &:hover{
@@ -227,18 +176,6 @@
   right: 1rem;
 }
 
-.action_panelCard {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-}
-
-.card_modal {
-  .p-card .p-card-body .panel_card {
-    width: 100%;
-  }
-}
-
 .add_obj {
   .p-dialog-header {
     height: 2rem !important;
@@ -263,7 +200,7 @@
   font-weight: 500;
   font-size: 14px;
   padding: 0 0.8rem;
-  top: 1rem;
+  top: 3%;
   cursor: pointer;
 }
 .disabled {
@@ -278,7 +215,7 @@
   font-family: 'Open Sans';
   font-size: 14px;
   padding: 0 0.8rem;
-  top: 1rem;
+  // top: 1rem;
 }
 
 // .upgrade_auto {
@@ -298,7 +235,7 @@
 .dailog_box {
   overflow: hidden;
   .p-dialog-content {
-    padding: 0 0 !important;
+    padding: 1rem !important;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -596,326 +533,6 @@
 
 }
 
-.panel_card {
-
-  .p-card-body,
-  .p-card-content {
-    padding: 0 0 !important;
-  }
-
-}
-
-.card-table {
-  .p-datatable-table {
-    padding: 0 1.5rem;
-  }
-}
-
-.insprint__block1{
-  // border-right: 1px solid #E2E2ED;
-  cursor: pointer;
-
-  .insprint__text1 {
-    position: relative;
-    top: 0rem;
-    left: 2rem;
-    font-size: 16px;
-    font-family: 'Open sans';
-    font-weight: bold;
-    border-right: 1px solid #E2E2ED;
-    padding-right: 2.4rem;
-  }
-}
-
-.insprint__block {
-  border-right: 1px solid #E2E2ED;
-  cursor: pointer;
-
-  .insprint__text {
-    position: relative;
-    top: 0rem;
-    left: 2rem;
-    font-size: 16px;
-    font-family: 'Open sans';
-    font-weight: bold;
-  }
-
-  .info__btn_insprint {
-    cursor: pointer;
-    height: 11%;
-    width: 5%;
-    left: 5%;
-    position: relative;
-    bottom: 21%;
-  }
-  .add_obj_insprint {
-    .p-dialog-header {
-      height: 2rem !important;
-    }
-
-    height: 4vh;
-    width: 2vw;
-  }
-  .map_obj_insprint {
-    height: 4vh;
-    width: 2vw;
-  }
-
-}
-
-.upgrade__block {
-  border-right: 1px solid #E2E2ED;
-  cursor: pointer;
-
-  .insprint__text {
-    position: relative;
-    top: 0rem;
-    left: 4rem;
-    font-size: 16px;
-    font-family: "Open sans";
-    font-weight: bold;
-  }
-
-  .upgrade_auto {
-    right: 1rem;
-    float: left;
-    padding-right: 2rem;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-    cursor: pointer;
-  }
-  .disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-    display: inline-block;
-    opacity: 0.4;
-  }
-  .info__btn_upgrade {
-    bottom: 21%;
-    cursor: pointer;
-    height: 11%;
-    left: 4%;
-    position: relative;
-    width: 4%;
-  }
-  .add_obj_upgrade {
-    .p-dialog-header {
-      height: 2rem !important;
-    }
-
-    height: 4vh;
-    width: 2vw;
-  }
-  .map_obj_upgrade {
-    height: 4vh;
-    width: 2vw;
-  }
-}
-
-.imp_exp__block {
-  cursor: pointer;
-  .insprint__text {
-    position: relative;
-    top: 2rem;
-    right: 1rem;
-    font-size: 14px;
-    font-family: "Open sans";
-    cursor: pointer;
-  }
-
-  .insprint_auto {
-    float: left;
-    padding-right: 2rem;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-    right: 0.65rem;
-    cursor: pointer;
-  }
-
-  .import__block {
-    display: flex;
-    padding: 1.5rem 0rem;
-    position: relative;
-    bottom: 2rem;
-    cursor: pointer;
-  }
-
-  .export__block {
-    display: flex;
-    position: relative;
-    bottom: 2rem;
-    cursor: pointer;
-  }
-  .disabled {
-    color: '#cccccc';
-  }
-
-  .add_obj {
-    position: relative;
-    right: 1rem;
-  }
-  .add_obj_import{
-    position: relative;
-    right: 1rem;
-    top: 0.2rem;
-  }
-  .add_obj_export{
-    position: relative;
-    right: 1rem;
-    top: 0.3rem;
-  }
-
-  .imp__text {
-    position: relative;
-    top: 0.5rem;
-  }
-}
-
-.utility__block {
-  border-right: 2px solid #E2E2ED;
-  cursor: not-allowed;
-  opacity: 0.4;
-
-  .insprint__text {
-    position: relative;
-    top: 0rem;
-    right: 1rem;
-    font-size: 16px;
-    font-family: "Open sans";
-    cursor: not-allowed;
-    font-weight: bold;
-  }
-
-  .insprint_auto {
-    float: left;
-    padding-right: 2rem;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-    right: 0.65rem;
-    cursor: not-allowed;
-  }
-  .disabled {
-    // float: left;
-    padding-right: 2rem;
-    pointer-events: none;
-    cursor: not-allowed;
-    display: inline-block;
-    opacity: 0.4;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-  }
-
-  .info__btn_utility {
-    cursor: not-allowed;
-    height: 11%;
-    left: 23%;
-    position: relative;
-    bottom: 22%;
-    width: 9%;
-  }
-}
-
-.createManual__block{
-  .create__block {
-    right: 1.45rem;
-  }
-
-  border-right: 1px solid #E2E2ED;
-  cursor: pointer;
-
-  .insprint__text {
-    position: relative;
-    top: 0rem;
-    right: 1rem;
-    font-size: 16px;
-    font-family: "Open sans";
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-  .insprint_auto {
-    float: left;
-    padding-right: 2rem;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-weight: 500;
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-    right: 0.65rem;
-    cursor: pointer;
-  }
-  .disabled {
-    float: left;
-    padding-right: 2rem;
-    pointer-events: none;
-    cursor: not-allowed;
-    display: inline-block;
-    opacity: 0.4;
-    position: relative;
-    text-align: center;
-    font-family: 'Open Sans';
-    font-size: 14px;
-    padding: 0 0.8rem;
-    top: 1rem;
-  }
-
-  .info__btn_create {
-    bottom: 22%;
-    cursor: pointer;
-    height: 11%;
-    left: 9%;
-    position: relative;
-    width: 8%;
-  }
-  .map_obj {
-    height: 4vh;
-    width: 2vw;
-  }
-}
-
-.card__insprint {
-  height: 23%;
-  width: 32%;
-  position: absolute;
-  z-index: 1;
-  background-color: #495057;
-  border-radius: 8px;
-  padding: 0.8rem 0.8rem;
-  color: white;
-  font-family: 'Open Sans';
-  font-size: 14px;
-}
-
-.text__insprint__info {
-  padding: 1.2rem 0;
-}
-
-
-// .footer__btn{
-//   display: flex;
-// }
-
 .screenshot__dialog{
   .p-dialog-content{
     overflow-x: hidden;
@@ -1142,15 +759,78 @@
     text-align: center;
   }
 }
-.panel_head{
-  position: relative;
-  right: 5rem;
+
+.capture_card_modal {
+  display: flex;
+  width: 100%;
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
-.panel_head1{
-  position: relative;
-  right: 3rem;
+.capture_card{
+  display: flex;
+  flex-direction: column;
+  padding:15px;
+  font-family: "Open Sans";
+  width: 20%;
+  gap: 2vh;
+  border-right: 1px solid #e2e2ed;
 }
-.panel_head2{
+.capture_card_top_section{
+  display: flex;
+  justify-content: center;
+}
+.capture_card_header{
+  margin-right: 10px;
+  text-align: center;
+  font-size: 1vw;
+}
+.capture_card_info_wrapper{
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 15px;
+}
+.capture_card_info_img{
+  width: 100%;
+}
+.capture_card_bottom_section{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.capture_bottom_btn{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding:5px;
+  cursor: pointer;
+}
+.capture_bottom_btn_img_wrapper{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+}
+.capture_bottom_btn_img{
+  width: 100%;
+}
+.capture_bottom_heading{
+  text-align: center;
+  font-size: 1vw;
+}
+.expandCollapseIcon{
+  width: 100%;
+}
+.expandCollapseIconWrapper{
+  cursor: pointer;
+  width: 20px;
+  position: absolute;
+  right:0;
+  bottom:0
+}
+.import_export{
   position: relative;
-  right: 4rem;
 }

@@ -611,8 +611,12 @@ const DesignModal = (props) => {
 
         let findTestCaseId = screenLavelTestSteps.find(screen=>screen.name===rowExpandedName.name)
         if (dependencyTestCaseFlag){
-            testCaseIDsList.push(findTestCaseId.id);
-            testcaseID = testCaseIDsList
+            for(let p = 0; p<testcaseList.length;p++){
+                if(testcaseList[p].checked === true && testcaseList[p].disableAndBlock === false){
+                    testcaseID.push(testcaseList[p].testCaseID)
+                }
+            }
+            testcaseID.push(findTestCaseId.id);
         } 
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
@@ -684,6 +688,9 @@ const DesignModal = (props) => {
             
         if (testCase) {
             if (event.checked) {
+                // Update the specific testCase object's checked property to true
+                testCase.checked = true;
+                setTestcaseList([...testcaseList]); // Update the state with the modified list
                 setSelectedTestCases([...selectedTestCases, testCase.testCaseName]);
                 handleAdd(testCase);
             } else {
@@ -753,6 +760,14 @@ const DesignModal = (props) => {
             </div>
         </>
     );
+    const bodyHeaderName = (row)=>{
+        return(
+            <>
+            <span className='rowNameTrim'>{row.name}</span>
+            <Tooltip target=".rowNameTrim " position="bottom" content={row.name}/>
+            </>
+        )
+    }
     const bodyHeader = (rowData)=>{
         const onInputChange = (event) => {
             let findTestCaseData = screenLavelTestSteps.find(screen=>screen.name === rowExpandedName.name)
@@ -866,7 +881,7 @@ const DesignModal = (props) => {
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
-                    <Button label="Debug" size='small'  disabled={debugEnable} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={rowData.testCases.length === 0 || debugEnable || changed} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
                     <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
@@ -1064,6 +1079,7 @@ const DesignModal = (props) => {
     }
     const deleteTestcase = () => {
         setEdit(false)
+        setStepSelect({edit: false, check: [], highlight: []});
         const updateData = screenLavelTestSteps.find(item=>item.id === rowExpandedName.id)
         let testCases = [...updateData.testCases]
         if (testCases.length === 1 && !testCases[0].custname) toast.current.show({severity:'warn', summary:'Warning', detail:MSG.DESIGN.WARN_DELETE.CONTENT,life:3000});
@@ -1368,7 +1384,7 @@ const DesignModal = (props) => {
                             onSelectionChange={e => { setSelectedTestCase({name:e.value.name,id:e.value.id})}} rowExpansionTemplate={rowExpansionTemplate}
                             dataKey="id" tableStyle={{ minWidth: '60rem' }}>
                         <Column expander={allowExpansion} style={{ width: '5rem',background: 'white',paddingLeft:'0.5rem' }} />
-                        <Column field="name" style={{background: 'white',paddingLeft:'0.5rem' }}/>
+                        <Column body={bodyHeaderName} style={{background: 'white',paddingLeft:'0.5rem' }}/>
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
                 </div>

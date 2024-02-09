@@ -15,6 +15,7 @@ import { TabMenu } from 'primereact/tabmenu';
 import TokenManagement from '../containers/TokenMangement';
 import { Checkbox } from 'primereact/checkbox';
 import IceProvision from '../containers/IceProvision';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
 import UserList from '../components/UserList';
 import { Tooltip } from 'primereact/tooltip';
 
@@ -45,6 +46,7 @@ const CreateUser = (props) => {
     const [ldapUserList, setLdapUserList] = useState([])
     const [ldapUserListInitial, setLdapUserListInitial] = useState([])
     const [loading, setLoading] = useState(false)
+    const [updatedInfo, setUpdatedInfo] = useState(true);
     const type = useSelector(state => state.admin.type);
     const addRole = useSelector(state => state.admin.addRole);
     const allRoles = useSelector(state => state.admin.allRoles);
@@ -82,6 +84,11 @@ const CreateUser = (props) => {
     }, [currentTab === "users"]);
 
 
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo ;
+
     useEffect(() => {
         let allRolesList = [];
         if (allRoles.length) {
@@ -101,7 +108,7 @@ const CreateUser = (props) => {
             });
             if(role) setRoleDropdownValue(role);
             setAllRolesUpdate(allRolesList);
-            if (editUser) setAdminCheck(props.editUserData.isAdmin);
+            if (editUser) setAdminCheck(props?.editUserData?.isAdmin);
         }
     }, [allRoles.length > 0]);
 
@@ -158,6 +165,9 @@ const CreateUser = (props) => {
             server: server,
             isadminuser: adminCheck // if user is Quality Manager, she/he has the Admin rights and it is optional
         };
+
+        const userdetail = { ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role};
+
         if (uType === "ldap") userObj.ldapUser = ldap.user;
         setLoading(bAction.slice(0, -1) + "ing User...");
 
@@ -167,6 +177,10 @@ const CreateUser = (props) => {
                 if (data.error) { displayError(data.error); return; }
                 setLoading(false);
                 if (data === "success") {
+                    if(userInfo && userInfo.user_id === userObj.userid){
+                    localStorage.setItem("userInfo", JSON.stringify(userdetail))
+                    dispatch(loadUserInfoActions.setUserInfo({ ...userInfo, email_id: userObj.email, firstname: userObj.firstname, lastname: userObj.lastname, role: userObj.role }))
+                    }
                     props.toastSuccess(MSG.CUSTOM("User " + action + "d successfully!", VARIANT.SUCCESS));
                     if (action === "create") { 
                         setSelectedTab("avoAzzureClient") }
@@ -506,16 +520,23 @@ const CreateUser = (props) => {
     const passwordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_PASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const confirmPasswordChange = (value) => {
         value = ValidationExpression(value, "password")
         dispatch(AdminActions.UPDATE_INPUT_CONFIRMPASSWORD(value))
+        {("" === value) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
     }
 
     const emailChange = (value) => {
         value = ValidationExpression(value, "email")
         dispatch(AdminActions.UPDATE_INPUT_EMAIL(value))
+        {(email === value || value === props?.editUserData?.email) ? setUpdatedInfo(true) : setUpdatedInfo(false)}
+    }
+
+    const roleChange = (value) =>{
+        {(role === value || value === props?.editUserData?.roleId) ?  setUpdatedInfo(true) : setUpdatedInfo(false)} 
     }
 
     const createUserDialogHide = () => {
@@ -562,7 +583,7 @@ const CreateUser = (props) => {
             onClick={() => {
                 editUser ? manage({ action: "update" }) : manage({ action: "create" });
             }}
-            disabled={nocreate}
+            disabled={editUser ? updatedInfo : false}
             size="small"
             >
             {editUser ? "" : <i className="m-1 pi pi-arrow-right"/>}
@@ -592,7 +613,7 @@ const CreateUser = (props) => {
                         confServerAddClass={confServerAddClass} clearForm={clearForm} setShowEditUser={setShowEditUser}
                         ldapGetUser={ldapGetUser} click={click} edit={edit} manage={manage} selectUserType={selectUserType} setShowDropdownEdit={setShowDropdownEdit} 
                         showDropdownEdit={showDropdownEdit} showDropdown={showDropdown} emailChange={emailChange} primaryRoles={allRolesUpdate}
-                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList}/>
+                        ldapSelectedUserList={ldapSelectedUserList} setLdapSelectedUserList={setLdapSelectedUserList} updatedInfo={updatedInfo} setUpdatedInfo={setUpdatedInfo} editUserData={props.editUserData} setEditUserData={props.setEditUserData}/>
 
                     <div style={{ paddingLeft: '1.5rem' }}>
                         {(type === "inhouse") ?
@@ -661,7 +682,7 @@ const CreateUser = (props) => {
                                     optionLabel="name"
                                     className= {`w-full md:w-20rem p-inputtext-sm ${userRolesAddClass ? 'inputErrorBorder' : ''}`}
                                     placeholder='Select Role'
-                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)) }}
+                                    onChange={(event) => { setRoleDropdownValue(event.target.value); dispatch(AdminActions.UPDATE_USERROLE(event.target.value)); roleChange(event.target.value)}}
                                     // disabled={editUser}
                                 />
                             </div>

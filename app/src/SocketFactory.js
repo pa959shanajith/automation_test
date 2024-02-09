@@ -86,12 +86,14 @@ const SocketFactory = () => {
     }, [socket])
 
     useEffect(() => {
-        var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')
-        var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: { check: 'notify', key: userName } });
-        dispatch(loadUserInfoActions.setSocket(socket));
-        return (() => {
-            socket.close();
-        });
+        if(!(document.location.href.includes("viewReports"))){
+            var userName = Buffer.from(((userInfo && userInfo.username) ? userInfo.username:(localStorage.getItem('userInfo')?JSON.parse(localStorage.getItem('userInfo')).username:uuid())) ).toString('base64')
+            var socket = socketIOClient(url, { forceNew: true, reconnect: true, query: { check: 'notify', key: userName } });
+            dispatch(loadUserInfoActions.setSocket(socket));
+            return (() => {
+                socket.close();
+            });
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [userInfo])
 

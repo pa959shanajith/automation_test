@@ -753,7 +753,7 @@ export const moveNodeEnd = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) =>
         let f;
         if (dNodes[pi].type === 'testcases'){
             for(let d = 0; d<dNodes.length; d++){
-                if(dNodes[d].name === dNodes[pi].parent.name){
+                if(dNodes[d].id === dNodes[pi].parent.id){
                     f = d
                     break
                 }
@@ -933,28 +933,18 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
     } else if (dNodes[sid].type === 'screens') {
         for (var l = 0; l < dNodes[0].children.length; l++) {
             if (dNodes[0].children[l].name === p.name) {
-                if(dNodes[sid].reuse !== true){
-                    dNodes[0].children[l].children = p.children
-                }else{
-                    dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child=>child.id !== sid)
-                }
+                dNodes[0].children[l].children = dNodes[0].children[l].children.filter(child=>child.id !== sid)
             }
         }
     } else if (dNodes[sid].type === 'testcases') {
         for (var k = 0; k < dNodes[0].children.length; k++) {
             for (var m = 0; m < dNodes[0].children[k].children.length; m++) {
                 if (dNodes[0].children[k].children[m].name === p.name) {
-                    if(dNodes[sid].reuse !== true){
-                        dNodes[0].children[k].children[m].children = p.children
-                    }else{
-                        dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
-                    }
-                    
-                     // No need to continue looping once we find the parent
+                    dNodes[0].children[k].children[m].children = dNodes[0].children[k].children[m].children.filter(child=>child.id !== sid)
                 }
             }
         }
-    }    
+    }       
     if (p["_id"]== null && p["state"]=="created" && p["type"]=="endtoend") {deletedNodes=[]}
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }

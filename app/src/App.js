@@ -22,6 +22,7 @@ import 'primeicons/primeicons.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.css';
 import 'primeflex/primeflex.css';
+import DevOpsReport from './pages/report/components/DevOpsReport';
 // import StaticDataForMindMap from './pages/design/containers/staticDataForMindMap';
 import ConfigurePage from './pages/execute/components/ConfigurePage';
 import './App.css';
@@ -81,7 +82,7 @@ const App = () => {
     {/* <ProgressBar /> */}
     {/* <ErrorBoundary> */}
     <div className="main_content">
-      {!['/login', '/','/undefined','/viewReports'].includes(location.pathname) && <Topbar />}
+      {!['/login', '/','/undefined','/viewReports','/devOpsReport'].includes(location.pathname) && <Topbar />}
       <SocketFactory/>
       <RouteApp/>
     </div>
@@ -102,6 +103,7 @@ const RouteApp = () => {
         <Route path="/" element={<BasePage />} />
         <Route path="/landing" element={<HomePage />} />
         {/* <Route path="/integration" element={<Integration />} /> */}
+        <Route path="/devOpsReport" element={<DevOpsReport/>} />      
         <Route path="/reports" element={<Report />} />
         <Route path="/profile" element={<Profile />} />
         {/* <Route path="/settings" element={<Settings />} /> */}
@@ -143,7 +145,9 @@ const TabCheck = (setBlockui) => {
   // add eventlistener to session storage
   window.addEventListener("storage", storage_Handler, false);
   // set tab UUID in session storage
-  localStorage["tabUUID"] = window.name;
+  if (!(window.location.pathname.includes('/executionReport') || window.location.pathname.includes('/reports') || window.location.pathname.includes('/accessibilityReport') || window.location.pathname.includes('/devOpsReport') || window.location.pathname.includes('/viewReports') || window.location.pathname.includes('/profile') || window.location.pathname.includes('/dashboard'))) {
+    localStorage["tabUUID"] = window.name;
+  }
 }
 
 export default App;

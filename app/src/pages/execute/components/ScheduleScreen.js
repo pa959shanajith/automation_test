@@ -331,7 +331,7 @@ const ScheduleScreen = ({
                         name="schedule"
                         value={el}
                         onChange={(e) => {
-                          setStartTime(new Date());
+                          setStartTime(new Date(Date.now() + (6 * 60 * 1000)));
                           setStartDate(null);
                           setSelectedPattren(e.value);
                         }}
@@ -364,7 +364,7 @@ const ScheduleScreen = ({
               placeholder="Enter Start date"
               onChange={(e) => {
                 setStartDate(e.value);
-                setStartTime(new Date());
+                setStartTime(new Date(Date.now() + (6 * 60 * 1000)));
               }}
               disabled={selectedPattren?.key}
               minDate={new Date()}

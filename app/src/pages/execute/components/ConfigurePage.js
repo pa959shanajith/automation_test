@@ -22,6 +22,7 @@ import ScreenOverlay from '../../global/components/ScreenOverlay';
 import { BrowserstackLogin,BrowserstackExecute } from "./Browserstack"; 
 import { readTestSuite_ICE, saveBrowserstackData, getDetails_SAUCELABS, saveSauceLabData } from "../api";
 import { checkRole, roleIdentifiers } from "../../design/components/UtilFunctions";
+import { InputText } from 'primereact/inputtext';
 
 import {SauceLabLogin,SauceLabsExecute} from './sauceLabs';
 import {
@@ -183,6 +184,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
+  const [runningStatusTimer, setRunningStatusTimer] = useState("");
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -209,9 +211,20 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
         text: 'Microsoft Edge'
     }
 ]);
-  const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
+  const [currentPage, setCurrentPage] = useState(1);
+
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
+
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+  else projectInfo = projectInfo;
+
   const [radioButton_grid, setRadioButton_grid] = useState(
-   selectProjects?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
+    projectInfo?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
   const [defaultValues, setDefaultValues] = useState({});
   const [defaultValues2, setDefaultValues2] = useState({});
@@ -225,15 +238,14 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [emailNotificationSender, setEmailNotificationSender] = useState(null);
   const [batchInfo, setBatchInfo] = useState([]);
   const [profileName, setProfileName] = useState(null);
+  const [configbtnsave,setConfigbtnsave]=useState(null);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
-  const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
     { label: "cURL", value: "curl" },
-    { label: "HTTP", value: "http" },
     { label: "Javascript", value: "javascript" },
     { label: "Python", value: "python" },
     { label: "PowerShell - RestMethod", value: "powershell" },
@@ -241,26 +253,17 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   ]
   const debouncedSearchValue = useDebounce(searchProfile, 500);
 
-  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  if (!userInfo) userInfo = userInfoFromRedux;
-  else userInfo = userInfo;
-
-  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
-  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
-  if (!projectInfo) projectInfo = projectInfoFromRedux;
-
   useEffect(() => {
-    setConfigProjectId(selectProjects?.projectId ? selectProjects.projectId : localStorageDefaultProject?.projectId)
-  }, [selectProjects]);
+    setConfigProjectId(projectInfo?.projectId)
+  }, [projectInfo]);
 
   useEffect(() => {
     setRadioButton_grid("Execute with Avo Assure Client")
-    setShowSauceLabs(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
-    setShowBrowserstack(selectProjects?.appType === "MobileWeb" || selectProjects?.appType === "MobileApp");
+    setShowSauceLabs(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
+    setShowBrowserstack(projectInfo?.appType === "MobileWeb" || projectInfo?.appType === "MobileApp");
     setExecutingOn("ICE");
     setShowIcePopup(true);
-  }, [selectProjects.projectId, selectProjects.appType]);
+  }, [projectInfo?.projectId, projectInfo?.appType]);
 
  const displayError = (error) => {
     setLoading(false)
@@ -312,6 +315,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
+  localStorage.setItem("configData",JSON.stringify(getConfigData))
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -389,7 +393,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     (async () => {
       var data = [];
       const Projects = await getProjectList();
-      // dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
+      // dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo,projectName: Projects.projectName[0], projectId: Projects.projectId[0], appType: Projects.appTypeName[0] }));
       setProject(Projects);
       for (var i = 0; Projects.projectName.length > i; i++) {
         data.push({ name: Projects.projectName[i], id: Projects.projectId[i], projectLevelRole: Projects.projectlevelrole[0][i]["assignedrole"] });
@@ -402,7 +406,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       // setConfigProjectId(data[0] && data[0]?.id);
       setProjectList(data);
     })();
-  }, [selectProjects]);
+  }, []);
 
  const showSuccess_CICD = (btnType) => {
     if (btnType === "Cancel") {
@@ -423,16 +427,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     \"key\": \"${currentKey}\",
     \"executionType\": \"${executionTypeInRequest}\"
 }"`,
-
-    http: `POST /execAutomation HTTP/1.1
-Host: ${url.slice(8, -15)}
-Content-Type: application/json
-Content-Length: 93
-
-{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
-}`,
 
     javascript: `var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
@@ -456,6 +450,10 @@ fetch("${url}", requestOptions)
 
     python: `import requests
 import json
+import time
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 url = "${url}"
 
@@ -467,32 +465,140 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+try:
+    response = requests.request("POST", url, headers=headers, data=payload, verify=False)
+    response = response.json()
+    print(f"status :            {response['status']}")
+    print(f"ReportLink :        {response['reportLink']}")
+    print(f"RunningStatusLink : {response['runningStatusLink']}")
+    status = response["status"]
 
-print(response.text)`,
+    if status == "pass":
+        running_status_link = response["runningStatusLink"]
+        status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+        status_response = status_response.json()
+        running_status = status_response["status"]
+        completed = status_response["Completed"]
 
-    powershell: `$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+        while running_status == "Inprogress":
+            print(f"Executing... {completed}")
+
+            status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
+            status_response = status_response.json()
+            running_status = status_response["status"]
+            if "Completed" in status_response:
+                completed = status_response["Completed"]
+            else:
+                completed = ""
+            time.sleep(${runningStatusTimer})
+
+        if running_status == "Completed":
+            pretty_json = json.dumps(status_response, indent=4)
+            print(pretty_json)
+    else:
+        print("Some error occurred")
+except Exception as e:
+    print("Some error occurred")
+`,
+
+    powershell: `# Disable SSL/TLS validation (for testing purposes only)
+[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+        
+# Define headers and body
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Content-Type", "application/json")
-
+    
 $body = @"
 {
     "key": "${currentKey}",
     "executionType": "${executionTypeInRequest}"
 }
 "@
+    
+try {
+    $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
+    $status = $response.status
+    
+    # Check if status is pass or fail
+    if ($status -ne "fail") {
+        Write-Host "Status            :" $response.status
+        Write-Host "ReportLink        :" $response.reportLink
+        Write-Host "RunningStatusLink :" $response.runningStatusLink
+        $runningStatusLink = $response.runningStatusLink
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+        $runningStatus = $statusResponse.status
+        $complete = $statusResponse.Completed
+        
+        while ($runningStatus -eq "Inprogress") {
+            Write-Host "Executing... $complete"
+    
+            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+            $runningStatus = $statusResponse.status
+            if ($statusResponse.PSObject.Properties["Completed"]) {
+                $complete = $statusResponse.Completed
+            }
+            else {
+                $complete = ""
+            }
+            Start-Sleep -Seconds ${runningStatusTimer}
+        }
+    
+        if ( $runningStatus -eq "Completed") {
+            $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
+            Write-Host $summaryReport
+        }
+    } 
+    else {
+        Write-Host "Some error occurred"
+    }
+}
+catch {
+    Write-Host "Some error occurred"
+}`,
 
-$response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-$response | ConvertTo-Json`,
+    shell: `#!/bin/bash
+# Disable SSL/TLS validation (for testing purposes only)
+export CURL_CA_BUNDLE=""
+export PYTHONHTTPSVERIFY=0
 
-    shell: `wget --no-check-certificate --quiet
-  --method POST
-  --timeout=0
-  --header 'Content-Type: application/json'
-  --body-data '{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
+# Define URL, headers, and body
+url="${url}"
+headers="--header=Content-Type:application/json"
+body='{
+  "key": "${currentKey}",
+  "executionType": "${executionTypeInRequest}"
 }'
-    '${url}'`,
+# Make the POST request with wget
+response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
+  
+# Check if the request was successful
+status=$(echo "$response" | jq -r '.status')
+  
+if [ "$status" != "fail" ]; then
+  runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+  reportLink=$(echo "$response" | jq -r '.reportLink')
+  echo "status            : $status"
+  echo "reportLink        : $reportLink"
+  echo "runningStatusLink : $runningStatusLink"
+
+  # Check the execution status in a loop
+  while true; do
+    statusResponse=$(wget --quiet --method=GET $headers -O - "$runningStatusLink")
+    runningStatus=$(echo "$statusResponse" | jq -r '.status')
+    complete=$(echo "$statusResponse" | jq -r '.Completed')
+
+    echo "Executing... $complete"
+
+    if [ "$runningStatus" == "Completed" ]; then
+      summaryReport=$(echo "$statusResponse" | jq -c '.')
+      echo "$summaryReport"
+      break
+    fi
+    sleep ${runningStatusTimer}
+  done
+else
+  echo "Some error occurred"
+fi`,
 };
 
   const fetchData = async () => {
@@ -821,74 +927,72 @@ else{
 };
 
 const handleSubmit1 = async (SauceLabPayload) => {
-  // close the existing dialog
-  // open the new dialog
   setLoading("Fetching details..");
-  const data1 = await getDetails_SAUCELABS()
-  if (data1.error) { setMsg(data1.error); return; }
-      if (data1 !== "empty") {
-        data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails') 
-        let data = await saveSauceLabData({
-          "SauceLabPayload" : {
-            ...data1,
-            "query" : showSauceLabs ? 'sauceMobileWebDetails':'sauceWebDetails'
-          }
+
+  try {
+    const data1 = await getDetails_SAUCELABS();
+
+    if (data1.error) {
+      setMsg(data1.error);
+      return;
+    }
+
+    if (data1 !== "empty") {
+      data1['query'] = (showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails');
+
+      let data = await saveSauceLabData({
+        "SauceLabPayload": {
+          ...data1,
+          "query": showSauceLabs ? 'sauceMobileWebDetails' : 'sauceWebDetails'
+        }
+      });
+
+      if (data && data.os_names && data.browser) {
+        const arrayOS = data.os_names.map((element, index) => {
+          return {
+            key: element,
+            text: element,
+            title: element,
+            index: index
+          };
         });
-        if (data && data.os_names && data.browser) {
-          // Data exists and has the expected properties
-          
-          const arrayOS = data.os_names.map((element, index) => {
-            return {
-              key: element,
-              text: element,
-              title: element,
-              index: index
-            };
-          });
-          setOsNames(arrayOS);
-          setBrowserDetails(data);
-          setLoading(false)
-          setDisplayBasic4('displayBasic4');
-      }
-      else if (data && data.emulator && data.real_devices && data.stored_files){
-          // const arrayPlatforms = Object.keys(data.emulator).map((element, index) => { 
-          //     return {
-          //         key: element,
-          //         text: element,
-          //         title: element,
-          //         index: index
-          //     }
-          // })
-          // setPlatforms(arrayPlatforms);
-    
-          setMobileDetails(data);
-          setDisplayBasic4(true);
-          setLoading(false);
-        }
-         else {
-          
-          // Data is empty or doesn't have expected properties
-          if (data == "unavailableLocalServer"){
-              toast.current.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
-                life: 5000
-              });
-          }else{
-            toast.current.show({
-              severity: 'error',
-              summary: 'error',
-              detail: "Error while fetching the data from Saucelabs",
-              life: 5000
-            });
-          } 
-          setLoading(false); 
-        }
+        setOsNames(arrayOS);
+        setBrowserDetails(data);
+        setLoading(false);
+        setDisplayBasic4('displayBasic4');
+      } else if (data && data.emulator && data.real_devices && data.stored_files) {
+        setMobileDetails(data);
+        setDisplayBasic4(true);
+        setLoading(false);
       } else {
-        setMsg("No data stored in settings"); return;
+        // Data is empty or doesn't have expected properties
+        console.log(data)
+        if (data === "unavailableLocalServer") {
+          toast.current.show({
+            severity: 'error',
+            summary: 'Error',
+            detail: "ICE Engine is not available, Please run the batch file and connect to the Server.",
+            life: 5000
+          });
+        }
+        setLoading(false);
       }
+    } else {
+      toast.current.show({
+        severity:'info',
+        summary: 'Info',
+        detail: "No data stored in settings",
+        life: 5000
+      });
+      return;
+    }
+  } catch (error) {
+    console.error("Error during handleSubmit1:", error);
+    setMsg("An error occurred while fetching details");
+  } finally {
+    setLoading(false);
   }
+};
 
 
            
@@ -927,7 +1031,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
           toast.current.show({severity:'error', summary: 'Error', detail:  "Error While Deleting Execute Configuration", life: 2000});
         }
       } else {
-        tableUpdate();
+        tableUpdate(currentPage);
         toast.current.show({severity:'success', summary: 'Success', detail:"Execution Profile deleted successfully.", life: 1000});
       }
       setLoading(false);
@@ -966,7 +1070,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   />,
   [setLoading, displayBasic4, onHidedia, handleSubmit1,setSauceLabUser]);
 
-  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={selectProjects.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
+  const sauceLabExecute = useMemo(() => <SauceLabsExecute selectProjects={projectInfo?.appType} mobileDetails={mobileDetails} browserDetails={browserDetails}
   displayBasic4={displayBasic4} onHidedia={onHidedia} showSauceLabs={showSauceLabs} currentSelectedItem={currentSelectedItem}
   changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
       onModalBtnClick={onHidedia} handleSubmit1={handleSubmit1}
@@ -988,7 +1092,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={selectProjects.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
@@ -1005,7 +1109,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       executionData["browserType"]=browserTypeExe;
   }
     setAllocateICE(false);
-    const modul_Info = parseLogicExecute(eachData,currentTask, selectProjects.appType, moduleInfo, accessibilityParameters, "");
+    const modul_Info = parseLogicExecute(eachData, currentTask, projectInfo?.appType, moduleInfo, accessibilityParameters, "");
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
@@ -1149,7 +1253,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
         };
 
   const cicdLicense = {
-    value: userInfo?.licensedetails?.CICD === false,
+    value: String(userInfo?.licensedetails?.CICD) === "false",
     msg: "You do not have access for CICD."
   }
 
@@ -1241,7 +1345,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >
               Schedule
             </Button>
-            <span id={cicdLicense.value || selectProjects.appType!=="Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
+            <span id={cicdLicense.value || projectInfo?.appType !== "Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
             <Button
               className="CICD"
               size="small"
@@ -1249,15 +1353,16 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
+                setRunningStatusTimer("")
               }}
-              disabled={selectProjects.appType!=="Web" || cicdLicense.value}
+                disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
               CI/CD
             </Button>
             </span>
             <div className="cloud-test-provider" >
               <Dropdown
-                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }}  options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={selectProjects.appType === "Desktop" || selectProjects.appType === "Mainframe" || selectProjects.appType === "OEBS" || selectProjects.appType === "SAP"} />
+                placeholder="Cloud Test" onChange={(e) => { handleOptionChange(e.target.value.name, 'web', item, idx, setConfigItem(idx)); setCurrentSelectedItem(item); handleTestSuite(item); setSaucelabExecutionEnv('saucelabs'); setBrowserstackExecutionEnv('browserstack') }} options={cloudTestOptions} optionLabel="name" itemTemplate={countryOptionTemplate} valueTemplate={selectedCountryTemplate} disabled={projectInfo.appType === "Desktop" || projectInfo.appType === "Mainframe" || projectInfo.appType === "OEBS" || projectInfo.appType === "SAP"} />
             </div> 
           
           </div>
@@ -1314,10 +1419,11 @@ const showToast = (severity, detail) => {
 };
 
   const configModal = (getType, getData = null) => {
+    const lsGetConfigData = JSON.parse(localStorage.getItem("configData"))
     if (getType === "CancelUpdate") {
       const getAvogrid = [
-        ...getConfigData?.avoAgentAndGrid?.avoagents,
-        ...getConfigData?.avoAgentAndGrid?.avogrids,
+        ...lsGetConfigData?.avoAgentAndGrid?.avoagents,
+        ...lsGetConfigData?.avoAgentAndGrid?.avogrids,
       ];
       getAvogrid.forEach((el, index, arr) => {
         if (Object.keys(el).includes("Hostname")) {
@@ -1329,7 +1435,7 @@ const showToast = (severity, detail) => {
         ...avodropdown,
         avogrid: getData?.executionRequest?.avoagents[0] ? getAvogrid.filter(
           (el) => el.name === getData?.executionRequest?.avoagents[0]
-        )[0] : getConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
+        )[0] : lsGetConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
@@ -1350,6 +1456,7 @@ const showToast = (severity, detail) => {
       setDefaultValues({ ...defaultValues, EmailSenderAddress: getData.executionRequest.emailNotificationSender, EmailRecieverAddress: getData.executionRequest.emailNotificationReciever});
       setIsNotifyOnExecutionCompletion(getData.executionRequest.isNotifyOnExecutionCompletion);
       setIsEmailNotificationEnabled(getData.executionRequest.isEmailNotificationEnabled);
+      setCheckedExecution(getData.executionRequest.execType)
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -1372,6 +1479,7 @@ const showToast = (severity, detail) => {
   };
 
   const onModalBtnClick = (getBtnType) => {
+    setConfigbtnsave(getBtnType)
     if (getBtnType === "Save" || getBtnType === "Update") {
       const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
         ac[cv.key] = ac[cv.key] || [];
@@ -1431,12 +1539,13 @@ const showToast = (severity, detail) => {
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
           batchInfoData.push({
+            key:item.key,
             scenarioTaskType: "disable",
             testsuiteName: item.suitename,
             testsuiteId: item.suiteid,
             batchname: "",
             versionNumber: 0,
-            appType: selectProjects.appType,
+            appType: projectInfo?.appType,
             domainName: "Banking",
             projectName: getProjectData()[0]?.name,
             projectId: configProjectId,
@@ -1456,6 +1565,7 @@ const showToast = (severity, detail) => {
           });
         }
       });
+      batchInfoData.sort((item1,item2)=>item1.key-item2.key)
 
       let executionData = {
         type: "",
@@ -1524,7 +1634,14 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
-      tableUpdate();
+      const pagecount=Math.floor(configPages/10);
+      if(configbtnsave=="Save"){
+        const first = (pagecount)*10;
+        onPageChange({first,rows:10,page:pagecount})
+      }
+      else{
+      tableUpdate(currentPage);
+      }
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
@@ -1541,14 +1658,14 @@ const showToast = (severity, detail) => {
   const Breadcrumbs = () => {
     function changeProject(e){
       const defaultProjectData = {
-        ...localStorageDefaultProject, // Parse existing data from localStorage
+        ...projectInfo, // Parse existing data from localStorage
         projectId: e.target.value,
         projectName: projectList.find((project)=>project.id === e.target.value).name,
         appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)],
         projectLevelRole: projectList.find((project)=>project.id === e.target.value)?.projectLevelRole
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
-      dispatch(loadUserInfoActions.setDefaultProject({ ...selectProjects, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
+      dispatch(loadUserInfoActions.setDefaultProject({ ...projectInfo, projectName: projectList.find((project) => project.id === e.target.value).name, projectId: e.target.value, appType: project?.appTypeName[project?.projectId.indexOf(e.target.value)], projectLevelRole: projectList.find((project) => project.id === e.target.value)?.projectLevelRole }));
     }
     return (
       <nav>
@@ -1842,7 +1959,15 @@ const showToast = (severity, detail) => {
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              scheduleThrough: showIcePopup ? "client" : (
+                fetechConfig[configItem]?.executionRequest?.avoagents[0]  
+                    ? (Object.values(fetechConfig[configItem].executionRequest.avoagents)[0])
+                    : getConfigData?.avoAgentAndGrid?.avogrids?.length > 0
+                      ? (getConfigData?.avoAgentAndGrid?.avogrids?.filter((item) => item?._id === fetechConfig[configItem]?.executionRequest?.avogridId)[0]?.name)
+                      : "Any Agent" 
+                         
+              ),
+              // scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
               testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
@@ -1959,6 +2084,7 @@ const showToast = (severity, detail) => {
   const onPageChange = (e) => {
       setFirstPage(e.first);
       setRowsPage(e.rows);
+      setCurrentPage(e.page+1);
       tableUpdate(e.page + 1, debouncedSearchValue);
   };
  
@@ -2077,7 +2203,7 @@ const showToast = (severity, detail) => {
                 <div className="radio_grid">
                 <div className="radioButtonContainer">
                   <RadioButton
-                  disabled={selectProjects.appType!=="Web"}
+                  // disabled={projectInfo?.appType !== "Web"}
                   checked={ radioButton_grid === "Execute with Avo Assure Agent/ Grid"}
                     value="Execute with Avo Assure Agent/ Grid"
                     onChange={(e) => {
@@ -2103,7 +2229,7 @@ Learn More '/>
                         setExecutingOn("ICE");
                       }}
                       checked={
-                        radioButton_grid === "Execute with Avo Assure Client" || selectProjects.appType!=="Web"
+                        radioButton_grid === "Execute with Avo Assure Client"
                       }
                     />
                   </div>
@@ -2393,9 +2519,25 @@ Learn More '/>
                     </div>
                   </div>
                   :
-                  <div className="container_codesnippetlabel" title={codeSnippets[selectedLanguage]}>
+                  <div className="container_codesnippetlabel">
+                    <div>
+                        <label className="code_label">Set The Timer:</label>
+                        <InputText
+                          // data-test="password"
+                          value={runningStatusTimer}
+                          className={'w-full md:w-10rem'}
+                          style={{'margin': '0.5rem 0px 0.5rem 10.2rem', 'width': "10rem"}}
+                          onChange={(event) => { setRunningStatusTimer(event.target.value) }}
+                          keyfilter="int"
+                          placeholder='Seconds'
+                      />
+                    </div>
                     <label className="code_label">Select Language:</label>
-                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem language-dropdown" />
+                    <Dropdown value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.value)} 
+                    options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem" 
+                    style={{'margin': '0.5rem 0px 1rem 9.1rem', 'width': "10rem"}}
+                    />
+
                     <div>
                       <div className="key">
                       <pre className="code_snippet__content code_snippet__pre">
@@ -2593,7 +2735,7 @@ Learn More '/>
               typeOfExecution={typeOfExecution}
               checkedExecution={checkedExecution}
               setCheckedExecution={setCheckedExecution}
-              typesOfAppType={typesOfAppType ? typesOfAppType : localStorageDefaultProject?.appType }
+              typesOfAppType={typesOfAppType ? typesOfAppType : projectInfo?.appType }
             />
           }
           headerTxt="Execution Configuration set up"
