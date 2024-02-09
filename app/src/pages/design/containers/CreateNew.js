@@ -13,7 +13,7 @@ import '../styles/CreateNew.scss';
 import DeleteScenarioPopUp from '../components/DeleteScenarioPopup';
 import CanvasEnE from './CanvasEnE';
 import { Navigate } from 'react-router-dom';
-import { projectList, selectedProj, screenData, moduleList, AnalyzeScenario, TypeOfViewMap } from '../designSlice';
+import { projectList, selectedProj, screenData, moduleList, AnalyzeScenario, TypeOfViewMap, SetCurrentId,dontShowFirstModule, selectedModuleReducer} from '../designSlice';
 import ModuleListDrop from '../components/ModuleListDrop';
 import { Toast } from 'primereact/toast';
 import { Dropdown } from 'primereact/dropdown';
@@ -60,14 +60,33 @@ const CreateNew = ({ importRedirect }) => {
                 break;
             case 'mindMapView':
                 dispatch(TypeOfViewMap("mindMapView"));
+                dispatch(dontShowFirstModule(true))
+                dispatch(SetCurrentId(moduleSelect._id))
                 break;
             default:
                 dispatch(TypeOfViewMap("mindMapView"));
+                dispatch(dontShowFirstModule(true))
+                dispatch(SetCurrentId(moduleSelect._id))
                 break;
-
         }
 
     }
+    useEffect( ()=>{
+        if(Object.keys(moduleSelect).length > 0){
+        (async()=>{
+            var req={
+                tab:"createTab",
+                projectid:Proj.projectId,
+                version:0,
+                cycId: null,
+                modName:"",
+                moduleid:moduleSelect._id
+            }
+            const data = await getModules(req) 
+            if(data.error)return;
+            else dispatch(selectedModuleReducer(data))
+        })()}
+    },[handleTypeOfViewMap ==="mindMapView"])
 
     const views = [
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },

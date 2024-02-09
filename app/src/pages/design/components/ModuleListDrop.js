@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import WSImportMindmap from'../components/WSImportMindmap.js';
-import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId} from '../designSlice';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -146,7 +146,7 @@ const ModuleListDrop = (props) =>{
         setWarning(false); 
         if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
      // eslint-disable-next-line react-hooks/exhaustive-deps
-     }, [moduleLists, initProj])
+     }, [moduleLists, initProj, currentId])
      useEffect(()=> {
         return () => {
           handleReaOnlyTestSuite({oldModuleForReset:localStorage.getItem('OldModuleForReset'),modID:localStorage.getItem('CurrentModuleForReset'),userInfo,appType:props.appType,module:props.module,proj:proj})
