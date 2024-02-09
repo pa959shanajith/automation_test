@@ -116,6 +116,11 @@
 
     }
 
+    .E2EDisable{
+        opacity: 0.3;
+        cursor:not-allowed ;
+    }
+
     .BasicDemo_primeReactTree {
         justify-content: center;
         align-items: center;
