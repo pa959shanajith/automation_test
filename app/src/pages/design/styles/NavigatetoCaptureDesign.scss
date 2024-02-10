@@ -6,8 +6,11 @@
         height: 3rem !important;
 
         .p-dialog-header-icons {
-            position: relative;
-            right: 96%;
+            position: absolute;
+            width: 2vw;
+            height: 2vh;
+            left: 1rem;
+            top: 1rem;
         }
         .p-dialog .p-dialog-header .p-dialog-title {
             margin-left: 2.79rem;
@@ -35,7 +38,7 @@
         }
     }
     .p-dialog-content {
-        overflow: unset;
+        overflow: auto;
         padding-bottom: 0 !important;
     }
 }
@@ -47,9 +50,10 @@
     padding: 1rem;
 }
 .tabView_captureDesign{
-    left: 40%;
+    left: 50%;
     position: absolute;
     top: 0rem;
+    transform: translateX(-50%);
     background: transparent !important;
     .p-tabview-nav {
         height: 3rem;
@@ -64,6 +68,10 @@
 }
 .captureDesign_dialog_div{
     .p-dialog-content {
-        overflow: unset;
+        overflow: auto;
     }
 }
+.p-tabview .p-tabview-panels{
+    background: transparent;
+}
+
