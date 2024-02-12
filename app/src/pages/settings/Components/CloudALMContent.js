@@ -45,46 +45,6 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
         setSelectedNodes({ calmTestId, calmTestname });
     };
 
-    useEffect(() => {
-        const _viewMappedDetails = almavomappedData?.filter((data) => data.projectname === reduxDefaultselectedProject.projectName).filter((details) => {
-            if (details.testid[0] === selectedNodes?.calmTestId) {
-                return details;
-            }
-        });
-        const updatedDataCopy = [...updatedTreeData];
-
-        _viewMappedDetails.forEach((details) => {
-            if (details.testscenarioid.length > 0) {
-                details.testscenarioid.map((data) => {
-                    updatedDataCopy.map((updatedData) => {
-                        if (updatedData._id === data) {
-                            updatedData.children.push({
-                                testcaseType: "children",
-                                _id: details.testid[0],
-                                name: details.testname[0]
-                            });
-                        }
-                    });
-                });
-            }
-        });
-
-        updatedDataCopy?.forEach((updatedData) => {
-            const uniqueChildren = [];
-            if (updatedData?.children?.length > 0) {
-                const idSet = new Set();
-                updatedData.children.forEach((child) => {
-                    if (!idSet.has(child._id)) {
-                        uniqueChildren.push(child);
-                        idSet.add(child._id);
-                    }
-                });
-            }
-            updatedData.children = uniqueChildren.filter((child) => child._id == selectedNodes.calmTestId);
-        });
-        setUpdatedTreeData((updatedTreeData) => updatedDataCopy);
-    }, [selectedNodes?.calmTestId])
-
     const handleSync = async () => {
         let scenarioIdDetails = [];
         let popupMsg = false;
@@ -160,9 +120,8 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
             "action": "saveSAP_ALMDetails_ICE"
         };
 
-        setTreeData(data);
+        setUpdatedTreeData(data);
         if (popupMsg) setMsg(popupMsg);
-        setSelectedNodes({});
         setAvoSelected([]);
         dispatch(enableSaveButton(true));
         dispatch(mappedPair(mappedData));
@@ -259,13 +218,51 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
         fetchMappedDetails();
     }, []);
 
-
-
-
     useEffect(() => {
         setAlmTestcases(allCalmTestCaseData);
         setUpdatedTreeData(treeData);
     }, [allCalmTestCaseData, treeData]);
+
+    useEffect(() => {
+        const _viewMappedDetails = almavomappedData?.filter((data) => data.projectname === reduxDefaultselectedProject.projectName).filter((details) => {
+            if (details.testid[0] === selectedNodes?.calmTestId) {
+                return details;
+            }
+        });
+        const updatedDataCopy = [...updatedTreeData];
+
+        _viewMappedDetails.forEach((details) => {
+            if (details.testscenarioid.length > 0) {
+                details.testscenarioid.map((data) => {
+                    updatedDataCopy.map((updatedData) => {
+                        if (updatedData._id === data) {
+                            updatedData.children.push({
+                                testcaseType: "children",
+                                _id: details.testid[0],
+                                name: details.testname[0]
+                            });
+                        }
+                    });
+                });
+            }
+        });
+
+        updatedDataCopy?.forEach((updatedData) => {
+            const uniqueChildren = [];
+            if (updatedData?.children?.length > 0) {
+                const idSet = new Set();
+                updatedData.children.forEach((child) => {
+                    if (!idSet.has(child._id)) {
+                        uniqueChildren.push(child);
+                        idSet.add(child._id);
+                    }
+                });
+            }
+
+            updatedData.children = uniqueChildren.filter((child) => child._id == selectedNodes?.calmTestId);
+        });
+        setUpdatedTreeData(updatedDataCopy);
+    }, [selectedNodes?.calmTestId]);
 
     return (
         <TabView className='tab__cls' activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
