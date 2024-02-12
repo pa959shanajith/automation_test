@@ -412,9 +412,12 @@ exports.testSuitesSchedulerRecurring_ICE = async (req, res) => {
 		return res.status('500').send(result);
 	}
 };
-exports.execAutomation = async(req,res) => {
+exports.execAutomation = async(req,res) => {	
 	let result = await queue.Execution_Queue.execAutomation(req, res);
 	if(req.body.isExecuteNow) return result;
+	if(req.body.eventType && req.body.eventType === "CALM"){
+		return result;
+	}
 	return res.send(result);
 }
 
@@ -444,6 +447,9 @@ exports.deleteExecutionListId = async(req,res) => {
 
 exports.runningStatus = async(req,res) => {
 	let result = await queue.Execution_Queue.runningStatus(req, res);
+	if(req.query.eventType && req.query.eventType === "CALM"){
+		return result;
+	}
 	return res.send(result);
 }
 

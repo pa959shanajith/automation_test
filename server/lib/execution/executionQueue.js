@@ -1228,14 +1228,23 @@ module.exports.Execution_Queue = class Execution_Queue {
                         });
                         responseFromGetReportApi['Modules'].push(data);
                     }
+                    if(req.query.eventType && req.query.eventType === "CALM"){
+                        return responseFromGetReportApi;
+                    }
                     res.send(responseFromGetReportApi)
                 }
             } else {
+                if(req.query.eventType && req.query.eventType === "CALM"){
+                    return 'Some Error Occured';
+                }
                 res.send('Some Error Occured');
             }
 
         } catch (error) {
             logger.error("Error occurred in runningStatus: "+error)
+            if(req.query.eventType && req.query.eventType === "CALM"){
+                return error;
+            }
             return res.send("fail")
         }
     }
