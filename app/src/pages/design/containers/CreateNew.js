@@ -75,7 +75,7 @@ const CreateNew = ({ importRedirect }) => {
         if(Object.keys(moduleSelect).length > 0){
         (async()=>{
             var req={
-                tab:"createTab",
+                tab:"createdTab",
                 projectid:Proj.projectId,
                 version:0,
                 cycId: null,
