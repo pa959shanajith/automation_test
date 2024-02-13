@@ -371,7 +371,7 @@ const CloudSettings = () => {
 
                 
             
-            <Card className="card__login__cloud">
+            <div className="card__login__cloud">
             {selectedscreen.name==="saucelab" ?( 
             <div>
                 <div className="input-cls1">
@@ -472,7 +472,7 @@ const CloudSettings = () => {
                 </div>
                 )}
 
-            </Card>
+            </div>
           
        
         </>
