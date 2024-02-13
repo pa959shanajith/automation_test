@@ -2,7 +2,7 @@
     [
         {
          "features": "Test Suite Creation",
-         "admin": "true",
+         "admin": "",
          "qualityManager":"true",
          "qalityLead":"true",
          "qualityEngineer":"false",
@@ -12,7 +12,7 @@
         },
         {
             "features": "Capture Element",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"true",
@@ -22,7 +22,7 @@
         },
         {
             "features": "Design Test Steps",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"true",
@@ -32,7 +32,7 @@
         },
         {
             "features": "Impact Analysis",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"false",
@@ -42,7 +42,7 @@
         },
         {
             "features": "Create Execution Profile",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"false",
@@ -52,7 +52,7 @@
         },
         {
             "features": "Execute",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"true",
@@ -62,7 +62,7 @@
         },
         {
             "features": "Configure Integration",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"false",
@@ -72,7 +72,7 @@
         },
         {
             "features": "Create Projects",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"false",
             "qualityEngineer":"false",
@@ -82,7 +82,7 @@
         },
         {
             "features": "Manage Project",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"false",
             "qualityEngineer":"false",
@@ -92,7 +92,7 @@
         },
         {
             "features": "View Reports",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"true",
@@ -102,7 +102,7 @@
         },
         {
             "features": "Log a bug",
-            "admin": "true",
+            "admin": "",
             "qualityManager":"true",
             "qalityLead":"true",
             "qualityEngineer":"true",
