@@ -750,7 +750,7 @@ export const saveSAP_ALMDetails_ICE  = async(data) => {
             data: data,
         })
         .then(res => {
-            if (res.status === 200){
+            if (res.status === 200 || res.status === 201){
                 resolve(res.data);
             }
             else{

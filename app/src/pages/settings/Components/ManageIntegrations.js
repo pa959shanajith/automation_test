@@ -544,13 +544,19 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const callCalmSaveButton = async () => {
         // Saving/Mapping API's
         if (mappedData && Object.keys(mappedData).length) {
-            const response = await api.saveSAP_ALMDetails_ICE(mappedData);
+            try {
+                const response = await api.saveSAP_ALMDetails_ICE(mappedData);
+                console.log(response,' its response');
             if (response.error) {
                 setToast("error", "Error", response.error);
             } else if (response === "scheduleModeOn")
                 setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
             else if (response.status == 201 || response.status == 200 || response.message.length > 0) {
                 setToast("success", "Success", 'Tests mapped successfully!');
+            }
+            } catch (maperror) {
+                console.log("failed to map : ", maperror);
+                setToast("error", "Error", "failed to map testcase");
             }
         }
         else {
