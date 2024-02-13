@@ -75,18 +75,18 @@ const CreateNew = ({ importRedirect }) => {
         if(Object.keys(moduleSelect).length > 0){
         (async()=>{
             var req={
-                tab:"createTab",
+                tab:"createdTab",
                 projectid:Proj.projectId,
                 version:0,
                 cycId: null,
                 modName:"",
-                moduleid:moduleSelect._id
+                moduleid:moduleSelect._id?moduleSelect._id:moduleSelect[0]._id
             }
             const data = await getModules(req) 
             if(data.error)return;
             else dispatch(selectedModuleReducer(data))
         })()}
-    },[handleTypeOfViewMap ==="mindMapView"])
+    },[handleTypeOfViewMap])
 
     const views = [
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
