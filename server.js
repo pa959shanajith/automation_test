@@ -1093,7 +1093,7 @@ var browserstack = require('./server/controllers/browserstack');
 					app.post('/execAutomation',suite.execAutomation);
 					app.post('/getAgentTask',suite.getAgentTask);
 					app.post('/setExecStatus',suite.setExecStatus);
-					app.post('/runningStatus', suite.runningStatus);
+					app.get('/runningStatus', suite.runningStatus);
 					app.post('/getGeniusData',plugin.getGeniusData);
 					app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 					app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
