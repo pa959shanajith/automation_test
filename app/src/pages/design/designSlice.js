@@ -40,9 +40,11 @@ const initialState = {
     opInput: "",
     reqHeader: "",
     reqBody: "",
+    reqAuthKeyword: "",
+    reqAuthInput:"",
     respHeader: "",
     respBody: "",
-    paramHeader: "",
+    paramHeader: ""
   },
   wsdlError: [],
   actionError: [],

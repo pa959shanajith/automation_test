@@ -12,7 +12,7 @@ import { Cert } from '../designSlice';
 const CertificateModal = props => {
 
     const dispatch = useDispatch();
-    const certificateInfo = useSelector(state=>state.design.cert);
+    const certificateInfo = useSelector(state => state.design.cert);
     const [certPath, setCertPath] = useState("");
     const [certPass, setCertPass] = useState("");
     const [authName, setAuthName] = useState("");
@@ -20,8 +20,6 @@ const CertificateModal = props => {
     const [error, setError] = useState(false);
     // const [visible, setVisible] = useState(true);
     useEffect(() => {
-    }, [])
-    useEffect(()=>{
         let { certsDetails, authDetails } = certificateInfo;
         let [newCertPath, newCertPass] = certsDetails ? certsDetails.split(";;") : "";
         let [newAuthName, newAuthPass] = authDetails ? authDetails.split(";") : "";
@@ -32,9 +30,9 @@ const CertificateModal = props => {
         setAuthPass(newAuthPass || "");
     }, [certificateInfo])
 
-    const certPathHandler = event => { 
-        setCertPath(event.target.value); 
-        if (error) setError(false); 
+    const certPathHandler = event => {
+        setCertPath(event.target.value);
+        if (error) setError(false);
     };
     const certPassHandler = event => setCertPass(event.target.value);
     const authNameHandler = event => setAuthName(event.target.value);
@@ -51,32 +49,75 @@ const CertificateModal = props => {
     const submitCert = () => {
         if (!certPath) setError(true);
         else {
-            let certObj ={
+            let certObj = {
                 certsDetails: `${certPath};;${certPass}`,
                 authDetails: `${authName};${authPass}`
             }
             dispatch(Cert(certObj));
             setMsg(MSG.SCRAPE.SUCC_CERT_SAVE);
-           props.setVisible(false);
+            props.setVisible(false);
         }
     }
-    const footerContent = (
-        <div>
-            <Button label="Reset" icon="pi pi-times" onClick={resetFields} className="p-button-text" />
-            <Button label="Submit" icon="pi pi-check" onClick={submitCert} autoFocus />
-        </div>
-    );
 
 
     return (
-        <div className="ws__cert_container">
-        <Dialog  header="Header" visible={props.visible} style={{ width: '50vw',zIndex:'1',height:'50vh' }} onHide={() => props.setVisible(false)} footer={footerContent}>
-            {/* header="Add Certificate" */}
-                <InputText data-test="certPath" className={"cert_input"+( error ? " cert_error" : "")} onChange={certPathHandler} value={certPath} placeholder="Enter Certificate Path;Enter Certificate Key(optional)"/>
-                <InputText data-test="certPass" className="cert_input" onChange={certPassHandler} value={certPass} placeholder="Enter Certificate Password(AES Encrypted);Enter server Certificate Path(Optional)"/>
-                <InputText data-test="authUserName" className="cert_input" onChange={authNameHandler} value={authName} placeholder="Enter AuthUserName"/>
-                <InputText data-test="authPass" className="cert_input" onChange={authPassHandler} value={authPass} placeholder="Enter AuthUserPassword(AES Encrypted)"/>
-            </Dialog>
+        <div className="flex flex-column w-full">
+            <div className='certificate_wrapper'>
+                <div className='flex flex-row p-2 justify-content-between	'>
+                    <label htmlFor='path_input'>Path</label>
+                    <InputText
+                        data-test="certPath"
+                        id="path_input"
+                        className={`p-inputtext-sm w-full md:w-30rem ${error ? 'p-invalid' : ''}`}
+                        onChange={certPathHandler}
+                        value={certPath}
+                        placeholder="Enter certificate path; Enter certification key(optional)"
+                    />
+                </div>
+
+                <div className='flex flex-row p-2 justify-content-between	'>
+                    <label htmlFor='password_input'>Password</label>
+                    <InputText
+                        id="password_input"
+                        data-test="certPass"
+                        className="p-inputtext-sm w-full md:w-30rem "
+                        onChange={certPassHandler}
+                        value={certPass}
+                        placeholder="Enter certificate password(AES Encrypted): Enter server certificate path"
+                    />
+                </div>
+
+                <div className='flex flex-row p-2 justify-content-between	'>
+                    <label htmlFor='authusername_input'>Auth Username</label>
+                    <InputText
+                        id="authusername_input"
+                        data-test="authUserName"
+                        className="p-inputtext-sm w-full md:w-30rem "
+                        onChange={authNameHandler}
+                        placeholder="Enter auth username"
+                        value={authName}
+                    />
+                </div>
+
+                <div className='flex flex-row p-2 justify-content-between	'>
+                    <label htmlFor='authpassword_input'>AuthPassword</label>
+                    <InputText
+                        data-test="authPass"
+                        className="p-inputtext-sm w-full md:w-30rem "
+                        onChange={authPassHandler}
+                        value={authPass}
+                        placeholder="Enter auth password(AES Encrypted)"
+                    />
+                </div>
+
+            </div>
+
+
+            <div className='flex flex-row' style={{ justifyContent: 'left' }}>
+                <Button label="Reset" size='small' onClick={resetFields} className="p-button-text" text />
+                <Button label="Submit" size='small' onClick={submitCert}  />
+            </div>
+
         </div>
     );
 }

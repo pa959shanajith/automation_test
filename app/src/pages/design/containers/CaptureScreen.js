@@ -109,7 +109,7 @@ const CaptureModal = (props) => {
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
   const imageRef4 = useRef(null);
-const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
+  const {endPointURL, method, opInput, reqHeader, reqBody,reqAuthKeyword,reqAuthInput,paramHeader} = useSelector(state=>state.design.WsData);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
@@ -801,6 +801,11 @@ const elementTypeProp =(elementProperty) =>{
 
           if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
           else wsdlInputs.splice(4, 1);
+
+          if(reqAuthKeyword != '' && reqAuthInput!= "") {
+            keywordVal.push(reqAuthKeyword)
+            wsdlInputs.push(reqAuthInput);
+          }
 
           setOverlay("Fetching Response Header & Body...");
           ResetSession.start();
