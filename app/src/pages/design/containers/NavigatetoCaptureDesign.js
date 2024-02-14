@@ -31,7 +31,7 @@ function NavigatetoCaptureDesign(params) {
     const headerTemplate = (
         <>
             <div>
-                <h5 className='header_Groups'>{params.fetchingDetails['name']}</h5>
+            <h5 className='header_Groups'>{params.fetchingDetails['name'] && params.fetchingDetails['name'].length>20?params.fetchingDetails['name'].trim().substring(0,20)+'...' : params.fetchingDetails['name']}</h5>
                 <TabView className="tabView_captureDesign" activeIndex={activeIndex} onTabChange={(e)=>tabChnage(e)} >
                     <TabPanel header="Element Repository"></TabPanel>
                     <TabPanel header="Design Test Steps"></TabPanel>

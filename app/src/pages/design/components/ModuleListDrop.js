@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import WSImportMindmap from'../components/WSImportMindmap.js';
-import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap} from '../designSlice';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -44,6 +44,7 @@ const ModuleListDrop = (props) =>{
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
     const currentId = useSelector(state=>state.design.currentid)
+    const updateModuleId = useSelector(state=>state.design.updateScreenModuleId)
     const typeOfView = useSelector(state=>state.design.TypeOfViewMap)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
@@ -145,8 +146,10 @@ const ModuleListDrop = (props) =>{
         else{dispatch(savedList(true))}
         setWarning(false); 
         if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
+        if(updateModuleId !=="")
+        {loadModule(updateModuleId)}
      // eslint-disable-next-line react-hooks/exhaustive-deps
-     }, [moduleLists, initProj, currentId])
+     }, [moduleLists, initProj, currentId,updateModuleId])
      useEffect(()=> {
         return () => {
           handleReaOnlyTestSuite({oldModuleForReset:localStorage.getItem('OldModuleForReset'),modID:localStorage.getItem('CurrentModuleForReset'),userInfo,appType:props.appType,module:props.module,proj:proj})
@@ -154,6 +157,7 @@ const ModuleListDrop = (props) =>{
             dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
             dispatch(dontShowFirstModule(false))
+            dispatch(setUpdateScreenModuleId(""))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);

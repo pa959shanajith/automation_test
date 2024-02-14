@@ -1357,7 +1357,7 @@ const DesignModal = (props) => {
     }
 
     useEffect(() => {
-        if (inputKeywordName && AllOptions.length > 0) {
+        if (inputKeywordName && AllOptions?.length > 0) {
           const isExist = AllOptions.some(option => option.value.toLowerCase() === inputKeywordName.toLowerCase());
           setIsNameValid(isExist);
         } else {
