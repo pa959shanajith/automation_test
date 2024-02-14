@@ -283,9 +283,9 @@ export default function Output() {
   return (<>
     <div className='Review_testcase'>
       <div className='Recommended_button mt-2'>
-        <Button className="btn button1 btn_cls" label="Generate system level test case" onClick={systemTestCase} disabled={buttonDisabled} outlined />
-        <Button className="btn button2 btn_cls" label="Generate module level test case" onClick={moduleTestCase} disabled={buttonDisabled} outlined />
-        <Button className="btn button3 btn_cls" label="Generate user story level test case" onClick={userStoryTestCase} disabled={buttonDisabled} outlined />
+        {/* <Button className="btn button1 btn_cls" label="Generate system level test case" onClick={systemTestCase} disabled={buttonDisabled} outlined /> */}
+        <Button style={{left:'5rem'}} className="btn button2 btn_cls" label="Generate module level test case" onClick={moduleTestCase} disabled={buttonDisabled} outlined />
+        <Button style={{right:'5rem'}} className="btn button3 btn_cls" label="Generate user story level test case" onClick={userStoryTestCase} disabled={buttonDisabled} outlined />
       </div>
       {showSearchBox ? (
         <div className='input_text'>
@@ -356,7 +356,7 @@ export default function Output() {
                   <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                 </div>}
                 <div className="p-2 bd-highlight top-50 start-50m hypen_cls" >
-                  <Button className="btn button1" label="Generate system level test case" onClick={systemTestCase} disabled={buttonDisabled} outlined />
+                  {/* <Button className="btn button1" label="Generate system level test case" onClick={systemTestCase} disabled={buttonDisabled} outlined /> */}
                 </div>
                 <div className="p-2 bd-highlight py-2 mt-1 hypen_cls" >
                   <Button className="btn button2" label="Generate module level test case" onClick={moduleTestCase} disabled={buttonDisabled} outlined />
