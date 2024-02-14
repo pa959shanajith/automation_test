@@ -434,7 +434,7 @@ const WebserviceScrape = (props) => {
                             <MonacoEditor
                                 language="xml"
                                 theme="vs-light"
-                                value={prettifiedRequestBody}
+                                value={reqBody}
                                 options={options}
                                 onChange={onRequestBodyChange}
                             />
