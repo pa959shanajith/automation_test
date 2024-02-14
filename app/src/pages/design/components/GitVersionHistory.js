@@ -17,7 +17,7 @@ import { ResetSession, Messages as MSG } from '../../global';
 const moment = require('moment');
 
 const GitVersionHistory = (props) => {
-
+  const moduleListed = useSelector(state => state.design.moduleList);
   const [data, setData] = useState([]);
   const [modlist, setModList] = useState(moduleListed);
   const [blockui, setBlockui] = useState({ show: false });
@@ -32,7 +32,6 @@ const GitVersionHistory = (props) => {
   const [hasTestsuite, setHasTestsuite] = useState(false);
   const dispatch = useDispatch();
   const toast = useRef(null);
-  const moduleListed = useSelector(state => state.design.moduleList);
   const initProj = useSelector(state => state.design.selectedProj);
   let userInfo1 = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo);
@@ -347,7 +346,7 @@ const GitVersionHistory = (props) => {
         emptyMessage={"No results found"}
         showGridlines
         scrollable
-        scrollHeight="383px"
+        scrollHeight="60vh"
         virtualScrollerOptions={{ itemSize: 46 }}  >
         {columns.map((col, i) => (
           <Column key={col.field} field={col.field} header={col.header} />

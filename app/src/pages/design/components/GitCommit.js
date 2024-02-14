@@ -84,7 +84,7 @@ const GitCommit = (props) => {
         <div className='flex flex-row gap-3'>
             <div className='commit_testcase_list card'>
                 <label>Unstaged Changes</label>
-                <div className="test_list pl-4 pt-3 pb-2">
+                <div className="test_list pl-4 pt-3 pb-2" style={{overflow:"auto"}}>
                     <div className="pb-3">
                         {LhsModuleList.length > 0 ? LhsModuleList.map(element => (
                             <div key={element._id} className="flex align-items-center pb-3">
@@ -98,7 +98,7 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : "No testcases Found"
+                        ) : "No test suite Found"
                         }
                     </div>
                 </div>
@@ -112,7 +112,7 @@ const GitCommit = (props) => {
 
             <div className='commit_testcase_list card'>
                 <label>Staged Changes</label>
-                <div className="pb-3">
+                <div className="pb-3"  style={{overflow:"auto"}}>
                     {RhsModuleList.length > 0 ? RhsModuleList.map(element => (
                             <div key={element._id} className="flex align-items-center pb-3">
                                 <Checkbox inputId={element._id}
@@ -125,7 +125,7 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : "No testcases Found"
+                        ) : <span className="pt-3">No test suite Found</span>
                     }
                 </div>
             </div>

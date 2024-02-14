@@ -10,13 +10,13 @@ import { useSelector } from 'react-redux';
 import { Toast } from "primereact/toast";
 import GitCommit from './GitCommit';
 import GitVersionHistory from './GitVersionHistory';
-import { exportToGit } from '../api';
+import { exportToGit, checkExportVer } from '../api';
 import { Messages as MSG, ResetSession, VARIANT, ScreenOverlay } from '../../global';
 import { moduleList } from '../designSlice';
 
 const GitDropdown = (props) => {
   const dropdownOptions = [
-         { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit_icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
+    { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit_icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
     { label: 'Version History', value: 'version_history', icon: <img src="static/imgs/Version_icon.svg" alt="Version History" style={{ marginRight: '1rem' }} /> },
   ];
   const [showToken, setShowToken] = useState(false);
@@ -47,7 +47,7 @@ const GitDropdown = (props) => {
     const data = await gitEditConfig(props.userId, props.projectId);
     if (data.error) { props.toastError(data.error); return; }
     else if (data == "empty") {
-      props.toastWarn(MSG.ADMIN.WARN_NO_CONFIG)
+      // props.toastWarn(MSG.ADMIN.WARN_NO_CONFIG)
     }
     else {
       setIsData(true)
@@ -60,6 +60,7 @@ const GitDropdown = (props) => {
       gitbranchRef.current.value = data[5];
     }
   }
+
   const commitIdChange = (value) => {
     setCommitID(value);
   }
@@ -120,21 +121,27 @@ const GitDropdown = (props) => {
   const commitAndPushOnClick = async () => {
     setLoading(true);
     try {
-      ResetSession.start();
-      var res = await exportToGit({
-        gitVersion: versionName,
-        mindmapId: moduleList,
-        "exportProjAppType": props.appType,
-        "projectId": props.projectId,
-        "projectName": props.projectName,
-        gitComMsgRef: commitMsg
-      });
-      if (res.error) { props.toastError(res.error); return; }
+      const exportVer = await checkExportVer({ "exportname": "exportname", "query": "exportgit", "projectId": props.projectId })
+      if (exportVer.includes(versionName)) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: "Version is already used, Please provide a unique version", life: 3000 }); return;
+      }
       else {
-        toast.current.show({ severity: 'success', summary: 'Success Message', detail: 'test_suit committed successfully' });
-        setTimeout(() => {
+        ResetSession.start();
+        var res = await exportToGit({
+          gitVersion: versionName,
+          mindmapId: moduleList,
+          "exportProjAppType": props.appType,
+          "projectId": props.projectId,
+          "projectName": props.projectName,
+          gitComMsgRef: commitMsg
+        });
+        if (res.error) { props.toastError(res.error); return; }
+        else {
+          toast.current.show({ severity: 'success', summary: 'Success Message', detail: 'Test Suite committed successfully' });
           setDialogVisible(false);
-        }, 2000);
+          setSelectedImage("")
+          setmoduleList([]);
+        }
       }
 
     } catch (error) {
@@ -172,30 +179,30 @@ const GitDropdown = (props) => {
   return (
     <div className='GitVersion_cls'>
       {moduleLists.length > 0 ?
-        <div onClick={dropdownVisible ? clickhandler : false}>
-          <Dropdown
+        <>
+          { dropdownVisible ? <div onClick={clickhandler} style={{width:"6rem"}}> <span className='git_icon_and_icon'><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>
+          : <Dropdown
             value={selectedImage}
             options={dropdownOptions}
-            onChange={handleDropdownChange}
+            onChange={ handleDropdownChange}
             className='p-inputtext-sm'
             optionLabel="label"
-            style={{height:'2rem'}}
-            placeholder={<span className='flex' style={{height:"15px", position:'relative', bottom:'0.2rem'}}><img src="static/imgs/GitIcon.svg" style={{height:"0.99rem", width:"2rem"}} alt="Git Icon" className="dropdown-image" /> Git </span>}
-            itemTemplate={(option) => (
-              <div>
-                {renderIcon(option.icon)}
-                {option.label}
-              </div>
-            )}
-          />
-        </div> : null
+            style={{ height: '2rem', display:"flex", alignItems:"center" }}
+            placeholder={"Select"}
+            // itemTemplate={(option) => (
+            //   <div>
+            //     {renderIcon(option.icon)}
+            //     {option.label}
+            //   </div>
+            // )}
+          />} </>: null
       }
 
       <Toast ref={toast} position="bottom-center" />
       <Dialog
         header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configurations'}
         visible={dialogVisible}
-        style={ selectedImage === 'commit' ? { width: "50vw",  height: '85vh'} : { width: "58vw",  height: '85vh' }}
+        style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={() => setDialogVisible(false)}
         footer={selectedImage === 'commit' ? commitFooter : selectedImage === 'version_history' ? ' ' : dialogFooter}
         className='gitVersion_dialog Git-config_cls'
