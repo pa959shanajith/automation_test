@@ -49,14 +49,6 @@ const GitVersionHistory = (props) => {
     dispatch(selectedProj(JSON.parse(localStorageDefaultProject).projectId));
   }
 
-  const columns = [
-    { field: 'sno', header: 'Sno' },
-    { field: 'version', header: 'Version' },
-    { field: 'datetime', header: 'datetime' },
-    { field: 'comments', header: 'Comments' },
-    { field: 'status', header: 'status' },
-  ];
-
   const DateTimeFormat = (inputDate) => {
     const providedDate = new Date(inputDate);
     const currentDate = new Date();
@@ -349,10 +341,12 @@ const GitVersionHistory = (props) => {
         scrollable
         scrollHeight="383px"
         virtualScrollerOptions={{ itemSize: 46 }}  >
-        {columns.map((col, i) => (
-          <Column key={col.field} field={col.field} header={col.header} />
-        ))}
-        <Column field="Actions" body={bodyTemplate} />
+        <Column field="sno" header='S.NO.'  />
+        <Column field="version" header='Version' />
+        <Column field="datetime" header='Date & Time'  />
+        <Column field="comments" header='Comments' />
+        <Column field="status" header='Status' />
+        <Column field="SelectDestination" header='SelectDestination' body={bodyTemplate} />
       </DataTable>
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
       {isCreateProjectVisible && <div>

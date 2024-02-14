@@ -370,8 +370,8 @@ export default function Output() {
           )
       ) : null
       }
-      <div>
-        <Button className="save_cls" style={{ width: '6rem', marginLeft: '55rem' }} label="Save" disabled={buttonDisabled} onClick={saveTestcases} />
+      <div style={{position:'relative'}}>
+        <Button className="save_cls"  label="Save" disabled={buttonDisabled} onClick={saveTestcases} />
       </div>
       <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
 

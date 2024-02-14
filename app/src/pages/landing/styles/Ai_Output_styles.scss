@@ -17,9 +17,13 @@
 margin-right: 10px;
 }
 .Review_testcase .save_cls {
-    width: '6rem';
-     margin-left:'55rem';
+  width: 6rem;
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
 }
+
 
 .btn_cls:hover {
   background-color:rgb(191, 212, 239);

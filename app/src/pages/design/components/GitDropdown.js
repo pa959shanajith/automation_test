@@ -16,7 +16,7 @@ import { moduleList } from '../designSlice';
 
 const GitDropdown = (props) => {
   const dropdownOptions = [
-         { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit_icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
+    { label: 'Commit', value: 'commit', icon: <img src="static/imgs/Commit_icon.svg" alt="commit Icon" style={{ marginRight: '1rem' }} /> },
     { label: 'Version History', value: 'version_history', icon: <img src="static/imgs/Version_icon.svg" alt="Version History" style={{ marginRight: '1rem' }} /> },
   ];
   const [showToken, setShowToken] = useState(false);
@@ -153,7 +153,8 @@ const GitDropdown = (props) => {
         <Button data-test="git_reset" label='reset' title="reset" onClick={() => gitReset()} />
         <Button data-test="git_create" label='save' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
       </> : <>
-        <Button data-test="git_save" label='save' onClick={() => gitConfigAction('save')} className="btn-save" title="Create" />
+        <Button data-test="git_create" label='Create' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
+
       </>
     }</div>
   );
@@ -179,8 +180,8 @@ const GitDropdown = (props) => {
             onChange={handleDropdownChange}
             className='p-inputtext-sm'
             optionLabel="label"
-            style={{height:'2rem'}}
-            placeholder={<span className='flex' style={{height:"15px", position:'relative', bottom:'0.2rem'}}><img src="static/imgs/GitIcon.svg" style={{height:"0.99rem", width:"2rem"}} alt="Git Icon" className="dropdown-image" /> Git </span>}
+            style={{ height: '2rem', width: '8rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            placeholder={<span className='flex' style={{ height: "15px", position: 'relative', bottom: '0.2rem' }}><img src="static/imgs/GitIcon.svg" style={{ height: "0.99rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span>}
             itemTemplate={(option) => (
               <div>
                 {renderIcon(option.icon)}
@@ -195,10 +196,10 @@ const GitDropdown = (props) => {
       <Dialog
         header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configurations'}
         visible={dialogVisible}
-        style={ selectedImage === 'commit' ? { width: "50vw",  height: '85vh'} : { width: "58vw",  height: '85vh' }}
+        style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={() => setDialogVisible(false)}
         footer={selectedImage === 'commit' ? commitFooter : selectedImage === 'version_history' ? ' ' : dialogFooter}
-        className='gitVersion_dialog Git-config_cls'
+        className='gitVersion_dialog  Git-config_cls'
       >
         {(selectedImage !== "commit" && selectedImage !== "version_history") && (
           <div className="mt-2">
