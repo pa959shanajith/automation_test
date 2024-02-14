@@ -2004,7 +2004,7 @@ const screenOption = screenData?.map((folder) => ({
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleExportClick}>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2196,7 +2196,7 @@ const screenOption = screenData?.map((folder) => ({
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleExportClick}>
+                  <div className="capture_bottom_btn"  onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2279,7 +2279,7 @@ const screenOption = screenData?.map((folder) => ({
             <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
-                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} label="Add more" size='small' />
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />

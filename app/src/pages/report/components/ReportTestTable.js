@@ -797,6 +797,7 @@ export default function BasicDemo() {
   const screenShotLink = (getLink) =>{
     return (
     <div className="action_items">
+      <div className={`screenshot-container ${getLink?.data?.screenshot_path ? '' : 'empty-container'}`}>
       {getLink?.data?.screenshot_path && (
         <div
           className="screenshot_view"
@@ -811,6 +812,8 @@ export default function BasicDemo() {
          <img className="screenshot" src="static/imgs/ViewScreenshot.svg" data-pr-tooltip="View Screenshot" />
         </div>
       )}
+      </div>
+      <div className="network-icon-container">
       {getLink?.data?.Network_Data && (
       <div>
         <Tooltip target=".Network_icon" position="bottom" />
@@ -824,6 +827,7 @@ export default function BasicDemo() {
         />
       </div>
       )}
+       </div>
     </div>
   )}
 

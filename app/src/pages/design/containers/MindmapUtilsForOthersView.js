@@ -1238,6 +1238,8 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
                             child.children = [];
                             child.parent.children[0].children = [];
                         }
+                    }else if(child.children.length>0 && child.children !== null && child.id === dNodes[sid].id){
+                        child.children = dNodes[sid].children
                     }
                 }
                 if (child.children && child.children.length > 0) {

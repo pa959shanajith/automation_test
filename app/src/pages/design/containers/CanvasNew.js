@@ -871,6 +871,8 @@ const CanvasNew = (props) => {
           setLinks(res.linkDisplay)
           setdLinks(res.dLinks)
           setdNodes(res.dNodes)
+          toast.current.show({severity:"success", summary:"Success", detail:MSG.MINDMAP.SUCC_DELETE_NODE.CONTENT, life:2000})
+          setCreateNew('autosave') 
       }
     }
   }
