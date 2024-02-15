@@ -40,6 +40,7 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
+import ReactTooltip from 'react-tooltip';
 
 
 
@@ -192,6 +193,7 @@ const GeniusSap = (props) => {
   const [DataParamPath, setDataParamPath] = useState(null)
   const [showMindmap, setShowMindmap] = useState(false);
   const [dataSaved, setDataSaved] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(3);
   const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
@@ -1620,10 +1622,9 @@ const debugTestCases = selectedBrowserType => {
     );
   }
   const items = [
-    {label: 'Project Details', },
-    {label: 'Record TestCases',},
-    {label: 'Preview TestCase', }
-    
+    {label: 'Project Details', disabled:true },
+    {label: 'Record TestCases', disabled:true},
+    {label: 'Preview TestCase', disabled:true }   
 ];
 {card && <div className="" ref={popupref} style={{
   zIndex: '10', backgroundColor: '#fff', borderTopLeftRadius: '8px', borderTopRightRadius: '8px', width: '480px', position: 'absolute', left: `2rem`, top: `${location.bottom - 10}px`, border: 'gray'
@@ -1840,78 +1841,89 @@ const debugTestCases = selectedBrowserType => {
             Project is required.
           </small>
           </div>
-          <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" style={{position:'fixed', left:'55rem',top:'15.5rem'}} />
-          <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} style={{position:'fixed', left:'82rem',top:'15.5rem'}} />
+          {/* <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" style={{position:'fixed', left:'60rem',top:'17.5rem'}} /> */}
+          {/* <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} style={{position:'fixed', left:'87rem',top:'17.5rem'}} /> */}
           </div>
           
 
-          <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
+          <div style={{ display:'flex',flexDirection:'column' }}>
           {/* <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} > */}
-            <div> <label className="label_genius"  htmlFor="project">Test Suite</label></div>
-            <label><img src="static/imgs/Required.svg" className="required_icon" style={{position:'fixed',right:'59.6rem',top:'13.9rem'}}/></label>
-            {/* <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div> */}
-            {/* <div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} 
-             ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
-            </div> */}
-  
-            <Dropdown 
-            
-             value={selectedModule ? selectedModule : null}
-             options={projModules.map((mod) => {
-              return {
-                key: mod._id,
-                text: mod.name
-              }
-            })}
-            onBlur={() => setTouched(true)}
-            onChange={(e) => {
-             
-              setSelectedModule(e.value)
+                <div style={{display:'flex',alignItems:'start'}}> 
+                  <label className="label_genius" htmlFor="project">Test Suite</label>
+                  <img src="static/imgs/Required.svg" className="required_icon" style={{paddingTop:'10px'}}/>
+                </div>
+            <div style={{display:'flex'}}>
               
-            }}
-             optionLabel="text"
-             placeholder="Select" 
-             style={{width:'18.75rem',height:'3rem'}}
-             />
-             <div className="validation_container">
-          {touched && !selectedModule && <small className={touched && !selectedModule ? "txt_invalid" : "txt_valid"}>
-            Test Suite is required.
-          </small>}
-        </div>
+              {/* <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div> */}
+              {/* <div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} 
+              ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
+              </div> */}
+    
+              <Dropdown 
+              
+              value={selectedModule ? selectedModule : null}
+              options={projModules.map((mod) => {
+                return {
+                  key: mod._id,
+                  text: mod.name
+                }
+              })}
+              onBlur={() => setTouched(true)}
+              onChange={(e) => {
+              
+                setSelectedModule(e.value)
+                
+              }}
+              optionLabel="text"
+              placeholder="Select" 
+              style={{width:'18.75rem',height:'3rem',marginRight:'10px'}}
+              />
+              <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" />
+
+            </div>
+                <div className="validation_container" style={{marginLeft:'1rem'}}>
+                  {touched && !selectedModule && <small className={touched && !selectedModule ? "txt_invalid" : "txt_valid"}>
+                    Test Suite is required.
+                  </small>}
+                </div>
           </div>
 
           <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project" style={{position:'relative',left:'5rem'}}>Testcase</label></div>
-            <label><img src="static/imgs/Required.svg" className="required_icon" style={{marginLeft:'2rem'}}/></label>
+          <div style={{display:'flex',alignItems:'start'}}> 
+                  <label className="label_genius" htmlFor="project">TestCase</label>
+                  <img src="static/imgs/Required.svg" className="required_icon" style={{paddingTop:'10px'}}/>
+          </div>
             <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}
             //  onClick={() => { setDisplayCreateScenario(true) }}
              ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
             </div>
-            
-            <Dropdown 
+            <div>
+              <Dropdown 
+              value={scenarioChosen ? scenarioChosen : null}
+              options={modScenarios.map((scenario) => {
+                return {
+                  key: scenario._id,
+                  text: scenario.name
+                }
+              })}
+              onChange={(e) => {
+                setScenarioChosen(e.value)
+                setVisibleScenario(true)
+                setVisibleReset(false)
+          
+              
+              }}
+              optionLabel="text"
+              placeholder="Select" 
+              style={{width:'18.75rem',height:'3rem',marginRight:'10px'}} 
+              //  disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
+              />
+                <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} s />
+            </div>
              
-             value={scenarioChosen ? scenarioChosen : null}
-             options={modScenarios.map((scenario) => {
-              return {
-                key: scenario._id,
-                text: scenario.name
-              }
-            })}
-            onChange={(e) => {
-              setScenarioChosen(e.value)
-              setVisibleScenario(true)
-              setVisibleReset(false)
-         
-             
-            }}
-             optionLabel="text"
-             placeholder="Select" 
-             style={{width:'18.75rem',height:'3rem',left:'5rem' }}  
-            //  disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
-             />
              <div className="validation_container">
-          {touched && !scenarioChosen &&<small className={touched && !scenarioChosen ? "txt_invalid" : "txt_valid"} style={{marginLeft:'6rem'}}>
+          {touched && !scenarioChosen &&<small className={touched && !scenarioChosen ? "txt_invalid" : "txt_valid"} style={{marginLeft:'1rem'}}>
             Test Case is required.
           </small>}
         </div>
@@ -1977,6 +1989,7 @@ const debugTestCases = selectedBrowserType => {
                     .then(keywordData => {
                       if (keywordData === "Invalid Session") return RedirectPage(history);
                       setProjectData(keywordData);
+                      setActiveIndex(1);
                       showDialog()
                     })
                   
@@ -1987,7 +2000,7 @@ const debugTestCases = selectedBrowserType => {
               </button>
               <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="AVO Genius for SAP" >
               <div className="App">
-            <TabMenu model={items} style={{display:'flex', justifyContent:'center'}}></TabMenu>
+            <TabMenu model={items} activeIndex={activeIndex}style={{display:'flex', justifyContent:'center'}}></TabMenu>
             <Menu model={menuModel} popup ref={menu} id="popup_menu" onHide={() => setSelectedRow(null)}/>
             <ContextMenu model={menuModel}  ref={cm}  onHide={() => setSelectedRow(null)} />
 
@@ -2038,6 +2051,7 @@ const debugTestCases = selectedBrowserType => {
             </div>
             { startGenius && <Button label={startGenius} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/> }
             <div class="icon-bar">
+            <ReactTooltip />
           {/* <Button label="Save" icon="pi pi-times" className="p-button-text" onClick={() => {
             port.postMessage({ data: { "module": projectData.module, "project": projectData.project, "scenario": projectData.scenario, "appType": projectData.appType, "screens": tableDataNew } })
           }} /> */}
