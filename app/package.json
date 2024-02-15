@@ -44,8 +44,7 @@
     "uuid": "^9.0.0",
     "web-vitals": "^2.1.4",
     "ace-builds":"^1.32.5",
-    "react-ace":"^10.1.0",
-    "react-tooltip":"^5.26.2"
+    "react-ace":"^10.1.0"
   },
   "scripts": {
     "start": "set REACT_APP_DEV=true && react-scripts start",
