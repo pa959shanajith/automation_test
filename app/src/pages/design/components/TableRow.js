@@ -52,7 +52,7 @@ const TableRow = (props) => {
     const [objetListOption,setObjetListOption] = useState(null);
     let objList = props.objList;
     let draggable = props.draggable;
-    
+    console.log("props", props);
     const { MenuList } = components;
 
     const hanldlecustomClick = (child) => {
