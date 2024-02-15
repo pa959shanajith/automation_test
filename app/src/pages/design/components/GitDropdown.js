@@ -128,6 +128,7 @@ const GitDropdown = (props) => {
       gituserRef.current.value = data[3];
       gitemailRef.current.value = data[4];
       gitbranchRef.current.value = data[5];
+      gitconfigRef.current.disabled = true;
     }
   }
 
@@ -167,6 +168,8 @@ const GitDropdown = (props) => {
     gituserRef.current.value = "";
     gitemailRef.current.value = "";
     gitbranchRef.current.value = "";
+    gitconfigRef.current.readOnly = false;
+    gitconfigRef.current.disabled = false;
   }
 
   const gitConfigAction = async (action) => {
@@ -230,7 +233,7 @@ const GitDropdown = (props) => {
     <div> {isData ?
       <>
         <Button data-test="git_reset" label='reset' title="reset" onClick={() => gitReset()} />
-        <Button data-test="git_create" label='save' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
+        <Button data-test="git_create" label='save' onClick={() => gitConfigAction('update')} className="btn-edit" title="Create" />
       </> : <>
         <Button data-test="git_create" label='Create' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
 
