@@ -730,7 +730,7 @@ exports.fetchALM_Testcases = async function (req,res) {
                 "testsuiteId": obj.mindmapid,
                 "batchname": "",
                 "versionNumber": 0,
-                "appType": "Web",
+                "appType": "SAP",
                 "domainName": "Banking",
                 "projectName": obj.projectName,
                 "projectId": obj.projectId,
