@@ -779,7 +779,7 @@ const elementTypeProp =(elementProperty) =>{
     if (typesOfAppType === "Webservice") {
       let arg = {}
       let testCaseWS = []
-      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeaderTemplate", "setWholeBody"];
       let wsdlInputs = [ 
           endPointURL, method, opInput, getFormattedValue(reqHeader), 
           getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
