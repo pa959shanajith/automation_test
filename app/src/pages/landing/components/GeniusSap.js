@@ -40,7 +40,7 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
-import ReactTooltip from 'react-tooltip';
+// import ReactTooltip from 'react-tooltip';
 
 
 
@@ -2051,7 +2051,7 @@ const debugTestCases = selectedBrowserType => {
             </div>
             { startGenius && <Button label={startGenius} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/> }
             <div class="icon-bar">
-            <ReactTooltip />
+            {/* <ReactTooltip /> */}
           {/* <Button label="Save" icon="pi pi-times" className="p-button-text" onClick={() => {
             port.postMessage({ data: { "module": projectData.module, "project": projectData.project, "scenario": projectData.scenario, "appType": projectData.appType, "screens": tableDataNew } })
           }} /> */}
