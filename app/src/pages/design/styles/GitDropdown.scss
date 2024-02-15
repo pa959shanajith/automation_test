@@ -1,4 +1,5 @@
 .gitVersion_dialog {
+  
   .label-cls {
     width: 150px;
 
@@ -47,9 +48,9 @@
     font-weight: 500;
   }
 
-  .GitVersion_cls .p-inputtext-sm {
-    height: 40px !important;
-    width: 100px !important;
+  .GitVersion_cls> .p-inputtext-sm {               
+    // height: 40px !important;
+    // width: 100px !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -100,7 +101,15 @@
     border: ipx solid #dee2e6;
     margin: 20px 0px;
   }
-
+  .import_cls  .p-datatable .p-datatable-thead>tr>th {
+    text-align: center !important;
+  }
+  .import_cls  .p-datatable .p-datatable-thead>tr>th>.p-column-header-content {
+    justify-content: center;
+  }
+  .import_cls  .p-datatable .p-datatable-thead tr th .p-column-header-content .p-column-title {
+    margin-left: 0px !important;
+  }
   .import_cls .p-datatable .p-datatable-tbody>tr>td {
     text-align: center !important;
     border-width: 0.1px !important;

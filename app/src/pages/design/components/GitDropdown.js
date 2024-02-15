@@ -230,7 +230,8 @@ const GitDropdown = (props) => {
         <Button data-test="git_reset" label='reset' title="reset" onClick={() => gitReset()} />
         <Button data-test="git_create" label='save' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
       </> : <>
-        <Button data-test="git_save" label='save' onClick={() => gitConfigAction('create')} className="btn-save" title="Create" />
+        <Button data-test="git_create" label='Create' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
+
       </>
     }</div>
   );
@@ -293,7 +294,7 @@ const GitDropdown = (props) => {
         style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={DialogCloseHandle}
         footer={selectedImage === 'commit' ? commitFooter : selectedImage === 'version_history' ? ' ' : dialogFooter}
-        className='gitVersion_dialog Git-config_cls'
+        className='gitVersion_dialog  Git-config_cls'
       >
         {(selectedImage !== "commit" && selectedImage !== "version_history") &&
           <GitConfigurationForm

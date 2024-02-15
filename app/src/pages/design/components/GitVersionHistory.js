@@ -40,7 +40,7 @@ useEffect(() => {
       const jsonData = await fetch_git_exp_details(props.projectId);
       const mappedData = jsonData.map((item, index) => ({
         "key": index,
-        "sl.no": index + 1,
+        "sno": index + 1,
         "version": item.version,
         "datetime": item.modifiedon,
         "comments": item.commitmessage,
@@ -226,25 +226,31 @@ const bodyTemplate = (rowData) => {
         />
       </div>
     </React.Fragment>)
-}
-return (
-  <div className="import_cls">
-    <DataTable value={data}
-      loading={dataLoading}
-      size={"Normal"}
-      emptyMessage={"No results found"}
-      showGridlines
-      scrollable
-      scrollHeight="53vh"
-      virtualScrollerOptions={{ itemSize: 46 }}  >
-      {columns.map((col, i) => (
-        <Column key={col.field} field={col.field} header={col.header} />
-      ))}
-      <Column field="Actions" body={bodyTemplate} />
-    </DataTable>
-    <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-  </div>
-);
+  }
+  return (
+    <div className="import_cls">
+      <DataTable value={data}
+        loading={dataLoading}
+        size={"Normal"}
+        emptyMessage={"No results found"}
+        showGridlines
+        scrollable
+        scrollHeight="53vh"
+        // virtualScrollerOptions={{ itemSize: 46 }}  
+      >
+        <Column field="sno" header='Sl.NO.'  />
+        <Column field="version" header='Version' />
+        <Column field="datetime" header='Date & Time'  />
+        <Column field="comments" header='Comments' />
+        <Column field="status" header='Status' />
+        <Column field="SelectDestination" header='SelectDestination' body={bodyTemplate} />
+      </DataTable>
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
+      {isCreateProjectVisible && <div>
+        <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError} />
+      </div>}
+    </div>
+  );
 };
 
 export default GitVersionHistory;
