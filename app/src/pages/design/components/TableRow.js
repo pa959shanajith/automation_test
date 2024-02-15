@@ -27,7 +27,7 @@ import { Button } from 'primereact/button';
 */
 
 const TableRow = (props) => {
-  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions} =props;
+  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
@@ -62,19 +62,35 @@ const TableRow = (props) => {
       setInputEditor(child.props.data.isCode);
     }
     const CustomMenu = (value) => {
+      console.log(value,'value');
       return (
         <MenuList {...value}>
           {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
-            <div key={index} >
-              {child.props && child.props.data && child.props.data.isCode !== "" ? (
-                <div className='optionstyle'>
-                  {child}
-                  <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img' onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); hanldlecustomClick(child, objType) }} />
-                </div>
+            <div key={index}>
+            {child.props && child.props.data && child.props.data.isCode !== "" ? (
+              <div className='optionstyle'>
+                {child.props.data.label && child.props.data.label.length > 27 ? (
+                  <div>{child.props.data.label.substring(0, 27)}....</div>
+                ) : (
+                  child
+                )}
+                <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
+                  onClick={() => {
+                    props.setStepOfCustomKeyword(props.stepSelect.check[0]);
+                    props.setCustomKeyWord(objType);
+                    hanldlecustomClick(child, objType);
+                    setCustomEdit(true);
+                  }}
+                />
+              </div>
+            ) : (
+              child.props.data.label && child.props.data.label.length > 27 ? (
+                <div>{child.props.data.label.substring(0, 27)}....</div>
               ) : (
                 child
-              )}
-            </div>
+              )
+            )}
+          </div>
           ))}
   
           <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
