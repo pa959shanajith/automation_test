@@ -451,15 +451,18 @@ const CreateProject = (props) => {
         setIsInvalidProject(true);
         return;
       }
-      setIsInvalidProject(false)
-      props.toastSuccess("Project Created Successfully");
-      dispatch(loadUserInfoActions.savedNewProject(true));
-      dispatch(migrateProject(value.trim()));
-      props.onHide();
-      setRefreshData(!refreshData);
+      if(projectRes === "success"){
+        setIsInvalidProject(false)
+        props.toastSuccess("Project Created Successfully");
+        dispatch(loadUserInfoActions.savedNewProject(true));
+        dispatch(migrateProject(value.trim()));
+        props.onHide();
+        setRefreshData(!refreshData);
+        if(props?.setProjectName) (props.setProjectName(projData.projectName));
+      }
+      
     } catch (error){
       console.error("API request failed:", error);
-
       props.toastError("Failed to create Project");
       }
     }
