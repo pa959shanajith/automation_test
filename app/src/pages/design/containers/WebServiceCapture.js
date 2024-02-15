@@ -84,7 +84,7 @@ const WebserviceScrape = (props) => {
         { label: 'Header' },
         { label: 'Body' },
         { label: 'Params' },
-        // { label: 'Authorization' },
+        { label: 'Authorization' },
         { label: 'Certificate' }
     ];
 
@@ -453,7 +453,7 @@ const WebserviceScrape = (props) => {
                     }
 
                     {/* -----------Authenticate----------------- */}
-                    {/* {requestActiveIndex === 4 && <div style={{ overflow: "auto" }}>
+                     {requestActiveIndex === 3 && <div style={{ overflow: "auto" }}>
                         <div className='flex flex-column'>
                             <div className='inputs_container'>
                                 <label htmlFor={"typeSelect"} className="inputs_container_label" >TYPE</label>
@@ -484,7 +484,7 @@ const WebserviceScrape = (props) => {
 
 
 
-                            <h4 style={{ marginLeft: "1rem" }}>Current Token</h4>
+                            {/*<h4 style={{ marginLeft: "1rem" }}>Current Token</h4>
                             <span style={{ fontSize: "12px", marginLeft: "1rem" }}>The access token is only available to you. Sync the token to let collaborators on this request use it</span>
                             <div className='inputs_container'>
                                 <label htmlFor={""} className="inputs_container_label"  >Access Token</label>
@@ -540,12 +540,12 @@ const WebserviceScrape = (props) => {
                             <div className='inputs_container'>
                                 <label htmlFor={""} className="inputs_container_label"  >Access Token URL</label>
                                 <InputText className=' p-inputtext-sm' placeholder="http:localhost:300/token" style={{ width: '70%' }} />
-                            </div>
-                        </div>
-                    </div>} */}
+                            </div> */}
+                        </div> 
+                    </div>}
 
                     {/* -----------Certificate----------------- */}
-                    {requestActiveIndex === 3 && <div className='certificate_container'>
+                    {requestActiveIndex === 4 && <div className='certificate_container'>
                         <CertificateModal />
                     </div>
                     }
