@@ -239,9 +239,35 @@ export const getProjectPlans = async (projectPayload) => {
     }
 }
 
-export const getSuitesandRuns = async (payload) => {
+export const getSuitesTestrail_ICE = async (payload) => {
     try {
-        const { data, status } = await axios(url + '/getSuitesandRuns', {
+        const { data, status } = await axios(url + '/getSuitesTestrail_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: payload
+        });
+        
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        } else if (status === 200 && data !== "fail") {
+            return data;
+        } else if (status !== 200 || data == "fail") {
+            return data;
+        }
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    }
+}
+
+export const getSectionsTestrail_ICE = async (payload) => {
+    try {
+        const { data, status } = await axios(url + '/getSectionsTestrail_ICE', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
@@ -517,7 +543,7 @@ export const getProjectsTestrail_ICE = async(testRailPayload) => {
     }
 }
 
-export const getTestcases_Testrail = async(payload) => {
+export const getTestcasesTestrail_ICE = async(payload) => {
     try{
         const res = await axios(url+'/getTestcasesTestrail_ICE', {
             method: 'POST',

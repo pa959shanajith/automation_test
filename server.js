@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-				var redisStore = require('connect-redis')(sessions);
+												var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -161,7 +161,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+									}  
 						return next();
 		});
 
@@ -334,7 +334,7 @@ if (cluster.isMaster) {
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
 			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
-		});
+		});	
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin|devOpsReport)$/, function(req, res) {
@@ -726,6 +726,7 @@ if (cluster.isMaster) {
 		app.post('/viewTestrailMappedList',testrail.viewMappedDetails_Testrail)
 		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
 		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
+		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
 		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

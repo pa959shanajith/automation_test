@@ -196,6 +196,7 @@ exports.getSuites_Testrail = async (req, res) => {
             A String of failure with statusCode => 500
             
 */
+
 exports.getTestcases_Testrail = async (req, res) => {
   try {
     // Add into the info log
@@ -206,7 +207,7 @@ exports.getTestcases_Testrail = async (req, res) => {
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
  
-    let username = req.session.username;
+    let username = req.session.username
  
     let name;
  
@@ -224,14 +225,17 @@ exports.getTestcases_Testrail = async (req, res) => {
       logger.debug("ICE Socket requesting Address: %s", name);
  
       // get the details from request body
-      let testrailAction = req.body.TestRailAction;
-      let runId = req.body.runId;
-   
+      let testrailAction = req.body.testrailAction;
+      let projectId = req.body.projectId;
+      let sectionId = req.body.sectionId
+      let suiteId = req.body.suiteId
       let testrailDetails = {
         testrailAction,
-        runId,
+        projectId,
+        suiteId,
+        sectionId
       };
-
+ 
       // add into the info log
       logger.info("Sending socket request for testrailLogin to redis");
  
@@ -239,14 +243,14 @@ exports.getTestcases_Testrail = async (req, res) => {
       mySocket.emit("testraillogin", testrailDetails);
  
       //ICE responds to the event and sends the above requested data
-      function testraillogin_listener(data) {
+      function testrail_testcase_listener(data) {
         // remove the added listener once the task is done
-        mySocket.removeListener("qcresponse", testraillogin_listener);
+        mySocket.removeListener(`qcresponse${data[0]['section_id']}`, testrail_testcase_listener);
         res.send(data);
       }
  
       // Invoke the above function on qcresponse event
-      mySocket.on("qcresponse", testraillogin_listener);
+      mySocket.on(`qcresponse${sectionId}`, testrail_testcase_listener);
     } else {
       logger.info(
         "Error occurred in getTestcases_Testrail: Invalid Testrail Credentials"
@@ -393,14 +397,14 @@ exports.getSuiteAndRunInfo_Testrail = async(req,res) => {
       mySocket.emit("testraillogin", testrailDetails);
 
       //ICE responds to the event and sends the above requested data
-      function testraillogin_listener(data) {
+      function testraillogin_runid_listener(data) {
         // remove the added listener once the task is done
-        mySocket.removeListener("qcresponse", testraillogin_listener);
+        mySocket.removeListener("qcresponse", testraillogin_runid_listener);
         res.send(data);
       }
 
       // Invoke the above function on qcresponse event
-      mySocket.on("qcresponse", testraillogin_listener);
+      mySocket.on("qcresponse", testraillogin_runid_listener);
 
     }
 
@@ -412,6 +416,45 @@ exports.getSuiteAndRunInfo_Testrail = async(req,res) => {
       }
 }
 
+
+/** 
+* @function : saveMapping_Testrail
+* @description : the function is responsible getting the mappedData and passing the request to DAS to save it in respective collection.
+* @param : mappedDetails:
+		   [{
+        "projectid": [
+            2
+        ],
+        "testplanid": [
+            3
+        ],
+        "suiteid": [
+            2
+        ],
+        "runid": [
+            4
+        ],
+        "testid": [
+            7
+        ],
+        "testname": [
+            "TC2"
+        ],
+        "reqdetails": [
+            []
+        ],
+        "scenarioid": [
+            "65aa3f560476b9796d450ad7"
+        ]
+    }]
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : Incase of failure
+			 A String with fail or empty message with statusCode => 500
+            Incase of success
+			 Success message with statusCode => 200
+            
+*/
 exports.saveMapping_Testrail = async (req, res) => {
   try {
     // Add into the info log
@@ -433,7 +476,7 @@ exports.saveMapping_Testrail = async (req, res) => {
         }
 
         const result = await utils.fetchData(inputs, "qualityCenter/saveIntegrationDetails_ICE", 'saveMapping_Testrail');
-        console.log(result)
+
         if(result == 'fail') {
             res.send('fail')
         } else {
@@ -449,7 +492,43 @@ exports.saveMapping_Testrail = async (req, res) => {
   }
 };
 
-
+/** 
+* @function : viewMappedDetails_Testrail
+* @description : this function is responsible for fetching the mappedData.
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : Incase of failure
+			 A String with fail or empty message with statusCode => 500
+            Incase of success
+			 mappedDetails:
+		   [{
+        "projectid": [
+            2
+        ],
+        "testplanid": [
+            3
+        ],
+        "suiteid": [
+            2
+        ],
+        "runid": [
+            4
+        ],
+        "testid": [
+            7
+        ],
+        "testname": [
+            "TC2"
+        ],
+        "reqdetails": [
+            []
+        ],
+        "scenarioid": [
+            "65aa3f560476b9796d450ad7"
+        ]
+    }]
+            
+*/
 exports.viewMappedDetails_Testrail = async(req,res) => {
   try{
     // Add into the info log
@@ -471,4 +550,72 @@ exports.viewMappedDetails_Testrail = async(req,res) => {
   }
 }
 
+exports.getSections_Testrail = async(req,res) => {
+  try{
+ 
+    // Add into the info log
+    logger.info("Inside UI service: getSections_Testrail")
+ 
+    let mySocket;
+ 
+    // get the clients name
+    let clientName = utils.getClientName(req.headers.host);
+ 
+    let username = req.session.username
+ 
+    let name;
+ 
+    // check if the socket connection is established with ice.
+    if (
+      myserver.allSocketsICEUser[clientName][username] &&
+      myserver.allSocketsICEUser[clientName][username].length > 0
+    )
+      name = myserver.allSocketsICEUser[clientName][username][0];
+ 
+    // Getting the details of the socket
+    mySocket = myserver.allSocketsMap[clientName][name];
+ 
+    if (mySocket != undefined && mySocket.connected) {
+      logger.debug("ICE Socket requesting Address: %s", name);
+ 
+      // get the details from request body
+      let projectId = req.body.projectId;
+      let suiteId = req.body.suiteId;
+      let testrailAction = req.body.testrailAction
+ 
+      let testrailDetails = {
+        projectId,
+        suiteId,
+        testrailAction
+      };
+ 
+      // add into the info log
+      logger.info("Sending socket request for testrailLogin to redis");
+ 
+      // emit the information to ICE, to request the Project details data.
+      mySocket.emit("testraillogin", testrailDetails);
+ 
+      //ICE responds to the event and sends the above requested data
+      function testrail_section_listener(data) {
+        // remove the added listener once the task is done
+        mySocket.removeListener(`qcresponse${data[0]['suite_id']}`, testrail_section_listener);
+        res.send(data);
+      }
+ 
+      // Invoke the above function on qcresponse event
+      mySocket.on(`qcresponse${suiteId}`, testrail_section_listener);
+    } else {
+      logger.info(
+        "Error occurred in getSections_Testrail: Invalid Testrail Credentials"
+      );
+      res.send("unavailableLocalServer");
+    }
+ 
+ 
+  }catch (exception) {
+    console.log(exception);
+    logger.error("Error occurred in getSections_Testrail:", exception.message);
+    res.send("fail");
+  }
+}
 
