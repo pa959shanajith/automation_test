@@ -149,7 +149,7 @@ const CreateUser = (props) => {
     const manage = (input) => {
         props.toast.current.clear();
         setUserNameForIceToken(userName);
-        const action =  type==="ldap" ? "createMultipleLdapUsers" : input.action;
+        const action =  (type==="ldap" && !editUser) ? "createMultipleLdapUsers" : input.action;
         const uType = type;
         if(type !== "ldap")
         {   

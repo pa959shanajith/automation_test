@@ -198,12 +198,15 @@ const ElementRepository = (props) => {
     // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
-        <div className={`flex flex-row name__ellipsis ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
-          {rowData.custname}
-          {uniqueArray.map((item)=>(
-            item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
-          ))}
-        </div>
+        <div className='flex justify-content-between'>
+          <div className={`flex flex-row ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
+          </div>
+          <div>{uniqueArray.map((item)=>(
+              item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
+            ))}
+          </div>
+      </div>
       </>
     );
   };
@@ -278,6 +281,11 @@ const handleAccordionNameEdit = (index,e) => {
 }
 
 const handleChangeScreenName=(index,e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
   SetScreenRename(e.target.value)
   const updatedScreenData = [...screenData];
   updatedScreenData[index].name = e.target.value;
@@ -300,6 +308,7 @@ const handleChangeScreenName=(index,e)=>{
                  src="static/imgs/paste_icon.svg"
                 />,
           command: () => pasteRow(accordionId),
+          disabled: (copiedRow === null)
         },
       ]);
     } else {
@@ -869,7 +878,16 @@ const deleteScreen = (index, screenDetails)=>{
               onSelectionChange={onRowClick}
             >
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
-              editor={(options) => cellEditor(options)}
+              editor={(options) => {
+                if (!options.rowData || Object.keys(options.rowData).length === 0) {
+                return null;
+              } 
+              else {
+                return (
+                  cellEditor(options)
+                );
+              }
+                }}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}></Column>
               <Column field="tag" header="Element Property" body={(rowData) => rowData?.tag?.includes("iris")? elementTypeProp(rowData.tag.split(";")[1]): rowData?.tag ? elementTypeProp(rowData.tag):""}></Column>
