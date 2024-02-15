@@ -57,31 +57,33 @@ const GitDropdown = (props) => {
 
   useEffect(() => {
     (async () => {
-      const projectList = await fetchProjects({ readme: "projects" });
-      setProjectListForCreateProject(projectList);
-      const projectListForDropdown = [];
-      const arrayNew = projectList.map((element, index) => {
-        if (projectName.current === element.name) setCreatedProjectDetails(element);
-        // const lastModified = DateTimeFormat(element.releases[0].modifiedon);
-        projectListForDropdown.push({ "name": element.name, "id": element._id })
-        return {
-          key: index,
-          projectName: element.name,
-          progressStep: element.progressStep,
-          modifiedName: element.firstname,
-          modifieDateProject: element.releases[0].modifiedon,
-          // modifiedDate: lastModified,
-          createdDate: element.releases[0].createdon,
-          appType: convertIdIntoNameOfAppType(element.type),
-          projectId: element._id,
-          projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
-        }
-      });
-      setProjectListDropdown(projectListForDropdown);
-      const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
-      setAllProjectlist(sortedProject);
+      if(selectedImage=== "version_history" && visibleGitconfFormAfterCreatePrj === false){
+        const projectList = await fetchProjects({ readme: "projects" });
+        setProjectListForCreateProject(projectList);
+        const projectListForDropdown = [];
+        const arrayNew = projectList.map((element, index) => {
+          if (projectName.current === element.name) setCreatedProjectDetails(element);
+          // const lastModified = DateTimeFormat(element.releases[0].modifiedon);
+          projectListForDropdown.push({ "name": element.name, "id": element._id })
+          return {
+            key: index,
+            projectName: element.name,
+            progressStep: element.progressStep,
+            modifiedName: element.firstname,
+            modifieDateProject: element.releases[0].modifiedon,
+            // modifiedDate: lastModified,
+            createdDate: element.releases[0].createdon,
+            appType: convertIdIntoNameOfAppType(element.type),
+            projectId: element._id,
+            projectLevelRole: element?.projectlevelrole?.assignedrole ?? ""
+          }
+        });
+        setProjectListDropdown(projectListForDropdown);
+        const sortedProject = arrayNew.sort((a, b) => new Date(b.modifieDateProject) - new Date(a.modifieDateProject));
+        setAllProjectlist(sortedProject);
+      }
     })();
-  }, [visibleGitconfFormAfterCreatePrj === false]);
+  }, [selectedImage, visibleGitconfFormAfterCreatePrj]);
 
 
   const projectListUpdateHandler = async () => {

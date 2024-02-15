@@ -24,13 +24,6 @@ const GitVersionHistory = (props) => {
   const [restorebtnDisable, setRestorebtnDisable] = useState(true);
 
 
-const columns = [
-  { field: 'sl.no', header: 'Sl.no' },
-  { field: 'version', header: 'Version' },
-  { field: 'datetime', header: 'datetime' },
-  { field: 'comments', header: 'Comments' },
-  { field: 'status', header: 'status' },
-];
 
 
 
@@ -246,9 +239,6 @@ const bodyTemplate = (rowData) => {
         <Column field="SelectDestination" header='SelectDestination' body={bodyTemplate} />
       </DataTable>
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-      {isCreateProjectVisible && <div>
-        <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError} />
-      </div>}
     </div>
   );
 };

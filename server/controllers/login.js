@@ -74,7 +74,6 @@ exports.loadUserInfo = async (req, res) => {
 		}
 		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
         userProfile['licenseID']='4_'
-		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
