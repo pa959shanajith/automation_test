@@ -52,7 +52,7 @@ const TableRow = (props) => {
     const [objetListOption,setObjetListOption] = useState(null);
     let objList = props.objList;
     let draggable = props.draggable;
-    console.log("props", props);
+
     const { MenuList } = components;
 
     const hanldlecustomClick = (child) => {
@@ -218,8 +218,6 @@ const TableRow = (props) => {
         }else if (event.value == 'custom keyword') {
           props.setStepOfCustomKeyword(props.stepSelect.check[0])
           props.setCustomKeyWord(objType);
-          console.log('props.stepSelect.check[0]', props.stepSelect.check[0])
-          console.log(objType)
         }
         else{
             const placeholders = props.getRowPlaceholders(objType, event.value);
