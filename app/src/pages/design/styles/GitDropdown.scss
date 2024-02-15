@@ -54,7 +54,36 @@
     display: flex;
     justify-content: center;
     align-items: center;
-     }
+    .p-dropdown-label {
+      display: flex !important;
+      align-items: center !important;
+    }
+  }
+
+  .createProject_GitConfig .p-inputtext-sm{
+    height: 40px !important;
+    width: 100px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .p-dropdown-label {
+      display: flex !important;
+      align-items: center !important;
+    }
+  }
+
+  .createProject_GitConfig{
+    .git_input {
+      margin-bottom: 16px;
+    }
+  }
+  
+  .GitVersion_cls .p-dropdown {
+    .p-dropdown-label {
+      display: flex !important;
+      align-items: center !important;
+    }
+  }
 
   .commit_testcase_list {
     display: flex;
@@ -63,9 +92,9 @@
     border: 1.5px solid rgba(169, 175, 175, 0.267);
     border-radius: 0.3rem;
     padding: 0.5rem;
-    width: 20rem;
-    max-height: 18rem;
-    height: 18rem;
+    width: 50%;
+    max-height: 35vh;
+    height: 35vh;
   }
 
   .import_cls .p-datatable {
@@ -103,9 +132,24 @@
     padding: .75rem !important;
   }
 
+
 }
 
-.git-config-custom-dropdown-item{
+.git_icon_and_icon {
+  display: flex;
+  flex-direction: row;
+  height: 32px;
+  position: relative;
+  /* bottom: 0.3rem; */
+  align-items: center;
+  justify-content: center;
+  background-color: #ffff;
+  border-radius: 7px;
+  border: 1.5px solid lightgrey;
+  cursor: pointer;
+}
+
+.git-config-custom-dropdown-item {
   width: 11rem !important;
   overflow: hidden;
   text-overflow: ellipsis;

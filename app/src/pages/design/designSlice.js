@@ -59,13 +59,17 @@ const initialState = {
   oldModuleForReset: "",
   currentModuleId: "",
   currentid: "",
-  updateScreenModuleId:"",
+  isCreateProjectVisible: false,
+  updateScreenModuleId:""
 }
 
 export const designSlice = createSlice({
   name: 'design',
   initialState,
   reducers: {
+    isCreateProjectVisible: (state, action) => {
+      state.isCreateProjectVisible = action.payload
+    },
     projectList: (state, action) => {
       state.projectList = action.payload
     },
@@ -241,7 +245,7 @@ export const designSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { projectList, moduleList, screenData,
+export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedProj,
   SetCurrentModuleId,
   SetCurrentId,
