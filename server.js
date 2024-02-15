@@ -708,6 +708,9 @@ var browserstack = require('./server/controllers/browserstack');
 		//Zephyr Plugin
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
+		app.post('/zephyrRepoDetails_ICE', auth.protect, zephyr.zephyrRepoDetails_ICE);
+		app.post('/zephyrModuleUnderRepo_ICE', auth.protect, zephyr.zephyrModuleUnderRepo_ICE);
+		app.post('/zephyrRepoTestcaseDetails_ICE', auth.protect, zephyr.zephyrRepoTestcaseDetails_ICE);
 		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
 		app.post('/zephyrMappedCyclePhase', auth.protect, zephyr.zephyrMappedCyclePhase);
 		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
