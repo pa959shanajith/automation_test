@@ -291,6 +291,32 @@ export const getSectionsTestrail_ICE = async (payload) => {
     }
 }
 
+export const saveTestrailMapping = async (payload) => {
+    try {
+        const { data, status } = await axios(url + '/saveTestrailMapping', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            credentials: 'include',
+            data: payload
+        });
+        
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(history)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        } else if (status === 200 && data !== "fail") {
+            return data;
+        } else if (status !== 200 || data == "fail") {
+            return data;
+        }
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.SETTINGS.ERR_TESTRAIL_TESTPLAN_FETCH }
+    }
+}
+
 /*  manageZephyrDetails
   api returns string "success" , "fail"
 */

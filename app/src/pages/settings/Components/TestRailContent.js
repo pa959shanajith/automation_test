@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import * as api from '../api.js';
 import { selectedProject, selectedIssue } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
+import { enableSaveButton, mappedPair } from "../settingSlice";
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 
 const TestRailContent = ({ domainDetails }) => {
@@ -19,13 +20,12 @@ const TestRailContent = ({ domainDetails }) => {
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [updatedTreeData, setUpdatedTreeData] = useState([]);
-    const [selectedTestRailNode, setSelectedTestRailNode] = useState("");
     const [avoSelected, setAvoSelected] = useState([]);
     const [projectSuites, setProjectSuites] = useState([]);
     const [sectionData, setSectionData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [trTreeData, setTrTreeData] = useState([]);
-
+    const [selectedTestRailNodeFirstTree, setSelectedTestRailNodeFirstTree] = useState({});
+    const [selectedTestRailNodesSecondTree, setSelectedTestRailNodesSecondTree] = useState([]);
     const toast = useRef();
 
     // constants, variables
@@ -62,33 +62,6 @@ const TestRailContent = ({ domainDetails }) => {
         testrailTestSuites.length > 0 && setProjectSuites(testrailTestSuites);
     };
 
-    const checkboxTemplate = (node) => {
-        if (node.testcaseType === "parent") {
-            return <>
-                <Checkbox
-                    value={node}
-                    checked={avoSelected.includes(node._id)}
-                    onChange={(e) => handleNode(e, node)}
-                />
-                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
-            </>
-        }
-        else return <span className="scenario_label">{node.name}</span>
-    };
-
-    const handleNode = (e, node) => {
-        if (e.checked) {
-            setAvoSelected([...avoSelected, node._id])
-        } else {
-            const nodeIndex = avoSelected.indexOf(node._id);
-            let newSelectedNodes = [...avoSelected];
-            if (nodeIndex !== -1) {
-                newSelectedNodes.splice(nodeIndex, 1);
-            }
-            setAvoSelected(newSelectedNodes);
-        }
-    };
-
     // Fetching AVO testcases
     useEffect(() => {
         setLoading(true);
@@ -120,7 +93,8 @@ const TestRailContent = ({ domainDetails }) => {
             try {
                 const testSection = [];
 
-                for (const suite of projectSuites) {
+                for (let i = 0; i < projectSuites.length; i++) {
+                    const suite = projectSuites[i];
                     const sections = await api.getSectionsTestrail_ICE({
                         "projectId": currentProject.id,
                         "suiteId": suite.id,
@@ -132,7 +106,6 @@ const TestRailContent = ({ domainDetails }) => {
                         children: sections || []
                     });
                 }
-
 
                 const fetchTestCases = async (projectId, suiteId, sectionId) => {
                     try {
@@ -146,7 +119,8 @@ const TestRailContent = ({ domainDetails }) => {
                         const testCaseDetails = [];
 
                         if (response.length > 0) {
-                            for (const testCase of response) {
+                            for (let i = 0; i < response.length; i++) {
+                                const testCase = response[i];
                                 const testCaseWithType = {
                                     ...testCase,
                                     type: "testcase",
@@ -167,7 +141,8 @@ const TestRailContent = ({ domainDetails }) => {
                 const organizeSectionsIntoHierarchy = async (sections, parentId = null) => {
                     const result = [];
 
-                    for (const section of sections) {
+                    for (let i = 0; i < sections.length; i++) {
+                        const section = sections[i];
                         if (section.parent_id === parentId) {
                             const children = await organizeSectionsIntoHierarchy(sections, section.id);
                             const newItem = { ...section, children };
@@ -187,14 +162,15 @@ const TestRailContent = ({ domainDetails }) => {
 
                 const testCaseData = [];
 
-                for (const section of testSection) {
+                for (let i = 0; i < testSection.length; i++) {
+                    const section = testSection[i];
                     const organizedHierarchy = await organizeSectionsIntoHierarchy(section.children) || [];
 
                     testCaseData.push({
                         ...section,
                         children: organizedHierarchy
                     });
-                };
+                }
 
                 setSectionData((sectionData) => testCaseData);
                 setLoading(false);
@@ -207,19 +183,89 @@ const TestRailContent = ({ domainDetails }) => {
         fetchSections();
     }, [projectSuites]);
 
-    const treeCheckboxTemplate = (node) => {
+    const treeCheckboxTemplateFirstTree = (node) => {
         if (node?.type === "testcase") {
             return <>
                 <Checkbox
                     value={node?.id}
-                    checked={avoSelected.includes(node._id)}
-                    onChange={(e) => handleNode(e, node)}
+                    checked={selectedTestRailNodeFirstTree.id == node.id}
+                    onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
                 <span className="scenario_label">{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
     };
+
+    const treeCheckboxTemplateSecondTree = (node) => {
+        if (node.testcaseType === "parent") {
+            return <>
+                <Checkbox
+                    value={node}
+                    checked={selectedTestRailNodesSecondTree.includes(node._id)}
+                    onChange={(e) => handleNodeToggleSecondTree(e, node)}
+                />
+                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
+            </>
+        }
+        else return <span className="scenario_label">{node.name}</span>
+    };
+
+
+    const handleNodeToggleFirstTree = (node) => {
+        setSelectedTestRailNodeFirstTree({ id: node.id, name: node.name, suite_id: node.suite_id });
+    };
+
+    const handleNodeToggleSecondTree = (e, node) => {
+        const selectedNodes = [...selectedTestRailNodesSecondTree];
+
+        if (e.checked) {
+            selectedNodes.push(node._id);
+        } else {
+            const nodeIndex = selectedNodes.indexOf(node._id);
+            if (nodeIndex !== -1) {
+                selectedNodes.splice(nodeIndex, 1);
+            }
+        }
+
+        setSelectedTestRailNodesSecondTree(selectedNodes);
+    };
+
+    const handleSync = () => {
+        let popupMsg = false;
+        let scenarioIdsList = [];
+        const { id, name, suite_id } = selectedTestRailNodeFirstTree;
+        if (selectedTestRailNodesSecondTree.length === 0) {
+            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
+        }
+
+        const data = updatedTreeData?.map((item) => {
+            if (selectedTestRailNodesSecondTree.includes(item._id)) {
+                scenarioIdsList.push(item._id);
+                return { ...item, checked: true, children: [{ _id: id, name: name, testcaseType: "children", suite_id }] }
+            } else {
+                return { ...item, checked: false }
+            }
+        });
+
+        const mappedData = {
+            "mappedDetails": [
+                {
+                    "projectId": projectDetails.projectId,
+                    "suiteid": [suite_id], // testrail suite id
+                    "testid": [id], // testrail test id
+                    "testname": [name], // selected calm test case name
+                    "scenarioid": [scenarioIdsList] // selected avo test case id
+                }
+            ]
+        };
+
+        setUpdatedTreeData((updatedTreeData) => data);
+        if (popupMsg) setMsg(popupMsg);
+        setSelectedTestRailNodesSecondTree([]);
+        dispatch(enableSaveButton(true));
+        dispatch(mappedPair(mappedData));
+    }
 
     useEffect(() => {
         setTestRailProjectsName(domainDetails?.projects);
@@ -246,11 +292,9 @@ const TestRailContent = ({ domainDetails }) => {
                                             sectionData.length > 0 &&
                                             <Tree
                                                 value={sectionData}
-                                                // value={trTreeData}
                                                 selectionMode="single"
-                                                selectionKeys={selectedTestRailNode}
-                                                onSelectionChange={(e) => setSelectedTestRailNode(e.value)}
-                                                nodeTemplate={treeCheckboxTemplate}
+                                                selectionKeys={selectedTestRailNodeFirstTree}
+                                                nodeTemplate={treeCheckboxTemplateFirstTree}
                                             />
                                         }
                                         {/* <div className="jira__paginator">
@@ -279,7 +323,11 @@ const TestRailContent = ({ domainDetails }) => {
 
                                             <div>
                                                 <div className="avotest__data">
-                                                    <Tree value={updatedTreeData} selectionMode="multiple" selectionKeys={avoSelected} nodeTemplate={checkboxTemplate} className="avoProject_tree" />
+                                                    <Tree value={updatedTreeData}
+                                                        selectionMode="multiple"
+                                                        selectionKeys={selectedTestRailNodesSecondTree}
+                                                        nodeTemplate={treeCheckboxTemplateSecondTree}
+                                                        className="avoProject_tree" />
                                                 </div>
                                                 <div className="testcase__AVO__jira__paginator">
                                                     {/* <Paginator
@@ -295,7 +343,7 @@ const TestRailContent = ({ domainDetails }) => {
                                 </div>
                             </div>
                             <span>
-                                {/* <Button className="map__btn" label="Map" size="small" onClick={() => handleSync()} /> */}
+                                <Button className="map__btn" label="Map" size="small" onClick={() => handleSync()} />
                             </span>
                         </div>
                     </TabPanel>

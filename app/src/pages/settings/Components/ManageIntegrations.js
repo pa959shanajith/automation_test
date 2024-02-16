@@ -568,6 +568,22 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     }
 
+    const callTestrailSaveButton = async () => {
+        if (mappedData && Object.keys(mappedData).length) {
+            const response = await api.saveTestrailMapping(mappedData);
+            if (response.error) {
+                setToast("error", "Error", response.error);
+            } else if (response === "scheduleModeOn")
+                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (response.status == 201 || response.status == 200 || response.message.length > 0 || response === "success") {
+                setToast("success", "Success", 'Tests mapped successfully!');
+            }
+        }
+        else {
+            setToast("info", "Info", 'Please sync atleast one map');
+        }
+    }
+
     const callViewMappedFiles = async (saveFlag) => {
         try {
             const response = await api.viewJiraMappedList_ICE("6440e7b258c24227f829f2a4");
@@ -863,7 +879,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
+                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name=="TestRail" ? callTestrailSaveButton : callZephyrSaveButton} />
                     <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" />
                 </div>)}
 
@@ -888,7 +904,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
          
 
     const CloudBasedIntegrationContent = useMemo(() => <CloudSettings  />, [])
-   
+    
 
 
     return (
