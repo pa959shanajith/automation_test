@@ -1157,7 +1157,10 @@ else{
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <h4 className='dailog_header2'>
+          {/* <span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
+          <span className='screen__name'>{parentData.name}</span>
+          {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable}>Add more</button>
@@ -1715,7 +1718,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
         {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
@@ -1848,12 +1851,10 @@ const confirmScreenChange = () => {
 
         const res = await scrapeApi.updateScreen_ICE(params);
         if(res === 'fail') {
-          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
-        else if(res === "no orderlist present") {
-          setScreenData([]);
-          toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+        }
         else {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 5000 });
           var req={
             tab:"createdTab",
             projectid:NameOfAppType.projectId,
@@ -1939,7 +1940,9 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen}/></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                    <div title={option.label}>{option.label}</div>
+                  )}/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -2317,7 +2320,7 @@ const screenOption = screenData?.map((folder) => ({
         visible={screenChange}
         onHide={() => setScreenChange(false)}
         showHeader={false}
-        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        message="Choosing the repository will overwrite the current data. Are you sure you want to proceed?"
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
 

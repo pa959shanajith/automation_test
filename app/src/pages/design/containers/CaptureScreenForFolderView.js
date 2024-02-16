@@ -1698,7 +1698,7 @@ const CaptureModal = (props) => {
                     <div
                         className={`tooltip__target-${rowdata.objectDetails.objId}
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
                     {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
                     {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
                 </div>
@@ -1828,12 +1828,9 @@ const CaptureModal = (props) => {
       
               const res = await scrapeApi.updateScreen_ICE(params);
               if(res === 'fail') {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
-              else if(res === "no orderlist present") {
-                setScreenData([]);
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the repository, try again!!.', life: 5000 });}
               else {
-                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repsotory updated and saved', life: 5000 });
                 var req={
                   tab:"createdTab",
                   projectid:NameOfAppType.projectId,
@@ -1890,7 +1887,7 @@ const CaptureModal = (props) => {
       };
       
       const screenOption = screenData?.map((folder) => ({
-        label: folder.name,
+        label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
         id:folder["_id"],
         related_dataobjects: folder.related_dataobjects,
         orderlist:folder.orderlist,
@@ -1913,7 +1910,7 @@ const CaptureModal = (props) => {
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
@@ -2102,7 +2099,7 @@ const CaptureModal = (props) => {
         visible={screenChange}
         onHide={() => setScreenChange(false)}
         showHeader={false}
-        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        message="Choosing the repository will overwrite the current data. Are you sure you want to proceed?"
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
         

@@ -19,7 +19,7 @@ import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { useNavigate } from 'react-router-dom';
-
+import { Tooltip } from 'primereact/tooltip';
 
 const ElementRepository = (props) => {
   const history = useNavigate();
@@ -886,7 +886,8 @@ const deleteScreen = (index, screenDetails)=>{
         <p className="not_captured_message">No Element Repository yet</p>
         <Button label='Create Repository' onClick={handleAddAccordion} />
         </div>)
-      :<Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>}
+      :<><Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
+      <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip></>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
         {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={

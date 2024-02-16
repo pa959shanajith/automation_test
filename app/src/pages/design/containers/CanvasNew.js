@@ -537,7 +537,6 @@ const CanvasNew = (props) => {
       if (toastData !== true){
         setVisibleCaptureAndDesign(true);
         setCaptureClick(true);
-        localStorage.setItem('updatedScreen', JSON.stringify({}))
         d3.select('#'+box).classed('node-highlight',false)
       }else{
         toast.current.show({severity:'error', summary:'Error', detail:"Save Mindmap before proceeding", life:2000})
