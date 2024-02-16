@@ -1419,6 +1419,8 @@ const DesignModal = (props) => {
                                     setInputEditor={setInputEditor}
                                     setAlloptions={setAlloptions}
                                     setCustomEdit={setCustomEdit}
+                                    fetchData={props.fetchingDetails}
+                                    typesOfAppType={props.appType}
                                     />)
                                 } 
                             </ReactSortable>

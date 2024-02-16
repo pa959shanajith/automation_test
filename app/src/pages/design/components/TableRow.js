@@ -6,6 +6,10 @@ import Select, { components } from "react-select";
 import { Icon } from '@mui/material';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
+import { OverlayPanel } from 'primereact/overlaypanel';
+import { getScreens } from '../api';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -29,6 +33,7 @@ import { Button } from 'primereact/button';
 const TableRow = (props) => {
   const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
     const rowRef = useRef(null);
+    const op = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
     const [objName, setObjName] = useState(null);
@@ -50,6 +55,8 @@ const TableRow = (props) => {
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [objetListOption,setObjetListOption] = useState(null);
+    const [elementData, setElementData] = useState([]);
+    // const [visible, setVisible] = useState(false);
     let objList = props.objList;
     let draggable = props.draggable;
 
@@ -508,6 +515,51 @@ const TableRow = (props) => {
               width: '100%'
             })
           };
+
+          const showCard = async(e,name) =>{
+            const list = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"]
+            const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
+              const screenData = await getScreens(props.fetchData['projectID'])
+              if(screenData.error)return;
+              else{
+                const elementScreen = screenData.screenList.find((item)=>item._id === props.fetchData['parent']['_id'])
+                if (props.typesOfAppType==="Web" && !list.includes(name)){
+                  const objectData = elementScreen.related_dataobjects.find((sub)=>sub.custname === name)
+                  let element = objectData?.xpath?.split(';')
+                  if(element==undefined) return;
+                  if(props.typesOfAppType==="Web" && element[0] !== 'iris' ){
+                    let dataValue = []
+                    let elementFinalProperties = {
+                      xpath: (element[0] === "null" || element[0] === "" || element[0] === "undefined") ? 'None' : element[0],
+                      id: (element[1] === "null" || element[1] === "" || (element[1] === "undefined")) ? 'None' : element[1],
+                      rxpath: (element[2] === "null" || element[2] === "" || (element[2] === "undefined")) ? 'None' : element[2],
+                      name: (element[3] === "null" || element[3] === "" || (element[3] === "undefined")) ? 'None' : element[3],
+                      classname: (element[5] === "null" || element[5] === "" || (element[5] === "undefined")) ? 'None' : element[5],
+                      cssselector: (element[12] === "null" || element[12] === "" || (element[12] === "undefined")) ? 'None' : element[12],
+                      href: (element[11] === "null" || element[11] === "" || (element[11] === "undefined")) ? 'None' : element[11],
+                      label: (element[10] === "null" || element[10] === "" || (element[10] === "undefined")) ? 'None' : element[10],
+                    }
+
+                    Object.entries(elementFinalProperties).forEach(([key, value], index) => {
+                      let currindex = objectData.identifier.filter(element => element.identifier === key)
+                      dataValue.push({ id: currindex[0].id, identifier: key, key, value, name: defaultNames[key] })
+                    }
+                    )
+                    dataValue.sort((a, b) => a.id - b.id)
+                    setElementData(dataValue);
+                    op.current.toggle(e)
+                  }
+                }else{
+                  setElementData([])
+                }
+              }
+          }
+          const elementValuetitle=(rowdata)=>{
+            return (
+              <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+            )
+           }
+
     return (
         <>
         <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
@@ -523,11 +575,10 @@ const TableRow = (props) => {
                     <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
-                        <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
+                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{props.typesOfAppType === 'Web' && <span title='Element Properties' onMouseEnter={(e)=>showCard(e,objName)} className='pi pi-eye'></span>}</div>
                         {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
         {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
                         </div>
-
                     }
                 </span>
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
@@ -558,6 +609,13 @@ const TableRow = (props) => {
                 <img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} />
             </span>
         </div>
+        {elementData.length>0 && <OverlayPanel ref={op} className='elementTable' showCloseIcon header={"Element Properties"}>
+          <DataTable value={elementData}>
+            <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+            <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+            <Column field="value" header="Value" style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+          </DataTable>
+        </OverlayPanel>}
         </>
     );
 };
