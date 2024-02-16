@@ -783,7 +783,7 @@ const toastSuccess = (successMessage) => {
 
   const handleScenarioCreate = async () => {
     if (!(scenarioName)) {
-      toastError(MSG.CUSTOM("Please enter Testcase", "error"));
+      toastError(MSG.CUSTOM("Please enter Test case", "error"));
       return;
     }
     const regEx = /[~*+=?^%<>()|\\|\/]/;
@@ -792,11 +792,11 @@ const toastSuccess = (successMessage) => {
       return;
     }
     else if (regEx.test(scenarioName)) {
-      toastError(MSG.CUSTOM("Testcase name cannot contain special characters", "error"))
+      toastError(MSG.CUSTOM("Test case name cannot contain special characters", "error"))
       return;
     }
     else if (modScenarios.filter((scenario) => scenario.name === scenarioName).length > 0) {
-      toastError(MSG.CUSTOM("Testcase already exists", "error"));
+      toastError(MSG.CUSTOM("Test case already exists", "error"));
       return;
     }
     
@@ -1103,13 +1103,13 @@ const toastSuccess = (successMessage) => {
           </div>
         </div>
       </Dialog>
-      <Dialog header={'Create Testcase'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '30vh',width: '25vw'}} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
+      <Dialog header={'Create Test case'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '30vh',width: '25vw'}} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}>
         <div style={{padding:'1.5rem'}}>
           <div className='dialog__child'>
           <InputText 
             required
             id="username" 
-            placeholder={`Testcase`}
+            placeholder={`Test case`}
             style={{width:'100%'}}
             value={scenarioName} 
             onChange={(e) => { setScenarioName(e.target.value.trim())  }}
@@ -1130,10 +1130,10 @@ const toastSuccess = (successMessage) => {
                 <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Create Project' : 'Project Details'}</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Create Testsuite' : 'Record Testcase'}</span></span>
+                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Create Testsuite' : 'Record Test case'}</span></span>
             </li>
             <li className="breadcrumbs__element__inner" data-value="disabled">
-                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Start Migration' : 'Preview Testcase'}</span></span>
+                <span className="containerSpan"><span className="styledSpan">{geniusMigrate ? 'Start Migration' : 'Preview Test case'}</span></span>
             </li>
           </ol>
         </div>
@@ -1272,8 +1272,8 @@ const toastSuccess = (successMessage) => {
 
           {!geniusMigrate && <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
           < div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project">Testcase</label></div>
-            {userInfo.rolename=="Quality Engineer"?<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Testcase</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
+            <div> <label className="label_genius"  htmlFor="project">Test case</label></div>
+            {userInfo.rolename=="Quality Engineer"?<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} onClick={() => { setDisplayCreateScenario(true) }}>Create Test case</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
             </div>
             {/* <NormalDropDown
               label="Scenario"

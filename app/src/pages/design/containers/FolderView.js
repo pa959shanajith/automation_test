@@ -242,8 +242,8 @@ const FolderView = (props) => {
     };
     // context Menu function
     const menuItemsTestSuite = [
-        { label: 'Add Testcase', icon: <img src="static/imgs/add-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { dispatch(typeOfOprationInFolder({ addNewTestCase: true })) } },
-        { label: 'Add Multiple Testcases', icon: <img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
+        { label: 'Add Test case', icon: <img src="static/imgs/add-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { dispatch(typeOfOprationInFolder({ addNewTestCase: true })) } },
+        { label: 'Add Multiple Test cases', icon: <img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { label: 'Debug', icon: <img src="static/imgs/Execute-icon.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} /> },
         { separator: true },
         { label: 'Rename', icon: <img src="static/imgs/edit-icon.png" alt="rename" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, command: () => { setRenaming(true); } },

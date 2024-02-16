@@ -1599,7 +1599,7 @@ exports.getall_uploadfiles = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcase fetched successfully");
+        logger.info("test case fetched successfully");
         res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
 
     } catch (error) {
@@ -1841,7 +1841,7 @@ exports.moduleLevel_ExecutionStatus = async function (req, res) {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
+        logger.info("test cases generated successfully");
         res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [],
             start_time:result && result[0].start_time ? result[0].start_time:'' ,
             end_time:result && result[0].end_time ? result[0].end_time:'', message: 'data found' });

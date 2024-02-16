@@ -784,7 +784,7 @@ const Analysis = (props) => {
                                                         },
                                                         title: {
                                                             display: true,
-                                                            text: 'Testcase Count',
+                                                            text: 'Test case Count',
                                                             color: '#666',
                                                             font: {
                                                                 size: 16,
@@ -848,7 +848,7 @@ const Analysis = (props) => {
                                                 },
                                                     title: {
                                                         display: true,
-                                                        text: 'Testcase Count',
+                                                        text: 'Test case Count',
                                                         color: '#666',
                                                         font: {
                                                             size: 16,
@@ -905,7 +905,7 @@ const Analysis = (props) => {
                                                     beginAtZero: true,
                                                     title: {
                                                         display: true,
-                                                        text: 'Testcase Group',
+                                                        text: 'Test case Group',
                                                         color: '#666',
                                                         font: {
                                                             size: 16,
@@ -919,7 +919,7 @@ const Analysis = (props) => {
                                                 },
                                                     title: {
                                                         display: true,
-                                                        text: 'Testcase Status',
+                                                        text: 'Test case Status',
                                                         color: '#666',
                                                         font: {
                                                             size: 16,

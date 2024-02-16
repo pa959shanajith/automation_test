@@ -509,7 +509,7 @@ exports.getTestcasesByScenarioId_ICE = async (req, res) => {
 			testcasesObj.testcaseName = testcasenames[index];
 			testcasesArr.push(testcasesObj);
 		}
-		logger.info("Sending testcase details from design/"+fnName+" service");
+		logger.info("Sending test case details from design/"+fnName+" service");
 		res.send(testcasesArr);
 	} catch (exception) {
 		logger.error("Error occurred in design/"+fnName+":", exception);

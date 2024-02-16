@@ -190,7 +190,7 @@ const CanvasNew = (props) => {
     const [captureClick, setCaptureClick] = useState(false);
     const [designClick, setDesignClick] = useState(false);
 
-
+    const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
   const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
@@ -444,8 +444,8 @@ const CanvasNew = (props) => {
       };
 
     const menuItemsModule = [
-        { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Test Case',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Multiple Test Cases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
@@ -468,8 +468,19 @@ const CanvasNew = (props) => {
       {separator: true},
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
       { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-      { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
-      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
+      // { label:  'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web"?true:false || isQualityEngineer), command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}, className: (appType !== "Web" || isQualityEngineer) ? 'disabled-menu-item' : '',},
+      {
+        label: 'Impact Analysis',
+        icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />,
+        disabled: (appType !== "Web" ? true : false || isQualityEngineer),
+        command: () => { setVisibleScenarioAnalyze(true); d3.select('#' + box).classed('node-highlight', false) },
+        title: (appType !== "Web" || isQualityEngineer) ? 'Disabled for Quality Engineer' : "Impact Analysis", 
+        style: { 
+          cursor: (appType !== "Web" || isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: (appType !== "Web" || isQualityEngineer) ? 'all !important' : 'none'
+        }
+      },
+      {label:'Tag a test Case',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -740,7 +751,7 @@ const CanvasNew = (props) => {
       else if (type=='screens'){
               if (reu){
                   reusedNode(dNodes,sid,type);
-                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Testcase.\n \n Are you sure you want to Delete permenantly?");
+                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Case.\n \n Are you sure you want to Delete permenantly?");
                   setSelectedDelNode(id);
                   setReuseDelConfirm(true);
                   return;
@@ -1669,12 +1680,12 @@ const CanvasNew = (props) => {
     // },
     {
       field: "addScenario",
-      header: "Add Testcase",
+      header: "Add Test Case",
       headerClassName: 'scenario-header',
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText name="inputValue" className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={handleInputChange}
+            <InputText name="inputValue" className='scenario_inp' placeholder='Test Case Name' value={inputValue} onChange={handleInputChange}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -1872,7 +1883,7 @@ const CanvasNew = (props) => {
   
   const footerContentScenario = (
     <div>
-        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
+        <Button label="Add Test Case"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
     </div> 
 );
 
@@ -2605,7 +2616,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup?fetchingDetailsForGroup:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} testSuiteInUse={testSuiteInUse}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
-             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Testcase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
+             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Test Case" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
         {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
        
         <div style={{ height: '100%', overflow: 'auto' }}>
@@ -2672,7 +2683,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
           <Dialog
             className='Tag_dialog'
             // header={<span className="tagheader">tag a testcase</span>}
-            header="Tag a Testcase"
+            header="Tag a Test Case"
             visible={visibleTag}
             style={{ width: '35vw', maxHeight: '20vw', overflow: "auto", contentStyle: { background: 'blue' } }}
             footer={footerContentTag}
@@ -2721,7 +2732,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </Card>
                 {fetchingDetails && fetchingDetails._id && tags[fetchingDetails._id]?.length === 0 && (
-                  <p className='taginstruction'>Provide a tag name and press enter to tag your testcase.</p>
+                  <p className='taginstruction'>Provide a tag name and press enter to tag your test case.</p>
                 )}
               </div>
             </div>

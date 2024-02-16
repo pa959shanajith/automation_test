@@ -31,7 +31,7 @@ const ProjectOverview = (props) => {
         { label: 'Analysis' },
         { label: 'Settings' },
         { label: 'Element Repository', command: ()=>handleElementRepository()},
-        { label: 'AI Testcase' },
+        { label: 'AI Test case' },
         { label: 'Capabalities'},
     ];
     

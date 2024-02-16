@@ -87,9 +87,9 @@ const ControlBox = (props) => {
             // }
         } else if (t === 'screens') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus).html('Add Testcase').style('font-family', 'LatoWeb');
+            c.select('p.' + faRef.plus).html('Add Test case').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-            c.select('p.' + faRef.plus1).html('Add Testcases').style('font-family', 'LatoWeb');
+            c.select('p.' + faRef.plus1).html('Add Tes tcases').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
             c.select('p.' + faRef.edit ).html('Rename').style('font-family', 'LatoWeb');
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);

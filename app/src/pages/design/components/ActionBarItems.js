@@ -134,7 +134,7 @@ const UpperContent = ({setCheckedTc, setDTcFlag, isMac, setOverlay, disable, set
                 setOverlay("");
                 ResetSession.end();
                 setMsg(MSG.DESIGN.ERR_DEBUG);
-                console.error("Error while traversing while executing debugTestcase method! \r\n " + (error.data));
+                console.error("Error while traversing while executing debug Test case method! \r\n " + (error.data));
             });
     };
 
@@ -281,8 +281,8 @@ const BottomContent = ({ setImported, setShowConfirmPop, disable, setOverlay, fe
     }
 
     const lowerList = [
-                        {'title': 'Import Test Case', 'tooltip':'Import TestCase', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
-                        {'title': 'Export Test Case', 'tooltip':'Export TestCase', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(), 'disable': disable}
+                        {'title': 'Import Test Case', 'tooltip':'Import Test Case', 'img': 'static/imgs/ic-import-script.png', 'action': ()=>importTestCase()},
+                        {'title': 'Export Test Case', 'tooltip':'Export Test Case', 'img': 'static/imgs/ic-export-script.png', 'action': ()=>exportTestCase(), 'disable': disable}
                     ]
                     // <input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
                     // <li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1($event)"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>

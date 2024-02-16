@@ -814,7 +814,7 @@ const onPageAvoChange = (event) => {
                     if(child.key === suiteId){
                         if(!testcases.length){
                             child.children = [];
-                            child.children.push({msg:'no testcase found'});
+                            child.children.push({msg:'no test case found'});
                         }
                         testcases.forEach((testcase) => {
                             child.children = child.children.filter((child) => Object.keys(child).length > 0);
@@ -1095,9 +1095,9 @@ const onPageAvoChange = (event) => {
                             <div className="card2_viewmap">
                                 <Card className="view_map_card">
                                     <div className="flex justify-content-flex-start toggle_btn">
-                                        <span>Azure DevOps Testcase to Avo Assure Testcase</span>
+                                        <span>Azure DevOps Test case to Avo Assure Test case</span>
                                         <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                        <span>Avo Assure Testcase to Azure DevOps Testcase</span>
+                                        <span>Avo Assure Test case to Azure DevOps Test case</span>
                                     </div>
 
                                     {checked ? (<div className="accordion_testcase">

@@ -608,7 +608,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     //     );
     // };
     const confirmPopupMsg = (
-        <div> <p>Note : If you import already mapped testcases will be unmapped</p></div>
+        <div> <p>Note : If you import already mapped test cases will be unmapped</p></div>
     )
 
 
@@ -831,7 +831,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     
             if(finalMappings.length === 0){
                 setImportStatus("Not_Mapped");
-                setToastNew("error", "Error", 'Please upload the valid testcase sheet !!!');return;
+                setToastNew("error", "Error", 'Please upload the valid test case sheet !!!');return;
             }
             else{
                 // saving the finalMappings 
@@ -1371,9 +1371,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                 <TabPanel header="View Mapping">
                                     <Card className="view_map_zephyr">
                                         <div className="flex justify-content-flex-start toggle_btn">
-                                            <span>Zephyr Testcase to Avo Assure Testcase</span>
+                                            <span>Zephyr Test case to Avo Assure Test case</span>
                                             <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                            <span>Avo Assure Testcase to Zephyr Testcase</span>
+                                            <span>Avo Assure Test case to Zephyr Test case</span>
                                         </div>
 
                                         {checked ? (<div className="accordion_testcase">

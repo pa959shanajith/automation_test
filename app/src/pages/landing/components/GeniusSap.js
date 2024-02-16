@@ -677,7 +677,7 @@ const GeniusSap = (props) => {
 
     const handleScenarioCreate = async () => {
       if (!(scenarioName)) {
-        props.toastError(MSG.CUSTOM("Please enter Testcase", "error"));
+        props.toastError(MSG.CUSTOM("Please enter Test case", "error"));
         return;
       }
       const regEx = /[~*+=?^%<>()|\\|\/]/;
@@ -686,11 +686,11 @@ const GeniusSap = (props) => {
         return;
       }
       else if (regEx.test(scenarioName)) {
-        props.toastError(MSG.CUSTOM("Testcase name cannot contain special characters", "error"))
+        props.toastError(MSG.CUSTOM("Test case name cannot contain special characters", "error"))
         return;
       }
       else if (modScenarios.filter((scenario) => scenario.name === scenarioName).length > 0) {
-        props.toastError(MSG.CUSTOM("Testcase already exists", "error"));
+        props.toastError(MSG.CUSTOM("Test case already exists", "error"));
         return;
       }
       
@@ -1702,14 +1702,14 @@ const debugTestCases = selectedBrowserType => {
       </Dialog>
       </div>
       <div className='create_testcase'>
-      <Dialog  className='create_testcase' header={'Create Testcase'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '40vh',width: '25vw'}} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}
+      <Dialog  className='create_testcase' header={'Create Test case'} visible={displayCreateScenario} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '40vh',width: '25vw'}} onHide={() => { setScenarioName(""); setDisplayCreateScenario(false); }}
       >
         <div style={{padding:'1.5rem'}}>
           <div className='dialog__child'>
           <InputText 
             required
             id="username" 
-            placeholder={`Testcase`}
+            placeholder={`Test case`}
             style={{width:'100%'}}
             onChange={(e) => setScenarioName(e.target.value)}
             />
@@ -1882,7 +1882,7 @@ const debugTestCases = selectedBrowserType => {
 
           <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project" style={{position:'relative',left:'5rem'}}>Testcase</label></div>
+            <div> <label className="label_genius"  htmlFor="project" style={{position:'relative',left:'5rem'}}>Test Case</label></div>
             <label><img src="static/imgs/Required.svg" className="required_icon" style={{marginLeft:'2rem'}}/></label>
             <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}
             //  onClick={() => { setDisplayCreateScenario(true) }}

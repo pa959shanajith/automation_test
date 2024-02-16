@@ -98,7 +98,7 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : "No testcases Found"
+                        ) : "No test cases Found"
                         }
                     </div>
                 </div>
@@ -125,7 +125,7 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : "No testcases Found"
+                        ) : "No test cases Found"
                     }
                 </div>
             </div>

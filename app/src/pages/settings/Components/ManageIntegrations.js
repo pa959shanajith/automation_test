@@ -967,9 +967,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                             <TabPanel header="View Mapping">
                                                 <Card className="view_map_card">
                                                     <div className="flex justify-content-flex-start toggle_btn">
-                                                        <span>Jira Testcase to Avo Assure Testcase</span>
+                                                        <span>Jira Test case to Avo Assure Test case</span>
                                                         <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                                        <span>Avo Assure Testcase to Jira Testcase</span>
+                                                        <span>Avo Assure Test case to Jira Test case</span>
                                                     </div>
 
                                                     {checked ? (<div className="accordion_testcase">
