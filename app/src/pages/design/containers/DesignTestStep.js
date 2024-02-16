@@ -106,7 +106,7 @@ const DesignModal = (props) => {
     const [customEdit , setCustomEdit] =useState(false);
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
-    console.log(customEdit,'customEdit');
+
     const handleAceEditor = (e) => {
         setInputEditor(e)
     }
