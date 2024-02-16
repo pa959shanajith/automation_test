@@ -6,7 +6,7 @@ import Select, { components } from "react-select";
 import { Icon } from '@mui/material';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
-import { OverlayPanel } from 'primereact/overlaypanel';
+import { Dialog } from 'primereact/dialog';
 import { getScreens } from '../api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -33,7 +33,6 @@ import { Column } from 'primereact/column';
 const TableRow = (props) => {
   const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
     const rowRef = useRef(null);
-    const op = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
     const [objName, setObjName] = useState(null);
@@ -56,7 +55,7 @@ const TableRow = (props) => {
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [objetListOption,setObjetListOption] = useState(null);
     const [elementData, setElementData] = useState([]);
-    // const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState(false);
     let objList = props.objList;
     let draggable = props.draggable;
 
@@ -515,9 +514,8 @@ const TableRow = (props) => {
               width: '100%'
             })
           };
-
-          const showCard = async(e,name) =>{
-            const list = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"]
+          const list = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"]
+          const showCard = async(name) =>{
             const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
               const screenData = await getScreens(props.fetchData['projectID'])
               if(screenData.error)return;
@@ -547,10 +545,8 @@ const TableRow = (props) => {
                     )
                     dataValue.sort((a, b) => a.id - b.id)
                     setElementData(dataValue);
-                    op.current.toggle(e)
+                    setVisible(true)
                   }
-                }else{
-                  setElementData([])
                 }
               }
           }
@@ -575,7 +571,7 @@ const TableRow = (props) => {
                     <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
-                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{props.typesOfAppType === 'Web' && <span title='Element Properties' onMouseEnter={(e)=>showCard(e,objName)} className='pi pi-eye'></span>}</div>
+                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onMouseEnter={()=>showCard(objName)} className='pi pi-eye'></span>}</div>
                         {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
         {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
                         </div>
@@ -609,13 +605,13 @@ const TableRow = (props) => {
                 <img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} />
             </span>
         </div>
-        {elementData.length>0 && <OverlayPanel ref={op} className='elementTable' showCloseIcon header={"Element Properties"}>
+        <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>
           <DataTable value={elementData}>
             <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
             <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
             <Column field="value" header="Value" style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
           </DataTable>
-        </OverlayPanel>}
+        </Dialog>
         </>
     );
 };
