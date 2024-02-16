@@ -13,19 +13,20 @@ import * as api from '../api.js';
 import { selectedProject, selectedIssue } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
 import { enableSaveButton, mappedPair } from "../settingSlice";
-import { RedirectPage, Messages as MSG, setMsg } from '../../global';
+import { Messages as MSG, setMsg } from '../../global';
 
-const TestRailContent = ({ domainDetails }) => {
+const TestRailContent = ({ domainDetails, ref }) => {
     // use states, refs
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [updatedTreeData, setUpdatedTreeData] = useState([]);
-    const [avoSelected, setAvoSelected] = useState([]);
+    const [rows, setRows] = useState([]);
     const [projectSuites, setProjectSuites] = useState([]);
     const [sectionData, setSectionData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedTestRailNodeFirstTree, setSelectedTestRailNodeFirstTree] = useState({});
     const [selectedTestRailNodesSecondTree, setSelectedTestRailNodesSecondTree] = useState([]);
+    const [checked, setChecked] = useState(false);
     const toast = useRef();
 
     // constants, variables
@@ -251,25 +252,68 @@ const TestRailContent = ({ domainDetails }) => {
         const mappedData = {
             "mappedDetails": [
                 {
-                    "projectId": projectDetails.projectId,
+                    "projectid": [currentProject.id],
                     "suiteid": [suite_id], // testrail suite id
                     "testid": [id], // testrail test id
                     "testname": [name], // selected calm test case name
-                    "scenarioid": [scenarioIdsList] // selected avo test case id
+                    "scenarioid": scenarioIdsList // selected avo test case id
                 }
             ]
         };
 
         setUpdatedTreeData((updatedTreeData) => data);
         if (popupMsg) setMsg(popupMsg);
-        setSelectedTestRailNodesSecondTree([]);
         dispatch(enableSaveButton(true));
         dispatch(mappedPair(mappedData));
+        setSelectedTestRailNodeFirstTree({});
+        setSelectedTestRailNodesSecondTree([]);
+        fetchMappedTestcases();
+    }
+
+    const fetchMappedTestcases = async () => {
+        const data = await api.viewTestrailMappedList();
+        setRows(data);
+    };
+
+    const handleUnSyncmappedData = async (items, scenario = null) => {
+        if (Object.keys(items).length) {
+            let findMappedId = rows.filter((row) => row._id === items._id);
+            if (findMappedId && findMappedId.length) {
+                const unSyncObj = [];
+                unSyncObj.push({
+                    'mapid': items._id,
+                    'testscenarioid': items.testscenarioid.filter((scenarioid) => scenarioid == scenario)
+                });
+
+                let args = Object.values(unSyncObj);
+                args['screenType'] = "Testrail";
+
+                const saveUnsync = await api.saveUnsyncDetails(args);
+                console.log("saveUnsync", saveUnsync);
+
+                if (saveUnsync.error)
+                    setToast("error", "Error", 'Failed to Unsync');
+                else if (saveUnsync === "unavailableLocalServer")
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+                else if (saveUnsync === "scheduleModeOn")
+                    setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+                else if (saveUnsync === "fail")
+                    setToast("error", "Error", MSG.INTEGRATION.ERR_SAVE.CONTENT);
+                else if (saveUnsync == "success") {
+                    fetchMappedTestcases();
+                    setToast("success", "Success", 'Mapped data unsynced successfully');
+                }
+            }
+        }
     }
 
     useEffect(() => {
         setTestRailProjectsName(domainDetails?.projects);
     }, [domainDetails?.projects]);
+
+    useEffect(() => {
+        fetchMappedTestcases();
+    }, [])
 
     return (
         <div className="tab__cls">
@@ -348,6 +392,46 @@ const TestRailContent = ({ domainDetails }) => {
                         </div>
                     </TabPanel>
                     <TabPanel header="View Mapping">
+                        <Card className="view_map_card">
+                            <div className="flex justify-content-flex-start toggle_btn">
+                                <span>TestRail Testcase to Avo Assure Testcase</span>
+                                <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+                                <span>Avo Assure Testcase to TestRail Testcase</span>
+                            </div>
+                            {checked ? (
+                                <div className="accordion_testcase">
+                                    <Accordion multiple activeIndex={0}>
+                                        {rows?.map((item) => (
+                                            <AccordionTab key={item._id} header={<span>{item.testname}</span>}>
+                                                {console.log("itemitemitem", item)}
+                                                {
+                                                    item.testscenarioname.map((scenario, index) => (
+                                                        <div className='unsync-icon' key={index}>
+                                                            <span>{scenario}</span>
+                                                            <i className="pi pi-times" onClick={() => handleUnSyncmappedData(item, item.testscenarioid[index])} />
+                                                        </div>
+                                                    ))
+                                                }
+                                            </AccordionTab>
+                                        ))}
+                                    </Accordion>
+                                </div>
+                            ) : (
+                                <div className="accordion_testcase">
+                                    <Accordion multiple activeIndex={0}>
+                                        {rows?.map((item) => (
+                                            <AccordionTab header={<span>{item.testscenarioname[0]}</span>}>
+                                                <div className='unsync-icon'>
+                                                    <span>{item.testname}</span>
+                                                    <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
+                                                </div>
+                                            </AccordionTab>
+                                        ))}
+                                    </Accordion>
+                                </div>
+                            )}
+
+                        </Card>
                     </TabPanel>
                 </TabView>
             </div>

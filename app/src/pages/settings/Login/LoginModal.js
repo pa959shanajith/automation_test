@@ -247,6 +247,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
     },[])
 
     const loginHandler = async() => {
+     let testrailLogin = true;
      if(checked){
             switch (selectedscreen.name) {
                 case 'Jira':
@@ -316,13 +317,16 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                     try {
                         setLoading('Updating...');
                         const data = await manageTestRailDetails(isEmpty ? "create" : "update", testRailLoginDetails);
-                        console.log("data", data);
                         setLoading(false);
-                        if (data.error) {
+                        if (data == 'Invalid Credentials' || data == 'Error:testrail Operations') {
                             toastError(data.error);
+                            testrailLogin = false
                             return;
+                        } else {
+                            toastSuccess(MSG.CUSTOM(`The Testrail configuration was successfully created`, VARIANT.SUCCESS));
+                            testrailLogin = true;
+                            showCard2();
                         }
-                        toastSuccess(MSG.CUSTOM(`The Testrail configuration was successfully created`, VARIANT.SUCCESS));
                         return;
                     } catch (e) {
                         toastError(MSG.SETTINGS.ERR_ENTER_VALID_CRED);
@@ -333,7 +337,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
             }
         }
 
-        showCard2();
+        testrailLogin && showCard2();
         setDisableFields(false);
     }
 
