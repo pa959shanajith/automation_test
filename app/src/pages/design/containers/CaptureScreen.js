@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful,setUpdateScreenModuleId, setChangeScreen} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -1851,8 +1851,7 @@ const confirmScreenChange = () => {
 
         const res = await scrapeApi.updateScreen_ICE(params);
         if(res === 'fail') {
-          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
-        }
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 5000 });
           var req={
