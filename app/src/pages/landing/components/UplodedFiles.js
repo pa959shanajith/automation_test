@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { useSelector } from 'react-redux';
 
 const UplodedFiles = ({ userData }) => {
   const [sortedData, setSortedData] = useState([]);
@@ -22,11 +23,20 @@ const UplodedFiles = ({ userData }) => {
     return timestamp.toLocaleDateString('en-GB', options);
   };
 
+  const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  let defaultselectedProject = reduxDefaultselectedProject;
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+      defaultselectedProject = JSON.parse(localStorageDefaultProject);
+  }
+  const filteredData = sortedData.filter((rowData) => rowData.project === defaultselectedProject.projectName);
+
+
   return (
     <>
       <div>
         <div >
-          <DataTable value={sortedData} className="p-datatable-custom">
+          <DataTable value={filteredData} className="p-datatable-custom">
                       <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} />
             <Column field="version" header="Version" />
             <Column field="uploadedTime" header="Upload Date" body={(rowData) => formatDate(rowData.uploadedTime)} />

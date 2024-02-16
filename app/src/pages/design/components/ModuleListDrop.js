@@ -1092,7 +1092,7 @@ setPreventDefaultModule(true);
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                                     if (!allModSelected) {
-                                        dispatch(selectedModulelist( moduleLists.filter(module=> module.type==='basic').map((modd) => modd._id) ))
+                                        dispatch(selectedModulelist( moduleLists?.filter(module=> module.type==='basic').map((modd) => modd._id) ))
                                     } else {
                                         dispatch(selectedModulelist([]) )
                                     }
@@ -1119,7 +1119,7 @@ setPreventDefaultModule(true);
                               </>
                               )
                         })} */}
-                  {moduleLists.map((e, i) => {
+                  {moduleLists?.map((e, i) => {
                     if (e.type === "basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase()) !== -1) || searchInpText === ""))
                       return (<>
                         {/* // <div key={i}>
@@ -1191,7 +1191,7 @@ setPreventDefaultModule(true);
                               </>
                               )
                         })} */}
-                  {moduleLists.map((e, i) => {
+                  {moduleLists?.map((e, i) => {
                     if (e.type === "endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase()) !== -1) || searchInpTextEnE === ""))
                       return (<>
 
