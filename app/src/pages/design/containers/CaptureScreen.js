@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful,setUpdateScreenModuleId} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful,setUpdateScreenModuleId, setChangeScreen} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -35,6 +35,7 @@ import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
+import NavigatetoCaptureDesign from './NavigatetoCaptureDesign';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -131,6 +132,9 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+  const [newCaptureScreen, setNewCaptureScreen] = useState([]);
+  const [visibleCaptureAndDesign, setVisibleCaptureAndDesign] = useState(false);
+
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
 
@@ -536,6 +540,10 @@ const elementTypeProp =(elementProperty) =>{
                 setCapturedDataToSave([...newScrapeList]);
                 viewString = newScrapeList;
               }
+            }
+            if(parentId !== null){
+              setCapturedDataToSave(newScrapeList);
+              viewString = newScrapeList;
             }
 
             setMainScrapedData(data);
@@ -1008,7 +1016,7 @@ else{
   const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
     if (mainScrapedData.reuse && !confirmed) {
-      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); handleDelete(null, true);}})
       return;
     }
     if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
@@ -1808,7 +1816,6 @@ const elementValuetitle=(rowdata)=>{
   setSelectedFolderValue(e.value)
   // const selectedFolderValue = e.value;
   // setSelectedScreen(selectedFolderValue);
-
   if(captureData.length >= 0){
     setScreenChange(true);
   }
@@ -1850,7 +1857,60 @@ const confirmScreenChange = () => {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
         else {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
-          dispatch(setUpdateScreenModuleId(res))
+          // setTimeout(() => {
+            // localStorage.setItem('updatedScreen',selectedFolderValue.id)
+            // dispatch(setChangeScreen({id:selectedFolderValue.id,index:props.fetchingDetails.childIndex}));
+          //   console.log("hi");
+          // }, 4000);
+          var req={
+            tab:"createdTab",
+            projectid:NameOfAppType.projectId,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:res
+          }
+          const dataScreen = await scrapeApi.getModules(req)
+          if(dataScreen.error)return;
+          else {
+            const screenData = getReqScreen (dataScreen)
+            function getReqScreen (data){
+              let sd = []
+              data.children.forEach((child)=>{
+                if(child._id === props.fetchingDetails["parent"]["_id"]){
+                  child.children.forEach((subChild)=>{
+                    if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                      if(subChild.children.length > 0){
+                         const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+                            return {
+                              ...item,
+                              parent:{...subChild,parent:{...child,parent:data}}
+                            }
+                         })}
+                         sd.push(newData);
+                      }
+                      else{
+                        sd.push({...subChild, parent:{...child,parent:data}})
+                      }
+                    }
+                  })
+                }
+              })
+              return sd;
+            }
+            dispatch(setUpdateScreenModuleId(res))
+            console.log(screenData);
+            props.setVisibleCaptureElement(false);
+            setTimeout(()=>{
+              setNewCaptureScreen(screenData);
+              setVisibleCaptureAndDesign(true);
+              props.setVisibleCaptureElement(true);
+              console.log("inside timer")
+            },3000)
+            
+            // dispatch(setChangeScreen(screenData));
+            // localStorage.setItem('updatedScreen',selectedFolderValue.id)
+          }
         }
         }
      catch (error) {
@@ -1870,11 +1930,13 @@ const screenOption = screenData?.map((folder) => ({
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
-  parent:folder.parent
+  parent:folder.parent,
+  title:folder.name
 }));
 
   return (
     <>
+    {newCaptureScreen.length > 0 && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign ? visibleCaptureAndDesign :props.visibleCaptureElement} setVisibleCaptureAndDesign={visibleCaptureAndDesign ? setVisibleCaptureAndDesign: props.setVisibleCaptureElement} setDesignClick={props.setDesignClick} fetchingDetails={newCaptureScreen[0]} testSuiteInUse={false} appType={typesOfAppType} impactAnalysisDone={{addedElement:false,addedTestStep:false}} testcaseDetailsAfterImpact={{}}  designClick={props.designClick}/>}
      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
@@ -2080,7 +2142,7 @@ const screenOption = screenData?.map((folder) => ({
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>

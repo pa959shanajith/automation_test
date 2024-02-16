@@ -1,4 +1,5 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import { useSelector, useDispatch } from "react-redux"
 import { Dialog } from "primereact/dialog";
 import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
@@ -15,6 +16,27 @@ function NavigatetoCaptureDesign(params) {
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [activeIndex, setActiveIndex] = useState(params.designClick?1:0);
+    // const changeScreenId = useSelector(state => state.design.changeScreen);
+
+    // let screenId = localStorage.getItem('updatedScreen');
+
+    // useEffect(()=>{
+    //     if(screenId || changeScreenId){
+    //         params.setVisibleCaptureAndDesign(true);
+    //         //         console.log("inside the capture screen",i)
+    //         params.setFetchingDetails(changeScreenId[0])
+    //         console.log("changes screen id")
+    //         // for(let i=0; i<params.dNodes.length; i++){
+    //         //     if(params.dNodes[i]._id === changeScreenId.id && params.dNodes[i].childIndex === changeScreenId.index){
+    //         //         params.setVisibleCaptureAndDesign(true);
+    //         //         console.log("inside the capture screen",i)
+    //         //         params.setFetchingDetails(params.dNodes[i])
+    //         //     }else{
+    //         //         console.log("outside");
+    //         //     }
+    //         // }
+    //     }
+    // },[screenId,changeScreenId])
 
     const tabChnage =(e) =>{
        if(!params.designClick){
@@ -50,7 +72,7 @@ function NavigatetoCaptureDesign(params) {
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse}/>
+                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick}/>
                     </div>  
                     :
                     <div>
