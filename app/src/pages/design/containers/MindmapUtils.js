@@ -260,7 +260,7 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                   parent: {
                     ...child.parent.data,
                     id: child.parent.id ? child.parent.id : parentId,
-                    parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
+                    parent: child.parent? child.parent.parent !== null? child.parent.parent.data:child.parent.data:null // Use the parent's ID as the unique identifier
                   }
                 };
           

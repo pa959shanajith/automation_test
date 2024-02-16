@@ -1046,7 +1046,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             dNodes[uNix] = new_obj_data_for_uNix
         } else {
             if (dNodes[pi].type === 'teststepsgroups') {
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent: { ...dNodes[pi].parent, children: [{ ...dNodes[pi].parent.children[0], children: [dNodes[uNix]] }, dNodes[uNix]] } };
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent: { ...dNodes[pi].parent, children: [{ ...dNodes[pi].parent.children[0], children: [dNodes[uNix]] }] } };
                 getChildUpdate(dNodes, newObject)
                 const new_obj_data_for_uNix = newObject.children[0]
                 dNodes[uNix] = new_obj_data_for_uNix
@@ -1228,16 +1228,18 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
                 if (child.children.length > 0) {
                     if (child.children[0].id === dNodes[sid].id) {
                         if (child.children.length > 0) {
-                            child.children = child.children[0].children;
+                            child.children = child.children[0].children !== null?child.children[0].children:[];
                             if (child.parent.children.length > 1) {
-                                child.parent.children = [child]
+                                child.parent.children = child !== null?[child]:[]
                             } else {
-                                child.parent.children[0].children = child.children
+                                child.parent.children[0].children = child.children !== null?child.children:[]
                             }
                         } else {
                             child.children = [];
                             child.parent.children[0].children = [];
                         }
+                    }else if(child.children.length>0 && child.children !== null && child.id === dNodes[sid].id){
+                        child.children = dNodes[sid].children !=null?dNodes[sid].children:[]
                     }
                 }
                 if (child.children && child.children.length > 0) {
@@ -1623,7 +1625,7 @@ export function restructureData(data) {
                     });
                 }
                 // Recursively process nested "teststepsgroups"
-                teststepsgroup.children.forEach(moveParentData);
+                teststepsgroup.children?.forEach(moveParentData);
             }
         }
 
@@ -2073,13 +2075,13 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 getChildUpdate(dNodes, newObject)
                 dNodes[pi] = newObject;
             }else if(dNodes[pi].type === 'teststepsgroups'){
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
-                getChildUpdate(dNodes, newObject)
-                dNodes[pi] = newObject;
+                const newObject_1 = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, parent:dNodes[pi].parent.parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObject_1)
+                dNodes[pi] = newObject_1;
             }else{
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
-                getChildUpdate(dNodes, newObject)
-                dNodes[pi] = newObject;
+                const newObject_2 = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObject_2)
+                dNodes[pi] = newObject_2;
             }
 
         }

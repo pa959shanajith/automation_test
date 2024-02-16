@@ -58,13 +58,18 @@ const initialState = {
   selectedScreenOfStepSlice: [],
   oldModuleForReset: "",
   currentModuleId: "",
-  currentid: ""
+  currentid: "",
+  isCreateProjectVisible: false,
+  updateScreenModuleId:""
 }
 
 export const designSlice = createSlice({
   name: 'design',
   initialState,
   reducers: {
+    isCreateProjectVisible: (state, action) => {
+      state.isCreateProjectVisible = action.payload
+    },
     projectList: (state, action) => {
       state.projectList = action.payload
     },
@@ -231,13 +236,16 @@ export const designSlice = createSlice({
     },
     selectedScreenOfStepSlice: (state, action) => {
       state.selectedScreenOfStepSlice = action.payload
+    },
+     setUpdateScreenModuleId:(state, action) =>{
+      state.updateScreenModuleId = action.payload
     }
 
   }
 })
 
 // Action creators are generated for each case reducer function
-export const { projectList, moduleList, screenData,
+export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedProj,
   SetCurrentModuleId,
   SetCurrentId,
@@ -275,6 +283,7 @@ export const { projectList, moduleList, screenData,
   TypeOfViewMap,
   SetOldModuleForReset,
   typeOfOprationInFolder,
-  selectedScreenOfStepSlice } = designSlice.actions
+  selectedScreenOfStepSlice,
+  setUpdateScreenModuleId } = designSlice.actions
 
 export default designSlice.reducer

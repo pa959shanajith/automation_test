@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful,setUpdateScreenModuleId} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -1809,7 +1809,7 @@ const elementValuetitle=(rowdata)=>{
   // const selectedFolderValue = e.value;
   // setSelectedScreen(selectedFolderValue);
 
-  if(captureData.length > 0){
+  if(captureData.length >= 0){
     setScreenChange(true);
   }
 
@@ -1831,18 +1831,42 @@ const elementValuetitle=(rowdata)=>{
 };
 
 const confirmScreenChange = () => {
-  // Proceed with screen change using selectedFolderValue from state
-  setSelectedScreen(selectedFolderValue);
-  setParentId(selectedFolderValue.id);
-  // fetchScrapeData();
-  setSaveDisable(false);
-  setElementRepo(true);
-  // Hide confirmation dialog
-  // setDisplayConfirmation(false);
+  (async () => {
+    try {
+        let params = {
+          param : "updateMindmapTestcaseScreen",
+          projectID :  NameOfAppType.projectId,
+          moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+          parent:props.fetchingDetails["parent"]["_id"],
+          currentScreen:parentData.id,
+          updateScreen:selectedFolderValue.id
+        }
+
+        const res = await scrapeApi.updateScreen_ICE(params);
+        if(res === 'fail') {
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
+        else if(res === "no orderlist present") {
+          setScreenData([]);
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+        else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
+          dispatch(setUpdateScreenModuleId(res))
+        }
+        }
+     catch (error) {
+        console.error('Error fetching User list:', error);
+    }
+})();
+
+  // setSelectedScreen(selectedFolderValue);
+  // setParentId(selectedFolderValue.id);
+  // // fetchScrapeData();
+  // setSaveDisable(false);
+  // setElementRepo(true);
 };
 
 const screenOption = screenData?.map((folder) => ({
-  label: folder.name,
+  label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
@@ -1856,7 +1880,7 @@ const screenOption = screenData?.map((folder) => ({
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       {showCaptureScreen ?
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         {
           typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
             <div className="capture_card_modal">
@@ -1864,13 +1888,13 @@ const screenOption = screenData?.map((folder) => ({
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen}/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -1980,7 +2004,7 @@ const screenOption = screenData?.map((folder) => ({
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleExportClick}>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2172,7 +2196,7 @@ const screenOption = screenData?.map((folder) => ({
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleExportClick}>
+                  <div className="capture_bottom_btn"  onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2255,7 +2279,7 @@ const screenOption = screenData?.map((folder) => ({
             <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
-                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} label="Add more" size='small' />
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
