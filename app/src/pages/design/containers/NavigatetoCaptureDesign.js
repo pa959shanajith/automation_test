@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
-import { useSelector, useDispatch } from "react-redux"
+import React, { useState } from "react";
+import { useDispatch } from "react-redux"
 import { Dialog } from "primereact/dialog";
 import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/NavigatetoCaptureDesign.scss'
+import { setUpdateScreenModuleId } from "../designSlice";
 
 
 
@@ -13,30 +14,11 @@ import '../styles/NavigatetoCaptureDesign.scss'
 
 
 function NavigatetoCaptureDesign(params) {
+    const dispatch = useDispatch();
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [activeIndex, setActiveIndex] = useState(params.designClick?1:0);
-    // const changeScreenId = useSelector(state => state.design.changeScreen);
-
-    // let screenId = localStorage.getItem('updatedScreen');
-
-    // useEffect(()=>{
-    //     if(screenId || changeScreenId){
-    //         params.setVisibleCaptureAndDesign(true);
-    //         //         console.log("inside the capture screen",i)
-    //         params.setFetchingDetails(changeScreenId[0])
-    //         console.log("changes screen id")
-    //         // for(let i=0; i<params.dNodes.length; i++){
-    //         //     if(params.dNodes[i]._id === changeScreenId.id && params.dNodes[i].childIndex === changeScreenId.index){
-    //         //         params.setVisibleCaptureAndDesign(true);
-    //         //         console.log("inside the capture screen",i)
-    //         //         params.setFetchingDetails(params.dNodes[i])
-    //         //     }else{
-    //         //         console.log("outside");
-    //         //     }
-    //         // }
-    //     }
-    // },[screenId,changeScreenId])
+    const [moduleData, setModuleData] = useState({});
 
     const tabChnage =(e) =>{
        if(!params.designClick){
@@ -68,11 +50,11 @@ function NavigatetoCaptureDesign(params) {
     // }
     return(
         <div className="captureDesign_dialog_div">
-            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false)}}>
+            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData))}}>
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick}/>
+                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}/>
                     </div>  
                     :
                     <div>

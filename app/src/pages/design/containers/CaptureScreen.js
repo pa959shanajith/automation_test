@@ -35,7 +35,6 @@ import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
-import NavigatetoCaptureDesign from './NavigatetoCaptureDesign';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -132,8 +131,6 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
-  const [newCaptureScreen, setNewCaptureScreen] = useState([]);
-  const [visibleCaptureAndDesign, setVisibleCaptureAndDesign] = useState(false);
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -297,7 +294,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       return 0;
     }
     parentScreenId();
-  }, [])
+  }, [parentId])
 
 
   const onIncreaseScreen = () => {
@@ -520,7 +517,7 @@ const elementTypeProp =(elementProperty) =>{
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
-      let Id = parentId !== null?parentId:parentData.id
+      let Id = parentData.id
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
@@ -1823,7 +1820,7 @@ const elementValuetitle=(rowdata)=>{
   // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
   else{
   setSelectedScreen(e.value);
-  setParentId(e.value.id);
+  
   // fetchScrapeData();
   setSaveDisable(false);
   setElementRepo(true);
@@ -1857,11 +1854,6 @@ const confirmScreenChange = () => {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
         else {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
-          // setTimeout(() => {
-            // localStorage.setItem('updatedScreen',selectedFolderValue.id)
-            // dispatch(setChangeScreen({id:selectedFolderValue.id,index:props.fetchingDetails.childIndex}));
-          //   console.log("hi");
-          // }, 4000);
           var req={
             tab:"createdTab",
             projectid:NameOfAppType.projectId,
@@ -1873,7 +1865,7 @@ const confirmScreenChange = () => {
           const dataScreen = await scrapeApi.getModules(req)
           if(dataScreen.error)return;
           else {
-            const screenData = getReqScreen (dataScreen)
+            const screenData_1 = getReqScreen (dataScreen)
             function getReqScreen (data){
               let sd = []
               data.children.forEach((child)=>{
@@ -1890,7 +1882,12 @@ const confirmScreenChange = () => {
                          sd.push(newData);
                       }
                       else{
-                        sd.push({...subChild, parent:{...child,parent:data}})
+                        sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+                          return{
+                            ...data,parent:{...child,parent:data}
+                          }
+
+                        })}})
                       }
                     }
                   })
@@ -1898,18 +1895,11 @@ const confirmScreenChange = () => {
               })
               return sd;
             }
-            dispatch(setUpdateScreenModuleId(res))
-            console.log(screenData);
-            props.setVisibleCaptureElement(false);
-            setTimeout(()=>{
-              setNewCaptureScreen(screenData);
-              setVisibleCaptureAndDesign(true);
-              props.setVisibleCaptureElement(true);
-              console.log("inside timer")
-            },3000)
             
-            // dispatch(setChangeScreen(screenData));
-            // localStorage.setItem('updatedScreen',selectedFolderValue.id)
+            console.log(screenData_1);
+            props.setFetchingDetails(screenData_1[0])
+            props.setModuleData({id:res, key:uuid()})
+            setParentId(uuid());
           }
         }
         }
@@ -1917,12 +1907,6 @@ const confirmScreenChange = () => {
         console.error('Error fetching User list:', error);
     }
 })();
-
-  // setSelectedScreen(selectedFolderValue);
-  // setParentId(selectedFolderValue.id);
-  // // fetchScrapeData();
-  // setSaveDisable(false);
-  // setElementRepo(true);
 };
 
 const screenOption = screenData?.map((folder) => ({
@@ -1936,8 +1920,7 @@ const screenOption = screenData?.map((folder) => ({
 
   return (
     <>
-    {newCaptureScreen.length > 0 && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign ? visibleCaptureAndDesign :props.visibleCaptureElement} setVisibleCaptureAndDesign={visibleCaptureAndDesign ? setVisibleCaptureAndDesign: props.setVisibleCaptureElement} setDesignClick={props.setDesignClick} fetchingDetails={newCaptureScreen[0]} testSuiteInUse={false} appType={typesOfAppType} impactAnalysisDone={{addedElement:false,addedTestStep:false}} testcaseDetailsAfterImpact={{}}  designClick={props.designClick}/>}
-     {overlay && <ScreenOverlay content={overlay} />}
+      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
@@ -1956,7 +1939,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen}/></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen}/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}

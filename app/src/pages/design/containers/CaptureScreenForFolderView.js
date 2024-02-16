@@ -293,7 +293,7 @@ const CaptureModal = (props) => {
             return 0;
         }
         parentScreenId();
-    }, [])
+    }, [parentId])
 
 
     const onIncreaseScreen = () => {
@@ -509,7 +509,7 @@ const CaptureModal = (props) => {
             let viewString = capturedDataToSave;
             let haveItems = viewString.length !== 0;
             let newlyScrapeList = [];
-            let Id = parentId !== null?parentId:parentData.id
+            let Id = parentData.id
             // setCapturedDataToSave(viewString);
             // (type, screenId, projectId, testCaseId:optional)
             scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
@@ -1800,7 +1800,7 @@ const CaptureModal = (props) => {
         // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
         else{
         setSelectedScreen(e.value);
-        setParentId(e.value.id);
+        // setParentId(e.value.id);
         // fetchScrapeData();
         setSaveDisable(false);
         setElementRepo(true);
@@ -1815,14 +1815,78 @@ const CaptureModal = (props) => {
       };
       
       const confirmScreenChange = () => {
-        // Proceed with screen change using selectedFolderValue from state
-        setSelectedScreen(selectedFolderValue);
-        setParentId(selectedFolderValue.id);
-        // fetchScrapeData();
-        setSaveDisable(false);
-        setElementRepo(true);
-        // Hide confirmation dialog
-        // setDisplayConfirmation(false);
+        (async () => {
+          try {
+              let params = {
+                param : "updateMindmapTestcaseScreen",
+                projectID :  NameOfAppType.projectId,
+                moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+                parent:props.fetchingDetails["parent"]["_id"],
+                currentScreen:parentData.id,
+                updateScreen:selectedFolderValue.id
+              }
+      
+              const res = await scrapeApi.updateScreen_ICE(params);
+              if(res === 'fail') {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
+              else if(res === "no orderlist present") {
+                setScreenData([]);
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+              else {
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Refreshed Element Repsotory', life: 5000 });
+                var req={
+                  tab:"createdTab",
+                  projectid:NameOfAppType.projectId,
+                  version:0,
+                  cycId: null,
+                  modName:"",
+                  moduleid:res
+                }
+                const dataScreen = await scrapeApi.getModules(req)
+                if(dataScreen.error)return;
+                else {
+                  const screenData_1 = getReqScreen (dataScreen)
+                  function getReqScreen (data){
+                    let sd = []
+                    data.children.forEach((child)=>{
+                      if(child._id === props.fetchingDetails["parent"]["_id"]){
+                        child.children.forEach((subChild)=>{
+                          if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                            if(subChild.children.length > 0){
+                               const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+                                  return {
+                                    ...item,
+                                    parent:{...subChild,parent:{...child,parent:data}}
+                                  }
+                               })}
+                               sd.push(newData);
+                            }
+                            else{
+                              sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+                                return{
+                                  ...data,parent:{...child,parent:data}
+                                }
+      
+                              })}})
+                            }
+                          }
+                        })
+                      }
+                    })
+                    return sd;
+                  }
+                  
+                  console.log(screenData_1);
+                  props.setFetchingDetails(screenData_1[0])
+                  props.setModuleData({id:res, key:uuid()})
+                  setParentId(uuid());
+                }
+              }
+              }
+           catch (error) {
+              console.error('Error fetching User list:', error);
+          }
+      })();
       };
       
       const screenOption = screenData?.map((folder) => ({

@@ -59,8 +59,8 @@ const initialState = {
   oldModuleForReset: "",
   currentModuleId: "",
   currentid: "",
-  updateScreenModuleId:"",
-  changeScreen:false,
+  updateScreenModuleId:{},
+  changeScreen:{},
   isCreateProjectVisible: false,
 }
 
