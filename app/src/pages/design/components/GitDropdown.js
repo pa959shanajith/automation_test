@@ -57,7 +57,7 @@ const GitDropdown = (props) => {
 
   useEffect(() => {
     (async () => {
-      if(selectedImage=== "version_history" && visibleGitconfFormAfterCreatePrj === false){
+      if(selectedImage=== "version_history" ){
         const projectList = await fetchProjects({ readme: "projects" });
         setProjectListForCreateProject(projectList);
         const projectListForDropdown = [];
