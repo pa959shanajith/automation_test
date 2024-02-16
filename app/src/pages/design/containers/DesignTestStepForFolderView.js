@@ -100,7 +100,6 @@ const DesignModal = (props) => {
     const customKeyToast = useRef();
     let runClickAway = true;
     const [selectedType, setSelectedType] = useState("Specific");
-    const [checked, setChecked] = useState(false);
     const [AllOptions , setAlloptions] = useState('');
     const [isNameValid, setIsNameValid] = useState(false);
     const [isSpaceError, setIsSpaceError] = useState(false);
@@ -1529,7 +1528,6 @@ const DesignModal = (props) => {
         setCustomTooltip("");
         setLangSelect('javascript');
         setInputEditor('');
-        setChecked(false);
     }
 
     const createCustomeKeywordFooter = () => <>
@@ -1602,13 +1600,13 @@ const DesignModal = (props) => {
             </Dialog>
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
-            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setInputKeywordName(''); setCustomTooltip("");setChecked(false);setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
                 <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
                     <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
-                        <div className="flex flex-row gap-2 align-items-center">
+                        {/* <div className="flex flex-row gap-2 align-items-center">
                             <label htmlFor='isGeneric' className="pb-2 font-medium" style={{ marginTop: "0.3rem" }}>Type: </label><div>I want it to be Generic</div>
                             <Checkbox required checked={checked} value={"Generic"} onChange={(e) => { setChecked(e.checked); setSelectedType(e.value) }} />
-                        </div>
+                        </div> */}
                         <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
                             <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
