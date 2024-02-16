@@ -35,7 +35,7 @@ function DesignTestStepsGroups(params) {
                 <div className='designTestGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse}/>
+                    <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse} setFetchingDetails={params.setFetchingDetailsForGroup} setModuleData={setModuleData}/>
                     </div>  
                     :
                     <div>

@@ -337,7 +337,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                         parent: {
                             ...child.parent.data,
                             id: child.parent.id ? child.parent.id : parentId,
-                            parent: child.parent ? child.data.parent : null,
+                            parent: child.parent? child.parent.parent !== null? child.parent.parent.data:child.parent.data:null, // Use the parent's ID as the unique identifier
                             children: [{ ...child.data, id: child.id ? child.id : generateId(parentId, childIdx + 1) }] // Use the parent's ID as the unique identifier
                         }
                     };
@@ -1645,7 +1645,7 @@ export function transformDataFromTreetoJourney(data) {
                 for (let s1 = 0; s1 < newData.children[m].children[s].children.length; s1++) {
                     const newObject = {
                         ...newData.children[m].children[s].children[s1],
-                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m], id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
+                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m],parent:{...newData, id:m}, id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
                     };
 
                     // Make changes in the deep copy

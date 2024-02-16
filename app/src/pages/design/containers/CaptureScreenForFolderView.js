@@ -1874,7 +1874,7 @@ const CaptureModal = (props) => {
                   }
                   
                   console.log(screenData_1);
-                  props.setFetchingDetails(screenData_1[0])
+                  props.setFetchingDetails(screenData_1[0].children[0])
                   props.setModuleData({id:res, key:uuid()})
                   setParentId(uuid());
                 }
