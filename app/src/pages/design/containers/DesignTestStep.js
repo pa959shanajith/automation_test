@@ -106,7 +106,7 @@ const DesignModal = (props) => {
     const [customEdit , setCustomEdit] =useState(false);
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
-    console.log(customEdit,'customEdit');
+
     const handleAceEditor = (e) => {
         setInputEditor(e)
     }
@@ -1419,6 +1419,8 @@ const DesignModal = (props) => {
                                     setInputEditor={setInputEditor}
                                     setAlloptions={setAlloptions}
                                     setCustomEdit={setCustomEdit}
+                                    fetchData={props.fetchingDetails}
+                                    typesOfAppType={props.appType}
                                     />)
                                 } 
                             </ReactSortable>
