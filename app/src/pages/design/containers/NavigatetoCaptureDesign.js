@@ -1,9 +1,11 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux"
 import { Dialog } from "primereact/dialog";
 import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/NavigatetoCaptureDesign.scss'
+import { setUpdateScreenModuleId } from "../designSlice";
 
 
 
@@ -12,9 +14,11 @@ import '../styles/NavigatetoCaptureDesign.scss'
 
 
 function NavigatetoCaptureDesign(params) {
+    const dispatch = useDispatch();
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [activeIndex, setActiveIndex] = useState(params.designClick?1:0);
+    const [moduleData, setModuleData] = useState({});
 
     const tabChnage =(e) =>{
        if(!params.designClick){
@@ -46,11 +50,11 @@ function NavigatetoCaptureDesign(params) {
     // }
     return(
         <div className="captureDesign_dialog_div">
-            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false)}}>
+            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData))}}>
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse}/>
+                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}/>
                     </div>  
                     :
                     <div>

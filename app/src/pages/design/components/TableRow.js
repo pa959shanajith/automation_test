@@ -59,27 +59,30 @@ const TableRow = (props) => {
     let objList = props.objList;
     let draggable = props.draggable;
 
-    const { MenuList } = components;
+  const { MenuList } = components;
 
-    const hanldlecustomClick = (child) => {
-      setInputKeywordName(child.props.data.label);
-      setCustomTooltip(child.props.data.tooltip);
-      setLangSelect(child.props.data.language);
-      setInputEditor(child.props.data.isCode);
-    }
-    const CustomMenu = (value) => {
-      console.log(value,'value');
-      return (
-        <MenuList {...value}>
-          {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
-            <div key={index}>
+  const hanldlecustomClick = (child) => {
+    setInputKeywordName(child.props.data.label);
+    setCustomTooltip(child.props.data.tooltip);
+    setLangSelect(child.props.data.language);
+    setInputEditor(child.props.data.isCode);
+  }
+  const CustomMenu = (value) => {
+    console.log(value, 'value');
+    return (
+      <MenuList {...value} style={{ width: '100%' }}>
+        {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
+          <div key={index}>
             {child.props && child.props.data && child.props.data.isCode !== "" ? (
               <div className='optionstyle'>
-                {child.props.data.label && child.props.data.label.length > 27 ? (
-                  <div>{child.props.data.label.substring(0, 27)}....</div>
-                ) : (
-                  child
-                )}
+                <div style={{ width: '90%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {child}
+                </div>
+                {/* {child.props.data.label && child.props.data.label.length > 27 ? (
+                <div>{child.props.data.label.substring(0, 27)}....</div>
+              ) : (
+                child
+              )} */}
                 <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
                   onClick={() => {
                     props.setStepOfCustomKeyword(props.stepSelect.check[0]);
@@ -90,212 +93,248 @@ const TableRow = (props) => {
                 />
               </div>
             ) : (
-              child.props.data.label && child.props.data.label.length > 27 ? (
-                <div>{child.props.data.label.substring(0, 27)}....</div>
-              ) : (
-                child
-              )
+              // child.props.data.label && child.props.data.label.length > 27 ? (
+              //   <div>{child.props.data.label.substring(0, 27)}....</div>
+              // ) : (
+              //   child
+              // )
+              child
             )}
           </div>
-          ))}
-  
-          <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
-          </Button>
-        </MenuList >
-      );
-    };
-  
-    useEffect(()=>{
-        if (!focused){
-            setObjName(props.testCase.custname);
-            const caseData = props.getKeywords(props.testCase.custname);
-            setObjType(caseData.obType);
-            setKeyword(props.testCase.keywordVal);
-            setSelectedOptions({value:props.testCase.keywordVal, label:!props.arrow?props.testCase.keywordVal !== ''?(props.testCase.custname!=="OBJECT_DELETED"?(caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined?props.keywordData[caseData.obType][props.testCase.keywordVal]?.description:props.keywordData[caseData.obType][caseData.keywords[0]].description: props.testCase.keywordDescription): props.testCase.keywordVal):props.testCase.keywordVal:caseData.keywords[0]})
-            setObjetListOption({value: props.testCase.custname,label:props.testCase.custname === ""?caseData.obType === "defaultList"?"@Generic":caseData.obType === "defaultListMobility"?"@Generic":objList[0]:props.testCase.custname})
-            setInput(props.testCase.inputVal[0]);
-            setOutput(props.testCase.outputVal);
-            setInputPlaceholder(null);
-            setOutputPlaceholder(null);
-            setKeywordList(null);
-            setTcAppType(props.testCase.appType);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            objList = props.objList;
-            setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim()!==""));
-            setCommented(props.testCase.outputVal.slice(-2) === "##");
-            
-            let newTcDetails = props.testCase.addTestCaseDetailsInfo;
-            if (typeof newTcDetails !== "object" && newTcDetails !== "") newTcDetails = JSON.parse(newTcDetails);
-            setTCDetails(newTcDetails);
-        }
-    }, [props.rowChange, props.testCase]);
+        ))}
 
-    useEffect(()=>{
-        setChecked(props.stepSelect.check.includes(props.idx));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.stepSelect.check]);
-    useEffect(()=>{
-        if (props.edit){
-            if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)){
-                setFocused(true);
-                setEscapeFlag(false);
-                rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-                let caseData = null;
-                let placeholders = null;
+        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+        </Button>
+      </MenuList >
 
-                if (!props.testCase.custname || (props.testCase.custname !== "OBJECT_DELETED" && objList.includes(props.testCase.custname))){
-                    let obj = !props.testCase.custname ? objList[0] : props.testCase.custname;
-                    caseData = props.getKeywords(obj);
-                    let key = (!caseData.keywords.includes(props.testCase.keywordVal) || !props.testCase.custname) ? caseData.keywords[0] : props.testCase.keywordVal;
-                    placeholders = props.getRowPlaceholders(caseData.obType, key);
+      // <MenuList {...value}>
+      //   {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
+      //     <div key={index}>
+      //     {child.props && child.props.data && child.props.data.isCode !== "" ? (
+      //       <div className='optionstyle'>
+      //         {child.props.data.label && child.props.data.label.length > 27 ? (
+      //           <div>{child.props.data.label.substring(0, 27)}....</div>
+      //         ) : (
+      //           child
+      //         )}
+      //         <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
+      //           onClick={() => {
+      //             props.setStepOfCustomKeyword(props.stepSelect.check[0]);
+      //             props.setCustomKeyWord(objType);
+      //             hanldlecustomClick(child, objType);
+      //             setCustomEdit(true);
+      //           }}
+      //         />
+      //       </div>
+      //     ) : (
+      //       child.props.data.label && child.props.data.label.length > 27 ? (
+      //         <div>{child.props.data.label.substring(0, 27)}....</div>
+      //       ) : (
+      //         child
+      //       )
+      //     )}
+      //   </div>
+      //   ))}
 
-                    setKeywordList(caseData.keywords);
-                    setObjType(caseData.obType);
-                    setOutputPlaceholder(placeholders.outputval);
-                    setInputPlaceholder(placeholders.inputval);
-                    setTcAppType(caseData.appType);
-                    setDisableStep(false);
-                } else setDisableStep(true);
-            }
-            else{
-                setFocused(false);
-                if (escapeFlag){
-                    setObjName(props.testCase.custname);
-                    setObjetListOption({value:props.testCase.custname,label:props.testCase.custname === ""? objList[0]:props.testCase.custname})
-                    setKeyword(props.testCase.keywordVal);
-                    setSelectedOptions({value:props.testCase.keywordVal, label:!props.arrow?props.testCase.keywordVal === '' ?
-                    props.getKeywords(props.testCase.custname).obType !== null?
-                    keywordList !== null?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords]?.description !== undefined?
-                    props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords].description:keywordList[0] :
-                    props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal]?.description:
-                    props.testCase.custname !== "OBJECT_DELETED"?props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description !== undefined?
-                    props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description:
-                    props.testCase.keywordVal:props.testCase.keywordVal:
-                    props.testCase.keywordVal:props.testCase.keywordVal})
-                    setInput(props.testCase.inputVal[0]);
-                    setOutput(props.testCase.outputVal);
-                }
-                else{
-                    props.setRowData({
-                        rowIdx: props.idx,
-                        operation: "row",
-                        objName: !objName ? objList[0] : objName,
-                        keyword: !keyword ? keywordList !== null?keywordList[0] : props.getKeywords(props.testCase.custname).keywords : keyword,
-                        inputVal: input,
-                        outputVal: output,
-                        appType: tcAppType
-                    });
-                    setEscapeFlag(true);
-                }
-            }
-            updateScrollBar();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.stepSelect.highlight, props.edit]);
+      //   <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+      //   </Button>
+      // </MenuList >
+    );
+  };
 
+  useEffect(() => {
+    if (!focused) {
+      setObjName(props.testCase.custname);
+      const caseData = props.getKeywords(props.testCase.custname);
+      setObjType(caseData.obType);
+      setKeyword(props.testCase.keywordVal);
+      setSelectedOptions({ value: props.testCase.keywordVal, label: !props.arrow ? props.testCase.keywordVal !== '' ? (props.testCase.custname !== "OBJECT_DELETED" ? (caseData.obType !== null ? props.keywordData[caseData.obType][caseData.keywords[0]].description !== undefined ? props.keywordData[caseData.obType][props.testCase.keywordVal]?.description : props.keywordData[caseData.obType][caseData.keywords[0]].description : props.testCase.keywordDescription) : props.testCase.keywordVal) : props.testCase.keywordVal : caseData.keywords[0] })
+      setObjetListOption({ value: props.testCase.custname, label: props.testCase.custname === "" ? caseData.obType === "defaultList" ? "@Generic" : caseData.obType === "defaultListMobility" ? "@Generic" : objList[0] : props.testCase.custname })
+      setInput(props.testCase.inputVal[0]);
+      setOutput(props.testCase.outputVal);
+      setInputPlaceholder(null);
+      setOutputPlaceholder(null);
+      setKeywordList(null);
+      setTcAppType(props.testCase.appType);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      objList = props.objList;
+      setRemarks(props.testCase.remarks.split(";").filter(remark => remark.trim() !== ""));
+      setCommented(props.testCase.outputVal.slice(-2) === "##");
+
+      let newTcDetails = props.testCase.addTestCaseDetailsInfo;
+      if (typeof newTcDetails !== "object" && newTcDetails !== "") newTcDetails = JSON.parse(newTcDetails);
+      setTCDetails(newTcDetails);
+    }
+  }, [props.rowChange, props.testCase]);
+
+  useEffect(() => {
+    setChecked(props.stepSelect.check.includes(props.idx));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(()=>{
-        if (props.stepSelect.highlight.includes(props.idx)) {
-            rowRef.current.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  }, [props.stepSelect.check]);
+  useEffect(() => {
+    if (props.edit) {
+      if (props.stepSelect.edit && props.stepSelect.highlight.includes(props.idx)) {
+        setFocused(true);
+        setEscapeFlag(false);
+        rowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        let caseData = null;
+        let placeholders = null;
+
+        if (!props.testCase.custname || (props.testCase.custname !== "OBJECT_DELETED" && objList.includes(props.testCase.custname))) {
+          let obj = !props.testCase.custname ? objList[0] : props.testCase.custname;
+          caseData = props.getKeywords(obj);
+          let key = (!caseData.keywords.includes(props.testCase.keywordVal) || !props.testCase.custname) ? caseData.keywords[0] : props.testCase.keywordVal;
+          placeholders = props.getRowPlaceholders(caseData.obType, key);
+
+          setKeywordList(caseData.keywords);
+          setObjType(caseData.obType);
+          setOutputPlaceholder(placeholders.outputval);
+          setInputPlaceholder(placeholders.inputval);
+          setTcAppType(caseData.appType);
+          setDisableStep(false);
+        } else setDisableStep(true);
+      }
+      else {
+        setFocused(false);
+        if (escapeFlag) {
+          setObjName(props.testCase.custname);
+          setObjetListOption({ value: props.testCase.custname, label: props.testCase.custname === "" ? objList[0] : props.testCase.custname })
+          setKeyword(props.testCase.keywordVal);
+          setSelectedOptions({
+            value: props.testCase.keywordVal, label: !props.arrow ? props.testCase.keywordVal === '' ?
+              props.getKeywords(props.testCase.custname).obType !== null ?
+                keywordList !== null ? props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords]?.description !== undefined ?
+                  props.keywordData[props.getKeywords(props.testCase.custname).obType][props.getKeywords(props.testCase.custname).keywords].description : keywordList[0] :
+                  props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal]?.description :
+                props.testCase.custname !== "OBJECT_DELETED" ? props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description !== undefined ?
+                  props.keywordData[props.getKeywords(props.testCase.custname).obType][props.testCase.keywordVal].description :
+                  props.testCase.keywordVal : props.testCase.keywordVal :
+              props.testCase.keywordVal : props.testCase.keywordVal
+          })
+          setInput(props.testCase.inputVal[0]);
+          setOutput(props.testCase.outputVal);
         }
         else {
-            setFocused(false);
+          props.setRowData({
+            rowIdx: props.idx,
+            operation: "row",
+            objName: !objName ? objList[0] : objName,
+            keyword: !keyword ? keywordList !== null ? keywordList[0] : props.getKeywords(props.testCase.custname).keywords : keyword,
+            inputVal: input,
+            outputVal: output,
+            appType: tcAppType
+          });
+          setEscapeFlag(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    });
-
-    const onBoxCheck = event => {
-        props.updateChecklist(props.idx,"check");
-        if (event.target.checked) setChecked(true);
-        else setChecked(false);
+      }
+      updateScrollBar();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.stepSelect.highlight, props.edit]);
 
-    const onRowClick = (event, msg) => {
-        props.updateChecklist(props.idx, "row", msg);
-        setChecked(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (props.stepSelect.highlight.includes(props.idx)) {
+      rowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-
-    const onObjSelect = event => {
-        const caseData = props.getKeywords(event.value)
-        const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
-        setInput("");
-        setOutput("");
-        setKeywordList(caseData.keywords);
-        setObjType(caseData.obType);
-        setOutputPlaceholder(placeholders.outputval);
-        setInputPlaceholder(placeholders.inputval);
-        setObjName(event.value)
-        submitData(event.value)
-        setKeyword(caseData.keywords[0]);
-        setSelectedOptions({value:caseData.keywords[0] ,label:!props.arrow?props.keywordData[caseData.obType][caseData.keywords[0]].description:caseData.keywords[0]})
-        setTcAppType(caseData.appType);
-        setDisableStep(false);
-        setObjetListOption(event)
-    };
-
-    const onKeySelect = event => {
-        if (event.value === 'show all') {
-            setEndIndex(keywordList.length);
-            setShowAllKeyword(true);
-        }else if (event.value == 'custom keyword') {
-          props.setStepOfCustomKeyword(props.stepSelect.check[0])
-          props.setCustomKeyWord(objType);
-        }
-        else{
-            const placeholders = props.getRowPlaceholders(objType, event.value);
-            setInput("");
-            setOutput("");
-            setOutputPlaceholder(placeholders.outputval);
-            setInputPlaceholder(placeholders.inputval);
-            setKeyword(event.value);
-            submitDatakeyword(event.value)
-            setAllKeyword(optionKeyword);
-            setSelectedOptions(event);
-            // testcaseDropdownRef.current.focus();
-            testcaseDropdownRef.current.blur();
-            document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
-        }
-    };
-    const submitData = (e) =>{
-        props.setRowData({rowIdx: props.idx, operation: "row", objName: e, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
-        // props.setStepSelect(oldState=>({...oldState, highlight: []}));
+    else {
+      setFocused(false);
     }
-    const submitDatakeyword = (e) =>{
-        props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: e, inputVal: input, outputVal: output, appType: tcAppType});
-        // props.setStepSelect(oldState=>({...oldState, highlight: []}));
-    }
-    const submitChanges = event => {
-        if (event.keyCode === 13){
-            props.setRowData({rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType});
-            props.setStepSelect(oldState=>({...oldState, highlight: []}));
-        }
-        else if (event.keyCode === 27) {
-            setEscapeFlag(true);
-            props.setStepSelect(oldState=>({...oldState, highlight: []}));
-        }
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  });
 
-    const onInputChange = event => setInput(event.target.value)
+  const onBoxCheck = event => {
+    props.updateChecklist(props.idx, "check");
+    if (event.target.checked) setChecked(true);
+    else setChecked(false);
+  }
 
-    const onOutputChange = event => setOutput(event.target.value)
-    const [startIndex, setStartIndex] = useState(0);
-    const [endIndex, setEndIndex] = useState(10);
-    const [showAll, setShowAll] = useState(false);
-    // const optionKeyword = keywordList?.slice(startIndex, endIndex + 1).map((keyword, i) => {
-    //     if (i < endIndex) {
-    //         return {
-    //             value: keyword,
-    //             label: props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? props.keywordData[objType][keyword].description : keyword,
-    //             tooltip: props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : keyword
-    //         }
-    //     }
-    //     else {
-    //         return {
-    //             value: "show all",
-    //             label: "Show All"
-    //         }
-    //     }});
-    const optionKeyword =
+  const onRowClick = (event, msg) => {
+    props.updateChecklist(props.idx, "row", msg);
+    setChecked(true);
+  }
+
+  const onObjSelect = event => {
+    const caseData = props.getKeywords(event.value)
+    const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+    setInput("");
+    setOutput("");
+    setKeywordList(caseData.keywords);
+    setObjType(caseData.obType);
+    setOutputPlaceholder(placeholders.outputval);
+    setInputPlaceholder(placeholders.inputval);
+    setObjName(event.value)
+    submitData(event.value)
+    setKeyword(caseData.keywords[0]);
+    setSelectedOptions({ value: caseData.keywords[0], label: !props.arrow ? props.keywordData[caseData.obType][caseData.keywords[0]].description : caseData.keywords[0] })
+    setTcAppType(caseData.appType);
+    setDisableStep(false);
+    setObjetListOption(event)
+  };
+
+  const onKeySelect = event => {
+    if (event.value === 'show all') {
+      setEndIndex(keywordList.length);
+      setShowAllKeyword(true);
+    } else if (event.value == 'custom keyword') {
+      props.setStepOfCustomKeyword(props.stepSelect.check[0])
+      props.setCustomKeyWord(objType);
+    }
+    else {
+      const placeholders = props.getRowPlaceholders(objType, event.value);
+      setInput("");
+      setOutput("");
+      setOutputPlaceholder(placeholders.outputval);
+      setInputPlaceholder(placeholders.inputval);
+      setKeyword(event.value);
+      submitDatakeyword(event.value)
+      setAllKeyword(optionKeyword);
+      setSelectedOptions(event);
+      // testcaseDropdownRef.current.focus();
+      testcaseDropdownRef.current.blur();
+      document.dispatchEvent(new KeyboardEvent('keypress', { key: " " }));
+    }
+  };
+  const submitData = (e) => {
+    props.setRowData({ rowIdx: props.idx, operation: "row", objName: e, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType });
+    // props.setStepSelect(oldState=>({...oldState, highlight: []}));
+  }
+  const submitDatakeyword = (e) => {
+    props.setRowData({ rowIdx: props.idx, operation: "row", objName: objName, keyword: e, inputVal: input, outputVal: output, appType: tcAppType });
+    // props.setStepSelect(oldState=>({...oldState, highlight: []}));
+  }
+  const submitChanges = event => {
+    if (event.keyCode === 13) {
+      props.setRowData({ rowIdx: props.idx, operation: "row", objName: objName, keyword: keyword, inputVal: input, outputVal: output, appType: tcAppType });
+      props.setStepSelect(oldState => ({ ...oldState, highlight: [] }));
+    }
+    else if (event.keyCode === 27) {
+      setEscapeFlag(true);
+      props.setStepSelect(oldState => ({ ...oldState, highlight: [] }));
+    }
+  }
+
+  const onInputChange = event => setInput(event.target.value)
+
+  const onOutputChange = event => setOutput(event.target.value)
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(10);
+  const [showAll, setShowAll] = useState(false);
+  // const optionKeyword = keywordList?.slice(startIndex, endIndex + 1).map((keyword, i) => {
+  //     if (i < endIndex) {
+  //         return {
+  //             value: keyword,
+  //             label: props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? props.keywordData[objType][keyword].description : keyword,
+  //             tooltip: props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : keyword
+  //         }
+  //     }
+  //     else {
+  //         return {
+  //             value: "show all",
+  //             label: "Show All"
+  //         }
+  //     }});
+  const optionKeyword =
     objName === "OBJECT_DELETED"
       ? keywordList?.slice(startIndex, endIndex + 1).map((keyword, i) => {
         const option = {
@@ -326,7 +365,7 @@ const TableRow = (props) => {
                 keyword !== "" &&
                 props.keywordData[objType][keyword] &&
                 props.keywordData[objType][keyword].description !== undefined
-                ? !props.arrow?props.keywordData[objType][keyword].description:keyword
+                ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
                 : keyword
               : "Show All",
           tooltip:
@@ -370,7 +409,7 @@ const TableRow = (props) => {
                 keyword !== "" &&
                 props.keywordData[objType][keyword] &&
                 props.keywordData[objType][keyword].description !== undefined
-                ? !props.arrow?props.keywordData[objType][keyword].description:keyword
+                ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
                 : keyword
               : "Show All",
           tooltip:
@@ -387,73 +426,72 @@ const TableRow = (props) => {
       }
       );
 
-      const handleOption = () => {
-        var optionKeyword_2 = keywordList?.slice(startIndex,keywordList.length).map((keyword, i) => {
-          const option = {
-            value: i < keywordList.length ? keyword : "show all",
-            isCode: i < keywordList.length
-              ? props.keywordData[objType] &&
-                keyword !== "" &&
-                props.keywordData[objType][keyword] &&
-                props.keywordData[objType][keyword].hasOwnProperty("code") === false
-                ? ""
-                : props.keywordData[objType][keyword].code
-              : "",
-            language: i < keywordList.length
-              ? props.keywordData[objType] &&
-                keyword !== "" &&
-                props.keywordData[objType][keyword] &&
-                props.keywordData[objType][keyword].hasOwnProperty("code") !== false
-                ? props.keywordData[objType][keyword].language
-                : ""
-              : "",
-            label: i < keywordList.length
-              ? props.keywordData[objType] &&
-                keyword !== "" &&
-                props.keywordData[objType][keyword] &&
-                props.keywordData[objType][keyword].description !== undefined
-                ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
-                : keyword
-              : "Show All",
-            tooltip: i < keywordList.length
-              ? props.keywordData[objType] &&
-                keyword !== "" &&
-                props.keywordData[objType][keyword] &&
-                props.keywordData[objType][keyword].tooltip !== undefined
-                ? props.keywordData[objType][keyword].tooltip
-                : keyword
-              : "",
-          };
-          return option;
-        });
-        setAlloptions(optionKeyword_2);
+  const handleOption = () => {
+    var optionKeyword_2 = keywordList?.slice(startIndex, keywordList.length).map((keyword, i) => {
+      const option = {
+        value: i < keywordList.length ? keyword : "show all",
+        isCode: i < keywordList.length
+          ? props.keywordData[objType] &&
+            keyword !== "" &&
+            props.keywordData[objType][keyword] &&
+            props.keywordData[objType][keyword].hasOwnProperty("code") === false
+            ? ""
+            : props.keywordData[objType][keyword].code
+          : "",
+        language: i < keywordList.length
+          ? props.keywordData[objType] &&
+            keyword !== "" &&
+            props.keywordData[objType][keyword] &&
+            props.keywordData[objType][keyword].hasOwnProperty("code") !== false
+            ? props.keywordData[objType][keyword].language
+            : ""
+          : "",
+        label: i < keywordList.length
+          ? props.keywordData[objType] &&
+            keyword !== "" &&
+            props.keywordData[objType][keyword] &&
+            props.keywordData[objType][keyword].description !== undefined
+            ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
+            : keyword
+          : "Show All",
+        tooltip: i < keywordList.length
+          ? props.keywordData[objType] &&
+            keyword !== "" &&
+            props.keywordData[objType][keyword] &&
+            props.keywordData[objType][keyword].tooltip !== undefined
+            ? props.keywordData[objType][keyword].tooltip
+            : keyword
+          : "",
       };
-      useEffect(() => {
-        handleOption();
-      }, [keywordList, props.keywordData, objType, props.arrow]);
-      
-// Depending on objname, optionKeyword will have different values.
+      return option;
+    });
+    setAlloptions(optionKeyword_2);
+  };
+  useEffect(() => {
+    handleOption();
+  }, [keywordList, props.keywordData, objType, props.arrow]);
 
-        const optionElement = objList?.map((object, i) => ({
-            key: i,
-            value: object,
-            label: object.length >= 50 ? object.substr(0, 44) + "..." : object,
-            disabled: objName === "OBJECT_DELETED" ? (object !== objName) : false
-          }));
-    const getOptionElementLable = (option) =>{
+  // Depending on objname, optionKeyword will have different values.
+  const optionElement = objList?.map((object, i) => ({
+    key: i,
+    value: object,
+    label: object.length >= 50 ? object.substr(0, 44) + "..." : object,
+    disabled: objName === "OBJECT_DELETED" ? (object !== objName) : false
+  }));
+  const getOptionElementLable = (option) =>{
+    return (
+        <div title={option.label}>
+        {option.label}
+      </div>
+    );
+}
+    const getOptionLabel = (option) => {
         return (
-            <div title={option.label}>
+          <div title={option.tooltip}>
             {option.label}
           </div>
         );
-    }
-        const getOptionLabel = (option) => {
-            return (
-              <div title={option.tooltip}>
-                {option.label}
-              </div>
-            );
-          };
+      };
 
           const customElementStyles = {
             menuList: (base) => ({
@@ -588,23 +626,23 @@ const TableRow = (props) => {
                             { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
                             { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</option>) }
                         </select> */}
-                </span>
-                <span className="input_col" >
-                    { focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ? 
-                                    <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} title={inputPlaceholder} disabled={disableStep}/> : 
-                                    <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} title={inputPlaceholder} disabled={disableStep}/> :
-                        <div className="d__row_text" title={input}>{draggable ? (input.length > 40 ? input.substr(0, 34) + "......" : input) : input}</div> }
-                </span>
-                <span className="output_col" >
-                    { focused ? <input className="col_out" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep}/> :
-                    <div className="d__row_text" title={output}>{output}</div> }
-                </span>
-            </div>
-            {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
-            <span className={"details_col"+(disableStep? " d__disabled_step":"")} onClick={(e)=>onRowClick(e, "noFocus")}>
-                <img src={"static/imgs/ic-details-" + ( TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail ) ? "active.png" : "inactive.png" : "inactive.png")} alt="details"  onClick={()=>{props.showDetailDialog(props.idx); setFocused(false)}} />
-            </span>
+          </span>
+          <span className="input_col" >
+            {focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ?
+              <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} title={inputPlaceholder} disabled={disableStep} /> :
+              <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} title={inputPlaceholder} disabled={disableStep} /> :
+              <div className="d__row_text" title={input}>{draggable ? (input.length > 40 ? input.substr(0, 34) + "......" : input) : input}</div>}
+          </span>
+          <span className="output_col" >
+            {focused ? <input className="col_out" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep} /> :
+              <div className="d__row_text" title={output}>{output}</div>}
+          </span>
         </div>
+        {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
+        <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
+          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+        </span>
+      </div>
         <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>
           <DataTable value={elementData}>
             <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />

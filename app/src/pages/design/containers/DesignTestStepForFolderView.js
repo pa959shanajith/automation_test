@@ -100,7 +100,6 @@ const DesignModal = (props) => {
     const customKeyToast = useRef();
     let runClickAway = true;
     const [selectedType, setSelectedType] = useState("Specific");
-    const [checked, setChecked] = useState(false);
     const [AllOptions , setAlloptions] = useState('');
     const [isNameValid, setIsNameValid] = useState(false);
     const [isSpaceError, setIsSpaceError] = useState(false);
@@ -1388,7 +1387,7 @@ const DesignModal = (props) => {
                     <span className="step_col d__step_head" ></span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keyword ":"Switch to new keyword"} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keyword ":"Switch to new keyword"}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1534,7 +1533,6 @@ const DesignModal = (props) => {
         setCustomTooltip("");
         setLangSelect('javascript');
         setInputEditor('');
-        setChecked(false);
         setCustomEdit(false);
     }
 
@@ -1608,13 +1606,13 @@ const DesignModal = (props) => {
             </Dialog>
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
-            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false); setInputKeywordName(''); setCustomTooltip("");setChecked(false);setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false); setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
                 <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
                     <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
-                        <div className="flex flex-row gap-2 align-items-center">
+                        {/* <div className="flex flex-row gap-2 align-items-center">
                             <label htmlFor='isGeneric' className="pb-2 font-medium" style={{ marginTop: "0.3rem" }}>Type: </label><div>I want it to be Generic</div>
                             <Checkbox required checked={checked} value={"Generic"} onChange={(e) => { setChecked(e.checked); setSelectedType(e.value) }} />
-                        </div>
+                        </div> */}
                         <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
                             <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
