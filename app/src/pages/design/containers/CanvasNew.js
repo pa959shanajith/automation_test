@@ -348,7 +348,7 @@ const CanvasNew = (props) => {
             }
             //load mindmap from data
             if(typeOfView === 'mindMapView'){
-              tree = generateTree(tree,types,{...count},props.verticalLayout,screenData)
+              tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
               journey = transformDataFromTreetoJourney(tree)
