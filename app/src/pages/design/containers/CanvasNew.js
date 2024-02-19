@@ -410,7 +410,7 @@ const CanvasNew = (props) => {
     };
 
     const agsLicense = {
-      value: userInfo?.licensedetails?.AGS === false,
+      value: userInfo?.licensedetails.AGS === false,
       msg: "You do not have access for Avo Genius"
     }
     const showToast = (severity, summary) => {

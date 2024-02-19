@@ -396,10 +396,6 @@ const CreateLanding = (props) => {
                                     disabled={editUser}
                                 />
                             </div>
-                           <div><label data-test="userTypeLabel" className="pb-2 font-medium" style={{ paddingLeft: '0.7rem', top:'9.5rem',position:'absolute',right:'16rem'}}>sofy API Key</label></div>                             
-                           <div className='SofyAPI'> 
-                                <InputText></InputText>
-                            </div>
 
                             <div className='flex flex-column'>
                                 <label htmlFor="email" className="pb-2 font-medium">Email Id <span style={{ color: "#d50000" }}>*</span></label>
