@@ -18,6 +18,8 @@ const AvoInput = ({
   setIsSpaceError,
   nameInput,
   isSpaceError,
+  customEdit,
+  setCustomEdit,
 }) => {
   const [touched, setTouched] = useState(false);
   const inputJsx = (
@@ -41,7 +43,7 @@ const AvoInput = ({
         <InputText
           {...(htmlFor && { id: htmlFor })}
           placeholder={placeholder}
-          className={`${(isNameValid || isSpaceError) && 'p-invalid'}`}
+          className={`${(isNameValid || isSpaceError)  && !customEdit && 'p-invalid'}`}
           value={inputTxt}
           onInput={(e) => {
             const inputValue = e.target.value;
@@ -64,7 +66,11 @@ const AvoInput = ({
           }else{
             setInputTxt(e.target.value);
           }
-          }}
+          if(customEdit){
+            setCustomEdit(false);
+          }
+          }
+        }
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />

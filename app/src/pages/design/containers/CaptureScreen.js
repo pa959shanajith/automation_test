@@ -131,6 +131,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
 
@@ -293,7 +294,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       return 0;
     }
     parentScreenId();
-  }, [])
+  }, [parentId])
 
 
   const onIncreaseScreen = () => {
@@ -516,7 +517,7 @@ const elementTypeProp =(elementProperty) =>{
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
-      let Id = parentId !== null?parentId:parentData.id
+      let Id = parentData.id
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
@@ -536,6 +537,10 @@ const elementTypeProp =(elementProperty) =>{
                 setCapturedDataToSave([...newScrapeList]);
                 viewString = newScrapeList;
               }
+            }
+            if(parentId !== null){
+              setCapturedDataToSave(newScrapeList);
+              viewString = newScrapeList;
             }
 
             setMainScrapedData(data);
@@ -1010,7 +1015,7 @@ else{
   const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
     if (mainScrapedData.reuse && !confirmed) {
-      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); handleDelete(null, true);}})
       return;
     }
     if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
@@ -1154,7 +1159,10 @@ else{
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <h4 className='dailog_header2'>
+          {/* <span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
+          <span className='screen__name'>{parentData.name}</span>
+          {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
           <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable}>Add more</button>
@@ -1712,7 +1720,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
         {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
@@ -1810,15 +1818,14 @@ const elementValuetitle=(rowdata)=>{
   setSelectedFolderValue(e.value)
   // const selectedFolderValue = e.value;
   // setSelectedScreen(selectedFolderValue);
-
-  if(captureData.length > 0){
+  if(captureData.length >= 0){
     setScreenChange(true);
   }
 
   // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
   else{
   setSelectedScreen(e.value);
-  setParentId(e.value.id);
+  
   // fetchScrapeData();
   setSaveDisable(false);
   setElementRepo(true);
@@ -1833,32 +1840,94 @@ const elementValuetitle=(rowdata)=>{
 };
 
 const confirmScreenChange = () => {
-  // Proceed with screen change using selectedFolderValue from state
-  setSelectedScreen(selectedFolderValue);
-  setParentId(selectedFolderValue.id);
-  // fetchScrapeData();
-  setSaveDisable(false);
-  setElementRepo(true);
-  // Hide confirmation dialog
-  // setDisplayConfirmation(false);
+  (async () => {
+    try {
+        let params = {
+          param : "updateMindmapTestcaseScreen",
+          projectID :  NameOfAppType.projectId,
+          moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+          parent:props.fetchingDetails["parent"]["_id"],
+          currentScreen:parentData.id,
+          updateScreen:selectedFolderValue.id
+        }
+
+        const res = await scrapeApi.updateScreen_ICE(params);
+        if(res === 'fail') {
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+        else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 5000 });
+          var req={
+            tab:"createdTab",
+            projectid:NameOfAppType.projectId,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:res
+          }
+          const dataScreen = await scrapeApi.getModules(req)
+          if(dataScreen.error)return;
+          else {
+            const screenData_1 = getReqScreen (dataScreen)
+            function getReqScreen (data){
+              let sd = []
+              data.children.forEach((child)=>{
+                if(child._id === props.fetchingDetails["parent"]["_id"]){
+                  child.children.forEach((subChild)=>{
+                    if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                      if(subChild.children.length > 0){
+                         const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+                            return {
+                              ...item,
+                              parent:{...subChild,parent:{...child,parent:data}}
+                            }
+                         })}
+                         sd.push(newData);
+                      }
+                      else{
+                        sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+                          return{
+                            ...data,parent:{...child,parent:data}
+                          }
+
+                        })}})
+                      }
+                    }
+                  })
+                }
+              })
+              return sd;
+            }
+            
+            console.log(screenData_1);
+            props.setFetchingDetails(screenData_1[0])
+            props.setModuleData({id:res, key:uuid()})
+            setParentId(uuid());
+          }
+        }
+        }
+     catch (error) {
+        console.error('Error fetching User list:', error);
+    }
+})();
 };
 
 const screenOption = screenData?.map((folder) => ({
-  label: folder.name,
+  label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
-  parent:folder.parent
+  parent:folder.parent,
+  title:folder.name
 }));
 
   return (
     <>
-     {overlay && <ScreenOverlay content={overlay} />}
+      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       {showCaptureScreen ?
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         {
           typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
             <div className="capture_card_modal">
@@ -1866,13 +1935,15 @@ const screenOption = screenData?.map((folder) => ({
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                    <div title={option.label}>{option.label}</div>
+                  )}/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -2058,7 +2129,7 @@ const screenOption = screenData?.map((folder) => ({
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select from Repository</h4>
+                  <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
@@ -2250,7 +2321,7 @@ const screenOption = screenData?.map((folder) => ({
         visible={screenChange}
         onHide={() => setScreenChange(false)}
         showHeader={false}
-        message="Changing the screen will erase the current data. Are you sure you want to proceed?"
+        message="Choosing the repository will overwrite the current data. Are you sure you want to proceed?"
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
 

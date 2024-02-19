@@ -19,7 +19,7 @@ import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { useNavigate } from 'react-router-dom';
-
+import { Tooltip } from 'primereact/tooltip';
 
 const ElementRepository = (props) => {
   const history = useNavigate();
@@ -64,6 +64,7 @@ const ElementRepository = (props) => {
   const [deleteScreens, setDeleteScreens] = useState(false);
   const [overlay, setOverlay] = useState(null);
   const [screenRename,SetScreenRename] =  useState("");
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -198,12 +199,15 @@ const ElementRepository = (props) => {
     // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
-        <div className={`flex flex-row name__ellipsis ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
-          {rowData.custname}
-          {uniqueArray.map((item)=>(
-            item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
-          ))}
-        </div>
+        <div className='flex justify-content-between'>
+          <div className={`flex flex-row ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
+          </div>
+          <div>{uniqueArray.map((item)=>(
+              item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
+            ))}
+          </div>
+      </div>
       </>
     );
   };
@@ -278,6 +282,11 @@ const handleAccordionNameEdit = (index,e) => {
 }
 
 const handleChangeScreenName=(index,e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
   SetScreenRename(e.target.value)
   const updatedScreenData = [...screenData];
   updatedScreenData[index].name = e.target.value;
@@ -300,6 +309,7 @@ const handleChangeScreenName=(index,e)=>{
                  src="static/imgs/paste_icon.svg"
                 />,
           command: () => pasteRow(accordionId),
+          disabled: (copiedRow === null)
         },
       ]);
     } else {
@@ -316,6 +326,7 @@ const handleChangeScreenName=(index,e)=>{
                   src="static/imgs/paste_icon.svg"
                 />,
           command: () => pasteRow(accordionId),
+          disabled: (copiedRow === null)
         },
       ]);
     }
@@ -329,6 +340,66 @@ const handleChangeScreenName=(index,e)=>{
     setShowCaptureElement(true);
   };
 
+  const saveElementProperties = () => {
+    let actualXpath = selectedCapturedElement && Array.isArray(selectedCapturedElement) ? selectedCapturedElement[0].xpath.split(';') : selectedCapturedElement?.xpath.split(';');
+    let arr = elementValues.map(element => (
+      (element.value === 'None') ? { ...element, value: "null" } : element
+    ))
+    let obj = arr.reduce((obj, item) => ({ ...obj, [item.key]: item.value }), {});
+    let newIdentifierList = arr.map(element => (
+      { id: element.id, identifier: element.identifier }
+    )).map((element, idx) => {
+      element.id = idx + 1
+      return element
+    })
+
+
+    let finalXPath = `${obj.xpath};${obj.id};${obj.rxpath};${obj.name};${actualXpath[4]};${obj.classname};${actualXpath[6]};${actualXpath[7]};${actualXpath[8]};${actualXpath[9]};${obj.label};${obj.href};${obj.cssselector}`
+    console.log(finalXPath)
+    let params = {
+      'objectId':selectedCapturedElement && Array.isArray(selectedCapturedElement) ? selectedCapturedElement[0]["_id"]:selectedCapturedElement["_id"],
+      'identifiers': newIdentifierList,
+      'xpath': finalXPath,
+      'param': 'updatedProperties',
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+
+      // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+      .then(response => {
+        console.log(response)
+        if (response == "Success") {
+          setElementPropertiesUpdated(true)
+          setElementProperties(false)
+          setScreenId(true);
+
+          // setMsg(MSG.SCRAPE.SUCC_OBJ_PROPERTIES);
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element properties updated successfully', life: 6000 });
+
+
+          // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+
+        }
+      })
+      .catch(error => {
+        console.log(error)
+
+        // setMsg("Some Error occured while updating element properties.");
+        // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+      }
+      )
+      setSelectedCapturedElement([])
+  }
+
+  const footerContent = (
+    <div>
+      <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
+      <Button label="Cancel" onClick={() => { setElementProperties(false);setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
+    </div>
+  )
+
   const onCellEditCompleteElementProperties = (e) => {
     const { key, value } = e.newRowData;
     const elementVals = [...elementValues]
@@ -337,9 +408,9 @@ const handleChangeScreenName=(index,e)=>{
     elementVals.find(v => v.key === key).value = value;
 
   };
-  // const textEditor = (options) => {
-  //   return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-  // };
+  const textEditor = (options) => {
+    return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  };
 
 
   const onRowReorder = (e) => {
@@ -815,7 +886,8 @@ const deleteScreen = (index, screenDetails)=>{
         <p className="not_captured_message">No Element Repository yet</p>
         <Button label='Create Repository' onClick={handleAddAccordion} />
         </div>)
-      :<Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>}
+      :<><Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
+      <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip></>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
         {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={
@@ -869,7 +941,16 @@ const deleteScreen = (index, screenDetails)=>{
               onSelectionChange={onRowClick}
             >
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
-              editor={(options) => cellEditor(options)}
+              editor={(options) => {
+                if (!options.rowData || Object.keys(options.rowData).length === 0) {
+                return null;
+              } 
+              else {
+                return (
+                  cellEditor(options)
+                );
+              }
+                }}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}></Column>
               <Column field="tag" header="Element Property" body={(rowData) => rowData?.tag?.includes("iris")? elementTypeProp(rowData.tag.split(";")[1]): rowData?.tag ? elementTypeProp(rowData.tag):""}></Column>
@@ -912,14 +993,14 @@ const deleteScreen = (index, screenDetails)=>{
               }} visibleCaptureElement={showCaptureElement} setVisibleCaptureElement={setShowCaptureElement}/>}
       <ContextMenu style={{height: '5.5rem'}} ref={contextMenuRef} model={contextMenuModel} />
       {"Web"?
-        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)}>
+        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
           <div className="card">
             <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
               <Column rowReorder style={{ width: '3rem' }} />
               <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
               {/* <column ></column> */}
               <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-              <Column field="value" header="Value" onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
             </DataTable>
           </div>
         </Dialog>: null }

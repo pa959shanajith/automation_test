@@ -1,4 +1,5 @@
 .gitVersion_dialog {
+  
   .label-cls {
     width: 150px;
 
@@ -47,12 +48,23 @@
     font-weight: 500;
   }
 
-  .GitVersion_cls .p-inputtext-sm {
-    height: 40px !important;
-    width: 100px !important;
+  .GitVersion_cls> .p-inputtext-sm {               
+    // height: 40px !important;
+    // width: 100px !important;
     display: flex;
     justify-content: center;
     align-items: center;
+    .p-dropdown-label {
+      display: flex !important;
+      align-items: center !important;
+    }
+  }
+  
+  .GitVersion_cls .p-dropdown {
+    .p-dropdown-label {
+      display: flex !important;
+      align-items: center !important;
+    }
   }
 
   .commit_testcase_list {
@@ -62,16 +74,24 @@
     border: 1.5px solid rgba(169, 175, 175, 0.267);
     border-radius: 0.3rem;
     padding: 0.5rem;
-    width: 20rem;
-    max-height: 18rem;
-    height: 18rem;
+    width: 50%;
+    max-height: 35vh;
+    height: 35vh;
   }
 
   .import_cls .p-datatable {
     border: ipx solid #dee2e6;
     margin: 20px 0px;
   }
-
+  .import_cls  .p-datatable .p-datatable-thead>tr>th {
+    text-align: center !important;
+  }
+  .import_cls  .p-datatable .p-datatable-thead>tr>th>.p-column-header-content {
+    justify-content: center;
+  }
+  .import_cls  .p-datatable .p-datatable-thead tr th .p-column-header-content .p-column-title {
+    margin-left: 0px !important;
+  }
   .import_cls .p-datatable .p-datatable-tbody>tr>td {
     text-align: center !important;
     border-width: 0.1px !important;
@@ -94,12 +114,45 @@
     padding: .75rem !important;
   }
 
+
 }
 
-.git-config-custom-dropdown-item{
+.git_icon_and_icon {
+  display: flex;
+  flex-direction: row;
+  height: 32px;
+  position: relative;
+  /* bottom: 0.3rem; */
+  align-items: center;
+  justify-content: center;
+  background-color: #ffff;
+  border-radius: 7px;
+  border: 1.5px solid lightgrey;
+  cursor: pointer;
+}
+
+.git-config-custom-dropdown-item {
   width: 11rem !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 11rem !important;
+}
+
+.createProject_GitConfig .p-inputtext-sm{
+  height: 40px !important;
+  width: 100px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .p-dropdown-label {
+    display: flex !important;
+    align-items: center !important;
+  }
+}
+
+.createProject_GitConfig{
+  .git_input {
+    margin-bottom: 16px;
+  }
 }
