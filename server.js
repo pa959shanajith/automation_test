@@ -161,8 +161,8 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-						}
-																		return next();
+}
+																					return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -287,6 +287,7 @@ if (cluster.isMaster) {
 		app.post('/saveSAP_ALMDetails_ICE',auth.protect, ALM.saveSAP_ALMDetails_ICE);
 		app.get('/fetchALM_Testcases',auth.protect,ALM.fetchALM_Testcases);
 		app.post('/viewALM_MappedList_ICE', auth.protect, ALM.viewALM_MappedList_ICE);
+		app.post('/sap-calm-testautomation/api/v1/testcases/execute1',ALM.Execute_Testcase_Run);
 		app.use(csrf({
 		cookie: true
 		}));

@@ -227,6 +227,10 @@ exports.fetchALM_Testcases = async function (req,res) {
         res.status(500).json({ code:'500', error: 'error while processing' });
     }
   };
+
+  exports.Execute_Testcase_Run = async function (req, res) {
+    console.log('Execute testcase API called here');
+  }
   
   exports.Execute_Testcase = async function (req, res) {
  
