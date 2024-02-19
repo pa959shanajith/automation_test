@@ -57,7 +57,7 @@ const reports = () => {
     ];
     const defaultSort = sort[0].name;
     const [selectedItem, setSelectedItem] = useState(defaultSort);
-    const filteredExecutionData = reportData.filter((data) => data);
+    const filteredExecutionData=reportData.length > 0 ? reportData.filter((report) =>report.configurename.toLowerCase().includes(searchReportData.toLowerCase())) : [];
     const [selectedProject, setSelectedProject] = useState(null);
 
     const selectProjects=useSelector((state) => state.landing.defaultSelectProject)
@@ -67,9 +67,9 @@ const reports = () => {
       const defaultProjectData = {
         ...localStorageDefaultProject, // Parse existing data from localStorage
         projectId: initProj,
-        projectName: projectList.find((project)=>project.id === initProj).name,
-        appType: project?.appTypeName[project?.projectId.indexOf(initProj)],
-        projectLevelRole: projectList.find((project)=>project.id === initProj).projectLevelRole
+        projectName: projectList.find((project)=>project.id === initProj)?.name,
+        appType: project?.appTypeName[project?.projectId?.indexOf(initProj)],
+        projectLevelRole: projectList.find((project)=>project.id === initProj)?.projectLevelRole
 
       };
       localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
