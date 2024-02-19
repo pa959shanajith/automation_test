@@ -1389,7 +1389,7 @@ const DesignModal = (props) => {
                     <span className="step_col d__step_head" ></span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keyword ":"Switch to new keyword"} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keyword ":"Switch to new keyword"}/></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
