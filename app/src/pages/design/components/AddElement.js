@@ -15,6 +15,8 @@ const AddElement = (props) => {
     const [addElementObjects, setAddElementObjects] = useState([]);
     const [addElementSelectObjectType, setAddElementSelectObjectType] = useState(null);
     const [addElementInputValue, setAddElementInputValue] = useState('');
+    const [addElementSave,setAddElementSave] = useState(false);
+    const [addElementObjectType,setAddElementObjectType] = useState(false);
 
     const objectTypes = [
         { value: "a", typeOfElement: "lnk", name: "Link" },
@@ -96,11 +98,13 @@ const AddElement = (props) => {
 
 
     const handleAddElementInputChange = (e) => {
-        setAddElementInputValue(e.target.value);
+        setAddElementInputValue(e.target.value.replace(/\s/g, ''));
+        setAddElementSave(true);
     };
 
     const handleAddElementDropdownChange = (e) => {
         setAddElementSelectObjectType(e.value);
+        setAddElementObjectType(true);
     };
 
     const handleAddElementAdd = () => {
@@ -116,8 +120,15 @@ const AddElement = (props) => {
         setAddElementObjects([...addElementObjects, updatedObjects]);
         setAddElementInputValue('');
         setAddElementSelectObjectType('');
+        setAddElementObjectType(false);
         setAddElementTempIdCounter(addElementTempIdCounter + 1);
     };
+
+    const deleteField = index => {
+        let updatedObjects = [...addElementObjects];
+        updatedObjects.splice(index, 1);
+        setAddElementObjects(updatedObjects);
+    }
 
     const handleAddElementClear = () => {
         setAddElementInputValue('');
@@ -128,7 +139,7 @@ const AddElement = (props) => {
     const addElementfooter = (
         <div className=''>
             <Button size="small" onClick={handleAddElementClear} text >Clear</Button> {/*className='add_object_clear'*/}
-            <Button size="small" onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
+            <Button size="small" disabled={addElementInputValue || !addElementSave} onClick={addElementSaveHandler}>Save</Button> {/*className='add_object_save' */}
         </div>
     )
     return (
@@ -158,6 +169,7 @@ const AddElement = (props) => {
                                     className='Element_name p-inputtext-sm mt-1'
                                     value={addElementInputValue}
                                     onChange={handleAddElementInputChange}
+                                    disabled={!addElementObjectType && !addElementInputValue}
                                     placeholder='Text Input'
                                     style={{ width: "15rem", marginLeft: "1.25rem" }} />
                             </div>
@@ -168,8 +180,8 @@ const AddElement = (props) => {
                     </Card>
                     <Card className='add_object__right' title="Added Elements">
                         {addElementObjects.map((value, index) => (
-                            <div key={index}>
-                                <p className="text__added__step">{value.objName}</p>
+                            <div key={index} style={{ overflow: 'auto', position: 'relative' }}>
+                                <span className="added__step"><p style={{whiteSpace: 'nowrap', overflow: 'hidden',textOverflow: 'ellipsis',width: '12rem'}}>{value.objName}<i className="pi pi-times cross_icon" onClick={()=>deleteField(index)}/></p></span>
                             </div>
                         ))}
                     </Card>

@@ -669,7 +669,9 @@ const CaptureModal = (props) => {
                 newOrderList.push(item.objectDetails.objId)
             }
         })
-        let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
+        let newCapturedDataToSave = capturedDataAfterSave.map(item => 
+            item.isCustom ? {custname:item.selectall,val:item.objectDetails.val,isCustom:item.isCustom,tag:item.objectProperty,tempOrderId:item.objectDetails.val,xpath:'',title:item.selectall} : item.objectDetails
+          );  
         setCaptureData(capturedDataAfterSave)
         setDeleted(deletedArr)
         setOrderList(newOrderList)
@@ -1143,7 +1145,7 @@ const CaptureModal = (props) => {
                 <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
                 </h4>
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn'>
-                    <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} >Add more</button>
+                    <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable}>Add more</button>
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1158,7 +1160,7 @@ const CaptureModal = (props) => {
             <div className='empty_msg flex flex-column align-items-center justify-content-center'>
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">Elements not captured</p>
-                {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} >Capture Elements</Button>}
+                {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
                 <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
             </div>
         </div>
@@ -1422,8 +1424,8 @@ const CaptureModal = (props) => {
             objects.objectProperty = element.tag;
             objects.screenshots = '';
             objects.actions = '';
-            objects.objectDetails = {};
-            objects.isCustom = true
+            objects.objectDetails = {val:element.val};
+            objects.isCustom = element.isCustom;
             addElementData.push(objects)
         })
         setCaptureData([...captureData, ...addElementData])
@@ -1965,7 +1967,7 @@ const CaptureModal = (props) => {
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleExportClick}>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2046,7 +2048,7 @@ const CaptureModal = (props) => {
             <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
-                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} label="Add more" size='small' />
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
