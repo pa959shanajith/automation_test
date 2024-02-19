@@ -229,7 +229,9 @@ exports.fetchALM_Testcases = async function (req,res) {
   };
 
   exports.Execute_Testcase_Run = async function (req, res) {
+
     console.log('Execute testcase API called here');
+    return res.status(202).send("Executed testcase");
   }
   
   exports.Execute_Testcase = async function (req, res) {
