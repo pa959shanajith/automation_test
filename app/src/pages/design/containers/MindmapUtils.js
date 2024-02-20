@@ -212,12 +212,12 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , dele
     }
 };
 
-export const generateTree = (tree,sections,count,verticalLayout,screenData,isAssign,cycleID) =>{
+export const generateTree = (tree,sections,count,verticalLayout,screenData,geniusMindmap,isAssign,cycleID) =>{
     unfoldtree(tree)
     var translate;
     var nodeDisplay = {}
     var linkDisplay = {}
-    var s = d3.select('.mp__canvas_svg');
+    var s = geniusMindmap?d3.select(`.mp__canvas_svg_genius`):d3.select(`.mp__canvas_svg`)
     let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     var typeNum = {
         'modules': 0,

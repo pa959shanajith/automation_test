@@ -40,7 +40,6 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
-// import ReactTooltip from 'react-tooltip';
 
 
 
@@ -353,7 +352,7 @@ const GeniusSap = (props) => {
     }
     else {
       showPopup(true)
-      setMessage('No fields for Data Parametrization...')
+      props.toastError(MSG.CUSTOM('No fields for Data Parametrization...', VARIANT.ERROR))
     }
   }
   const saveAsExcelFile = (buffer, fileName) => {
@@ -426,7 +425,7 @@ const GeniusSap = (props) => {
   const saveScreen = () => {
     setDataManipulated(true)
     console.log(selectedScreen)
-    const screenEditTable = [...tableAfterOperation]
+    const screenEditTable = [...tableDataNew]
     let objIndex = screenEditTable.findIndex(testCase => testCase.name === selectedScreen.name)
     screenEditTable[objIndex].name = singleData.name
     setTableAfterOperation(screenEditTable)
@@ -1373,8 +1372,16 @@ const onScreenNameChange = (e, name) => {
       screenData.testcases.forEach((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
-          testcase.inputVal[0] = `|${testcase.custname}|`
+          // let originalVal = testcase.inputVal[0]
+          // testcase.inputVal[0] = `|${testcase.custname}|`;
+          if (Array.isArray(testcase.inputVal)) {
+            let originalVal = testcase.inputVal[0];
+            testcase.inputVal[0] = `|${testcase.custname}|`;
+          } else {
+            // Handle the case where inputVal is not an array (optional)
+            // For example, you might want to convert it to an array:
+            testcase.inputVal = [`|${testcase.custname}|`];
+          }
   
   
   
@@ -1679,7 +1686,7 @@ const debugTestCases = selectedBrowserType => {
       accept={()=>{visibleScenario?setSelectedScenario(scenarioChosen): resetFields()}} 
       reject={()=>{}} 
       />
-      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={!showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
+      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
       {loading ? <ScreenOverlay content={loading} /> : null}
       <div className='create_testsuite'>
       <Dialog className='create_testsuite' header={'Create Test Suite'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '40vh',width: '25vw'}} 
@@ -2051,27 +2058,26 @@ const debugTestCases = selectedBrowserType => {
             </div>
             { startGenius && <Button label={startGenius} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/> }
             <div class="icon-bar">
-            {/* <ReactTooltip /> */}
           {/* <Button label="Save" icon="pi pi-times" className="p-button-text" onClick={() => {
             port.postMessage({ data: { "module": projectData.module, "project": projectData.project, "scenario": projectData.scenario, "appType": projectData.appType, "screens": tableDataNew } })
           }} /> */}
 
           <div disabled={tableDataNew.length <= 0} onClick={(e) => { if(tableDataNew.length <= 0) e.preventDefault() }}>
-            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
+            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} title={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
             {/* <span className= "bottombartooltips" data-pr-tooltip="Collapse All " data-pr-position="top"onClick={() => setExpandedRows(null)}>p<i className='pi pi-chevron-circle-right' style={{ fontSize: '18px' }} ></i></span> */}
           </div> {/** undo the last step */}
-          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
+          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} title={'Erase all data'} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
             <span><img src={`static/imgs/${startGenius || dataSaved ? "erase_all_disable" : "erase_all_enable"}.svg`}></img></span> 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
+          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "} title={'Run test steps'}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
 
-            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "}  data-pr-position="top" >
+            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "} title={'Save Data'} data-pr-position="top" >
               <span onClick={(e) => {if(startGenius || dataSaved) {e.preventDefault()} else {handleSaveMindmap()}}}><img src={`static/imgs/${startGenius || dataSaved ? "save_disable" : "save_enable"}.svg`}></img>
             </span>
 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
-          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
+          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} title={'Show Mindmap'} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
+          <div disabled={startGenius} className={`${(startGenius) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "}  title={'Data Parameterization'} data-pr-position="top" onClick={(e) => {if(startGenius){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
           {/* <div className="bottombartooltips" data-pr-tooltip={"Minimize"} data-pr-position="top" style={{ border: 'none' }} ></div> * maximize genius window */}
           {/* <div className="bottombartooltips" data-pr-tooltip="Close Genius App " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'30rem',cursor:'pointer' }} ><img src='static\imgs\close_icon.svg'></img></div>* close genius window */}
             </div>

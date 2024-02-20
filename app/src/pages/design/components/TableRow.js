@@ -6,6 +6,10 @@ import Select, { components } from "react-select";
 import { Icon } from '@mui/material';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { getScreens } from '../api';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -27,31 +31,33 @@ import { Button } from 'primereact/button';
 */
 
 const TableRow = (props) => {
-  const { setInputKeywordName, setCustomTooltip, setLangSelect, setInputEditor, setAlloptions, setCustomEdit } = props;
-  const rowRef = useRef(null);
-  const testcaseDropdownRef = useRef(null);
-  const [checked, setChecked] = useState(false);
-  const [objName, setObjName] = useState(null);
-  const [objType, setObjType] = useState(null);
-  const [keyword, setKeyword] = useState(null);
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [inputPlaceholder, setInputPlaceholder] = useState('');
-  const [outputPlaceholder, setOutputPlaceholder] = useState('');
-  const [keywordList, setKeywordList] = useState(null);
-  const [focused, setFocused] = useState(false);
-  const [commented, setCommented] = useState(false);
-  const [remarks, setRemarks] = useState([]);
-  const [TCDetails, setTCDetails] = useState("");
-  const [escapeFlag, setEscapeFlag] = useState(true);
-  const [tcAppType, setTcAppType] = useState("");
-  const [disableStep, setDisableStep] = useState(false);
-  const [allkeyword, setAllKeyword] = useState([]);
-  const [showAllKeyword, setShowAllKeyword] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState(null);
-  const [objetListOption, setObjetListOption] = useState(null);
-  let objList = props.objList;
-  let draggable = props.draggable;
+  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
+    const rowRef = useRef(null);
+    const testcaseDropdownRef = useRef(null);
+    const [checked, setChecked] = useState(false);
+    const [objName, setObjName] = useState(null);
+    const [objType, setObjType] = useState(null);
+    const [keyword, setKeyword] = useState(null);
+    const [input, setInput] = useState('');
+    const [output, setOutput] = useState('');
+    const [inputPlaceholder, setInputPlaceholder] = useState('');
+    const [outputPlaceholder, setOutputPlaceholder] = useState('');
+    const [keywordList, setKeywordList] = useState(null);
+    const [focused, setFocused] = useState(false);
+    const [commented, setCommented] = useState(false);
+    const [remarks, setRemarks] = useState([]);
+    const [TCDetails, setTCDetails] = useState("");
+    const [escapeFlag, setEscapeFlag] = useState(true);
+    const [tcAppType, setTcAppType] = useState("");
+    const [disableStep, setDisableStep] = useState(false);
+    const [allkeyword, setAllKeyword] = useState([]);
+    const [showAllKeyword, setShowAllKeyword] = useState(false);
+    const [selectedOptions, setSelectedOptions] = useState(null);
+    const [objetListOption,setObjetListOption] = useState(null);
+    const [elementData, setElementData] = useState([]);
+    const [visible, setVisible] = useState(false);
+    let objList = props.objList;
+    let draggable = props.draggable;
 
   const { MenuList } = components;
 
@@ -463,117 +469,157 @@ console.log(optionKeyword,'optionKeyword',keywordList);
     handleOption();
   }, [keywordList, props.keywordData, objType, props.arrow]);
 
-
   const optionElement = objList?.map((object, i) => ({
     key: i,
     value: object,
     label: object.length >= 50 ? object.substr(0, 44) + "..." : object,
     disabled: objName === "OBJECT_DELETED" ? (object !== objName) : false
   }));
-  const getOptionElementLable = (option) => {
+  const getOptionElementLable = (option) =>{
     return (
-      <div title={option.label}>
+        <div title={option.label}>
         {option.label}
       </div>
     );
-  }
-  const getOptionLabel = (option) => {
+}
+    const getOptionLabel = (option) => {
+        return (
+          <div title={option.tooltip}>
+            {option.label}
+          </div>
+        );
+      };
+
+          const customElementStyles = {
+            menuList: (base) => ({
+              ...base,
+              FontSize: 100,
+              fontSize: 14,
+              background: "white",
+              height:Object.keys(optionElement).length>6?200:110,
+            }),
+            menuPortal: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+             }),
+            menu: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+            }),
+            control: (base) => ({
+              ...base,
+              height: 25,
+              minHeight: 35,
+              width: 150
+            }),
+            option: (base) =>({
+                ...base,
+                padding: "3px",
+              fontFamily: "Open Sans",
+            })
+          };
+
+        const customStyles = {
+            menuList: (base) => ({
+              ...base,
+              FontSize: 100,
+              fontSize: 14,
+              background: "white",
+              height:Object.keys(optionKeyword).length>4?200:110,
+            }),
+            menuPortal: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+             }),
+            menu: (base) => ({ 
+                ...base, 
+                zIndex: 999999
+            }),
+            control: (base) => ({
+              ...base,
+              height: 25,
+              minHeight: 35,
+              width: "85%"
+            }),
+            option: (base, { data }) => ({
+                ...base,
+                padding: "3px",
+              fontFamily: "Open Sans",
+              background: data.isCode === "" ? '' : '#e3caff',
+              width: '100%'
+            })
+          };
+          const list = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp", "@Object", "@Word"]
+          const showCard = async(name) =>{
+            const defaultNames = { xpath: 'Absolute X-Path', id: 'ID Attribute', rxpath: 'Relative X path', name: 'Name Attribute', classname: 'Classname Attribute', cssselector: 'CSS Selector', href: 'Href Attribute', label: 'Label' }
+              const screenData = await getScreens(props.fetchData['projectID'])
+              if(screenData.error)return;
+              else{
+                const elementScreen = screenData.screenList.find((item)=>item._id === props.fetchData['parent']['_id'])
+                if (props.typesOfAppType==="Web" && !list.includes(name)){
+                  const objectData = elementScreen.related_dataobjects.find((sub)=>sub.custname === name)
+                  let element = objectData?.xpath?.split(';')
+                  if(element==undefined) return;
+                  if(props.typesOfAppType==="Web" && element[0] !== 'iris' ){
+                    let dataValue = []
+                    let elementFinalProperties = {
+                      xpath: (element[0] === "null" || element[0] === "" || element[0] === "undefined") ? 'None' : element[0],
+                      id: (element[1] === "null" || element[1] === "" || (element[1] === "undefined")) ? 'None' : element[1],
+                      rxpath: (element[2] === "null" || element[2] === "" || (element[2] === "undefined")) ? 'None' : element[2],
+                      name: (element[3] === "null" || element[3] === "" || (element[3] === "undefined")) ? 'None' : element[3],
+                      classname: (element[5] === "null" || element[5] === "" || (element[5] === "undefined")) ? 'None' : element[5],
+                      cssselector: (element[12] === "null" || element[12] === "" || (element[12] === "undefined")) ? 'None' : element[12],
+                      href: (element[11] === "null" || element[11] === "" || (element[11] === "undefined")) ? 'None' : element[11],
+                      label: (element[10] === "null" || element[10] === "" || (element[10] === "undefined")) ? 'None' : element[10],
+                    }
+
+                    Object.entries(elementFinalProperties).forEach(([key, value], index) => {
+                      let currindex = objectData.identifier.filter(element => element.identifier === key)
+                      dataValue.push({ id: currindex[0].id, identifier: key, key, value, name: defaultNames[key] })
+                    }
+                    )
+                    dataValue.sort((a, b) => a.id - b.id)
+                    setElementData(dataValue);
+                    setVisible(true)
+                  }
+                }
+              }
+          }
+          const elementValuetitle=(rowdata)=>{
+            return (
+              <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+            )
+           }
+
     return (
-      <div title={option.tooltip}>
-        {option.label}
-      </div>
-    );
-  };
-
-  const customElementStyles = {
-    menuList: (base) => ({
-      ...base,
-      FontSize: 100,
-      fontSize: 14,
-      background: "white",
-      height: Object.keys(optionElement).length > 6 ? 200 : 110,
-    }),
-    menuPortal: (base) => ({
-      ...base,
-      zIndex: 999999
-    }),
-    menu: (base) => ({
-      ...base,
-      zIndex: 999999
-    }),
-    control: (base) => ({
-      ...base,
-      height: 25,
-      minHeight: 35,
-      width: 150
-    }),
-    option: (base) => ({
-      ...base,
-      padding: "3px",
-      fontFamily: "Open Sans",
-    })
-  };
-
-  const customStyles = {
-    menuList: (base) => ({
-      ...base,
-      FontSize: 100,
-      fontSize: 14,
-      background: "white",
-      height: Object.keys(optionKeyword).length > 4 ? 200 : 110,
-    }),
-    menuPortal: (base) => ({
-      ...base,
-      zIndex: 999999
-    }),
-    menu: (base) => ({
-      ...base,
-      zIndex: 999999
-    }),
-    control: (base) => ({
-      ...base,
-      height: 25,
-      minHeight: 35,
-      width: "85%"
-    }),
-    option: (base, { data }) => ({
-      ...base,
-      padding: "3px",
-      fontFamily: "Open Sans",
-      background: data.isCode === "" ? '' : '#e3caff',
-      width: '100%'
-    })
-  };
-  return (
-    <>
-      <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable" : "")}>
-        <span className="step_col">{props.idx + 1}</span>
-        <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck} /></span>
-        <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
-          <span className="objname_col">
-            {focused ?
-              // <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
-              //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
-              //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
-              // </select>
-              <Select value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select' />
-              :
-              <div className="d__row_text" title={objName} >
-                <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? { overflow: 'hidden', display: 'inline-block', width: '6rem', textOverflow: 'ellipsis' } : null}>{objName}</span>
-                {(objName === "OBJECT_DELETED" && props.impactAnalysisDone?.addedElement) ? <span style={{ display: 'inline-block', marginRight: '6px' }}><Tag severity="danger" value="deleted"></Tag></span> : null}
-                {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{ display: 'inline-block', marginRight: '5px' }}><Tag severity="success" value="Newly Added"></Tag></span> : null}
-              </div>
-
-            }
-          </span>
-          <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} >
-            {focused ?
-              <>
-                <Select className='select-option' value={selectedOptions.label !== undefined ? selectedOptions.label !== '' ? selectedOptions.label !== selectedOptions.value ? selectedOptions : objType !== null ? { label: props.keywordData[objType][selectedOptions.value]?.description !== undefined ? !props.arrow ? props.keywordData[objType][selectedOptions.value]?.description : selectedOptions.value : keyword, value: props.keywordData[objType][selectedOptions.value]?.description !== undefined ? !props.arrow ? props.keywordData[objType][selectedOptions.value]?.description : selectedOptions.value : keyword } : selectedOptions : { label: !props.arrow ? props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description : props.getKeywords(props.testCase.custname).keywords[0], value: keyword } : { label: !props.arrow ? props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description : props.getKeywords(props.testCase.custname).keywords[0], value: keyword }} id="testcaseDropdownRefID" blurInputOnSelect={false} ref={testcaseDropdownRef} isDisabled={objName === "OBJECT_DELETED" ? true : optionKeyword === undefined ? true : false} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} isMulti={false} closeMenuOnSelect={false} components={{ MenuList: CustomMenu }} options={optionKeyword} menuPortalTarget={document.body} styles={customStyles} getOptionLabel={getOptionLabel} menuPlacement="auto" placeholder='Select' />
-              </> :
-              <div className="d__row_text" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""}>{props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? !props.arrow ? props.keywordData[objType][keyword].description : keyword : keyword}</div>}
-
-            {/* <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
+        <>
+        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+                <span className="step_col">{props.idx + 1}</span>
+                <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
+            <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
+                <span className="objname_col">
+                    { focused ? 
+                    // <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
+                    //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
+                    //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
+                    // </select>
+                    <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
+                     :
+                    <div className="d__row_text" title={objName} >
+                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onMouseEnter={()=>showCard(objName)} className='pi pi-eye'></span>}</>}</div>
+                        {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
+        {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
+                        </div>
+                    }
+                </span>
+                <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
+                    { focused ? 
+                    <>
+                        <Select className='select-option' value={selectedOptions.label !== undefined?selectedOptions.label !== ''?selectedOptions.label!==selectedOptions.value?selectedOptions:objType !== null? {label:props.keywordData[objType][selectedOptions.value]?.description!==undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword, value:props.keywordData[objType][selectedOptions.value]?.description!== undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword}:selectedOptions:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}} id="testcaseDropdownRefID" blurInputOnSelect={false} ref={testcaseDropdownRef} isDisabled={objName==="OBJECT_DELETED"?true:optionKeyword === undefined?true:false} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} isMulti={false} closeMenuOnSelect={false} components={{ MenuList: CustomMenu }} options={optionKeyword}  menuPortalTarget={document.body} styles={customStyles} getOptionLabel={getOptionLabel} menuPlacement="auto" placeholder='Select'/>                    
+                    </> :
+                        <div className="d__row_text" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""}>{props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].description !== undefined ? !props.arrow?props.keywordData[objType][keyword].description:keyword : keyword}</div>}
+                            
+                        {/* <select className="col_select" value={keyword} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} disabled={disableStep}>
                             { objName === "OBJECT_DELETED" && <option>{keyword}</option> }
                             { keywordList && keywordList.map((keyword, i) => <option key={i} value={keyword} title={props.keywordData[objType] && keyword != "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""}>{keyword}</option>) }
                         </select> */}
@@ -594,8 +640,15 @@ console.log(optionKeyword,'optionKeyword',keywordList);
           <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
         </span>
       </div>
-    </>
-  );
+        <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>
+          <DataTable value={elementData}>
+            <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+            <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+            <Column field="value" header="Value" style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+          </DataTable>
+        </Dialog>
+        </>
+    );
 };
 
 
