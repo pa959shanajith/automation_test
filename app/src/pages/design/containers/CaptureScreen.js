@@ -1020,33 +1020,33 @@ else{
   };
 
 
-  const handleDelete = (selectedElement,confirmed) => {
+  const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
     if (mainScrapedData.reuse && !confirmed) {
-      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(selectedElement) ;handleDelete(selectedElement, true);}})
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
       return;
     }
-    if(selectedElement.objectDetails.objId!== undefined && !selectedElement.objectDetails.duplicate){
+    if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
     let newOrderList = [];
 
-    // const capturedDataAfterDelete = captureData.filter(item =>
-    //   item.objectDetails.objId !== rowData.objectDetails.objId
-    // );
+    const capturedDataAfterDelete = captureData.filter(item =>
+      item.objectDetails.objId !== rowData.objectDetails.objId
+    );
 
-    // deletedArr.push(rowData.objectDetails.objId);
+    deletedArr.push(rowData.objectDetails.objId);
 
-    var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+    // var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
 
-      return !selectedElement.find(function (objFromB) {
-        if (item.objectDetails.val === objFromB.objectDetails.val) {
-          if(item.objectDetails.objId){
-            deletedArr.push(item.objectDetails.objId)}
-          return true
-        }
-      })
-    })
+    //   return !selectedElement.find(function (objFromB) {
+    //     if (item.objectDetails.val === objFromB.objectDetails.val) {
+    //       if(item.objectDetails.objId){
+    //         deletedArr.push(item.objectDetails.objId)}
+    //       return true
+    //     }
+    //   })
+    // })
 
     let notused = scrapeItemsL.filter(item => {
       if (deletedArr.includes(item.objectDetails.objId)) {
