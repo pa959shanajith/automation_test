@@ -275,7 +275,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (testrailProjects === "Invalid Session"){
             setToast('error','Error','Invalid session')
         }
-        else if (testrailProjects === "invalidcredentials") setToast('error','Error',"Invalid Credentials");
+        else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
         // else if (testrailProjects === "noprojectfound") setLoginError("Invalid credentials or no project found");
         // else if (testrailProjects === "invalidurl") setLoginError("Invalid URL");
         else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
@@ -575,7 +575,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 setToast("error", "Error", response.error);
             } else if (response === "scheduleModeOn")
                 setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-            else if (response.status == 201 || response.status == 200 || response.message.length > 0 || response === "success") {
+            else if (response.status == 201 || response.status == 200 || response.message.length > 0 || response == "success") {
                 setToast("success", "Success", 'Tests mapped successfully!');
             }
         }

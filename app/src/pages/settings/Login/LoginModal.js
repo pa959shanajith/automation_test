@@ -157,6 +157,10 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                 disbalebtn = AzureLoginDetails.url && AzureLoginDetails.username && AzureLoginDetails.password;
                 setDisableLoginBtn(!disbalebtn);
                 break;
+            case 'TestRail':
+                disbalebtn = testRailLoginDetails.url && testRailLoginDetails.username && testRailLoginDetails.apiKey;
+                setDisableLoginBtn(!disbalebtn);
+                break;
             case 'ALM':
                 break;
             case 'qTest':
@@ -226,10 +230,10 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
             if (testRailData === "empty") setMsg(testRailData);
             if (testRailData == {} || testRailData === "empty" || testRailData.error == "fail" ) {
+                setIsEmpty(true);
                 dispatchAction(testRailLogin({ fieldName: "url", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "username", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "apiKey", value: "" }));
-                setIsEmpty(true);
             }
             else {
                 dispatchAction(testRailLogin({ fieldName: "url", value: testRailData.url }));
@@ -316,7 +320,14 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                 case 'TestRail':
                     try {
                         setLoading('Updating...');
-                        const data = await manageTestRailDetails(isEmpty ? "create" : "update", testRailLoginDetails);
+                        const userObj = {
+                            "TestRailUrl": testRailLoginDetails.url,
+                            "TestRailUsername": testRailLoginDetails.username,
+                            "TestRailToken": testRailLoginDetails.apiKey,
+                            "action": isEmpty ? "create" : "update"
+                        };
+
+                        const data = await manageTestRailDetails(userObj);
                         setLoading(false);
                         if (data == 'Invalid Credentials' || data == 'Error:testrail Operations') {
                             toastError(data.error);

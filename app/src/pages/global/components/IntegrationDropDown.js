@@ -2,6 +2,7 @@ import React , { useState, useEffect} from 'react';
 import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
 import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR,getDetails_Azure,connectAzure_ICE } from '../../execute/api';
+import { getDetails_Testrail } from '../../settings/api';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
 
@@ -63,6 +64,9 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
             if(type === "Azure") data = await connectAzure_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password);
             if(type === "qTest") data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
+            if(type === "TestRail") {
+                data = await getDetails_Testrail(latestCredentialsData.url, latestCredentialsData.username, latestCredentialsData.apiKey);
+            };
             if(data.error){displayError(data.error);return;}    
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
             else if (data === "Invalid Session") setErrorMsg("Invalid Session");
@@ -196,6 +200,26 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                     setCredentials(credentialsData);
                     saveAction(true, credentialsData);
                 }
+            } else if(type == 'TestRail') {
+                const data = await getDetails_Testrail();
+                if (data.error) { setMsg(data.error); return; }
+                if(data !=="empty" || data!= {}){
+                    setIsEmpty(false);
+                    let credentialsData = {
+                        url: '',
+                        username: '',
+                        apiKey: ''
+                    };
+                    
+                    if(data.url) credentialsData['url'] = data.url;
+                    if(data.username) credentialsData['username'] = data.username;
+                    if(data.apiKey) credentialsData['apiKey'] = data.apiKey;
+                    
+                    setDefaultValues(credentialsData);
+                    // setZephAuthType(credentialsData.authtype);
+                    setCredentials(credentialsData);
+                    saveAction(true, credentialsData);
+                }
             } else {
                 const data = await getDetails_Azure()
                 if (data.error) { setMsg(data.error); return; }
@@ -230,7 +254,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
         }
     }
     useEffect(() => {
-        (type==="Zephyr" || type === "Azure") && getDetails(type);
+        (type==="Zephyr" || type === "Azure" || type === "TestRail") && getDetails(type);
     }, [])
     
 
@@ -281,6 +305,7 @@ const placeholder={
     ALM:{url:"Enter ALM Url" ,username:"Enter User Name", password:"Enter Password" },
     qTest:{url:"Enter qTest Url" ,username:"Enter User Name", password:"Enter Password" },
     Azure:{url:"Enter Azure Url" ,username:"Enter User Name", password:"Enter Password" },
+    TestRail:{url:"Enter TestRail Url" ,username:"Enter TestRail Username", password:"Enter TestRail API Keys" },
 }
 
 

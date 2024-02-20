@@ -371,14 +371,14 @@ export const manageZephyrDetails = async(action, userObj) => {
     }
 }
 
-export const manageTestRailDetails = async (action, userObj) => {
+export const manageTestRailDetails = async (data) => {
     try {
         const { data, status } = await axios(url + '/manageTestrailDetails', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            data: { action, user: userObj },
+            data,
             credentials: 'include'
         });
 
