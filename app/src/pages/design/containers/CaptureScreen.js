@@ -681,7 +681,9 @@ const elementTypeProp =(elementProperty) =>{
         newOrderList.push(item.objectDetails.objId)
       }
     })
-    let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
+    let newCapturedDataToSave = capturedDataAfterSave.map(item => 
+      item.isCustom ? {custname:item.selectall,val:item.objectDetails.val,isCustom:item.isCustom,tag:item.objectProperty,tempOrderId:item.objectDetails.val,xpath:'',title:item.selectall} : item.objectDetails
+    );
     setCaptureData(capturedDataAfterSave)
     setDeleted(deletedArr)
     setOrderList(newOrderList)
@@ -1442,8 +1444,8 @@ const footerSave = (
       objects.objectProperty = element.tag;
       objects.screenshots = '';
       objects.actions = '';
-      objects.objectDetails = {};
-      objects.isCustom=true
+      objects.objectDetails = {val:element.val};
+      objects.isCustom=element.isCustom;
       addElementData.push(objects)
     })
     setCaptureData([...captureData, ...addElementData])
@@ -2174,7 +2176,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                  <div className={`capture_bottom_btn ${(AddElement) ? "disabled" : ""}`} onClick={handleCompareClick}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
                     </div>
