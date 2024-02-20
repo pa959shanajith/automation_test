@@ -19,7 +19,6 @@ const AvoInput = ({
   nameInput,
   isSpaceError,
   customEdit,
-  setCustomEdit,
 }) => {
   const [touched, setTouched] = useState(false);
   const inputJsx = (
@@ -66,11 +65,9 @@ const AvoInput = ({
           }else{
             setInputTxt(e.target.value);
           }
-          if(customEdit){
-            setCustomEdit(false);
-          }
           }
         }
+        disabled={customEdit}
           onBlur={() => setTouched(true)}
           {...(required && { className: (touched && !inputTxt) ? 'p-invalid' : ''})}
         />
