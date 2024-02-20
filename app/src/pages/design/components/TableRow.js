@@ -185,7 +185,6 @@ const TableRow = (props) => {
           caseData = props.getKeywords(obj);
           let key = (!caseData.keywords.includes(props.testCase.keywordVal) || !props.testCase.custname) ? caseData.keywords[0] : props.testCase.keywordVal;
           placeholders = props.getRowPlaceholders(caseData.obType, key);
-
           setKeywordList(caseData.keywords);
           setObjType(caseData.obType);
           setOutputPlaceholder(placeholders.outputval);
@@ -229,10 +228,9 @@ const TableRow = (props) => {
       }
       updateScrollBar();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.stepSelect.highlight, props.edit]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  
   useEffect(() => {
     if (props.stepSelect.highlight.includes(props.idx)) {
       rowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -240,7 +238,6 @@ const TableRow = (props) => {
     else {
       setFocused(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   });
 
   const onBoxCheck = event => {
@@ -255,8 +252,9 @@ const TableRow = (props) => {
   }
 
   const onObjSelect = event => {
-    const caseData = props.getKeywords(event.value)
+    const caseData = props.getKeywords(event.value);
     const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
+    console.log(caseData,'caseData',event.value);
     setInput("");
     setOutput("");
     setKeywordList(caseData.keywords);
@@ -391,7 +389,7 @@ const TableRow = (props) => {
                 props.keywordData[objType][keyword].hasOwnProperty("code") ===
                 false
                 ? ""
-                : props.keywordData[objType][keyword].code
+                : props.keywordData[objType][keyword]?.code
               : "",
           language:
             i < endIndex
@@ -425,7 +423,7 @@ const TableRow = (props) => {
         return option;
       }
       );
-
+console.log(optionKeyword,'optionKeyword',keywordList);
   const handleOption = () => {
     var optionKeyword_2 = keywordList?.slice(startIndex, keywordList.length).map((keyword, i) => {
       const option = {
@@ -436,7 +434,7 @@ const TableRow = (props) => {
             props.keywordData[objType][keyword] &&
             props.keywordData[objType][keyword].hasOwnProperty("code") === false
             ? ""
-            : props.keywordData[objType][keyword].code
+            :props.keywordData[objType][keyword]?.code
           : "",
         language: i < keywordList.length
           ? props.keywordData[objType] &&
@@ -451,7 +449,7 @@ const TableRow = (props) => {
             keyword !== "" &&
             props.keywordData[objType][keyword] &&
             props.keywordData[objType][keyword].description !== undefined
-            ? !props.arrow ? props.keywordData[objType][keyword].description : keyword
+            ? !props.arrow ? props.keywordData[objType][keyword]?.description : keyword
             : keyword
           : "Show All",
         tooltip: i < keywordList.length
@@ -471,7 +469,6 @@ const TableRow = (props) => {
     handleOption();
   }, [keywordList, props.keywordData, objType, props.arrow]);
 
-  // Depending on objname, optionKeyword will have different values.
   const optionElement = objList?.map((object, i) => ({
     key: i,
     value: object,
