@@ -210,67 +210,64 @@ const SamlConf = () => {
   }
 
   return (
-    <div className="grid saml_container">
-
-      <div id="page-taskName">{ 
-        (samlEdit === false) ? <span>"Create SAML Configuration"</span>:
-          <div id="page-taskName flex flex-row">
-            <i className="m-2 pi pi-arrow-left" onClick={() =>  setSamlEdit(false)} />
+    <div className="saml_container">
+      <Toast ref={toast} position="bottom-center" />
+      <div className="saml_header">{
+        (samlEdit === false) ? <span>"Create SAML Configuration"</span> :
+          <div className='flex flex-row'>
+            <i className="m-2 pi pi-arrow-left" onClick={() => setSamlEdit(false)} />
             <span> "Edit SAML Configuration" </span>
           </div>
       }
       </div>
 
-      <div className="col-6 lg:col-6 xl:col-6 md:col-6 sm:col-12">
-        {(samlEdit === false) ? <AvoInput
-          autoComplete="off"
-          htmlFor="servername"
-          labelTxt="Server Name"
-          infoIcon="static/imgs/Info_icon.svg"
-          required={true}
-          placeholder="Enter Server Name"
-          inputTxt={name}
-          customClass={`inputColumn ${nameErrBorder ? 'p-invalid' : ''}`}
-          setInputTxt={updateSamlServerName}
-          inputType="lablelRowReqInfo"
-          charCheck={nameErrBorder}
-        /> : <>
-          <label className='serverNamelabel' style={{ paddingLeft: '0.7rem' }}>Server Name</label>
-          <Dropdown data-test="confServer"
-            id="confServer"
-            className='w-full p-inputtext-sm'
+      <div style={{ width: "40%" }}>
+
+        <div className="pb-3">
+          <label htmlFor="servername" className="label_text">Server Name</label>
+          {(samlEdit === false) ? <InputText
+            autoComplete="off"
+            placeholder="Enter Server Name"
             value={name}
-            options={selBox}
-            onChange={(e) => { setName(e.target.value); samlGetServerData(e.target.value); }}
-            // optionLabel="name"
-            // disabled={confExpired === server}
-            placeholder='Select server'
+            className={`w-full p-inputtext-sm ${nameErrBorder ? 'p-invalid' : ''}`}
+            onChange={(e) => updateSamlServerName(e.target.value)}
+            id="servername"
           />
-        </>}
-        <AvoInput
-          htmlFor="singleSign"
-          labelTxt="Single Sign On URL"
-          infoIcon="static/imgs/Info_icon.svg"
-          required={true}
-          placeholder="Enter Single Sign On URL"
-          inputTxt={url}
-          customClass={`inputColumn ${urlErrBorder ? 'p-invalid' : ''}`}
-          setInputTxt={setUrl}
-          inputType="lablelRowReqInfo"
-          charCheck={urlErrBorder}
-        />
-        <AvoInput
-          htmlFor="issueDetails"
-          labelTxt="Issue Details"
-          infoIcon="static/imgs/Info_icon.svg"
-          required={true}
-          placeholder="Enter Issue Details"
-          inputTxt={idp}
-          customClass={`inputColumn ${idpErrBorder ? 'p-invalid' : ''}`}
-          setInputTxt={setIdp}
-          inputType="lablelRowReqInfo"
-          charCheck={idpErrBorder}
-        />
+            :
+            <Dropdown data-test="confServer"
+              id="servername"
+              className='w-full p-inputtext-sm'
+              value={name}
+              options={selBox}
+              onChange={(e) => { setName(e.target.value); samlGetServerData(e.target.value); }}
+              // optionLabel="name"
+              // disabled={confExpired === server}
+              placeholder='Select server'
+            />}
+        </div>
+
+        <div className="pb-3">
+          <label htmlFor="singleSign" className="label_text">Single Sign On URL</label>
+          <InputText
+            id="singleSign"
+            placeholder="Enter Single Sign On URL"
+            value={url}
+            className={`w-full p-inputtext-sm ${urlErrBorder ? 'p-invalid' : ''}`}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+
+        <div className="pb-3">
+          <label htmlFor="issueDetails" className="label_text">Issue Details</label>
+          <InputText
+            id="issueDetails"
+            placeholder="Enter Issue Details"
+            value={idp}
+            className={`w-full p-inputtext-sm ${idpErrBorder ? 'p-invalid' : ''}`}
+            onChange={(e) => setIdp(e.target.value)}
+          />
+        </div>
+
         <div className="flex flex-row pb-3 align-items-center	">
           <FileUpload
             name="cert file"
