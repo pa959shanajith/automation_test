@@ -21,7 +21,7 @@ function DesignTestStepsGroups(params) {
     const headerTemplate = (
         <>
             <div>
-            <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
+                <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
                     <TabPanel className="tabPanelforHeader" header="Element Repository"/>
                     <TabPanel className="tabPanelforHeader" header="Design Test Steps"/>
