@@ -35,6 +35,7 @@ import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
+import { BlockUI } from 'primereact/blockui';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -48,6 +49,7 @@ const CaptureModal = (props) => {
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
   const [overlay, setOverlay] = useState(null);
+  const [blocked, setBlocked] = useState(false);
   const [isInsprintHovered, setIsInsprintHovered] = useState(false);
   const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
   const [isPdfHovered, setIsPdfHovered] = useState(false);
@@ -513,7 +515,7 @@ const elementTypeProp =(elementProperty) =>{
   const fetchScrapeData = () => {
     return new Promise((resolve, reject) => {
       setOverlay("Loading...");
-
+      setBlocked(true)
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
@@ -551,6 +553,7 @@ const elementTypeProp =(elementProperty) =>{
             setSaved({ flag: true });
             setOrderList(newOrderList);
             setOverlay("");
+            setBlocked(false)
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
             const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
@@ -589,6 +592,7 @@ const elementTypeProp =(elementProperty) =>{
               }));
             }
             setOverlay("");
+            setBlocked(false)
             dispatch(disableAppend(!haveItems));
             dispatch(disableAction(haveItems));
             dispatch(actionError([]));
@@ -598,6 +602,7 @@ const elementTypeProp =(elementProperty) =>{
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
             setOverlay("");
+            setBlocked(false)
             // screenshot
           }
           resolve("success");
@@ -848,6 +853,8 @@ const elementTypeProp =(elementProperty) =>{
       }
   } 
   else{
+    setOverlay("Loading...")
+    setBlocked(true)
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
@@ -863,6 +870,7 @@ const elementTypeProp =(elementProperty) =>{
       .then(data => {
         let err = null;
         setOverlay("");
+        setBlocked(false)
         setVisible(false);
         // ResetSession.end();
         if (data === "Invalid Session") return RedirectPage(history);
@@ -1012,22 +1020,33 @@ else{
   };
 
 
-  const handleDelete = (rowData,confirmed) => {
+  const handleDelete = (selectedElement,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
     if (mainScrapedData.reuse && !confirmed) {
-      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(selectedElement) ;handleDelete(selectedElement, true);}})
       return;
     }
-    if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
+    if(selectedElement.objectDetails.objId!== undefined && !selectedElement.objectDetails.duplicate){
     let deletedArr = [...deleted];
     let scrapeItemsL = [...captureData];
     let newOrderList = [];
 
-    const capturedDataAfterDelete = captureData.filter(item =>
-      item.objectDetails.objId !== rowData.objectDetails.objId
-    );
+    // const capturedDataAfterDelete = captureData.filter(item =>
+    //   item.objectDetails.objId !== rowData.objectDetails.objId
+    // );
 
-    deletedArr.push(rowData.objectDetails.objId);
+    // deletedArr.push(rowData.objectDetails.objId);
+
+    var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+
+      return !selectedElement.find(function (objFromB) {
+        if (item.objectDetails.val === objFromB.objectDetails.val) {
+          if(item.objectDetails.objId){
+            deletedArr.push(item.objectDetails.objId)}
+          return true
+        }
+      })
+    })
 
     let notused = scrapeItemsL.filter(item => {
       if (deletedArr.includes(item.objectDetails.objId)) {
@@ -1117,7 +1136,7 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(rowData)} />
+          className="delete__icon" onClick={() => handleDelete(selectedElement)} />
 
 
         
@@ -1164,10 +1183,11 @@ else{
           <span className='screen__name'>{parentData.name}</span>
           {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
+        
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable}>Add more</button>
+          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable && blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
-          <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
+          <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
         </div> : null
         }
@@ -1201,10 +1221,12 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
+    
     {(selectedCapturedElement.length>0 && (NameOfAppType.appType=="Web" || AppTypeElementIdentifier=="Web")) ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
+    <Button label='Save' onClick={onSave} disabled={saveDisable || blocked}></Button>
+    
     </>
   )
   
@@ -1927,9 +1949,14 @@ const screenOption = screenData?.map((folder) => ({
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
       {showCaptureScreen ?
+    
+      
+      
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
+        <BlockUI blocked={blocked} template={<div className='overlay__content'>{overlay}</div>}>
         {
           typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          
             <div className="capture_card_modal">
               {/* Select From Repository */}
               <div className="capture_card">
@@ -2066,6 +2093,7 @@ const screenOption = screenData?.map((folder) => ({
                 </div>
               </div>
             </div>
+          
             : null
         }
         <div className='card'>
@@ -2122,7 +2150,12 @@ const screenOption = screenData?.map((folder) => ({
             </div>
           </Dialog>
         </div>
-      </Dialog>:
+        </BlockUI>
+      </Dialog>
+      
+      
+            
+      :
       <div>
       {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
       {typesOfAppType != "Webservice" && !props.testSuiteInUse? <div className="capture_card_modal">
