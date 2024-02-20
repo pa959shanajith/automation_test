@@ -371,22 +371,23 @@ export const manageZephyrDetails = async(action, userObj) => {
     }
 }
 
-export const manageTestRailDetails = async (data) => {
+export const manageTestRailDetails = async (payload) => {
     try {
         const { data, status } = await axios(url + '/manageTestrailDetails', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',
             },
-            data,
+            data: payload,
             credentials: 'include'
         });
+
 
         if (status === 401 || data === "Invalid Session") {
             RedirectPage(navigate)
             return { error: MSG.GENERIC.INVALID_SESSION };
         }
-        else if (status === 200 && data !== "fail") {
+        else if (data == "success") {
             return data;
         }
     } catch (err) {

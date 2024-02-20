@@ -26,6 +26,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             alm: {url:"",username:"",password:""}, 
             qtest: {url:"",username:"",password:"",qteststeps:""}, 
             zephyr: {url:"",username:"",password:""},
+            testrail: {url:"", username:"", password:""},
             azure: {url:"",username:"",password:""},}
             setCredentialsExecution(integration)
 
@@ -43,13 +44,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 		} else if (type==="Zephyr" && latestCredentialsData.authtype==="token" && !latestCredentialsData.apitoken) {
             setAuthErrBor(true);
             setErrorMsg("Please "+placeholder[type].apitoken);
-        } else if (type!=="Zephyr" && !latestCredentialsData.url) {
+        } else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.url) {
             setUrlErrBor(true);
             setErrorMsg("Please "+placeholder[type].url);
-		} else if (type!=="Zephyr" && !latestCredentialsData.userName) {
+		} else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.userName) {
             setUserNameErrBor(true);
             setErrorMsg("Please "+placeholder[type].username);
-		} else if (type!=="Zephyr" && !latestCredentialsData.password) {
+		} else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.password) {
             setPassErrBor(true);
             setErrorMsg("Please "+placeholder[type].password);
 		} else if (appType !== "SAP" && browserTypeExe.length === 0) {
@@ -105,6 +106,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 						url: latestCredentialsData.url,
 						username: latestCredentialsData.userName,
                         password: latestCredentialsData.password
+					}
+                }
+                else if(type === "TestRail"){
+                    integration.testrail = {
+						url:latestCredentialsData.url,
+						username: latestCredentialsData.username,
+                        password: latestCredentialsData.apiKey,
 					}
                 }
                 setCredentialsExecution(integration)
@@ -214,7 +222,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                     if(data.url) credentialsData['url'] = data.url;
                     if(data.username) credentialsData['username'] = data.username;
                     if(data.apiKey) credentialsData['apiKey'] = data.apiKey;
-                    
+
                     setDefaultValues(credentialsData);
                     // setZephAuthType(credentialsData.authtype);
                     setCredentials(credentialsData);
@@ -254,7 +262,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
         }
     }
     useEffect(() => {
-        (type==="Zephyr" || type === "Azure" || type === "TestRail") && getDetails(type);
+        (type==="Zephyr" || type === "Azure" || type =="TestRail") && getDetails(type);
     }, [])
     
 
@@ -277,10 +285,10 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 </div>
                 </>
                 :null}
-                <p><input value={credentials.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{marginBottom:"1rem"}} /></p>
-                {(type==="Zephyr" && zephAuthType==="basic") || type!=="Zephyr"?
+                {type !== "TestRail" && <p><input value={credentials.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{marginBottom:"1rem"}} /></p>}
+                {(type==="Zephyr" && zephAuthType==="basic")?
                 <>
-                    <p className="halfWrap halfWrap-margin" ><input value={credentials.userName} onChange={(event)=>{setCredentials({url: credentials.url, userName: event.target.value, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{marginBottom:"1rem"}} /></p>
+                <p className="halfWrap halfWrap-margin" ><input value={credentials.userName} onChange={(event)=>{setCredentials({url: credentials.url, userName: event.target.value, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{marginBottom:"1rem"}} /></p>
                     <p className="halfWrap"><input value={credentials.password} onChange={(event)=>{setCredentials({url: credentials.url, userName: credentials.userName, password: event.target.value, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="password" className={"i__input-cust i__input e__modal-alm-input"+ (passErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].password} /></p>
                 </>
                 :null}
@@ -292,6 +300,18 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 {type==="qTest"?
                     <p className="qtestSteps"  ><input value={qtestSteps} onChange={()=>{setqtestSteps(!qtestSteps)}} type="checkbox" title="Update steps status" style={{marginTop:"1rem"}}/><span className="i__step">Update step status</span></p>
                 :null}
+                {type === "TestRail" ?
+                    <>
+                        <p className="halfWrap">
+                            <input value={credentials.username} onChange={(event) => { setCredentials({ url: credentials.url, username: event.target.value, apiKey: credentials.apiKey }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{ marginBottom: "1rem" }} />
+                        </p>
+                        <p className="halfWrap">
+                            <input value={credentials.apiKey} onChange={(event) => { setCredentials({ url: credentials.url, username: credentials.username, apiKey: event.target.value }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (passErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].password} />
+                        </p>
+                        <p><input value={credentials.url} onChange={(event) => { setCredentials({ url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype }) }} type="text" className={(urlErrBor ? " i__inputErrBor " : "") + "i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{ marginBottom: "1rem" }} /></p>
+                    </>
+                    : null
+                }
                 </div>
         </div>
     )
@@ -305,7 +325,7 @@ const placeholder={
     ALM:{url:"Enter ALM Url" ,username:"Enter User Name", password:"Enter Password" },
     qTest:{url:"Enter qTest Url" ,username:"Enter User Name", password:"Enter Password" },
     Azure:{url:"Enter Azure Url" ,username:"Enter User Name", password:"Enter Password" },
-    TestRail:{url:"Enter TestRail Url" ,username:"Enter TestRail Username", password:"Enter TestRail API Keys" },
+    TestRail:{url:"Enter TestRail Url" ,username:"Enter TestRail Username", password:"Enter TestRail API Keys/Token" },
 }
 
 
