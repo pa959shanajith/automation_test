@@ -626,6 +626,7 @@ const DesignModal = (props) => {
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
 
+    // console.log(getKeywords('@Browser'),'getKeywords');
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
@@ -1454,6 +1455,9 @@ const DesignModal = (props) => {
         else if (inputEditor === '') {
             toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
         }
+        else if (customTooltip === '') {
+            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+        }
         else {
             try {
                 setCustomKeyWord(false)
@@ -1629,7 +1633,6 @@ const DesignModal = (props) => {
                                 nameInput='name'
                                 isSpaceError={isSpaceError}
                                 customEdit={customEdit}
-                                setCustomEdit={setCustomEdit}
                                 />
                                 </div>
                                 </div>
@@ -1652,6 +1655,7 @@ const DesignModal = (props) => {
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
                             />
                         </div>
                     </div>

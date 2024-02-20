@@ -1627,7 +1627,6 @@ const DesignModal = (props) => {
                                 nameInput='name'
                                 isSpaceError={isSpaceError}
                                 customEdit={customEdit}
-                                setCustomEdit={setCustomEdit}
                                 />
                                 </div>
                                 </div>
@@ -1650,6 +1649,7 @@ const DesignModal = (props) => {
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
                             />
                         </div>
                     </div>
