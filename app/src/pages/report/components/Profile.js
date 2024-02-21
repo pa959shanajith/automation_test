@@ -7,7 +7,7 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import "./Profile.scss";
 import { Badge } from "primereact/badge";
 import { Tree } from "primereact/tree";
-import { reportsBar } from "../../utility/mockData";
+import { reportsBar, reportsData } from "../../utility/mockData";
 import { useLocation } from "react-router-dom";
 import { downloadReports, fetchScenarioInfo, getAccessibilityData, getReportList, getReportListSuites, getScreenData, getTestSuite } from "../api";
 import { Button } from "primereact/button";
@@ -15,12 +15,15 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
 import { FooterTwo } from "../../global";
 import { Divider } from "primereact/divider";
+import { InputText } from "primereact/inputtext";
+import { InputNumber } from "primereact/inputnumber";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
   const [testSuite, setTestSuite] = useState({});
   const [accessibilityValues, setAccessibilityValues] = useState({});
   const [reportsTable, setReportsTable] = useState([]);
+  const [reportsDataTable, setReportsDataTable] = useState([]);
   const [toggleBtn, setToggleBtn] = useState(true);
   const [downloadId, setDownloadId] = useState("");
   const [accessKey, setAccessKey] = useState("");
@@ -51,6 +54,19 @@ const Profile = () => {
     { field: "icon", header: "" },
     { field: "statusAccess", header: ""  }
   ];
+
+  function handleSearch(event) {
+    const inputValue = event.target.value;
+    console.log(reportsTable);
+    setSearchScenario(inputValue);
+    if (inputValue) { 
+      {const filterData = reportsDataTable.filter((item) =>item?.name?.props?.children[1]===inputValue)
+      setReportsDataTable(filterData)
+      }
+    } else {
+      setReportsDataTable(reportsTable);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -83,6 +99,24 @@ const Profile = () => {
             ),
           }))
         );
+        setReportsDataTable((
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el._id,
+            key: ind.toString(),
+            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
+            dateTime: el.startDate,
+            status: checkStatus(el.modStatus),
+            testSuites: el.modStatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+            testCases: el.scestatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+          }))
+        ));
       } else if(location?.state?.viewBy === "Test Suites") {
         setReportsTable(
           executionProfiles.map((el, ind) => ({
@@ -102,8 +136,35 @@ const Profile = () => {
             ),
           }))
         );
+        setReportsDataTable(
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el._id,
+            key: ind.toString(),
+            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
+            dateTime: el?.starttime,
+            status: checkStatus(el.modstatus),
+            testSuites: el.modstatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+            testCases: el.scestatus.reduce(
+              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+              {}
+            ),
+          }))
+        );
       } else if(location?.state?.viewBy === "Accessibility") {
         setReportsTable(
+          executionProfiles.map((el, ind) => ({
+            ...el,
+            id: el?._id,
+            key: ind.toString(),
+            name: el?.title,
+            dateTime: el?.executedtime,
+          }))
+        );
+        setReportsDataTable(
           executionProfiles.map((el, ind) => ({
             ...el,
             id: el?._id,
@@ -761,12 +822,12 @@ const Profile = () => {
             Execution List : {location?.state?.execution}
           </div>
           <div className="search_container">
-            <AvoInput
+            <InputNumber
               icon="pi pi-search"
-              placeholder="Search"
-              inputTxt={searchScenario}
-              setInputTxt={setSearchScenario}
-              inputType="searchIcon"
+              placeholder="Search Execution Number"
+              value={searchScenario}
+              onValueChange={handleSearch}
+              useGrouping={false}
             />
           </div>
         </div>
@@ -1074,10 +1135,10 @@ const Profile = () => {
       <div className="profile_container">
         {location?.state?.viewBy !== "Accessibility" ? (
           <DataTable
-            value={reportsTable}
+            value={reportsDataTable}
             tableStyle={{ minWidth: "50rem" }}
             header={tableHeader}
-            globalFilter={searchScenario}
+            // globalFilter={searchScenario}
             className="reports_table"
           >
             {tableColumns.map((col) => (
@@ -1102,10 +1163,10 @@ const Profile = () => {
           </DataTable>
         ) : (
           <DataTable
-            value={reportsTable}
+            value={reportsDataTable}
             tableStyle={{ minWidth: "50rem" }}
             header={tableHeader}
-            globalFilter={searchScenario}
+            // globalFilter={searchScenario}
             className="accessibility_table"
           >
             {tableColumnsAccess.map((col) => (
