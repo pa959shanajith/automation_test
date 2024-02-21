@@ -112,7 +112,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                     integration.testrail = {
 						url:latestCredentialsData.url,
 						username: latestCredentialsData.username,
-                        password: latestCredentialsData.apiKey,
+                        apitoken: latestCredentialsData.apiKey,
 					}
                 }
                 setCredentialsExecution(integration)
