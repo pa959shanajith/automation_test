@@ -10,7 +10,7 @@ import { RadioButton } from 'primereact/radiobutton';
 import { Tooltip } from 'primereact/tooltip';
 import { AdminActions } from '../../admin/adminSlice';
 import "../styles/manageIntegrations.scss";
-import ZephyrContent from "../components/ZephyrContent";
+import ZephyrContent from "../Components/ZephyrContent";
 // import { useDispatch } from 'react-redux';
 import GitConfig from "../containers/GitConfig";
 import { Toast } from "primereact/toast";
