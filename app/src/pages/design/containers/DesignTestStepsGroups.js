@@ -5,7 +5,7 @@ import CaptureModal from '../containers/CaptureScreenForFolderView';
 import DesignModal from '../containers/DesignTestStepForFolderView';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/designTestStepsGroups.scss'
-import { setUpdateScreenModuleId } from "../designSlice";
+import { dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
 
 
 
@@ -31,7 +31,7 @@ function DesignTestStepsGroups(params) {
     );
     return(
         <div className="designGroup_dialog_div">
-            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData))}}>
+            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}}>
                 <div className='designTestGroups'>
                     
                 {activeIndex === 0 ?<div>
