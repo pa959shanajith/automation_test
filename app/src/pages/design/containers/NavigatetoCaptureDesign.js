@@ -5,7 +5,7 @@ import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/NavigatetoCaptureDesign.scss'
-import { SetCurrentId, dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
+import { dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
 
 
 
