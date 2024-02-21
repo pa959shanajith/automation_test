@@ -655,6 +655,7 @@ const elementTypeProp =(elementProperty) =>{
           dispatch(disableAction(haveItems));
           dispatch(disableAppend(!haveItems));
           setOverlay("");
+          setBlocked(false)
           reject("fail")
         })
     });
@@ -815,6 +816,7 @@ const elementTypeProp =(elementProperty) =>{
           else wsdlInputs.splice(4, 1);
 
           setOverlay("Fetching Response Header & Body...");
+          setBlocked(true)
           ResetSession.start();
           for (let i = 0; i < wsdlInputs.length; i++) {
               if (wsdlInputs[i] !== "") {
@@ -828,6 +830,7 @@ const elementTypeProp =(elementProperty) =>{
           scrapeApi.initScrapeWS_ICE(arg)
           .then(data => {
               setOverlay("");
+              setBlocked(false)
               ResetSession.end();
               if (data === "Invalid Session") {
                   return RedirectPage(history);
@@ -846,6 +849,7 @@ const elementTypeProp =(elementProperty) =>{
           })
           .catch(error => {
               setOverlay("");
+              setBlocked(false)
               ResetSession.end();
               console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
               toastError(MSG.SCRAPE.ERR_OPERATION);
@@ -853,8 +857,7 @@ const elementTypeProp =(elementProperty) =>{
       }
   } 
   else{
-    setOverlay("Loading...")
-    setBlocked(true)
+    
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
@@ -866,6 +869,7 @@ const elementTypeProp =(elementProperty) =>{
     };
     screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
     setOverlay(blockMsg);
+    setBlocked(true)
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
         let err = null;
@@ -892,6 +896,7 @@ const elementTypeProp =(elementProperty) =>{
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
           setOverlay("");
+          setBlocked(false)
           err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
         }
         else if (data === "wrongWindowName")
@@ -1003,6 +1008,7 @@ else{
       })
       .catch(error => {
         setOverlay("");
+        setBlocked(false)
         // ResetSession.end();
         toastError(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
@@ -1953,7 +1959,7 @@ const screenOption = screenData?.map((folder) => ({
       
       
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-        <BlockUI blocked={blocked} template={<div className='overlay__content'>{overlay}</div>}>
+        <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
           typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
           

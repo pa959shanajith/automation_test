@@ -55,6 +55,13 @@
 
 .element-repository{
     overflow: auto;
+    .p-accordion-header{
+        .p-accordion-header-link{
+            .p-accordion-header-text{
+                line-height: 1.3;
+            }
+        }
+    }
 }
 
 .button__elements{
