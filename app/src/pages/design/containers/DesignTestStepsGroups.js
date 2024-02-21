@@ -5,7 +5,7 @@ import CaptureModal from '../containers/CaptureScreenForFolderView';
 import DesignModal from '../containers/DesignTestStepForFolderView';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/designTestStepsGroups.scss'
-import { setUpdateScreenModuleId } from "../designSlice";
+import { dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
 
 
 
@@ -21,7 +21,7 @@ function DesignTestStepsGroups(params) {
     const headerTemplate = (
         <>
             <div>
-            <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
+                <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
                     <TabPanel className="tabPanelforHeader" header="Element Repository"/>
                     <TabPanel className="tabPanelforHeader" header="Design Test Steps"/>
@@ -31,7 +31,7 @@ function DesignTestStepsGroups(params) {
     );
     return(
         <div className="designGroup_dialog_div">
-            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData))}}>
+            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}}>
                 <div className='designTestGroups'>
                     
                 {activeIndex === 0 ?<div>

@@ -1629,7 +1629,6 @@ const DesignModal = (props) => {
                                 nameInput='name'
                                 isSpaceError={isSpaceError}
                                 customEdit={customEdit}
-                                setCustomEdit={setCustomEdit}
                                 />
                                 </div>
                                 </div>
@@ -1652,6 +1651,7 @@ const DesignModal = (props) => {
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
                             />
                         </div>
                     </div>
@@ -1662,11 +1662,11 @@ const DesignModal = (props) => {
                         <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
 
                             <div className="flex align-items-center" >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
                                 <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
                             </div>
                             <div className="flex align-items-center"  >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
                                 <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
                             </div>
                         </div>

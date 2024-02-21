@@ -292,14 +292,14 @@ export const fetchScenarioInfo = async(executionId) => {
     }
 }
 
-export const downloadReports = async(getDownload, type) => {
+export const downloadReports = async(payload, type) => {
     try{
-        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${type}`, {
+        const res = await axios(url+`/viewReport?reportID=${payload?.id}&fileType=${ payload?.type === 'json' ? 'json' : 'pdf' }&images=${type}${payload?.exportLevel ? `&exportLevel=${payload?.exportLevel}`:""}&executionListId=${payload?.executionListId}&downloadLevel=${payload?.downloadLevel}`, {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',
             },
-            responseType:(getDownload?.type === 'json')? 'application/json' : 'arraybuffer',
+            responseType:(payload?.type === 'json')? 'application/json' : 'arraybuffer',
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -353,7 +353,7 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag  },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -655,7 +655,7 @@ export const publicViewReport = async (reportid, reportType="json", screenshotFl
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag  },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
