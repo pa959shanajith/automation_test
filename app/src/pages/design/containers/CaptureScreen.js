@@ -111,7 +111,7 @@ const CaptureModal = (props) => {
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
   const imageRef4 = useRef(null);
-  const {endPointURL, method, opInput, reqHeader, reqBody,reqAuthKeyword,reqAuthInput,paramHeader} = useSelector(state=>state.design.WsData);
+  const {endPointURL, method, opInput, reqHeader, reqBody,reqAuthKeyword,reqAuthInput,paramHeader, basicAuthPassword, basicAuthUsername} = useSelector(state=>state.design.WsData);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
@@ -570,7 +570,7 @@ const elementTypeProp =(elementProperty) =>{
 
               let localRespBody = "";
               if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
-
+              let [basicAuthUsername, basicAuthPassword] = data.authInput[0] != "" ? data.authInput[0].split(";") : ""
               dispatch(WsData({
                 endPointURL: data.endPointURL,
                 method: data.method,
@@ -579,7 +579,10 @@ const elementTypeProp =(elementProperty) =>{
                 reqBody: localReqBody,
                 paramHeader: data.param ? data.param.split("##").join("\n") : "",
                 respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
-                respBody: localRespBody
+                respBody: localRespBody,
+                reqAuthKeyword: data.authKeyword,
+                basicAuthUsername: basicAuthUsername,
+                basicAuthPassword: basicAuthPassword
               }));
               setSaved({ flag: true });
               // setHideSubmit(false);
@@ -815,9 +818,9 @@ const elementTypeProp =(elementProperty) =>{
           if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
           else wsdlInputs.splice(4, 1);
 
-          if(reqAuthKeyword != '' && reqAuthInput!= "") {
+          if(reqAuthKeyword != '' && basicAuthUsername != "" && basicAuthPassword  != "") {
             keywordVal.push(reqAuthKeyword)
-            wsdlInputs.push(reqAuthInput);
+            wsdlInputs.push(`${basicAuthUsername};${basicAuthPassword};`);
           }
 
           setOverlay("Fetching Response Header & Body...");
@@ -846,7 +849,7 @@ const elementTypeProp =(elementProperty) =>{
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
                 toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess("Successfully fetched data"); // SCRAPESUCC_WEBSERVICE_RESP
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));

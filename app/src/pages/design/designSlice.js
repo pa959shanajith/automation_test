@@ -44,7 +44,9 @@ const initialState = {
     reqAuthInput:"",
     respHeader: "",
     respBody: "",
-    paramHeader: ""
+    paramHeader: "",
+    basicAuthUsername: "",
+    basicAuthPassword: ""
   },
   wsdlError: [],
   actionError: [],
