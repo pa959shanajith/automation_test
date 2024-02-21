@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,700italic,400,600,700"
+        rel="stylesheet" type="text/css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Open Sans";
+        }
+
+        .header {
+            width: 100%;
+            background-color: #EBEBFF;
+            -webkit-print-color-adjust: exact;
+            text-align: center;
+            /* Horizontally center the content */
+        }
+
+        .header_logo_container {
+            display: inline-block;
+            width: 10%;
+            margin: 5px;
+            vertical-align: middle;
+            /* Vertically align the content */
+        }
+
+        .header_logo {
+            width: 100%;
+        }
+
+        .header_title {
+            display: inline-block;
+            width: 55%;
+            vertical-align: middle;
+        }
+
+        .header_dates {
+            display: inline-block;
+            width: 30%;
+            font-size: 12px;
+            vertical-align: middle;
+            text-align: end;
+        }
+
+        .header_date {
+            font-weight: bold;
+        }
+
+        .desc {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E0E0E0;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .table_container {
+            display: inline-block;
+            width: 30%;
+        }
+
+        .desc_table {
+            width: 100%;
+            vertical-align: top;
+            margin-right: 30px;
+            border-collapse: separate;
+            border-spacing: 0px 10px;
+        }
+
+        .desc_tr {
+            font-size: 12px;
+            width: 50px;
+            border: 1px solid red;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .desc_td_left {
+            width: 100px;
+        }
+
+        .desc_td_right {
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .desc_progress_container {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .desc_right_heading {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 360px;
+            height: 20px;
+            font-size: 0px;
+            overflow: hidden;
+        }
+
+        .progress-block {
+            height: 100%;
+            box-sizing: border-box;
+            float: left;
+            position: relative;
+        }
+
+        .executed {
+            background-color: #605BFF;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .passed {
+            background-color: #1DA750;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .failed {
+            background-color: #D9342B;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .terminated {
+            background-color: #64748B;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .progress_info {
+            width: 360px;
+            height: 20px;
+            display: inline-block;
+            margin-bottom: 5px;
+            font-size: 10px;
+            font-weight: 600;
+
+        }
+
+        .progress-bar-inner {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .blue-info {
+            color: #605BFF;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .green-info {
+            color: #1DA750;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .red-info {
+            color: #D9342B;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .gray-info {
+            color: #64748B;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .summ_card {
+            display: inline-block;
+            margin-right: 18px;
+        }
+
+        .summ_progress_title {
+            font-weight: bold;
+        }
+
+        .summ_card_heading {
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .summ-progress-bar {
+            width: 240px;
+            height: 20px;
+            margin-bottom: 5px;
+            font-size: 0;
+        }
+
+        .summ-progress-bar .progress-segment {
+            display: inline-block;
+            height: 100%;
+        }
+
+        .summ-progress_info {
+            width: 320px;
+            font-size: 10px;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .summ_progress-bar-inner {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .main_heading {
+            margin: 20px 0px 20px 0px;
+        }
+
+        .summ_report_container {
+            margin-top: 40px;
+        }
+
+        #summ_report_table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #FFFFFF;
+            -webkit-print-color-adjust: exact;
+            font-size: 12px;
+        }
+
+        #summ_report_table td,
+        #summ_report_table th {
+            border: 1px solid #dae6f1;
+            -webkit-print-color-adjust: exact;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <span class="header_logo_container">
+            <img src="data:image/png;base64,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"
+                alt="Avo Assure logo" class="header_logo">
+        </span>
+        <span class="header_title">
+            <h3>Execution Profile: Regression Test</h3>
+        </span>
+        <span class="header_dates">
+            <div>Report Generated Date: <span class="header_date">{{reportGeneratedDate}}</span></div>
+            <div>Report Generated Time: <span class="header_date">{{reportGeneratedTime}}</span></div>
+        </span>
+    </div>
+    <div class="desc">
+        <h4 class="main_heading">Description</h4>
+        <div class="table_container">
+            <table class="desc_table">
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Project Name</td>
+                    <td class="desc_td_right">: {{projectName}}</td>
+                </tr>
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Browser</td>
+                    <td class="desc_td_right">: {{browser}}</td>
+                </tr>
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Browser Version</td>
+                    <td class="desc_td_right">: {{browserVersion}}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="table_container">
+            <table class="desc_table">
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Start Date & Time</td>
+                    <td class="desc_td_right">: {{startDateTime}}</td>
+                </tr>
+                <tr class="desc_tr">
+                    <td class="desc_td_left">End Date & Time</td>
+                    <td class="desc_td_right">: {{endDateTime}}</td>
+                </tr>
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Elapsed Time</td>
+                    <td class="desc_td_right">: {{ellapsedTime}}</td>
+                </tr>
+
+            </table>
+        </div>
+        <div class="table_container">
+            <table class="desc_table">
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Overall Status</td>
+                    <td class="desc_td_right">: {{overallStatus}}</td>
+                </tr>
+                <tr class="desc_tr">
+                    <td class="desc_td_left">Run Number</td>
+                    <td class="desc_td_right">: 01</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="summary">
+        <h4 class="main_heading">Summary</h4>
+        <div class="summ_card">
+            <div class="summ_progress_title">
+                Test Suite Summary
+            </div>
+            <div class="summ_card_heading">Total Test Suites: {{testSuiteResults.totalTs}}</div>
+            <div class="summ-progress-bar" style="display: inline-block;width:100px;background-color: #E0E0E0;">
+                <div class="progress-block executed" style="width:{{testSuiteResults.executedTsPercent}}%"></div>
+            </div>
+            <div class="summ-progress-bar" style="display: inline-block">
+                <div class="progress-block passed" style="width:{{testSuiteResults.passedTsPercent}}%"></div>
+                <div class="progress-block failed" style="width:{{testSuiteResults.failedTsPercent}}%"></div>
+                <div class="progress-block terminated" style="width:{{testSuiteResults.terminatedTsPercent}}%"></div>
+            </div>
+            <div>
+                <div class="summ-progress_info" style="display: inline-block;width:100px">
+                    <span class="summ_progress-bar-inner blue-info">
+                        <span class="progress_info_one">Executed: {{testSuiteResults.executedTs}}/{{testSuiteResults.totalTs}}</span><br />
+                        <span class="progress_info_two">In %: {{testSuiteResults.executedTsPercent}}</span>
+                    </span>
+                </div>
+                <div class="summ-progress_info">
+                    
+                    <span class="summ_progress-bar-inner green-info">
+                        <span class="progress_info_one">Passed: {{testSuiteResults.passedTs}}/{{testSuiteResults.totalTs}}</span><br />
+                        <span class="progress_info_two">In %: {{testSuiteResults.passedTsPercent}}%</span>
+                    </span>
+                    <span class="summ_progress-bar-inner red-info">
+                        <span class="progress_info_one">Failed: {{testSuiteResults.failedTs}}/{{testSuiteResults.totalTs}}</span><br />
+                        <span class="progress_info_two">In %: {{testSuiteResults.failedTsPercent}}%</span>
+                    </span>
+                    <span class="summ_progress-bar-inner gray-info">
+                        <span class="progress_info_one">Terminated: {{testSuiteResults.terminatedTs}}/{{testSuiteResults.totalTs}}</span><br />
+                        <span class="progress_info_two">In %: {{testSuiteResults.terminatedTsPercent}}%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="summ_card">
+            <div class="summ_progress_title">
+                Test Case Summary
+            </div>
+            <div class="summ_card_heading">Total Test Cases: {{testCaseResults.totalTc}}</div>
+            <div class="summ-progress-bar" style="display: inline-block;width:100px;background-color: #E0E0E0;">
+                <div class="progress-block executed" style="width:{{testCaseResults.executedTcPercent}}%"></div>
+            </div>
+            <div class="summ-progress-bar" style="display: inline-block">
+                <div class="progress-block passed" style="width:{{testCaseResults.passedTcPercent}}%"></div>
+                <div class="progress-block failed" style="width:{{testCaseResults.failedTcPercent}}%"></div>
+                <div class="progress-block terminated" style="width:{{testCaseResults.terminatedTcPercent}}%"></div>
+            </div>
+            <div>
+                <div class="summ-progress_info" style="display: inline-block;width:100px">
+                    <span class="summ_progress-bar-inner blue-info">
+                        <span class="progress_info_one">Executed: {{testCaseResults.executedTc}}/{{testCaseResults.totalTc}}</span><br />
+                        <span class="progress_info_two">In %: {{testCaseResults.executedTcPercent}}</span>
+                    </span>
+                </div>
+                <div class="summ-progress_info">
+                    
+                    <span class="summ_progress-bar-inner green-info">
+                        <span class="progress_info_one">Passed: {{testCaseResults.passedTc}}/{{testCaseResults.totalTc}}</span><br />
+                        <span class="progress_info_two">In %: {{testCaseResults.passedTcPercent}}%</span>
+                    </span>
+                    <span class="summ_progress-bar-inner red-info">
+                        <span class="progress_info_one">Failed: {{testCaseResults.failedTc}}/{{testCaseResults.totalTc}}</span><br />
+                        <span class="progress_info_two">In %: {{testCaseResults.failedTcPercent}}%</span>
+                    </span>
+                    <span class="summ_progress-bar-inner gray-info">
+                        <span class="progress_info_one">Terminated: {{testCaseResults.terminatedTc}}/{{testCaseResults.totalTc}}</span><br />
+                        <span class="progress_info_two">In %: {{testCaseResults.terminatedTcPercent}}%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- summary Report -->
+    <div class="summ_report_container">
+        <h3>
+            Test Suite Execution Status
+        </h3>
+        {{#each tsExecutionStatusArr}}
+        <div>
+            <div style="font-weight: bold;margin-top: 10px;">
+                {{tsName}}
+            </div>
+            <table id="summ_report_table">
+                <tr style="background-color: #F8F9FA;">
+                    <th style="width: 10%;">S.No.</th>
+                    <th>Testcase(s)</th>
+                    <th>Status</th>
+                </tr>
+                {{#each iTcArr}}
+                <tr>
+                    <td>{{sNo}}</td>
+                    <td>{{tcName}}</td>
+                    <td><span style="display:inline-block;width:15px;height:15px;border-radius: 50%;margin-right: 10px;"
+                            class="{{statusClassName tcStatus}}"></span>{{tcStatus}}
+                    </td>
+                </tr>
+                {{/each}}
+            </table>
+            <div
+                style="padding:10px 0px 10px 0px; font-size: 12px;background-color: #F8F9FA;-webkit-print-color-adjust: exact;">
+                <span style="font-weight: bold; font-size: 16px;">
+                    Total Test Cases:
+                </span>
+                <span style="margin-right: 10px;">
+                    <span
+                        style="display:inline-block;width:50px;border-radius: 10px;margin-right: 5px;text-align: center;color:white; padding:5px; font-weight: bold;"
+                        class="executed">{{executedTc}}/{{totalTc}}</span>
+                    Executed
+                </span>
+                <span style="margin-right: 10px;">
+                    <span
+                        style="display:inline-block;width:50px;border-radius: 10px;margin-right: 5px;text-align: center;color:white; padding:5px; font-weight: bold;"
+                        class="passed">{{passedTc}}/{{totalTc}}</span>
+                    Passed
+                </span>
+                <span style="margin-right: 10px;">
+                    <span
+                        style="display:inline-block;width:50px;border-radius: 10px;margin-right: 5px;text-align: center;color:white; padding:5px; font-weight: bold;"
+                        class="failed">{{failedTc}}/{{totalTc}}</span>
+                    Failed
+                </span>
+                <span style="margin-right: 10px;">
+                    <span
+                        style="display:inline-block;width:50px;border-radius: 10px;margin-right: 5px;text-align: center;color:white; padding:5px; font-weight: bold;"
+                        class="terminated">{{terminatedTc}}/{{totalTc}}</span>
+                    Terminated
+                </span>
+            </div>
+        </div>
+        {{/each}}
+
+    </div>
+
+</body>
+
+</html>
