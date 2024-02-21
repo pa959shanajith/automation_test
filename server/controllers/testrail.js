@@ -246,7 +246,7 @@ exports.getTestcases_Testrail = async (req, res) => {
       function testrail_testcase_listener(data) {
         // remove the added listener once the task is done
         mySocket.removeListener(`qcresponse${data[0]['section_id']}`, testrail_testcase_listener);
-        res.send(data[0]?.message);
+        res.send(data[0].message);
       }
  
       // Invoke the above function on qcresponse event
@@ -599,7 +599,7 @@ exports.getSections_Testrail = async(req,res) => {
       function testrail_section_listener(data) {
         // remove the added listener once the task is done
         mySocket.removeListener(`qcresponse${data[0]['suite_id']}`, testrail_section_listener);
-        res.send(data[0]?.message);
+        res.send(data[0].message);
       }
  
       // Invoke the above function on qcresponse event
