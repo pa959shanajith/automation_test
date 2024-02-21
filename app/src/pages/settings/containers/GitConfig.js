@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ScreenOverlay, ScrollBar, Messages as MSG, setMsg } from '../../global'
 import { FormInputGit, FormSelect } from '../../admin/components/FormComp'
 import { getUserDetails, getDomains_ICE, getDetails_ICE, gitEditConfig } from '../../admin/api';
-import GitButtonActions from '../../settings/Components/GitButtonActions'
+import GitButtonActions from '../../settings/components/GitButtonActions'
 import { useDispatch, useSelector } from 'react-redux';
 
 import '../styles/GitConfig.scss'
