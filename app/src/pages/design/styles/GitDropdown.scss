@@ -59,24 +59,6 @@
       align-items: center !important;
     }
   }
-
-  .createProject_GitConfig .p-inputtext-sm{
-    height: 40px !important;
-    width: 100px !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .p-dropdown-label {
-      display: flex !important;
-      align-items: center !important;
-    }
-  }
-
-  .createProject_GitConfig{
-    .git_input {
-      margin-bottom: 16px;
-    }
-  }
   
   .GitVersion_cls .p-dropdown {
     .p-dropdown-label {
@@ -155,4 +137,22 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 11rem !important;
+}
+
+.createProject_GitConfig .p-inputtext-sm{
+  height: 40px !important;
+  width: 100px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .p-dropdown-label {
+    display: flex !important;
+    align-items: center !important;
+  }
+}
+
+.createProject_GitConfig{
+  .git_input {
+    margin-bottom: 16px;
+  }
 }
