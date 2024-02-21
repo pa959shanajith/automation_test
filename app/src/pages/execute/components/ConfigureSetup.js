@@ -414,9 +414,10 @@ const ConfigureSetup = ({
                         </span>
                       </div>
                     ))}
-                     {selectedTags.length > 0 && (
+                     {selectedTags.length > 1 && (
                         <div >
-                        <img className="clear-all-button" src="static/imgs/clear all_icon.svg" onClick={handleClearAllTags}></img>
+                        <img className="clear-all-button" src="static/imgs/clear all_icon.svg" onClick={handleClearAllTags} ></img>
+                        <Tooltip target=".clear-all-button" position="right" content="Clear all tag(s)."/>
                        </div>
                       )}
                   </div>
