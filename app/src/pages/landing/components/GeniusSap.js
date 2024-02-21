@@ -192,6 +192,7 @@ const GeniusSap = (props) => {
   const [DataParamPath, setDataParamPath] = useState(null)
   const [showMindmap, setShowMindmap] = useState(false);
   const [dataSaved, setDataSaved] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(3);
   const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
@@ -351,7 +352,7 @@ const GeniusSap = (props) => {
     }
     else {
       showPopup(true)
-      setMessage('No fields for Data Parametrization...')
+      props.toastError(MSG.CUSTOM('No fields for Data Parametrization...', VARIANT.ERROR))
     }
   }
   const saveAsExcelFile = (buffer, fileName) => {
@@ -424,7 +425,7 @@ const GeniusSap = (props) => {
   const saveScreen = () => {
     setDataManipulated(true)
     console.log(selectedScreen)
-    const screenEditTable = [...tableAfterOperation]
+    const screenEditTable = [...tableDataNew]
     let objIndex = screenEditTable.findIndex(testCase => testCase.name === selectedScreen.name)
     screenEditTable[objIndex].name = singleData.name
     setTableAfterOperation(screenEditTable)
@@ -1371,8 +1372,16 @@ const onScreenNameChange = (e, name) => {
       screenData.testcases.forEach((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
-          testcase.inputVal[0] = `|${testcase.custname}|`
+          // let originalVal = testcase.inputVal[0]
+          // testcase.inputVal[0] = `|${testcase.custname}|`;
+          if (Array.isArray(testcase.inputVal)) {
+            let originalVal = testcase.inputVal[0];
+            testcase.inputVal[0] = `|${testcase.custname}|`;
+          } else {
+            // Handle the case where inputVal is not an array (optional)
+            // For example, you might want to convert it to an array:
+            testcase.inputVal = [`|${testcase.custname}|`];
+          }
   
   
   
@@ -1620,10 +1629,9 @@ const debugTestCases = selectedBrowserType => {
     );
   }
   const items = [
-    {label: 'Project Details', },
-    {label: 'Record TestCases',},
-    {label: 'Preview TestCase', }
-    
+    {label: 'Project Details', disabled:true },
+    {label: 'Record TestCases', disabled:true},
+    {label: 'Preview TestCase', disabled:true }   
 ];
 {card && <div className="" ref={popupref} style={{
   zIndex: '10', backgroundColor: '#fff', borderTopLeftRadius: '8px', borderTopRightRadius: '8px', width: '480px', position: 'absolute', left: `2rem`, top: `${location.bottom - 10}px`, border: 'gray'
@@ -1678,7 +1686,7 @@ const debugTestCases = selectedBrowserType => {
       accept={()=>{visibleScenario?setSelectedScenario(scenarioChosen): resetFields()}} 
       reject={()=>{}} 
       />
-      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={!showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
+      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
       {loading ? <ScreenOverlay content={loading} /> : null}
       <div className='create_testsuite'>
       <Dialog className='create_testsuite' header={'Create Test Suite'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '40vh',width: '25vw'}} 
@@ -1840,78 +1848,89 @@ const debugTestCases = selectedBrowserType => {
             Project is required.
           </small>
           </div>
-          <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" style={{position:'fixed', left:'55rem',top:'15.5rem'}} />
-          <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} style={{position:'fixed', left:'82rem',top:'15.5rem'}} />
+          {/* <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" style={{position:'fixed', left:'60rem',top:'17.5rem'}} /> */}
+          {/* <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} style={{position:'fixed', left:'87rem',top:'17.5rem'}} /> */}
           </div>
           
 
-          <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
+          <div style={{ display:'flex',flexDirection:'column' }}>
           {/* <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} > */}
-            <div> <label className="label_genius"  htmlFor="project">Test Suite</label></div>
-            <label><img src="static/imgs/Required.svg" className="required_icon" style={{position:'fixed',right:'59.6rem',top:'13.9rem'}}/></label>
-            {/* <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div> */}
-            {/* <div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} 
-             ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
-            </div> */}
-  
-            <Dropdown 
-            
-             value={selectedModule ? selectedModule : null}
-             options={projModules.map((mod) => {
-              return {
-                key: mod._id,
-                text: mod.name
-              }
-            })}
-            onBlur={() => setTouched(true)}
-            onChange={(e) => {
-             
-              setSelectedModule(e.value)
+                <div style={{display:'flex',alignItems:'start'}}> 
+                  <label className="label_genius" htmlFor="project">Test Suite</label>
+                  <img src="static/imgs/Required.svg" className="required_icon" style={{paddingTop:'10px'}}/>
+                </div>
+            <div style={{display:'flex'}}>
               
-            }}
-             optionLabel="text"
-             placeholder="Select" 
-             style={{width:'18.75rem',height:'3rem'}}
-             />
-             <div className="validation_container">
-          {touched && !selectedModule && <small className={touched && !selectedModule ? "txt_invalid" : "txt_valid"}>
-            Test Suite is required.
-          </small>}
-        </div>
+              {/* <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div> */}
+              {/* <div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} 
+              ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
+              </div> */}
+    
+              <Dropdown 
+              
+              value={selectedModule ? selectedModule : null}
+              options={projModules.map((mod) => {
+                return {
+                  key: mod._id,
+                  text: mod.name
+                }
+              })}
+              onBlur={() => setTouched(true)}
+              onChange={(e) => {
+              
+                setSelectedModule(e.value)
+                
+              }}
+              optionLabel="text"
+              placeholder="Select" 
+              style={{width:'18.75rem',height:'3rem',marginRight:'10px'}}
+              />
+              <Button  onClick={() => { setDisplayCreateModule(true); }} icon="pi pi-plus" />
+
+            </div>
+                <div className="validation_container" style={{marginLeft:'1rem'}}>
+                  {touched && !selectedModule && <small className={touched && !selectedModule ? "txt_invalid" : "txt_valid"}>
+                    Test Suite is required.
+                  </small>}
+                </div>
           </div>
 
           <div style={{ position: "relative" ,display:'flex',flexDirection:'column' }}>
           <div style={{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
-            <div> <label className="label_genius"  htmlFor="project" style={{position:'relative',left:'5rem'}}>Testcase</label></div>
-            <label><img src="static/imgs/Required.svg" className="required_icon" style={{marginLeft:'2rem'}}/></label>
+          <div style={{display:'flex',alignItems:'start'}}> 
+                  <label className="label_genius" htmlFor="project">TestCase</label>
+                  <img src="static/imgs/Required.svg" className="required_icon" style={{paddingTop:'10px'}}/>
+          </div>
             <div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div><div className="create__button" data-attribute={!(selectedModule && selectedModule.key) ? "disabled" : ""} style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}
             //  onClick={() => { setDisplayCreateScenario(true) }}
              ></div><div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>
             </div>
-            
-            <Dropdown 
+            <div>
+              <Dropdown 
+              value={scenarioChosen ? scenarioChosen : null}
+              options={modScenarios.map((scenario) => {
+                return {
+                  key: scenario._id,
+                  text: scenario.name
+                }
+              })}
+              onChange={(e) => {
+                setScenarioChosen(e.value)
+                setVisibleScenario(true)
+                setVisibleReset(false)
+          
+              
+              }}
+              optionLabel="text"
+              placeholder="Select" 
+              style={{width:'18.75rem',height:'3rem',marginRight:'10px'}} 
+              //  disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
+              />
+                <Button icon="pi pi-plus"  onClick={() => { setDisplayCreateScenario(true) }} s />
+            </div>
              
-             value={scenarioChosen ? scenarioChosen : null}
-             options={modScenarios.map((scenario) => {
-              return {
-                key: scenario._id,
-                text: scenario.name
-              }
-            })}
-            onChange={(e) => {
-              setScenarioChosen(e.value)
-              setVisibleScenario(true)
-              setVisibleReset(false)
-         
-             
-            }}
-             optionLabel="text"
-             placeholder="Select" 
-             style={{width:'18.75rem',height:'3rem',left:'5rem' }}  
-            //  disabled={!(selectedModule && selectedModule.key) || props.selectedModule}
-             />
              <div className="validation_container">
-          {touched && !scenarioChosen &&<small className={touched && !scenarioChosen ? "txt_invalid" : "txt_valid"} style={{marginLeft:'6rem'}}>
+          {touched && !scenarioChosen &&<small className={touched && !scenarioChosen ? "txt_invalid" : "txt_valid"} style={{marginLeft:'1rem'}}>
             Test Case is required.
           </small>}
         </div>
@@ -1977,6 +1996,7 @@ const debugTestCases = selectedBrowserType => {
                     .then(keywordData => {
                       if (keywordData === "Invalid Session") return RedirectPage(history);
                       setProjectData(keywordData);
+                      setActiveIndex(1);
                       showDialog()
                     })
                   
@@ -1987,7 +2007,7 @@ const debugTestCases = selectedBrowserType => {
               </button>
               <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="AVO Genius for SAP" >
               <div className="App">
-            <TabMenu model={items} style={{display:'flex', justifyContent:'center'}}></TabMenu>
+            <TabMenu model={items} activeIndex={activeIndex}style={{display:'flex', justifyContent:'center'}}></TabMenu>
             <Menu model={menuModel} popup ref={menu} id="popup_menu" onHide={() => setSelectedRow(null)}/>
             <ContextMenu model={menuModel}  ref={cm}  onHide={() => setSelectedRow(null)} />
 
@@ -2043,21 +2063,21 @@ const debugTestCases = selectedBrowserType => {
           }} /> */}
 
           <div disabled={tableDataNew.length <= 0} onClick={(e) => { if(tableDataNew.length <= 0) e.preventDefault() }}>
-            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
+            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} title={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
             {/* <span className= "bottombartooltips" data-pr-tooltip="Collapse All " data-pr-position="top"onClick={() => setExpandedRows(null)}>p<i className='pi pi-chevron-circle-right' style={{ fontSize: '18px' }} ></i></span> */}
           </div> {/** undo the last step */}
-          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
+          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} title={'Erase all data'} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
             <span><img src={`static/imgs/${startGenius || dataSaved ? "erase_all_disable" : "erase_all_enable"}.svg`}></img></span> 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
+          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "} title={'Run test steps'}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
 
-            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "}  data-pr-position="top" >
+            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "} title={'Save Data'} data-pr-position="top" >
               <span onClick={(e) => {if(startGenius || dataSaved) {e.preventDefault()} else {handleSaveMindmap()}}}><img src={`static/imgs/${startGenius || dataSaved ? "save_disable" : "save_enable"}.svg`}></img>
             </span>
 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
-          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
+          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} title={'Show Mindmap'} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
+          <div disabled={startGenius} className={`${(startGenius) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "}  title={'Data Parameterization'} data-pr-position="top" onClick={(e) => {if(startGenius){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
           {/* <div className="bottombartooltips" data-pr-tooltip={"Minimize"} data-pr-position="top" style={{ border: 'none' }} ></div> * maximize genius window */}
           {/* <div className="bottombartooltips" data-pr-tooltip="Close Genius App " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'30rem',cursor:'pointer' }} ><img src='static\imgs\close_icon.svg'></img></div>* close genius window */}
             </div>

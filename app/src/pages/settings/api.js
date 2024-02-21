@@ -744,3 +744,90 @@ export const getjira_json = async(input_payload) => {
         return {error:MSG.INTEGRATION.ERR_LOGIN_AGAIN}
     }
 }
+
+export const zephyrRepoDetails_ICE = async(projectId, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrRepoDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+           data: {
+                action : 'zephyrRepoDetails_ICE',
+                projectId:	projectId,
+                zephyraction: "repodetails",
+                user_id : user_id 
+            }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_ADD_PROJECT}
+    }
+}
+
+export const zephyrModuleUnderRepo_ICE = async(data, user_id) => {
+    try{
+        const res = await axios(url+'/zephyrModuleUnderRepo_ICE', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                action: 'zephyrModuleUnderRepo_ICE',
+                repoId: data.repoId,
+                projectId: data.projectId,
+                zephyraction: "projectrepo",
+                user_id : user_id
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    } catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_GET_LIST}
+    }
+}
+
+export const zephyrRepoTestcaseDetails_ICE = async(zephyraction, treeId) => {
+    try{
+        const res = await axios(url+'/zephyrRepoTestcaseDetails_ICE', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+                action : 'zephyrRepoTestcaseDetails_ICE',
+                treeId: treeId,
+                zephyraction: zephyraction,
+           }
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.INTEGRATION.ERR_FETCH_TESTCASE}
+    }
+}
