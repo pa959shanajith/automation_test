@@ -337,6 +337,7 @@ const GeniusSap = (props) => {
 
 
       })
+      setSelectedScreen({name:screenData.name})
       return abc
     })
 
@@ -1367,7 +1368,7 @@ const onScreenNameChange = (e, name) => {
     }
   }
   const saveDataParam = () => {
-    const table = tableAfterOperation
+    const table = tableDataNew
     const UiDataParam = table.map(screenData => {
       screenData.testcases.forEach((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
@@ -1394,21 +1395,21 @@ const onScreenNameChange = (e, name) => {
     console.log(UiDataParam)
     // setTableAfterOperation(table)
     console.log(singleData)
-    const originalData = tableAfterOperation
-    let objIndex = tableAfterOperation.findIndex(testCase => testCase.name === selectedScreen.name)
-    const firstSteps = tableAfterOperation[0].testcases
+    const originalData = tableDataNew
+    let objIndex = tableDataNew.findIndex(testCase => testCase.name === selectedScreen.name)
+    const firstSteps = tableDataNew[1].testcases
     const lastStep = originalData[originalData.length - 1].testcases
     const newDataParamTableStart = [singleData, startLoop, ...firstSteps]
     const newDataParamTableEnd = [...lastStep, endLoop]
-    originalData[0].testcases = newDataParamTableStart
+    originalData[1].testcases = newDataParamTableStart
     if (originalData.length === 1) {
-      originalData[0].testcases = [...newDataParamTableStart, endLoop]
-      originalData[0].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
+      originalData[1].testcases = [...newDataParamTableStart, endLoop]
+      originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     } else {
       originalData[originalData.length - 1].testcases = newDataParamTableEnd;
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
-    originalData[0].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
+    originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
     allScreenData[selectedScreen.name]["testcases"] = originalData[objIndex].testcases;
     setTableAfterOperation(originalData)
   
@@ -1659,7 +1660,7 @@ const debugTestCases = selectedBrowserType => {
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>X-path</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].xpath.trim().length !== 0 ? (popupData[0].xpath.trim().length > 10 && !showFullXpath ? popupData[0].xpath.trim().substring(0, 20) + "..." : popupData[0].xpath.trim()) : 'Not Found'}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].xpath?.trim().length !== 0 ? (popupData[0].xpath?.trim().length > 10 && !showFullXpath ? popupData[0].xpath?.trim().substring(0, 20) + "..." : popupData[0].xpath.trim()) : 'Not Found'}</p>
     </div>
     <Divider style={{ margin: '0' }} />
   </div>
