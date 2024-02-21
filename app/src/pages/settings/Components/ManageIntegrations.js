@@ -9,7 +9,7 @@ import { Button } from 'primereact/button';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { Card } from 'primereact/card';
 import LoginModal from "../Login/LoginModal";
-import CloudSettings from "../../settings/Components/Cloud/CloudSettings"
+import CloudSettings from "../../settings/components/Cloud/CloudSettings"
 import { useDispatch, useSelector } from 'react-redux';
 import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
