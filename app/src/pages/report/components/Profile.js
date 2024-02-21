@@ -824,10 +824,11 @@ const Profile = () => {
           <div className="search_container">
             <InputNumber
               icon="pi pi-search"
-              placeholder="Search Execution Number"
+              placeholder="Search With Execution Number"
               value={searchScenario}
               onValueChange={handleSearch}
               useGrouping={false}
+              style={{width:'16rem'}}
             />
           </div>
         </div>
