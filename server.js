@@ -838,5 +838,4 @@ var browserstack = require('./server/controllers/browserstack');
 			cluster.worker.kill();
 		}, 200);
 	}
-	
 }
