@@ -24,6 +24,7 @@ const ExportModal = props => {
     const projectId = props.fetchingDetails.projectID
     const screenName = props.fetchingDetails["name"]
     let versionnumber = 0
+    const [disableExport, setDisableExport] = useState(false);
     const Content = () => {
         return (
             <div className='mp__import-popup'>
@@ -45,7 +46,7 @@ const ExportModal = props => {
 
     const Footer = () => {
         return (
-            <Button data-test="export" size="small" onClick={onExport} label="Export"></Button>
+            <Button data-test="export" size="small" disabled={!disableExport} onClick={onExport} label="Export"></Button>
         )
     }
 
@@ -137,6 +138,7 @@ const ExportModal = props => {
         let updatedObjects = [...objects];
         updatedObjects[index].objType = event.target.value;
         setObjects(updatedObjects);
+        setDisableExport(true);
     }
 
     const validate = (arr) => {

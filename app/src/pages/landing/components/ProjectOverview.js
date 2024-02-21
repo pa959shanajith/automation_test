@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import '../styles/ProjectOverview.scss';
 import Analysis from './Analysis';
-import Settings from '../../settings/Components/Settings';
+import Settings from '../../settings/components/Settings';
 import ProjectCreation from './ProjectCreation'
 import CustomKeyword from './CustomKeyword';
 import { useSelector } from 'react-redux';
