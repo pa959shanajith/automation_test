@@ -50,7 +50,7 @@ function NavigatetoCaptureDesign(params) {
     // }
     return(
         <div className="captureDesign_dialog_div">
-            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}}>
+            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}else{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false)}}}>
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
