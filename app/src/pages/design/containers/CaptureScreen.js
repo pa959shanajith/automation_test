@@ -2293,7 +2293,7 @@ const screenOption = screenData?.map((folder) => ({
                 </div>}
                 <div onClick={togglePanel} className="expandCollapseIconWrapper">
                   <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-                  <i className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+                  <i style={{color:'blue',fontWeight:'800'}}className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
                 </div>
               </div>
             </div>
