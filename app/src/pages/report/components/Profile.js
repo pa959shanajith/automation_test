@@ -449,7 +449,7 @@ const Profile = () => {
   };
  const handleViweReports = async (reportid) =>{
     setSelectedExe((prev) => {
-      const win = window.open(`/viewReports?reportID=${reportid}&execution=${Number(prev) + 1}`, "_blank"); 
+      const win = window.open(`/viewReports?reportID=${reportid}&execution=${Number(prev) + 1}&exportLevel=${exportLevel}&downloadLevel=testCase&viewReport=true`, "_blank"); 
       win.focus();
       return prev;
     })

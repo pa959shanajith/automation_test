@@ -345,7 +345,7 @@ export const getAccessibilityScreens = async(projId, relName, cycId) =>{
     }
 }
 
-export const viewReport = async (reportid, reportType="json", screenshotFlag) => { 
+export const viewReport = async (reportid, reportType="json", screenshotFlag, downloadLevel, viewReport ) => { 
     try{
         const res = await axios(url+'/viewReport', {
             method: 'GET',
@@ -353,7 +353,7 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, fileType: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag, downloadLevel, viewReport },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
