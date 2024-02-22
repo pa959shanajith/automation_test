@@ -161,7 +161,7 @@ const Messages={
         SUCC_TASK_REASSIGN: {"CONTENT":"Task Reassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_APPROVED: {"CONTENT":"Task Approved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SUBMIT: {"CONTENT":"Task Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"Keyword Created successfully.Sent for approval", "VARIANT": VARIANT.SUCCESS},
+        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"custom keyword saved successfully", "VARIANT": VARIANT.SUCCESS},
 
         WARN_DELETED_TC_FOUND: {"CONTENT":"Deleted objects found in some teststeps, Please delete or modify those steps.", "VARIANT": VARIANT.WARNING},
         WARN_DELETE: {"CONTENT":"No steps to Delete.", "VARIANT": VARIANT.WARNING},
@@ -515,6 +515,8 @@ const Messages={
         ERR_INVALID_INFO: {"CONTENT": "Enter Correct Details", "VARIANT": VARIANT.ERROR},
         ERR_ENTER_VALID_CRED: {"CONTENT": "Enter Valid Credentials", "VARIANT": VARIANT.ERROR},
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
+        ERR_TESTRAIL_FETCH: {"CONTENT": "Failed to fetch Testrail details.", "VARIANT": VARIANT.ERROR},
+        ERR_TESTRAIL_TESTPLAN_FETCH: {"CONTENT": "Failed to fetch Testrail test plans.", "VARIANT": VARIANT.ERROR},
         ERR_SAUCELABS_FETCH: {"CONTENT": "Failed to fetch Saucelabs details.", "VARIANT": VARIANT.ERROR},
         ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure DevOps details","VARIANT":VARIANT.ERROR},
         ERR_UPLOAD_APK:{"CONTENT": "Failed to Upload apk","VARIANT":VARIANT.ERROR},

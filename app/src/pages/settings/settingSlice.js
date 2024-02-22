@@ -13,6 +13,11 @@ const initialState = {
         password:'',
         token:''
     },
+    testRailLogin: {
+        username:'',
+        apiKey:'',
+        url:''
+    },
     AzureLogin:{
         username:'',
         password:'',
@@ -154,6 +159,13 @@ export const settingSlice=createSlice({
             const { fieldName, value } = action.payload;
             state.zephyrLogin[fieldName] = value;
         },
+        testRailLogin:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.testRailLogin[fieldName] = value;
+        },
+        resetTestRailLogin:(state,action) => {
+            state.testRailLogin = initialState.testRailLogin;
+        },
         resetZephyrLogin: (state) => {
             state.zephyrLogin = initialState.zephyrLogin;
           },
@@ -224,6 +236,8 @@ export const {
     mappedTree,
     showOverlay,
     zephyrLogin,
+    testRailLogin,
+    resetTestRailLogin,
     resetZephyrLogin,
     AzureLogin,
     saucelabsInitialState,

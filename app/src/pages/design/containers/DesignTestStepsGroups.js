@@ -31,7 +31,7 @@ function DesignTestStepsGroups(params) {
     );
     return(
         <div className="designGroup_dialog_div">
-            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}}>
+            <Dialog className='designGroup_dialog_box' header={headerTemplate} visible={params.visibleDesignStepGroups} position='right' style={{ width: '85%', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleDesignStepGroups(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}else{params.setVisibleDesignStepGroups(false)}}}>
                 <div className='designTestGroups'>
                     
                 {activeIndex === 0 ?<div>
