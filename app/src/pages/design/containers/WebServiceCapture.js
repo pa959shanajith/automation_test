@@ -498,6 +498,9 @@ const WebserviceScrape = (props) => {
                                     onChange={setAuthorizationKeyWord}
                                     defaultValue={autheniticateList[0]}
                                 />
+                               { reqAuthKeyword === "OAuth_2.0" &&  <div style={{width:'20%'}}>
+                                    <Button size="small" label="Generate Token"></Button>
+                                </div>}
                             </div>
                             {reqAuthKeyword === "setBasicAuth" && <>
                                 <div className='inputs_container'>
@@ -531,9 +534,6 @@ const WebserviceScrape = (props) => {
                                         value={oAuthUrl}
                                         onChange={onOAuthUrlChange}
                                     />
-                                    <div style={{width:'20%'}}>
-                                    <Button size="small" label="Generate Token"></Button>
-                                    </div>
                                 </div>
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_client_id"} className="inputs_container_label" > Client Id </label>
