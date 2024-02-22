@@ -235,12 +235,15 @@ export const designSlice = createSlice({
       state.selectedScreenOfStepSlice = action.payload
     },
     SetDebuggerPoints:(state,action)=>{
-      if(action.payload.push){
+      if(action.payload.push=='push'){
         state.debuggerPoints.push(action.payload.stepNo)
       }
-      else{
+      else if (!action.payload.push=='pop'){
         let newDubbugerPoint=state.debuggerPoints.filter(step=>step!==action.payload.stepNo)
         state.debuggerPoints=newDubbugerPoint
+      }
+      else{
+        state.debuggerPoints=action.payload
       }
     },
     SetAdvanceDebug:(state,action)=>{

@@ -12,7 +12,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -36,6 +36,8 @@ const DesignModal = (props) => {
     const saveEnable = useSelector(state => state.design.SaveEnable);
     const mainTestCases = useSelector(state => state.design.TestCases);
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
@@ -73,6 +75,7 @@ const DesignModal = (props) => {
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
     const [arrow, setArrow] = useState(false);
+    const[actionForAdvanceDebug,setActionForAdvanceDebug]=useState("")
     let runClickAway = true;
     
 
@@ -624,8 +627,12 @@ const DesignModal = (props) => {
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,debuggerPoints)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,actionForAdvanceDebug)
             .then(data => {
+                if(advanceDebug && debuggerPoints){
+                //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
+                setOverlay("");
+                }
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return ;
@@ -651,6 +658,7 @@ const DesignModal = (props) => {
                     toast.current.show({severity: 'success',summary: 'Success', detail:data, life:2000})
                 }										
             })
+
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
@@ -1413,6 +1421,32 @@ const DesignModal = (props) => {
            
         }
     ]
+    const handlePlay=()=>{
+        // SetEnablePauseDebugger({status:false})
+        let newDebuggerPoints=debuggerPoints.shift()
+        dispatch(SetDebuggerPoints({push:'play',payload:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
+        .then(data => {
+            if(data==="success"){
+
+            }
+            console.log(data)
+        }
+        )
+    }
+    const handleMoveToNext=()=>{
+        let nextVal=debuggerPoints[0]+1
+        let newDebuggerPoints=[nextVal,[...debuggerPoints].shift()]
+        dispatch(SetDebuggerPoints({push:'nextStep',payload:newDebuggerPoints}))
+
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
+        .then(data => {
+            console.log(data)
+        }
+        )
+        }
+        
+    
     return (
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
@@ -1470,17 +1504,18 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false))}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',payload:[]})}}>
                     <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
-                        <img src='static/imgs/start.svg' alt='' style={{height:'30px'}}/>
-                        <img src='static/imgs/stepInto.svg' alt='' style={{height:'30px'}}/>
-                        <img src='static/imgs/stepOver.svg' alt='' style={{height:'30px'}}/>
-                        <img src='static/imgs/stepout.svg' alt='' style={{height:'30px'}}/>
+                        {(debuggerPoints.length>=1 && advanceDebug)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px'}}/>:<span><i className="pi pi-pause" style={{ height:'30px' }}></i>
+</span>}
+                        
+                        <img src='static/imgs/stepInto.svg' onClick={handleMoveToNext}alt='' style={{height:'30px'}}/>
+                        
                         <img src='static/imgs/stop.svg' alt='' style={{height:'30px'}}/>
                     </div>
-                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>dispatch(SetAdvanceDebug(true))}/></div>
+                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
 
                     </div>
                     <div className="card">

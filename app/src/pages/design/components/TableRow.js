@@ -375,19 +375,19 @@ const TableRow = (props) => {
           const ActivateDebuggerPoint=()=>{
             setDebuggerPoint(debuggerPoint=>!debuggerPoint)
             if(!debuggerPoint){
-              dispatch(SetDebuggerPoints({push:true,stepNo:props.idx+1}))
+              dispatch(SetDebuggerPoints({push:'push',stepNo:props.idx+1}))
             }
               else{
-                dispatch(SetDebuggerPoints({push:false,stepNo:props.idx+1}))
+                dispatch(SetDebuggerPoints({push:'pop',stepNo:props.idx+1}))
               }
               
           }
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:'grey',color:'white'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly'}} 
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:'lightgrey',color:'red'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
-                  <span><i style={{fontSize:'13px'}} className={debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
+                  <span><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{fontSize:'20px'}:{fontSize:'13px'}} className={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>

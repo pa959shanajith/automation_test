@@ -1183,22 +1183,50 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
   api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
                 or {status:"", "":xpath}
 */ 
-export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false,debuggerPoints) => {
+export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false,advanceDebug=false,debuggerPoints=[],actionForAdvanceDebug="") => {
     return new Promise((resolve, reject)=>{
-        axios(url+"/debugTestCase_ICE", {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            data : {
-                param : 'debugTestCase_ICE',
+        let data={}
+        if(advanceDebug){
+        if(actionForAdvanceDebug=='play'){
+            data={
+                param:'playDebug',
+                debuggerPoints:debuggerPoints
+            }
+        }
+        else if (actionForAdvanceDebug=='moveToNextStep'){
+            data={
+                param:'moveToNextStep',
+                debuggerPoints:debuggerPoints
+            }
+        }
+        else  {
+            
+             data={   param : 'debugTestCase_ICE',
                 userInfo: userInfo,
                 browsertypes: browserType,
                 testcaseids: testcaseID,
                 apptype: appType,
                 geniusExecution,
                 debuggerPoints:debuggerPoints
+            }
+        }
+        }
+        else{
+            data={   
+                param : 'debugTestCase_ICE',
+                userInfo: userInfo,
+                browsertypes: browserType,
+                testcaseids: testcaseID,
+                apptype: appType,
+                geniusExecution,
+        }
+    }
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
             },
+            data : data,
             credentials : 'include',
         })
         .then(res=>{
