@@ -55,17 +55,18 @@ const TestRailContent = ({ domainDetails, ref }) => {
             TestRailAction: "getSuites",
             projectId: e.value.id
         });
-        setLoading(false);
 
         if (testrailTestSuites.error)
             setToast("error", "Error", testrailTestSuites.error);
 
-        testrailTestSuites.length > 0 && setProjectSuites(testrailTestSuites);
+        if (testrailTestSuites.length > 0) {
+            setProjectSuites(testrailTestSuites);
+            setLoading(false);
+        };
     };
 
     // Fetching AVO testcases
     useEffect(() => {
-        setLoading(true);
         const fetchAvoModules = async () => {
             const getModulesData = await getProjectsMMTS(projectDetails.projectId);
             const testCasesList = getModulesData[0].mindmapList?.flatMap(({ scenarioList, ...rest }) => (
@@ -84,13 +85,12 @@ const TestRailContent = ({ domainDetails, ref }) => {
         };
 
         fetchAvoModules();
-        setLoading(false);
     }, []);
 
     // Fetching Testrail test suites, test  sections & test  cases
     useEffect(() => {
-        setLoading(true);
         const fetchSections = async () => {
+            setLoading(true);
             try {
                 const testSection = [];
 
@@ -130,7 +130,7 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                 testCaseDetails.push(testCaseWithType);
                             }
                         }
-
+                        setLoading(false);
                         return testCaseDetails;
                     } catch (error) {
                         console.error("Error fetching test cases:", error);
@@ -171,6 +171,7 @@ const TestRailContent = ({ domainDetails, ref }) => {
                         ...section,
                         children: organizedHierarchy
                     });
+                    setLoading(false);
                 }
 
                 setSectionData((sectionData) => testCaseData);
@@ -332,14 +333,21 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                         </div>
                                     </div>
                                     <div className='zephyrdata-card1'>
+
                                         {
-                                            sectionData.length > 0 &&
-                                            <Tree
-                                                value={sectionData}
-                                                selectionMode="single"
-                                                selectionKeys={selectedTestRailNodeFirstTree}
-                                                nodeTemplate={treeCheckboxTemplateFirstTree}
-                                            />
+                                            sectionData.length > 0 ?
+                                                <Tree
+                                                    value={sectionData}
+                                                    selectionMode="single"
+                                                    selectionKeys={selectedTestRailNodeFirstTree}
+                                                    nodeTemplate={treeCheckboxTemplateFirstTree}
+                                                />
+                                                :
+                                                (loading && <div className="bouncing-loader">
+                                                    <div></div>
+                                                    <div></div>
+                                                    <div></div>
+                                                </div>)
                                         }
                                         {/* <div className="jira__paginator">
                                                 <Paginator
@@ -420,20 +428,19 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
                                             <AccordionTab header={<span>{item.testscenarioname[0]}</span>}>
-                                                    {
-                                                        item.testname?.map((test) => (
-                                                            <div className='unsync-icon'>
-                                                                <p>{test}</p>
-                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
-                                                            </div>
-                                                        ))
-                                                    }
+                                                {
+                                                    item.testname?.map((test) => (
+                                                        <div className='unsync-icon'>
+                                                            <p>{test}</p>
+                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
+                                                        </div>
+                                                    ))
+                                                }
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
                                 </div>
                             )}
-
                         </Card>
                     </TabPanel>
                 </TabView>
