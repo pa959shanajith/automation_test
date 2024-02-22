@@ -189,7 +189,9 @@ const CanvasNew = (props) => {
     const [visibleCaptureAndDesign,setVisibleCaptureAndDesign] = useState(false);
     const [captureClick, setCaptureClick] = useState(false);
     const [designClick, setDesignClick] = useState(false);
-
+    const [enteredTags, setEnteredTags] = useState([]);
+    const [tagAdded, setTagAdded] = useState(false);
+    const [saveDisabled, setSaveDisabled] = useState(true);
 
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -348,7 +350,7 @@ const CanvasNew = (props) => {
             }
             //load mindmap from data
             if(typeOfView === 'mindMapView'){
-              tree = generateTree(tree,types,{...count},props.verticalLayout,screenData)
+              tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
               journey = transformDataFromTreetoJourney(tree)
@@ -416,7 +418,16 @@ const CanvasNew = (props) => {
     const showToast = (severity, summary) => {
       toast.current.show({ severity, summary, life: 3000 });
     };
-   
+    useEffect(() => {
+      setTagAdded(false);
+    }, [visibleTag]);
+    
+    useEffect(() => {
+      const shouldDisableSave = inputValue.trim() !== '' || (!tagAdded && tags[fetchingDetails?._id]?.length === 0) ||!tagAdded;
+      setSaveDisabled(shouldDisableSave);
+    }, [inputValue, tagAdded, tags, fetchingDetails]);
+    
+    
       const handleSaveTags = async () => {
         setLoading(true);
         const filteredTags = tags[fetchingDetails._id].filter(tag => tag !== null && tag !== undefined);
@@ -430,17 +441,20 @@ const CanvasNew = (props) => {
           // setTags(tagdata);
           if(response==="pass"){
             setTags(tags)
-            // console.log("tagsinsave",tags)
+            showToast('success', 'Tag(s) saved successfully.',3000);
           }else{
             setTags('')
+            showToast('error', 'Failed to save tag(s). Please try again.',6000);
           }
            
           setVisibleTag(false) 
+          setTagAdded(false);
+          setInputValue('');
       };
       const handleDialogHide = () => {
         setVisibleTag(false)
         setInputValue('');
-    
+        setTagAdded(true);
       };
 
     const menuItemsModule = [
@@ -568,12 +582,14 @@ const CanvasNew = (props) => {
     const handleSuggestionSelect = (e) => {
       setInputValue(e.value);
       setShowSuggestions(false);
+      setTagAdded(true);
     };
   
  
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleAddTag();
+      setTagAdded(true);
     }
   };
   const handleAddTag = () => {
@@ -583,6 +599,7 @@ const CanvasNew = (props) => {
       if (tags[fetchingDetails._id].includes(inputValue)) {
         showToast('error', 'Tag already exists');
       } else {
+        setEnteredTags([...enteredTags, inputValue]);
         setTags({ ...tags, [fetchingDetails._id]: updatedTags });
         for (let i = 0; i < dNodes[0].children.length; i++) {
           if (dNodes[0].children[i]._id === fetchingDetails._id) {
@@ -591,6 +608,7 @@ const CanvasNew = (props) => {
           }
         }
         setInputValue('');
+        setTagAdded(true);
       }
     }
   };
@@ -598,12 +616,14 @@ const CanvasNew = (props) => {
   const handleRemoveTag = (indexToRemove) => {
     const updatedTags = tags[fetchingDetails._id].filter((_, index) => index !== indexToRemove);
   setTags({ ...tags, [fetchingDetails._id]: updatedTags });
+  setTagAdded(true);
     for (let i = 0; i < dNodes[0].children.length; i++) {
           if (dNodes[0].children[i]._id === fetchingDetails._id) {
             const data = { ...dNodes[0].children[i], tag: updatedTags };
             dNodes[0].children[i] = data; 
           }
         }
+        showToast('success', 'Tag(s) removed successfully.',3000);
   };  
 
   const renderTags = () => {
@@ -1898,7 +1918,8 @@ const footerContentScreen =(
   // functions for tag a testcase 
   const footerContentTag=(
     <div>
-            <Button label="Save"  className="savetag" onClick={handleSaveTags} /> 
+            <Button label="Save"  className="savetag" onClick={handleSaveTags}  disabled={saveDisabled}
+ /> 
         </div>
   ) 
   const updateObjects = (tab) => {
@@ -2689,6 +2710,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                       <div className='tagname'>Tags</div>
                       <div>
                         <AutoComplete
+                        key={visibleTag ? 'visible' : 'hidden'}
                           id="username"
                           className='inputtag'
                           value={inputValue}
@@ -2723,7 +2745,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </Card>
                 {fetchingDetails && fetchingDetails._id && tags[fetchingDetails._id]?.length === 0 && (
-                  <p className='taginstruction'>Provide a tag name and press enter to tag your testcase.</p>
+                  <p className='taginstruction'>Provide a tag name and press enter to add tag(s).</p>
                 )}
               </div>
             </div>
@@ -2740,8 +2762,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
-            {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} />}
-            {visibleCaptureAndDesign && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick}/>}
+            {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} setFetchingDetailsForGroup={setFetchingDetailsForGroup} />}
+            {visibleCaptureAndDesign && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick} dNodes={dNodes} setFetchingDetails={setFetchingDetails}/>}
             <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />

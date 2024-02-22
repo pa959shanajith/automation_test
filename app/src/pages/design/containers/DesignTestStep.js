@@ -106,7 +106,7 @@ const DesignModal = (props) => {
     const [customEdit , setCustomEdit] =useState(false);
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
-    console.log(customEdit,'customEdit');
+
     const handleAceEditor = (e) => {
         setInputEditor(e)
     }
@@ -626,6 +626,7 @@ const DesignModal = (props) => {
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
 
+    // console.log(getKeywords('@Browser'),'getKeywords');
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
@@ -1365,7 +1366,6 @@ const DesignModal = (props) => {
           setIsNameValid(false);
         }
     }, [inputKeywordName, AllOptions]);
-    console.log(isSpaceError,'space',isNameValid);
     const rowExpansionTemplate = (data) => {
         function handleArrow(){
             setArrow(!arrow)
@@ -1389,7 +1389,7 @@ const DesignModal = (props) => {
                     <span className="step_col d__step_head" ></span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keyword ":"Switch to new keyword"} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keyword ":"Switch to new keyword"}/></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1419,6 +1419,8 @@ const DesignModal = (props) => {
                                     setInputEditor={setInputEditor}
                                     setAlloptions={setAlloptions}
                                     setCustomEdit={setCustomEdit}
+                                    fetchData={props.fetchingDetails}
+                                    typesOfAppType={props.appType}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1452,6 +1454,9 @@ const DesignModal = (props) => {
         }
 
         else if (inputEditor === '') {
+            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+        }
+        else if (customTooltip === '') {
             toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
         }
         else {
@@ -1629,7 +1634,6 @@ const DesignModal = (props) => {
                                 nameInput='name'
                                 isSpaceError={isSpaceError}
                                 customEdit={customEdit}
-                                setCustomEdit={setCustomEdit}
                                 />
                                 </div>
                                 </div>
@@ -1652,6 +1656,7 @@ const DesignModal = (props) => {
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
                             />
                         </div>
                     </div>
@@ -1662,11 +1667,11 @@ const DesignModal = (props) => {
                         <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
 
                             <div className="flex align-items-center" >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
                                 <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
                             </div>
                             <div className="flex align-items-center"  >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
                                 <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
                             </div>
                         </div>

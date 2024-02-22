@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-				var redisStore = require('connect-redis')(sessions);
+												var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -161,7 +161,7 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-			}
+									}  
 						return next();
 		});
 
@@ -248,7 +248,6 @@ if (cluster.isMaster) {
 		var browserstack = require('./server/controllers/browserstack');
 		var generateAI = require('./server/controllers/generateAI');
 		
-
 		// No CSRF token
 		app.post('/moduleLevel_ExecutionStatus',report.moduleLevel_ExecutionStatus);
 		app.post('/teststepLevel_ExecutionStatus',report.teststepLevel_ExecutionStatus);
@@ -336,7 +335,7 @@ if (cluster.isMaster) {
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
 			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
-		});
+		});	
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin|devOpsReport)$/, function(req, res) {
@@ -491,6 +490,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
 		var zephyr = require('./server/controllers/zephyr');
+		var testrail = require('./server/controllers/testrail');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -499,7 +499,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
 		var SauceLab = require('./server/controllers/sauceLab');
-var browserstack = require('./server/controllers/browserstack');
+        var browserstack = require('./server/controllers/browserstack');
 
 
 
@@ -590,8 +590,10 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Testrail',auth.protect, admin.getDetails_Testrail)
 		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageTestrailDetails', auth.protect,admin.manageTestrailDetails);
 		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
@@ -708,6 +710,9 @@ var browserstack = require('./server/controllers/browserstack');
 		//Zephyr Plugin
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
+		app.post('/zephyrRepoDetails_ICE', auth.protect, zephyr.zephyrRepoDetails_ICE);
+		app.post('/zephyrModuleUnderRepo_ICE', auth.protect, zephyr.zephyrModuleUnderRepo_ICE);
+		app.post('/zephyrRepoTestcaseDetails_ICE', auth.protect, zephyr.zephyrRepoTestcaseDetails_ICE);
 		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
 		app.post('/zephyrMappedCyclePhase', auth.protect, zephyr.zephyrMappedCyclePhase);
 		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
@@ -716,7 +721,17 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
 		app.post('/excelToZephyrMappings', auth.protect, zephyr.excelToZephyrMappings);
-		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
+
+		// Testrail Plugin
+		app.post('/getProjectsTestrail_ICE',auth.protect, testrail.getProjects_Testrail);
+		app.post('/getSuitesTestrail_ICE',auth.protect, testrail.getSuites_Testrail);
+		app.post('/getTestcasesTestrail_ICE',auth.protect, testrail.getTestcases_Testrail);
+		app.post('/saveTestrailMapping',auth.protect,testrail.saveMapping_Testrail)
+		app.post('/viewTestrailMappedList',auth.protect,testrail.viewMappedDetails_Testrail)
+		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
+		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
+		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
+		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);
 		app.post('/APG_OpenFileInEditor', auth.protect, flowGraph.APG_OpenFileInEditor);
