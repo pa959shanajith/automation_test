@@ -1423,8 +1423,10 @@ const DesignModal = (props) => {
     ]
     const handlePlay=()=>{
         // SetEnablePauseDebugger({status:false})
-        let newDebuggerPoints=debuggerPoints.shift()
-        dispatch(SetDebuggerPoints({push:'play',payload:newDebuggerPoints}))
+        let debuggerPointShift=[...debuggerPoints]
+        debuggerPointShift.shift()
+        let newDebuggerPoints=debuggerPointShift
+        dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
         DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
         .then(data => {
             if(data==="success"){
@@ -1435,9 +1437,12 @@ const DesignModal = (props) => {
         )
     }
     const handleMoveToNext=()=>{
+        
         let nextVal=debuggerPoints[0]+1
-        let newDebuggerPoints=[nextVal,[...debuggerPoints].shift()]
-        dispatch(SetDebuggerPoints({push:'nextStep',payload:newDebuggerPoints}))
+        let debuggerPointShift=[...debuggerPoints]
+        debuggerPointShift.shift()
+        let newDebuggerPoints=[nextVal,...debuggerPointShift]
+        dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
 
         DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
         .then(data => {
@@ -1504,7 +1509,7 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',payload:[]})}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',points:[]})}}>
                     <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>

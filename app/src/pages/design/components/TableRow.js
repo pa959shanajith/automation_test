@@ -83,7 +83,13 @@ const TableRow = (props) => {
             setTCDetails(newTcDetails);
         }
     }, [props.rowChange, props.testCase]);
-
+useEffect(()=>{
+if(!debuggerPoints.length){
+  setDebuggerPoint(false)
+  setDebugeerInLightMode(false)
+ 
+}
+},[debuggerPoints])
     useEffect(()=>{
         setChecked(props.stepSelect.check.includes(props.idx));
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -384,7 +390,7 @@ const TableRow = (props) => {
           }
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:'lightgrey',color:'red'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:' #FFFC89 ',color:'red',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
                   <span><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{fontSize:'20px'}:{fontSize:'13px'}} className={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>

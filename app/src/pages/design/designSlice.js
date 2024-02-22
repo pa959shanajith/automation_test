@@ -237,13 +237,14 @@ export const designSlice = createSlice({
     SetDebuggerPoints:(state,action)=>{
       if(action.payload.push=='push'){
         state.debuggerPoints.push(action.payload.stepNo)
+        state.debuggerPoints=state.debuggerPoints.sort((a,b)=>a-b)
       }
-      else if (!action.payload.push=='pop'){
+      else if (action.payload.push=='pop'){
         let newDubbugerPoint=state.debuggerPoints.filter(step=>step!==action.payload.stepNo)
-        state.debuggerPoints=newDubbugerPoint
+        state.debuggerPoints=newDubbugerPoint.sort((a,b)=>a-b)
       }
       else{
-        state.debuggerPoints=action.payload
+        state.debuggerPoints=action.payload.points
       }
     },
     SetAdvanceDebug:(state,action)=>{
