@@ -1366,7 +1366,6 @@ const DesignModal = (props) => {
           setIsNameValid(false);
         }
     }, [inputKeywordName, AllOptions]);
-    console.log(isSpaceError,'space',isNameValid);
     const rowExpansionTemplate = (data) => {
         function handleArrow(){
             setArrow(!arrow)

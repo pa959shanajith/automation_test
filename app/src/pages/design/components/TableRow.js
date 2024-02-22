@@ -68,7 +68,6 @@ const TableRow = (props) => {
     setInputEditor(child.props.data.isCode);
   }
   const CustomMenu = (value) => {
-    console.log(value, 'value');
     return (
       <MenuList {...value} style={{ width: '100%' }}>
         {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
@@ -254,7 +253,6 @@ const TableRow = (props) => {
   const onObjSelect = event => {
     const caseData = props.getKeywords(event.value);
     const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
-    console.log(caseData,'caseData',event.value);
     setInput("");
     setOutput("");
     setKeywordList(caseData.keywords);
@@ -423,7 +421,7 @@ const TableRow = (props) => {
         return option;
       }
       );
-console.log(optionKeyword,'optionKeyword',keywordList);
+// console.log(optionKeyword,'optionKeyword',keywordList);
   const handleOption = () => {
     var optionKeyword_2 = keywordList?.slice(startIndex, keywordList.length).map((keyword, i) => {
       const option = {
