@@ -72,6 +72,7 @@ export default function BasicDemo() {
   const [networkDialog, setNewtorkDialog] = useState(false);
   const [networkData, setNetworkData] = useState([]);
   const [description, setDescription] = useState(null);
+  const [downloadLevel, setDownloadLevel] = useState(null);
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -86,9 +87,11 @@ export default function BasicDemo() {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get("reportID");
-      return id;
+      const downloadLevel = urlParams.get("downloadLevel");
+      return { id, downloadLevel, viewReport };
     };
-    const id = getQueryParam();
+    const { id, downloadLevel } = getQueryParam();
+    setDownloadLevel(downloadLevel);
     const getUrl = new URLSearchParams(window.location.search);
     const execution = getUrl.get("execution");    
     const accessibilityID = getUrl.get("accessibilityID");
@@ -105,7 +108,7 @@ export default function BasicDemo() {
 
   const getReportsTable = async () => {
     if (reportid) {
-      const view = await viewReport(reportid);
+      const view = await viewReport(reportid, "json", false, downloadLevel, true);
       setReportData(JSON.parse(view));
     }
   };

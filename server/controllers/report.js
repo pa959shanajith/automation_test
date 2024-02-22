@@ -282,7 +282,7 @@ const prepareReportData = (reportData, embedImages) => {
     return { report, scrShots };
 };
 
-const prepareExecutionReportData = async(exportLevel = "", downloadLevel = "", executionListId = "", reportId = "",embedImages="") => {
+const prepareExecutionReportData = async(exportLevel = "", downloadLevel = "", executionListId = "", reportId = "",embedImages = "", isViewReport = false) => {
     // row Level Data
     if (downloadLevel == "row") {
         let commonFields = {};
@@ -745,7 +745,7 @@ const prepareExecutionReportData = async(exportLevel = "", downloadLevel = "", e
             report.commentsLength = commentsLength;
         }
         report["rawHtmlPath"] =  htmlPaths.tc_report_path;
-        report["overallstatus"] =  [report["overallstatus"]];
+        report["overallstatus"] =  isViewReport ? report["overallstatus"] : [report["overallstatus"]];
         report["scrShots"] = scrShots;
         return report;
     }
@@ -1853,6 +1853,7 @@ exports.viewReport = async (req, res, next) => {
     const exportLevel = req.query.exportLevel;
     const downloadLevel = req.query.downloadLevel;
     const executionListId = req.query.executionListId; // required for row-level downloads
+    const isViewReport = req.query.viewReport === "true" ? true : false;
 
     logger.info("Requesting report type - " + fileType);
     var statusCode = 400;
@@ -1866,7 +1867,7 @@ exports.viewReport = async (req, res, next) => {
         });
     }
     // generate Report Data
-    replacements = await prepareExecutionReportData(exportLevel, downloadLevel, executionListId, reportId, embedImages);
+    replacements = await prepareExecutionReportData(exportLevel, downloadLevel, executionListId, reportId, embedImages, isViewReport);
     scrShots = replacements.scrShots ? replacements.scrShots : [];
     // if filetype is json
     if (fileType == "json") {
