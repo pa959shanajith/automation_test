@@ -515,6 +515,8 @@ const Messages={
         ERR_INVALID_INFO: {"CONTENT": "Enter Correct Details", "VARIANT": VARIANT.ERROR},
         ERR_ENTER_VALID_CRED: {"CONTENT": "Enter Valid Credentials", "VARIANT": VARIANT.ERROR},
         ERR_JIRA_FETCH: {"CONTENT": "Failed to fetch JIRA details.", "VARIANT": VARIANT.ERROR},
+        ERR_TESTRAIL_FETCH: {"CONTENT": "Failed to fetch Testrail details.", "VARIANT": VARIANT.ERROR},
+        ERR_TESTRAIL_TESTPLAN_FETCH: {"CONTENT": "Failed to fetch Testrail test plans.", "VARIANT": VARIANT.ERROR},
         ERR_SAUCELABS_FETCH: {"CONTENT": "Failed to fetch Saucelabs details.", "VARIANT": VARIANT.ERROR},
         ERR_ADD_FETCH:{"CONTENT": "Failed to fetch Azure DevOps details","VARIANT":VARIANT.ERROR},
         ERR_UPLOAD_APK:{"CONTENT": "Failed to Upload apk","VARIANT":VARIANT.ERROR},

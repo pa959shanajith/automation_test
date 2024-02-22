@@ -288,11 +288,11 @@
 
     display: flex;
 
-    flex-direction: row;
+    flex-direction:  column;
 
-    position: relative;
+    height: 90%;
 
-    top: 3rem;
+    gap : 2rem;
 
     .p-component {
 
@@ -300,6 +300,10 @@
 
     }
 
+    .integration-card {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .manage_integrations {
