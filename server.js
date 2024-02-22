@@ -722,8 +722,8 @@ if (cluster.isMaster) {
 		app.post('/getProjectsTestrail_ICE',auth.protect, testrail.getProjects_Testrail);
 		app.post('/getSuitesTestrail_ICE',auth.protect, testrail.getSuites_Testrail);
 		app.post('/getTestcasesTestrail_ICE',auth.protect, testrail.getTestcases_Testrail);
-		app.post('/saveTestrailMapping',testrail.saveMapping_Testrail)
-		app.post('/viewTestrailMappedList',testrail.viewMappedDetails_Testrail)
+		app.post('/saveTestrailMapping',auth.protect,testrail.saveMapping_Testrail)
+		app.post('/viewTestrailMappedList',auth.protect,testrail.viewMappedDetails_Testrail)
 		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
 		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
 		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
