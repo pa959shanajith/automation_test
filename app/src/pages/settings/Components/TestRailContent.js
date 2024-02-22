@@ -403,7 +403,6 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
                                             <AccordionTab key={item._id} header={<span>{item.testname}</span>}>
-                                                {console.log("itemitemitem", item)}
                                                 {
                                                     item.testscenarioname.map((scenario, index) => (
                                                         <div className='unsync-icon' key={index}>
@@ -421,10 +420,14 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
                                             <AccordionTab header={<span>{item.testscenarioname[0]}</span>}>
-                                                <div className='unsync-icon'>
-                                                    <span>{item.testname}</span>
-                                                    <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
-                                                </div>
+                                                    {
+                                                        item.testname?.map((test) => (
+                                                            <div className='unsync-icon'>
+                                                                <p>{test}</p>
+                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
+                                                            </div>
+                                                        ))
+                                                    }
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
