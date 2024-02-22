@@ -1345,7 +1345,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >
               Schedule
             </Button>
-            <span id={cicdLicense.value || projectInfo?.appType !== "Web" ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
+            <span id={cicdLicense.value || !(projectInfo?.appType == "Web" || projectInfo.appType === "Desktop") ? 'CICD_Disable_tooltip' : 'CICD_tooltip'}>
             <Button
               className="CICD"
               size="small"
@@ -1355,7 +1355,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setConfigItem(idx);
                 setRunningStatusTimer("")
               }}
-                disabled={projectInfo.appType !== "Web" || cicdLicense.value}
+                disabled={!(projectInfo.appType === "Web" || projectInfo.appType === "Desktop") || cicdLicense.value}
             >  
               CI/CD
             </Button>
