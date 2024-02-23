@@ -63,7 +63,7 @@ const ElementRepository = (props) => {
   const [updateDeleteCurrentElements, setUpdateDeleteCurrentElements] = useState(false);
   const [deleteScreens, setDeleteScreens] = useState(false);
   const [overlay, setOverlay] = useState(null);
-  const [screenRename,SetScreenRename] =  useState("");
+  const [screenRename,setScreenRename] =  useState("");
   const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
 
 
@@ -255,15 +255,18 @@ const handleAccordionNameEdit = (index,e) => {
 
   const previousName = updatedScreenData[index].name;
 
-    if (screenRename.trim() === '') {
+    if (!previousName && screenRename.trim() === '') {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Screen name cannot be empty!', life: 5000 });
-      SetScreenRename(previousName);
+      setScreenRename(previousName);
       return;
+    }
+    else{
+      setScreenRename(previousName)
     }
  
   let params ={
     projectid: defaultselectedProject.projectId,
-    name: screenRename,
+    name: screenRename ? screenRename : previousName,
     param : 'update',
     screenid: updatedScreenData[index]["_id"]
   }
@@ -273,8 +276,9 @@ const handleAccordionNameEdit = (index,e) => {
     if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
     else if(response === "invalid session") return RedirectPage(history);
     else{
-      SetScreenRename("")
+      setScreenRename("")
       setEditingIndex(null)
+      screenRename && toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository renamed', life: 5000 });
     }
   })
   .catch(error => console.log(error))
@@ -287,7 +291,7 @@ const handleChangeScreenName=(index,e)=>{
     e.preventDefault();
     return;
   }
-  SetScreenRename(e.target.value)
+  setScreenRename(e.target.value)
   const updatedScreenData = [...screenData];
   updatedScreenData[index].name = e.target.value;
   setScreenData(updatedScreenData);
@@ -912,7 +916,7 @@ const deleteScreen = (index, screenDetails)=>{
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
-                    <span className='screenname__display'>{screenDetails.name}</span>
+                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>10?screenDetails.name.trim().substring(0,10)+'...':screenDetails.name }</span>
                   )}
                 </span>
               {activeAccordionIndex === index && (

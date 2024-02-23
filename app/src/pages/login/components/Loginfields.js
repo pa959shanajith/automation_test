@@ -44,10 +44,12 @@ const Login = (props) => {
         setShowForgotPasswordScreen(true);
         setShowloginScreen(false);
         setEmail('');
+        setUsername('');
     }
     const singleSignOnHandler = () => {
         setSingleSignOnScreen(true);
         setShowloginScreen(false);
+        setUsername('');
     }
     const backButtonHandler = () => {
         setShowloginScreen(true);
@@ -132,7 +134,7 @@ const Login = (props) => {
     const loginSubmitHandler = async (event) => {
         toast.current.clear();
         event.preventDefault();
-        if (username.trim().length > 0 && password.length > 0) {
+        if (username.trim().length > 0) {
             checkUser();
         }
         else { toastError("Enter a valid username and password.") }
@@ -341,12 +343,18 @@ const Login = (props) => {
                 {singleSignOnScreen && <>
                     <span className='Forgot_Header'>Login with SSO/SAML</span>
                     <span className='Password_reset_link'> Enter user ID associated with SSO/SAML account.</span>
-                    <form>
+                    <form onSubmit={loginSubmitHandler}>
                         <div className='flex flex-column'>
                             <label className='text-left Login_Font' htmlFor="username">User ID</label>
                             <div className="p-input-icon-left mb-5 mt-2">
                                 <i className='pi pi-user'></i>
-                                <InputText id="username" className='forgetPassword_user_input' placeholder='Enter user id' />
+                                <InputText 
+                                    id="username" 
+                                    className='forgetPassword_user_input' 
+                                    placeholder='Enter user id'
+                                    value={username}
+                                    onChange={handleUsername} 
+                                />
                             </div>
                         </div>
                         <div className='login_btn mb-5'>

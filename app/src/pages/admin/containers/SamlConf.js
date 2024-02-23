@@ -209,6 +209,18 @@ const SamlConf = () => {
     setName(value);
   }
 
+  const closeModal = () => {
+    setshowDeleteModal(false);
+  }
+
+  const deleteModalButtons = () => {
+    return (
+      <div>
+        <Button label="Yes" size="small" id="deleteGlobalModalButton" onClick={() => { samlConfManage("delete"); setshowDeleteModal(false); }} ></Button>
+        <Button label="No" size="small" onClick={() => { setshowDeleteModal(false); samlReset(); }} text></Button>
+      </div>
+    )
+  }
   return (
     <div className="saml_container">
       <Toast ref={toast} position="bottom-center" />
@@ -291,6 +303,15 @@ const SamlConf = () => {
           </>}
         </div>
       </div>
+      {showDeleteModal ?
+        <ModalContainer 
+          title="Delete Configuration" 
+          show={showDeleteModal}
+          footer={deleteModalButtons()} 
+          close={closeModal} 
+          width={'25%'}
+          content="Are you sure you want to delete ? Users depending on this configuration will not be able to login." />
+        : null}
     </div>
   );
 };

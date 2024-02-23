@@ -21,6 +21,7 @@ const ProjectCreation = (props) => {
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
   if (!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo;
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
 
   const handleClick = () => {
     navigate("/admin");
@@ -204,8 +205,8 @@ const ProjectCreation = (props) => {
             <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
         </Card>) : null}
         {
-          userInfo && userInfo.rolename === "Quality Manager" && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
-            <Button className="CreateProj_btn" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
+          (userInfo && userInfo?.rolename === "Quality Manager") && (projectInfoFromRedux && projectInfoFromRedux?.appType === "Web") && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
+            <Button className="CreateProj_btn m-3" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
 }
       </div>
