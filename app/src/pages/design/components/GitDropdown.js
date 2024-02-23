@@ -56,6 +56,7 @@ const GitDropdown = (props) => {
   const [projectlistRefresher, setProjectlistRefresher] = useState(false);
   const [versionNameError, setversionNameError] = useState(false);
   const [commentError, setCommentError] = useState(false);
+  if(CreateProjectVisible) {projectName.current = ''}
 
 
   useEffect(() => {
@@ -270,7 +271,7 @@ const GitDropdown = (props) => {
 
   const createProjectCloseDialogHandler = () => {
     dispatch(isCreateProjectVisible(false));
-    setVisibleGitconfFormAfterCreatePrj(true);
+    if(projectName.current !== '')  setVisibleGitconfFormAfterCreatePrj(true);
     setIsData(false);
     setProjectlistRefresher(true);
   }
