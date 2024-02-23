@@ -53,6 +53,7 @@ const TableRow = (props) => {
     const [debugeerInLightMode,setDebugeerInLightMode]=useState(false);
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const advanceDebug=useSelector(state=>state.design.advanceDebug)
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
 
 
     let objList = props.objList;
@@ -390,10 +391,10 @@ if(!debuggerPoints.length){
           }
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
-                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?{fontSize:'20px'}:{fontSize:'13px'}} className={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && advanceDebug)?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>

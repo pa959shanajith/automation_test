@@ -61,6 +61,7 @@ const initialState = {
   currentid: "",
   debuggerPoints:[],
   advanceDebug:false,
+  enablePlayButton:false
 }
 
 export const designSlice = createSlice({
@@ -249,8 +250,11 @@ export const designSlice = createSlice({
     },
     SetAdvanceDebug:(state,action)=>{
       state.advanceDebug=action.payload
-    }
+    },
 
+    SetEnablePlayButton:(state,action)=>{
+      state.enablePlayButton=action.payload
+    }
   }
 })
 
@@ -295,6 +299,7 @@ export const { projectList, moduleList, screenData,
   typeOfOprationInFolder,
   selectedScreenOfStepSlice,
   SetDebuggerPoints ,
-  SetAdvanceDebug} = designSlice.actions
+  SetAdvanceDebug,
+  SetEnablePlayButton} = designSlice.actions
 
 export default designSlice.reducer

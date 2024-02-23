@@ -237,8 +237,8 @@ exports.debugTestCase_ICE = function (req, res) {
 											};
 										}
 										var responsedata = requestedtestcaseids.map(i=> tcDict[i])
-										responsedata.push(browsertypeobject);
-										logger.info("Sending socket request for debugTestCase to cachedb");
+										
+										responsedata.push(browsertypeobject,debuggerPointsObject);										logger.info("Sending socket request for debugTestCase to cachedb");
 										dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
 										startDebugging(dataToIce);
 									}

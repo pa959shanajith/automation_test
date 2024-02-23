@@ -12,7 +12,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -37,7 +37,7 @@ const DesignModal = (props) => {
     const mainTestCases = useSelector(state => state.design.TestCases);
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const advanceDebug=useSelector(state=>state.design.advanceDebug)
-
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
@@ -632,6 +632,8 @@ const DesignModal = (props) => {
                 if(advanceDebug && debuggerPoints){
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
                 setOverlay("");
+                dispatch(SetEnablePlayButton(true))
+                return
                 }
                 setOverlay("");
                 ResetSession.end();
@@ -1424,6 +1426,7 @@ const DesignModal = (props) => {
     const handlePlay=()=>{
         // SetEnablePauseDebugger({status:false})
         let debuggerPointShift=[...debuggerPoints]
+        dispatch(SetEnablePlayButton(false))
         debuggerPointShift.shift()
         let newDebuggerPoints=debuggerPointShift
         dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
@@ -1517,7 +1520,7 @@ const DesignModal = (props) => {
                     <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
-                        {(debuggerPoints.length>=1 && advanceDebug)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<span style={{cursor:'pointer'}}><i className="pi pi-pause" style={{ height:'30px' }}></i>
+                        {(enablePlayButton)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<span style={{cursor:'pointer'}}><i className="pi pi-pause" style={{ height:'30px' }}></i>
 </span>}
                         
                         <img src='static/imgs/stepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
