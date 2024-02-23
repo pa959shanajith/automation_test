@@ -861,7 +861,7 @@ const DesignModal = (props) => {
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(rowData && !props.testSuiteInUse)?<div>
+            {(rowData && !props.testSuiteInUse && !advanceDebug)?<div>
                 {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
@@ -947,7 +947,7 @@ const DesignModal = (props) => {
                 <label htmlFor="ingredient1" className="ml-2">Advance Debug</label>
             </div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={() =>{!ingredients.includes('Advance Debug')? handleDebug(selectedSpan):DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)}} autoFocus />
+            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={() =>{!ingredients.includes('Advance Debug')? handleDebug(selectedSpan):dispatch(SetAdvanceDebug(false));DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)}} autoFocus />
         </div>
     );
     
@@ -1450,13 +1450,17 @@ const DesignModal = (props) => {
         }
         )
         }
+    const handleRemoveDebuggerPoints=()=>{
+        dispatch(SetDebuggerPoints({push:'reset',points:[]}))
+        toast.current.show({severity:'success', summary:'Success', detail:"Debugger points removed successfully", life:2000})
+    }    
         
     
     return (
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position={visibleRight?'left':'right'} visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
+            <Dialog className='design_dialog_box' header={headerTemplate} position={visibleRight?'left':'right'} visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false});dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',points:[]});setVisibleRight(false)}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
@@ -1509,17 +1513,17 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',points:[]})}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]})}}>
                     <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
-                        {(debuggerPoints.length>=1 && advanceDebug)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px'}}/>:<span><i className="pi pi-pause" style={{ height:'30px' }}></i>
+                        {(debuggerPoints.length>=1 && advanceDebug)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<span style={{cursor:'pointer'}}><i className="pi pi-pause" style={{ height:'30px' }}></i>
 </span>}
                         
-                        <img src='static/imgs/stepInto.svg' onClick={handleMoveToNext}alt='' style={{height:'30px'}}/>
+                        <img src='static/imgs/stepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
-                        <img src='static/imgs/stop.svg' alt='' style={{height:'30px'}}/>
-                    </div>
+                        <span title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{cursor:'pointer'}}><i className="pi pi-ban" style={{ height:'30px' }}></i></span>
+                                            </div>
                     <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
 
                     </div>
@@ -1527,7 +1531,7 @@ const DesignModal = (props) => {
             <DataTable value={watchlist}>
                 <Column field="testStep" header="Step no."></Column>
                 <Column field="name" header="Element Name"></Column>
-                <Column field="variable" header="Variable"></Column>
+                <Column field="variable" header="status/value"></Column>
                 
             </DataTable>
         </div>
