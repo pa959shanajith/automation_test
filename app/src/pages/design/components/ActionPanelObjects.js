@@ -473,7 +473,7 @@ const isAnySpecifiedFieldFilled = (obj) => {
 };
 
 const isSaveEnabled = () => {
-    return objects.some(obj => areMandatoryFieldsFilled(obj) && isAnySpecifiedFieldFilled(obj)) && objectsData;
+    return objects.some(obj => areMandatoryFieldsFilled(obj) && isAnySpecifiedFieldFilled(obj));
 };
 
   const renderAccordionHeader = (objName, index, objects) => {
