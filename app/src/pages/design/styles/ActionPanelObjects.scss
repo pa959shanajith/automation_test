@@ -359,7 +359,7 @@
 
 .accordion-actions {
     position: relative;
-    left: 36rem;
+    left: 35rem;
     bottom: 3rem;
 }
 
@@ -381,7 +381,11 @@
 }
 
 .save-btn {
-    top: 0.7rem;
+    right: 6%;
+    top: 0.9rem;
+    .p-button:focus {
+        box-shadow: none !important;
+    }
 }
 
 

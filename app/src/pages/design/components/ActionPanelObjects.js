@@ -401,7 +401,7 @@ const ActionPanel = (props) => {
 
 
   const createElementFooter = (
-    <div className='save_clear'>
+    <div>
       {/* <Button className='add_object_clear' >Clear</Button> */}
       <Button className='add_object_save' onClick={() => { onSubmit(customObjList); props.setSaveDisable(false) }} disabled={!submitEnable}>Submit</Button>
     </div>
@@ -464,13 +464,25 @@ const ActionPanel = (props) => {
 
   // ============================ Create element ==================================
 
+  const areMandatoryFieldsFilled = (obj) => {
+    return obj.url && obj.objName && obj.tempId;
+};
+
+const isAnySpecifiedFieldFilled = (obj) => {
+    return obj.name || obj.relXpath || obj.className || obj.id || obj.qSelect || obj.absXpath;
+};
+
+const isSaveEnabled = () => {
+    return objects.some(obj => areMandatoryFieldsFilled(obj) && isAnySpecifiedFieldFilled(obj)) && objectsData;
+};
+
   const renderAccordionHeader = (objName, index, objects) => {
     return (
-      <div className="accordion-header">
-        <div style={{ marginTop: "3rem" }}>{(objName === "") ? `Element ${index + 1}` : objName}</div>
+      <div className="accordion-header" style={{width:'8rem'}}>
+        <div style={{ marginTop: "3rem",overflow:'hidden',textOverflow:'ellipsis'}}>{(objName === "") ? `Element ${index + 1}` : objName}</div>
         <div className="accordion-actions">
-          <Button label="Save" severity="secondary" text className='save-btn' onClick={() => onSave(index)} />
-          <button className=" pi pi-plus button-add" onClick={newField} />
+          <Button label="Save" severity="secondary" text className='save-btn' onClick={() => onSave(index)} disabled={!isSaveEnabled()} />
+          <button className=" pi pi-plus button-add" onClick={newField} disabled={!submitEnable} />
           <button className=" pi pi-trash button-delete" disabled={objects.length == 1} onClick={() => deleteField(index)} />
         </div>
       </div>
