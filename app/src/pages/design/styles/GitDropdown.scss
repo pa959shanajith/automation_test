@@ -1,3 +1,5 @@
+@import "../../global/styles/ColorVariables.scss";
+
 .gitVersion_dialog {
   
   .label-cls {
@@ -27,6 +29,9 @@
     margin-bottom: 16px;
   }
 
+  .Git-config_cls .p-inputtext.p-inputtext-sm{
+    font-size: $f7_regular;
+  }
   .Git-config_cls .git_comp,
   .Git-config_cls .a__btn {
     display: none;
@@ -131,12 +136,20 @@
   cursor: pointer;
 }
 
+.GitVersion_cls > .p-inputgroup > .p-inputgroup-addon{
+  background: #ffff !important;
+  padding: 0px !important;
+}
+
+
 .git-config-custom-dropdown-item {
   width: 11rem !important;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 11rem !important;
+  display: flex;
+  align-items: center;
 }
 
 .createProject_GitConfig .p-inputtext-sm{
