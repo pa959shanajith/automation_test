@@ -635,8 +635,9 @@ const TableRow = (props) => {
         </div>
         {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
         <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
-          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
-          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye'></span>}</>}
+          <span>
+          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon'></span>}</>}</span>
         </span>
       </div>
         <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>
