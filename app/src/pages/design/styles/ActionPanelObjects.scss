@@ -850,13 +850,14 @@
     margin-top: -0.7rem !important;
     margin-bottom: 1rem !important;
 }
-addtag{
+.addtag{
     margin-top: 5rem;
     justify-content: space-around;
     margin-left: 1rem;
 }
 .inputtag{
-    margin-right: 2rem;
+    flex: 1;
+    margin-right: 1rem;
 }
 @media only screen and (max-width: 1024px) {
     .inputtag {
@@ -881,6 +882,9 @@ addtag{
   }
   .tag-input{
     margin-top: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 //   .closebutton {
 //     background: none;
@@ -928,8 +932,8 @@ addtag{
     height: 2.5rem; 
     margin-left: 1rem;
     margin-top: 2rem;
-    margin-right: 2rem;
-
+    margin-right:-28rem;
+    cursor: pointer;
   }
 .cardstag{
     margin-top: 2rem;
@@ -941,6 +945,8 @@ addtag{
 .cardimg{
     height: 6rem;
     margin-left: 4rem;
+    max-width: 100%;
+    height: auto;
 }
 .tagtitle{
     margin-top: -2rem;
@@ -949,7 +955,6 @@ addtag{
 .cardstag > *:not(:last-child) {
     margin-right: 0.5rem; 
 }
-/* YourComponent.css */
 
 .suggestion-box {
     position: absolute;
@@ -976,13 +981,7 @@ addtag{
   .suggestion-box li:hover {
     background-color: #f0f0f0;
   }
-  /* Add these styles to your CSS stylesheet or style block */
 
-
-// .chip-container {
-//     display: inline-flex;
-//     flex-wrap: wrap;
-//   }
   
   .chiptag {
     display: inline-flex;
@@ -1007,11 +1006,15 @@ addtag{
     background-color: #EBEBFF;
     height: 4rem;
   }
-  
-  .p-dialog .p-dialog-header {
-    background: #EBEBFF !important;
-   
-}
+  .Tag_dialog{
+    width: 80%;
+    max-height: 80vh; 
+    overflow: auto;
+   .p-dialog-header {
+        background: #E2E2ED !important;
+    }
+  }
+ 
 .tagplace{
 font-family: "Open Sans";
 margin-left: 3rem;
@@ -1026,4 +1029,9 @@ margin-left: 3rem;
 }
 .savetag{
     width: fit-content;
+}
+.tagtestcase {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

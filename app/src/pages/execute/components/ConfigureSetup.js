@@ -80,8 +80,8 @@ const ConfigureSetup = ({
 
   
   const searchOptions = [
-    { label: 'search by names', value: 'option1' },
-    { label: 'search by tags', value: 'option2' }
+    { label: 'Search by name', value: 'option1' },
+    { label: 'Search by tag', value: 'option2', className:"tagSearch" }
   ];
 
   const handleDropdownChange = (e) => {
