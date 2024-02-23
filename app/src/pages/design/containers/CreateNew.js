@@ -89,9 +89,9 @@ const CreateNew = ({ importRedirect }) => {
     },[handleTypeOfViewMap])
 
     const views = [
+        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/folderViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Folder View</h5></div>, code: 'folderView', disabled: true },
-        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/tableViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Table View</h5></div>, code: 'tableView', disabled: true },
     ];
 
@@ -203,8 +203,10 @@ const CreateNew = ({ importRedirect }) => {
         return (
             <div className={`${handleTypeOfViewMap ==='folderView' ? "canvas_topbar_in_folderview": "canvas_topbar"}`}>
                             <div className='mp__toolbar__container '>
-                                <div className="mr-3 ml-4">
+                                <div className="mr-3 ml-5">
+                                    <label style={{position:'relative', bottom:"1.3vh"}} htmlFor='views'>View: </label>
                                     <Dropdown 
+                                        id="views"
                                         className={'w-full md:w-12rem p-inputtext-sm'} 
                                         value={selectedView}
                                         onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
