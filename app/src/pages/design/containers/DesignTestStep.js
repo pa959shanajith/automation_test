@@ -947,7 +947,7 @@ const DesignModal = (props) => {
                 <label htmlFor="ingredient1" className="ml-2">Advance Debug</label>
             </div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={() =>{!ingredients.includes('Advance Debug')? handleDebug(selectedSpan):dispatch(SetAdvanceDebug(false));DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)}} autoFocus />
+            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={() =>{!ingredients.includes('Advance Debug')? handleDebug(selectedSpan):dispatch(SetAdvanceDebug(true));DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)}} autoFocus />
         </div>
     );
     
