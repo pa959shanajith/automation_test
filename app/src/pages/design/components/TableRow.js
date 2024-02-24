@@ -637,7 +637,7 @@ const TableRow = (props) => {
         <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
           <span>
           <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
-          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon1'></span>}</>}</span>
+          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon3'></span>}</>}</span>
         </span>
       </div>
         <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>
