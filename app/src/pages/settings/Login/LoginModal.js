@@ -414,7 +414,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.username,
         Zephyr: zephyrLoginDetails.username,
         TestRail: testRailLoginDetails.username,
-        default: testRailLoginDetails.username
+        default: ""
     };
 
     const passwordDetailsMap = {
@@ -422,7 +422,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.password,
         Zephyr: zephyrLoginDetails.password,
         TestRail: testRailLoginDetails.apiKey,
-        default: testRailLoginDetails.apiKey
+        default: ""
     };
 
     const urlDetailsMap = {
@@ -430,7 +430,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.url,
         Zephyr: zephyrLoginDetails.url,
         TestRail: testRailLoginDetails.url,
-        default: testRailLoginDetails.url
+        default: ""
     };
 
     return (
