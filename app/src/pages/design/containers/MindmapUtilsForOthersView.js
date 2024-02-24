@@ -1801,11 +1801,31 @@ export function transformDataFromTreetoJourney(data) {
                     }
                     parent.push(childItem);
                 }
+            }else if (childItem.parent && childItem.childIndex === 1) {
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
+                }else{
+                    const parentIndex = childItem.parent.childIndex;
+                    const parentData = findParent(parentIndex, newItem);
+
+                    if (parentData) {
+                        if (!parentData.children) {
+                            parentData.children = [];
+                        }
+                        parent.push(childItem);
+                    }
+                }
             } else {
-                if (parent[0].children.length === 0) {
-                    parent[parent.length - 1].children.push(childItem);
-                } else {
-                    newItem.children[i - 1].children.push(childItem);
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
                 }
             }
         }
