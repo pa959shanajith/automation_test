@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset, SetTagTestCases} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -374,7 +374,7 @@ const CanvasNew = (props) => {
         dispatch(SetOldModuleForReset(tree.dNodes[0]._id))
         localStorage.setItem('OldModuleForReset',tree.dNodes[0]._id)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.module,props.reload,props.verticalLayout,analyzeScenario,typeOfView]);
+    }, [props.module,props.reload,props.verticalLayout,analyzeScenario,typeOfView,]);
     useEffect(()=>{
         if(createnew === 'save'){
             setCreateNew(false)
@@ -430,6 +430,7 @@ const CanvasNew = (props) => {
     
       const handleSaveTags = async () => {
         setLoading(true);
+        // dispatch(SetTagTestCases(true))
         const filteredTags = tags[fetchingDetails._id].filter(tag => tag !== null && tag !== undefined);
         const data = {
             testscenarioId: fetchingDetails["_id"],
@@ -450,11 +451,13 @@ const CanvasNew = (props) => {
           setVisibleTag(false) 
           setTagAdded(false);
           setInputValue('');
+          dispatch(SetTagTestCases(false))
       };
       const handleDialogHide = () => {
         setVisibleTag(false)
         setInputValue('');
         setTagAdded(true);
+        dispatch(SetTagTestCases(false))
       };
 
     const menuItemsModule = [
@@ -659,10 +662,11 @@ const CanvasNew = (props) => {
     return taglist
   })
   
-    const handleTags = async() => {
+    const handleTags = () => {
       
       if (toastData !== true) {
         setVisibleTag(true);
+        dispatch(SetTagTestCases(true))
         d3.select('#' + box).classed('node-highlight', false);
       } else {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save Mindmap before proceeding', life: 2000 });

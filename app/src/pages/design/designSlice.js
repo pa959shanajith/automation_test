@@ -61,6 +61,7 @@ const initialState = {
   currentid: "",
   updateScreenModuleId:{},
   isCreateProjectVisible: false,
+  tagtestcase:false
 }
 
 export const designSlice = createSlice({
@@ -240,6 +241,9 @@ export const designSlice = createSlice({
      setUpdateScreenModuleId:(state, action) =>{
       state.updateScreenModuleId = action.payload
     },
+    SetTagTestCases:(state,action)=>{
+      state.tagtestcase=action.payload
+    }
 
   }
 })
@@ -284,6 +288,7 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   SetOldModuleForReset,
   typeOfOprationInFolder,
   selectedScreenOfStepSlice,
-  setUpdateScreenModuleId} = designSlice.actions
+  setUpdateScreenModuleId,
+SetTagTestCases} = designSlice.actions
 
 export default designSlice.reducer
