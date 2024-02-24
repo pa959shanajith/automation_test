@@ -1192,7 +1192,7 @@ else{
         </h4>
         
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
-          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable && blocked} outlined>Add more</Button>
+          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
