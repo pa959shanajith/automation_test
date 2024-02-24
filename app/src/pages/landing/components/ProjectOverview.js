@@ -30,7 +30,7 @@ const ProjectOverview = (props) => {
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
-        { label: 'Element Repository', command: ()=>handleElementRepository()},
+        { label: 'Element Repository', command: ()=>handleElementRepository(), disabled: defaultselectedProject.appType==="Webservice"},
         { label: 'AI Testcase' },
         { label: 'Capabalities'},
     ];

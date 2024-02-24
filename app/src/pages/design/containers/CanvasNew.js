@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -1373,8 +1373,10 @@ const CanvasNew = (props) => {
     setBox(e.target.parentElement.id)
     if(type === "teststepsgroups"){
       setFetchingDetailsForGroup(dNodes[e.target.parentElement.id.split("_")[1]])
+      dispatch(setElementRepoModuleID({id:dNodes[0]._id, key:"repo"}))
     }else{
       setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+      dispatch(setElementRepoModuleID({id:dNodes[0]._id, key:"repo"}))
     }
     const element = d3.select('#'+e.target.parentElement.id)
     if(type==="modules"){ menuRef_module.current.show(e);element.classed('node-highlight',!0)}

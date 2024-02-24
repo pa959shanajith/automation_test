@@ -133,6 +133,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -1142,8 +1143,8 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(selectedElement)} />
-
+          className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+          
 
         
 
@@ -1873,7 +1874,7 @@ const confirmScreenChange = () => {
         let params = {
           param : "updateMindmapTestcaseScreen",
           projectID :  NameOfAppType.projectId,
-          moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+          moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
           parent:props.fetchingDetails["parent"]["_id"],
           currentScreen:parentData.id,
           updateScreen:selectedFolderValue.id
@@ -1883,7 +1884,7 @@ const confirmScreenChange = () => {
         if(res === 'fail') {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 5000 });
+          
           var req={
             tab:"createdTab",
             projectid:NameOfAppType.projectId,
@@ -1901,7 +1902,7 @@ const confirmScreenChange = () => {
               data.children.forEach((child)=>{
                 if(child._id === props.fetchingDetails["parent"]["_id"]){
                   child.children.forEach((subChild)=>{
-                    if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                    if(subChild._id === selectedFolderValue.id){
                       if(subChild.children.length > 0){
                          const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
                             return {
@@ -1926,10 +1927,18 @@ const confirmScreenChange = () => {
               return sd;
             }
             
-            console.log(screenData_1);
-            props.setFetchingDetails(screenData_1[0])
-            props.setModuleData({id:res, key:uuid()})
-            setParentId(uuid());
+            // console.log(screenData_1);
+            if(screenData_1.length>0){
+              props.setFetchingDetails(screenData_1[0])
+              props.setModuleData({id:res, key:uuid()})
+              setParentId(uuid());
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+            }else{
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+            }
+            // props.setFetchingDetails(screenData_1[0])
+            // props.setModuleData({id:res, key:uuid()})
+            // setParentId(uuid());
           }
         }
         }
