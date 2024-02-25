@@ -54,11 +54,11 @@ function NavigatetoCaptureDesign(params) {
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}/>
+                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:Object.keys(moduleData).length>0?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}/>
                     </div>  
                     :
                     <div>
-                        <DesignModal  fetchingDetails={!params.designClick?params.fetchingDetails['children'][0]:params.fetchingDetails} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>
+                        <DesignModal  fetchingDetails={!params.designClick?params.fetchingDetails['children'][0]:Object.keys(moduleData).length>0?params.fetchingDetails['children'][0]:params.fetchingDetails} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>
                     </div>  }   
                 </div>
             </Dialog>

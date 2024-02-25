@@ -1650,19 +1650,19 @@ const debugTestCases = selectedBrowserType => {
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>Tag</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', marginLeft: '10px' }}>{popupData[0].custname}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', marginLeft: '10px' }}>{popupData[0]?.custname}</p>
     </div>
     <Divider style={{ margin: '0' }} />
     <div className="column2" >
       <p style={{ marginLeft: '-25px' }}>Id</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%' }}>{popupData[0].keywordVal}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%' }}>{popupData[0]?.keywordVal}</p>
     </div>
     <Divider style={{ margin: '0' }} />
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>X-path</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].xpath?.trim().length !== 0 ? (popupData[0].xpath?.trim().length > 10 && !showFullXpath ? popupData[0].xpath?.trim().substring(0, 20) + "..." : popupData[0].xpath.trim()) : 'Not Found'}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0]?.xpath?.trim().length !== 0 ? (popupData[0]?.xpath?.trim().length > 10 && !showFullXpath ? popupData[0]?.xpath?.trim().substring(0, 20) + "..." : popupData[0]?.xpath.trim()) : 'Not Found'}</p>
     </div>
     <Divider style={{ margin: '0' }} />
   </div>
