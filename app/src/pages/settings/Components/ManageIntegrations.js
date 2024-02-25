@@ -19,7 +19,7 @@ import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree,enableSaveButton
+    selectedAvoproject, mappedTree,enableSaveButton, updateTestrailMapping
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -48,6 +48,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
     const testrailLoginDetails = useSelector(state => state.setting.testRailLogin);
     const enabledSaveButton = useSelector(state => state.setting.enableSaveButton);
+    const isTestrailMapped = useSelector(state => state.setting.updateTestrailMapping);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
     const [Index, setIndex] = useState(0);
@@ -281,7 +282,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
         else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
         // else if (testrailProjects === "Error:Failed in running testrail") setLoginError("Host not reachable");
-        // else if (testrailProjects === "Error:testrail Operations") setLoginError("Failed during execution");
+        else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
         else if (testrailProjects) {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
@@ -575,8 +576,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 setToast("error", "Error", response.error);
             } else if (response === "scheduleModeOn")
                 setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-            else if (response.status == 201 || response.status == 200 || response.message.length > 0 || response == "success") {
+            else if (response.status == 201 || response.status == 200 || response == "success") {
                 setToast("success", "Success", 'Tests mapped successfully!');
+                dispatchAction(updateTestrailMapping(true));
             }
         }
         else {
