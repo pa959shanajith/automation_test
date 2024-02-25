@@ -60,7 +60,7 @@ const GeniusSapDialog = () =>{
 
   return <>
     <Toast ref={toast} position="bottom-center" baseZIndex={9999} style={{ maxWidth: "35rem" }} />
-    <Dialog style={small?{width:'45vw',height:'30vh'}: {width: '80vw',height: '97vh' }} header={ small?null:"Avo Genius for SAP"} visible={showSapGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch(showSapGenius({ showSapGeniusWindow: false, geniusSapWindowProps: {} })) }}>
+    <Dialog style={small?{width:'45vw',height:'30vh'}: {width: '80vw',height: '97vh' }} header={ small?null:"Avo Genius(SAP)"} visible={showSapGeniusDialog} draggable={false} className="geniusMindmapDialog" onHide={() => { dispatch(showSapGenius({ showSapGeniusWindow: false, geniusSapWindowProps: {} })) }}>
         <GeniusSap {...geniusSapWindowProps } toastWarn={toastWarn} toastSuccess={toastSuccess} toastInfo={toastInfo} toastError={toastError}></GeniusSap>
     </Dialog>  
 

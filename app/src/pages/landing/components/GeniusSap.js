@@ -219,7 +219,7 @@ const GeniusSap = (props) => {
           step: `Step ${counter}`,
           elementName: sapGeniusScrapeData.custname,
           keywordVal: sapGeniusScrapeData.keywordVal,
-          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.inputVal}</div>,
+          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.id.split("/")[6] !=="pwdRSYST-BCODE"?sapGeniusScrapeData.inputVal:"*********"}</div>,
           tempOrderId: newUUID,
           testcases: sapGeniusScrapeDataModified
         });
@@ -257,7 +257,7 @@ const GeniusSap = (props) => {
           step: `Step ${counter}`,
           elementName: sapGeniusScrapeData.custname,
           keywordVal: sapGeniusScrapeData.keywordVal,
-          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.inputVal}</div>,
+          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.id.split("/")[6] !=="pwdRSYST-BCODE"?sapGeniusScrapeData.inputVal:"*********"}</div>,
           testcases: sapGeniusScrapeData
         });
         setDataLength(data.length);
@@ -812,6 +812,7 @@ const onScreenNameChange = (e, name) => {
     screenViewObject.applicationPath = applicationPath;
     screenViewObject.scrapeType = "Genius";
     if (startGenius === "Activate Genius") {
+      props.toastSuccess(MSG.CUSTOM("Genius activated successfully", "success"));
       setStartGenius("Stop Genius");
       data.push({
         id: 1,
@@ -1149,10 +1150,17 @@ const onScreenNameChange = (e, name) => {
       <React.Fragment>
         <Tooltip target=".pi-info-circle" />
         <span className="removeEllipsis" style={{}} onMouseEnter={() => { if (rowData.custname.trim().length > 30) setShowFull(true) }} onMouseLeave={() => setShowFull(false)}> {rowData.custname.trim().length > 30 && !showFull ? rowData.custname.trim().substring(0, 20) + "..." : rowData.custname.trim()}</span>
-        <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span>
+        {/* <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span> */}
       </React.Fragment>
     );
     {/* <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span> */ }
+  }
+
+  const keywordValTemplate = (rowData) =>{
+    return <div><div className='keyworddata'>{rowData?.keywordVal}</div></div>
+  }
+  const inputValTemplate = (rowData) =>{
+    return <div><div className='Testdata'> {rowData?.inputVal}</div></div>
   }
 
   let tableDataNew = useMemo(() => {
@@ -1410,7 +1418,7 @@ const onScreenNameChange = (e, name) => {
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
     originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
-    allScreenData[selectedScreen.name]["testcases"] = originalData[objIndex].testcases;
+    allScreenData[selectedScreen.name] = originalData[objIndex].testcases;
     setTableAfterOperation(originalData)
   
     setDataParamUrl(false)
@@ -1603,16 +1611,12 @@ const debugTestCases = selectedBrowserType => {
           footer={` Test Steps count : ${data.testcases.length > 0 ? data.testcases.length : 0}`} style={{ textAlign: 'center' }}
         >
 
-          <Column rowReorder headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem', borderTopLeftRadius: '8px' }} style={{  paddingLeft: '0.8rem', paddingRight: '0.8rem' }} />
-          {/* <Column headerStyle={{ backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem',flexGrow:'0.2'}}  editor={(options) => textEditor(options)} header="Step" bodyStyle={{ textAlign: 'center' ,flexGrow:'0.2'}} field="stepNo"  style={{ width: '20%',overflowWrap: 'anywhere',paddingLeft:'0.8rem',paddingRight:'0.8rem' }} onCellEditComplete={onCellEditComplete}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem' }} header="Step" bodyStyle={{ textAlign: 'center' }} field="stepNo" style={{ minWidth: '4rem', width: '28%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem' }} ></Column>
-          {/* <Column  headerStyle={{ backgroundColor: ' #74737f', color: '#fff'}} header="Object Property" body={actionIconTemplate}  exportable={false} style={{ minWidth: '8rem' }}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff' }} body={ActionIconTemplate} header="Element Name" style={{ width: '13%', overflowWrap: 'anywhere', justifyContent: 'space-between' }}></Column>
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '100px' }} field="keywordVal" header="Keyword" style={{ width: '30%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff' }} field="inputVal" header="Test Data" style={{  }} className='Testdata'></Column>
-          {/* <Column headerStyle={{ backgroundColor: ' #74737f', color: '#fff' }} field="outputVal" header="Output Data" editor={(options) => textEditor(options)} style={{ width: '20%', overflowWrap: 'anywhere' }}></Column> */}
-          {/* <Column rowEditor headerStyle={{ width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f',flexGrow:'0.2' }} bodyStyle={{ textAlign: 'center' ,flexGrow:'0.2'}}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f', borderTopRightRadius: '8px' }} body={actionBodyTemplate} bodyStyle={{ textAlign: 'center', minWidth: '4rem' }} exportable={false} style={{ minWidth: '8rem' }}></Column>
+          <Column rowReorder style={{ justifyContent: "center", width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopLeftRadius: '8px', flex: "0 0" }} />
+          <Column style={{ justifyContent: "center", width: '10%', minWidth: "10%" }} field="stepNo"/>
+          <Column body={ActionIconTemplate} style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  ></Column>
+          <Column body={keywordValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '20%', flex:"0 0"}} field="keywordVal"></Column>
+          <Column body={inputValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  field="inputVal" ></Column>
+          <Column body={actionBodyTemplate}  className='step_sap' exportable={false} style={{ justifyContent: "center", width: '40%', minWidth: '6%', flex:"0 0"}}></Column>
 
         </DataTable>
         {/* </ScrollPanel> */}
@@ -2006,7 +2010,7 @@ const debugTestCases = selectedBrowserType => {
                 }>
                 Next
               </button>
-              <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="AVO Genius for SAP" >
+              <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="Avo Genius(SAP)" >
               <div className="App">
             <TabMenu model={items} activeIndex={activeIndex}style={{display:'flex', justifyContent:'center'}}></TabMenu>
             <Menu model={menuModel} popup ref={menu} id="popup_menu" onHide={() => setSelectedRow(null)}/>
@@ -2040,18 +2044,12 @@ const debugTestCases = selectedBrowserType => {
                 onSelectionChange={e => { setSelectedRow(e.value); setSingleData(e.value); setSelectedScreen({ name: e.value.name }) }}
               >
 
-              <Column expander headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem', flexGrow: '0.2', borderTopLeftRadius: '8px' }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
-              {/* <Column expander  headerStyle={{backgroundColor: '#74737f', color: '#fff'}}/> */}
-              {/* <Column field="step" header="Step" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff', width: '13%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'center' }} style={{ minWidth: '4rem', width: '20%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: 'flex-start' }} /> */}
-              {/* <Column body={actionScreen} header="Step"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}}/> */}
-              <Column body={actionScreen} headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '4rem'}} header="Step" bodyStyle={{ textAlign: 'center' }} style={{ minWidth: '4rem', width: '20%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: 'flex-start' }} ></Column>
-              <Column header="Element Name" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'space-between' }} ></Column>
-              {/* <Column header="Element Name" headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column header="Keyword" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff', width: '100px' }} style={{ width: '40%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }} ></Column>
-              {/* <Column header="Keyword"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column header="Test Data" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff' }} style={{ justifyContent: 'flex-start', width: '-40%', overflowWrap: 'anywhere' }} ></Column>
-              {/* <Column header="Test Data"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column headerStyle={{ width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f', flexGrow: '0.2', borderTopRightRadius: '8px' }} bodyStyle={{ textAlign: 'center', flexGrow: '0.2', minWidth: '4rem' }} exportable={false} style={{ minWidth: '8rem' }}></Column>
+              <Column expander headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopLeftRadius: '8px', flex:"0 0" }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
+              <Column body={actionScreen} className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '10%', flex:"0 0"}} header="Steps" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '30%', flex:"0 0"}} header="Element Name" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '20%', flex:"0 0"}} header="Keyword" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '30%', flex:"0 0"}} header="Test Data" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopRightRadius: '8px', flex:"0 0" }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
               </DataTable>
             </div>
                 </div>
@@ -2070,7 +2068,7 @@ const debugTestCases = selectedBrowserType => {
           <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} title={'Erase all data'} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
             <span><img src={`static/imgs/${startGenius || dataSaved ? "erase_all_disable" : "erase_all_enable"}.svg`}></img></span> 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "} title={'Run test steps'}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
+          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "} title={'Preview'}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
 
             <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "} title={'Save Data'} data-pr-position="top" >
               <span onClick={(e) => {if(startGenius || dataSaved) {e.preventDefault()} else {handleSaveMindmap()}}}><img src={`static/imgs/${startGenius || dataSaved ? "save_disable" : "save_enable"}.svg`}></img>
