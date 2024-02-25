@@ -812,6 +812,7 @@ const onScreenNameChange = (e, name) => {
     screenViewObject.applicationPath = applicationPath;
     screenViewObject.scrapeType = "Genius";
     if (startGenius === "Activate Genius") {
+      props.toastSuccess(MSG.CUSTOM("Genius activated successfully", "success"));
       setStartGenius("Stop Genius");
       data.push({
         id: 1,
@@ -1417,7 +1418,7 @@ const onScreenNameChange = (e, name) => {
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
     originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
-    allScreenData[selectedScreen.name]["testcases"] = originalData[objIndex].testcases;
+    allScreenData[selectedScreen.name] = originalData[objIndex].testcases;
     setTableAfterOperation(originalData)
   
     setDataParamUrl(false)
@@ -1615,6 +1616,7 @@ const debugTestCases = selectedBrowserType => {
           <Column body={ActionIconTemplate} style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  ></Column>
           <Column body={keywordValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '20%', flex:"0 0"}} field="keywordVal"></Column>
           <Column body={inputValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  field="inputVal" ></Column>
+          <Column body={actionBodyTemplate}  className='step_sap' exportable={false} style={{ justifyContent: "center", width: '40%', minWidth: '6%', flex:"0 0"}}></Column>
 
         </DataTable>
         {/* </ScrollPanel> */}
