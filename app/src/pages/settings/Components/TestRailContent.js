@@ -10,12 +10,12 @@ import { Paginator } from 'primereact/paginator';
 import { Checkbox } from 'primereact/checkbox';
 import { useSelector, useDispatch } from 'react-redux';
 import * as api from '../api.js';
-import { selectedProject, selectedIssue } from '../settingSlice';
+import { selectedProject, mappedTree } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
 import { enableSaveButton, mappedPair, updateTestrailMapping } from "../settingSlice";
-import { Messages as MSG, setMsg } from '../../global';
+import { Messages as MSG } from '../../global';
 
-const TestRailContent = ({ domainDetails, ref }) => {
+const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -38,13 +38,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
     const currentProject = useSelector(state => state.setting.selectedProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const isTestrailMapped = useSelector(state => state.setting.updateTestrailMapping);
+    const mappedData = useSelector(state => state.setting.mappedPair);
+
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
-    };
-
-    const setToast = (tag, summary, msg) => {
-        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 5000 });
     };
 
     const onDropdownChange = async (e) => {
@@ -88,7 +86,9 @@ const TestRailContent = ({ domainDetails, ref }) => {
                         ...rest
                     }
                 }))
-            ));
+            )).map((obj, index) => {
+                return { ...obj, key: index }
+            });
 
             setUpdatedTreeData(() => testCasesList);
         };
@@ -257,12 +257,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
     };
 
     const handleSync = () => {
-        let popupMsg = false;
         let scenarioIdsList = [];
         const { id, name, suite_id } = selectedTestRailNodeFirstTree;
-        if (selectedTestRailNodesSecondTree.length === 0) {
-            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
-        }
 
         const data = updatedTreeData?.map((item) => {
             if (selectedTestRailNodesSecondTree.includes(item._id)) {
@@ -286,8 +282,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
         };
 
         setUpdatedTreeData((updatedTreeData) => data);
-        if (popupMsg) setMsg(popupMsg);
-        dispatch(enableSaveButton(true));
+        if (selectedTestRailNodesSecondTree.length === 0 || Object.keys(selectedTestRailNodeFirstTree)?.length === 0) {
+            dispatch(enableSaveButton(false));
+        } else {
+            dispatch(enableSaveButton(true));
+        }
         dispatch(mappedPair(mappedData));
         setSelectedTestRailNodeFirstTree({});
         setSelectedTestRailNodesSecondTree([]);
@@ -334,6 +333,25 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     setToast("success", "Success", 'Mapped data unsynced successfully');
                 }
             }
+
+            const removeTestCase = updatedTreeData.map((data) => {
+                if (data._id == scenario) {
+                    if (data.children && data.children.length > 0) {
+                        const filteredChildren = data.children.filter((child) => child._id != items.testid[0]);
+                        console.log("filteredChildren", filteredChildren);
+
+                        return {
+                            ...data,
+                            children: filteredChildren
+                        };
+                    }
+                    return data;
+                } else
+                    return data;
+            });
+
+            dispatch(mappedTree(removeTestCase));
+            setUpdatedTreeData((prevTreeData) => removeTestCase);
         }
     }
 

@@ -2681,7 +2681,7 @@ exports.getDetails_Testrail = async(req,res) => {
 		logger.info("Inside UI service: " + actionName);
 
 		// get userId from session
-		const userId = "659bc2372833ce0bd02d25da";
+		const userId = req.session.userid
 
 		let inputs = {
 			userId: userId
@@ -2832,7 +2832,7 @@ exports.manageTestrailDetails = async (req, res) => {
 	  logger.info("Inside UI service: " + actionName);
 	  
 	  // get userId from session
-	  const userId = "659bc2372833ce0bd02d25da";
+	  const userId = req.session.userid;
 	  
 	  // get remaining data from body
 	  let { TestRailUrl, TestRailUsername, TestRailToken, action } = req.body;

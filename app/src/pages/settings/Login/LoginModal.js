@@ -3,7 +3,9 @@ import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin, zephyrLogin, AzureLogin, screenType, resetZephyrLogin, resetIntergrationLogin, resetAzureLogin, testRailLogin, resetTestRailLogin } from '../settingSlice';
+import { IntergrationLogin, zephyrLogin, AzureLogin, screenType, resetZephyrLogin,
+         resetIntergrationLogin, resetAzureLogin, testRailLogin, resetTestRailLogin,
+         updateTestrailMapping } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -17,13 +19,13 @@ import { Toast } from "primereact/toast";
 import { Checkbox } from 'primereact/checkbox';
 import { Messages as MSG } from '../../global/components/Messages';
 import { RedirectPage, ScreenOverlay,ResetSession,setMsg, VARIANT} from '../../global';
-import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails, getDetails_Testrail, loginToTestRail_ICE} from "../api"
+import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails, getDetails_Testrail } from "../api"
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 
 
 
-const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
+const LoginModal = ({ isSpin = false, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
     const toast = useRef();
     // list of selectors
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
@@ -223,17 +225,18 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
     const getTestRailDetails = async () => {
         try {
-            setLoading("Loading...")
+            setLoading("Loading...");
+            dispatchAction(updateTestrailMapping(true));
             const testRailData = await getDetails_Testrail();
             
             setLoading(false);
 
             if (testRailData === "empty") setMsg(testRailData);
             if (testRailData == {} || testRailData === "empty" || testRailData.error == "fail" ) {
-                setIsEmpty(true);
                 dispatchAction(testRailLogin({ fieldName: "url", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "username", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "apiKey", value: "" }));
+                setIsEmpty(true);
             }
             else {
                 dispatchAction(testRailLogin({ fieldName: "url", value: testRailData.url }));
@@ -391,7 +394,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                         toastSuccess("Successfully deleted the credentials")
                     break;
                 case 'TestRail':
-                    const testRailData = await manageTestRailDetails("delete", {});
+                    const testRailData = await manageTestRailDetails({action:"delete"});
                     if (testRailData.error) {
                         toastError(testRailData.error);
                         return;
