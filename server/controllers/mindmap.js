@@ -1742,6 +1742,61 @@ exports.importDefinition = async (req, res) => {
         res.send("Fail");
     }
 };
+exports.generateToken = async (req, res) => {
+	try {
+        logger.info("Inside UI service: generateToken");
+        var username=req.session.username;
+		var clientName=utils.getClientName(req.headers.host);
+        var icename = undefined
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if(icename!=undefined){
+			let action = req.body.data.type
+			if(action == 'OAuth2.0') {
+				try {
+					let inputs = {...req.body.data};
+					dataToIce = {"emitAction" : "generateToken","username" : icename,'details':inputs};
+					var socket = require('../lib/socket');
+					var mySocket;
+					mySocket = socket.allSocketsMap[clientName][icename];
+					if(mySocket.connected){
+	
+						logger.info("Sending request to ICE for generate Token");
+						mySocket.emit("generateToken", dataToIce.details);
+						function result_generateToken_listener(message) {
+							let data = message;
+							//LB: make sure to send recieved data to corresponding user
+							mySocket.removeListener('result_generateToken', result_generateToken_listener);
+							try {
+								if(data == ''){
+									logger.info('Error Occured in generating Token');
+								}
+								res.send(data);
+							} catch (exception) {
+								res.send("fail");
+								logger.error("Exception in the service generateToken - result_generateToken: %s", exception);
+							}
+						}
+						mySocket.on("result_generateToken",result_generateToken_listener)
+					} else {
+						flag = "unavailableLocalServer";
+						logger.error("Error occurred in the service generateToken - result_generateToken: Socket not Available");
+						res.send(flag);
+					}
+					
+				} catch (exception) {
+					logger.error("Exception in the service generateToken - generateToken: %s", exception);
+				}
+			}
+		} else {
+			flag = "unavailableLocalServer";
+			logger.error("Error occurred in the service generateToken - generateToken: Socket not Available");
+			res.send(flag);
+		}
+	} catch (exception) {
+        logger.error("Exception in the service generateToken: %s", exception);
+        res.send("Fail");
+    }
+};
 exports.fetch_git_exp_details = async (req, res) => {
     const fnName = "fetch_git_exp_details";
     logger.info("Inside UI service: " + fnName);

@@ -1124,6 +1124,26 @@ export const updateScreen_ICE = arg => {
     });
 }
 
+export const generateToken = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/generateToken", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
 export const excelToScreen = (data) =>	{
     return new Promise((resolve, reject)=>{
         const res = axios(url+"/importScreenfromExcel", {
