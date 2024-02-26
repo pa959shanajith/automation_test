@@ -212,8 +212,8 @@ const GeniusSap = (props) => {
             ...element, stepNo: index + 1
           }
         })
-
-        data.push({
+        
+                data.push({
           id: counter,
           name: sapGeniusScrapeData.window_name,
           step: `Step ${counter}`,
@@ -1159,8 +1159,13 @@ const onScreenNameChange = (e, name) => {
   const keywordValTemplate = (rowData) =>{
     return <div><div className='keyworddata'>{rowData?.keywordVal}</div></div>
   }
+  const sapPasswordMask = (rowData) => {
+    const result = rowData.id.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
+    return result
+  }
   const inputValTemplate = (rowData) =>{
-    return <div><div className='Testdata'> {rowData?.inputVal}</div></div>
+    
+    return <div><div className='Testdata'> {sapPasswordMask(rowData)}</div></div>
   }
 
   let tableDataNew = useMemo(() => {
@@ -1616,7 +1621,7 @@ const debugTestCases = selectedBrowserType => {
           <Column body={ActionIconTemplate} style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  ></Column>
           <Column body={keywordValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '20%', flex:"0 0"}} field="keywordVal"></Column>
           <Column body={inputValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  field="inputVal" ></Column>
-          <Column body={actionBodyTemplate}  className='step_sap' exportable={false} style={{ justifyContent: "center", width: '40%', minWidth: '6%', flex:"0 0"}}></Column>
+          <Column body={actionBodyTemplate} exportable={false} style={{ justifyContent: "center", width: '10%', minWidth: '5%', flexGrow: '0.2', flex:"0 0" }}/>
 
         </DataTable>
         {/* </ScrollPanel> */}
@@ -1628,9 +1633,9 @@ const debugTestCases = selectedBrowserType => {
   }
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
+      <>
         <span style={ { fontSize: '14px', opacity: '0.4' } } onClick={(event) => {  menu.current.toggle(event) }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-ellipsis-v' style={{ fontSize: '14px' }} ></i></span>
-      </React.Fragment>
+      </>
     );
   }
   const items = [
@@ -2076,7 +2081,7 @@ const debugTestCases = selectedBrowserType => {
 
           </div>
           <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} title={'Show Mindmap'} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
-          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
+          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} title={'Data Parameterization'} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
           {/* <div className="bottombartooltips" data-pr-tooltip={"Minimize"} data-pr-position="top" style={{ border: 'none' }} ></div> * maximize genius window */}
           {/* <div className="bottombartooltips" data-pr-tooltip="Close Genius App " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'30rem',cursor:'pointer' }} ><img src='static\imgs\close_icon.svg'></img></div>* close genius window */}
             </div>
