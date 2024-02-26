@@ -533,6 +533,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
+		app.post('/generateToken', auth.protect, mindmap.generateToken);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);

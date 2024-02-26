@@ -333,7 +333,7 @@ const WebserviceScrape = (props) => {
                     "header": rReqHeader,
                     "param": rParamHeader,
                     "authKeyword": authKeyword,
-                    "authInput": [`${basicAuthUsername};${basicAuthPassword};`]
+                    "authInput": `${basicAuthUsername};${basicAuthPassword}`
                 };
 
                 if (viewArray.length > 0) scrapeData.view = viewArray;
@@ -380,7 +380,9 @@ const WebserviceScrape = (props) => {
                 })
         }
     }
-
+    const onGenerateToken = () => {
+        api.generateToken({'type':'OAuth2.0'});
+    }
 
     const onAppendchange = (e) => {
         if (e.checked) {
@@ -532,7 +534,7 @@ const WebserviceScrape = (props) => {
                                         onChange={onOAuthUrlChange}
                                     />
                                     <div style={{width:'20%'}}>
-                                    <Button size="small" label="Generate Token"></Button>
+                                    <Button size="small" label="Generate Token" onClick={onGenerateToken}></Button>
                                     </div>
                                 </div>
                                 <div className='inputs_container'>

@@ -820,7 +820,7 @@ const elementTypeProp =(elementProperty) =>{
 
           if(reqAuthKeyword != '' && basicAuthUsername != "" && basicAuthPassword  != "") {
             keywordVal.push(reqAuthKeyword)
-            wsdlInputs.push(`${basicAuthUsername};${basicAuthPassword};`);
+            wsdlInputs.push(`${basicAuthUsername};${basicAuthPassword}`);
           }
 
           setOverlay("Fetching Response Header & Body...");
