@@ -66,7 +66,6 @@ const WebserviceScrape = (props) => {
     const [authKeyword, setAuthKeyword] = useState('');
     const [authUsername, setAuthUsername] = useState('');
     const [authPassword, setAuthPassword] = useState('');
-    const [authInput, setAuthInput] = useState("");
     const [selectedTab, setSelectedTab] = useState("request");
     const [oAuthScope, setOAuthScope] = useState("");
     const [oAuthClientSecret, setOAuthClientSecret] = useState("");
@@ -95,7 +94,8 @@ const WebserviceScrape = (props) => {
 
     const autheniticateList = [
         { value: "setBasicAuth", name: "Basic Auth" },
-        { value: "OAuth_2.0", name: "OAuth 2.0" }
+        { value: "OAuth2.0", name: "OAuth2.0" },
+        { value: "bearertoken", name: "Bearer Token"}
     ];
 
     const methodType = [{ value: "GET", name: "GET" },
@@ -172,17 +172,17 @@ const WebserviceScrape = (props) => {
 
     const onAuthorisationUsernameChange = event => {
         setAuthUsername(event.target.value);
-        if (authKeyword == 'setBasicAuth') {
-            setAuthInput(`${event.target.value};${authPassword};`)
-        }
+        // if (authKeyword == 'setBasicAuth') {
+        //     setAuthInput(`${event.target.value};${authPassword};`)
+        // }
         dispatch(WsData({ basicAuthUsername: event.target.value }));
     }
 
     const onAuthorisationPasswordChange = event => {
         setAuthPassword(event.target.value);
-        if (authKeyword == 'setBasicAuth') {
-            setAuthInput(`${authUsername};${event.target.value};`)
-        }
+        // if (authKeyword == 'setBasicAuth') {
+        //     setAuthInput(`${authUsername};${event.target.value};`)
+        // }
         dispatch(WsData({ basicAuthPassword: event.target.value }));
     }
 
@@ -233,15 +233,20 @@ const WebserviceScrape = (props) => {
         let arg = {};
         let callApi = true;
         //eslint-disable-next-line
-        let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        // let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        let rReqHeader = reqHeader;
         //eslint-disable-next-line
-        let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        // let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        let rParamHeader = paramHeader;
         //eslint-disable-next-line
-        let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
+        // let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
+        let rReqBody = reqBody;
         //eslint-disable-next-line
-        let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        let rRespHeader = respHeader;
+        // let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
-        let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+        let rRespBody = respBody;
+        // let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
         if (!endPointURL ||  method === "0") props.toastError("Please fill the mandatory fields"); // error
         // else if () props.toastError("Please fill the mandatory fields"); // error
         else {
@@ -380,8 +385,13 @@ const WebserviceScrape = (props) => {
                 })
         }
     }
-    const onGenerateToken = () => {
-        api.generateToken({'type':'OAuth2.0'});
+    const onGenerateToken = async() => {
+        // if( !(oAuthGrantTypechange && oAuthClientId && oAuthUrl && oAuthClientSecret && oAuthScope)){
+        //     if(oAuthGrantTypechange === ''){
+        //         setOAuthGrantTypeError(true)
+        //     }else if{oAuthClientId === }
+        // }
+        // const apiGenerator = await api.generateToken({'type':'OAuth2.0','token_url':'', 'client_id': '', 'client_secret':'', 'scope': '', 'grant_type': ''});
     }
 
     const onAppendchange = (e) => {
@@ -407,7 +417,7 @@ const WebserviceScrape = (props) => {
                             placeholder='Select'
                             style={{ width: "10%" }}
                             onChange={methodHandler}
-                            disabled={!appendCheck && method }
+                            disabled={!appendCheck && !method }
                         />
                         <InputText
                             className='p-inputtext-sm'
@@ -485,9 +495,9 @@ const WebserviceScrape = (props) => {
 
                     {/* -----------Authenticate----------------- */}
                     {requestActiveIndex === 3 && <div style={{ overflow: "auto" }}>
-                        <div className='flex flex-column'>
-                            <div className='inputs_container'>
-                                <label htmlFor={"typeSelect"} className="inputs_container_label" >TYPE</label>
+                        <div className='flex flex-column' style={{ width: '70%' }}>
+                            <div className={`${reqAuthKeyword === 'OAuth2.0' ? "type_selection_dropdown" : "inputs_container" }`}>
+                                <label htmlFor={"typeSelect"} className={`${reqAuthKeyword === 'OAuth2.0' ? "type_selection_dropdown_label" : 'inputs_container_label'}` }>TYPE</label>
                                 <Dropdown
                                     data-test="typeSelect"
                                     id="typeSelect"
@@ -500,8 +510,8 @@ const WebserviceScrape = (props) => {
                                     onChange={setAuthorizationKeyWord}
                                     defaultValue={autheniticateList[0]}
                                 />
-                               { reqAuthKeyword === "OAuth_2.0" &&  <div style={{width:'20%'}}>
-                                    <Button size="small" label="Generate Token"></Button>
+                               { reqAuthKeyword === "OAuth2.0" &&  <div style={{width:'20%'}}>
+                                    <Button size="small" label="Generate Token" onClick={onGenerateToken}></Button>
                                 </div>}
                             </div>
                             {reqAuthKeyword === "setBasicAuth" && <>
@@ -513,6 +523,7 @@ const WebserviceScrape = (props) => {
                                         style={{ width: '70%' }}
                                         value={basicAuthUsername}
                                         onChange={onAuthorisationUsernameChange}
+                                        placeholder='Enter the username'
                                     />
                                 </div>
                                 <div className='inputs_container'>
@@ -523,10 +534,11 @@ const WebserviceScrape = (props) => {
                                         style={{ width: '70%' }}
                                         value={basicAuthPassword}
                                         onChange={onAuthorisationPasswordChange}
+                                        placeholder='Enter the password'
                                     />
                                 </div>
                             </>}
-                            { reqAuthKeyword === "OAuth_2.0" && <>
+                            { reqAuthKeyword === "OAuth2.0" && <>
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_url"} className="inputs_container_label" > URL </label>
                                     <InputText
@@ -534,11 +546,9 @@ const WebserviceScrape = (props) => {
                                         inputId="oauth_url"
                                         style={{ width: '70%' }}
                                         value={oAuthUrl}
-                                        onChange={onOAuthUrlChange}
+                                        onChange={(e) => onOAuthUrlChange(e.target.value)}
+                                        placeholder="Enter the URL here"
                                     />
-                                    <div style={{width:'20%'}}>
-                                    <Button size="small" label="Generate Token" onClick={onGenerateToken}></Button>
-                                    </div>
                                 </div>
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_client_id"} className="inputs_container_label" > Client Id </label>
@@ -547,7 +557,8 @@ const WebserviceScrape = (props) => {
                                         inputId="oauth_client_id"
                                         style={{ width: '70%' }}
                                         value={oAuthClientId}
-                                        onChange={onOAuthClientIdChange}
+                                        onChange={(e) => onOAuthClientIdChange(e.target.value)}
+                                        placeholder="Enter the client id here"
                                     />
                                 </div>
                                 <div className='inputs_container'>
@@ -557,7 +568,8 @@ const WebserviceScrape = (props) => {
                                         inputId="oauth_client_secret"
                                         style={{ width: '70%' }}
                                         value={oAuthClientSecret}
-                                        onChange={onOAuthClientSecretChange}
+                                        onChange={(e) => onOAuthClientSecretChange(e.target.value)}
+                                        placeholder="Enter the client secret"
                                     />
                                 </div>
                                 <div className='inputs_container'>
@@ -567,7 +579,8 @@ const WebserviceScrape = (props) => {
                                         inputId="oauth_scope"
                                         style={{ width: '70%' }}
                                         value={oAuthScope}
-                                        onChange={onOAuthScopeChange}
+                                        onChange={(e) => onOAuthScopeChange(e.target.value)}
+                                        placeholder="Enter the scope here"
                                     />
                                 </div>
                                 <div className='inputs_container'>
@@ -577,70 +590,23 @@ const WebserviceScrape = (props) => {
                                         inputId="oauth_grant_type"
                                         style={{ width: '70%' }}
                                         value={oAuthGrantTypechange}
-                                        onChange={onOAuthGrantTypeChange}
+                                        onChange={(e) => onOAuthGrantTypeChange(e.target.value)}
                                     />
                                 </div>
                                 
                             </>}
-
-                            {/* <h4 style={{ marginLeft: "1rem" }}>Current Token</h4>
-                            <span style={{ fontSize: "12px", marginLeft: "1rem" }}>The access token is only available to you. Sync the token to let collaborators on this request use it</span>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Access Token</label>
-                                <div style={{ width: '70%', display: 'flex', gap: '1rem' }} >
-                                    <Dropdown
-
-                                        optionLabel="name"
-                                        style={{ width: '50%' }}
-                                        className={`p-inputtext-sm`}
-
-                                    />
-                                    <InputText className={`p-inputtext-sm`} style={{ width: '50%' }} placeholder="Some access tokens" />
-                                </div>
-                            </div>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Header Prefix</label>
-                                <InputText className=' p-inputtext-sm' placeholder="Bearer" style={{ width: '70%' }} />
-                            </div> */}
-
-
+                            { reqAuthKeyword === 'bearertoken' && <>
+                                <InputText
+                                    className=' p-inputtext-sm'
+                                    inputId="beare_tken_input"
+                                    style={{ width: '70%' }}
+                                    value={basicAuthPassword}
+                                    // onChange={}
+                                    placeholder="Enter the bearer token"
+                                />
+                            </>}
                         </div>
 
-                        {/* <h4 style={{ marginLeft: "1rem" }}>Configure New Token</h4> */}
-                        {/* <div>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Token Name</label>
-                                <InputText className='' placeholder="New access token" style={{ width: '70%' }} />
-                            </div>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Grant Type</label>
-                                <Dropdown
-                                     optionLabel="name"
-                                     style={{ width: '70%' }}
-                                     className={`p-inputtext-sm`}
-                                     placeholder='Authorization Code'
-                                 />
-                             </div>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Callback URL</label>
-                                <div className='flex flex-column' style={{ width: '70%' }}>
-                                    <InputText className=' p-inputtext-sm' placeholder="http:localhost:300/redirect" />
-                                    <span className='flex flex-row'>
-                                        <Checkbox inputId={"editChecker"} name="response_checker" value={""} onChange={""} checked={true} />
-                                        <label htmlFor={"editChecker_text"} className="ml-2">Authorize Using Browser</label>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Auth URL</label>
-                                <InputText className=' p-inputtext-sm' style={{ width: '70%' }} placeholder="http:localhost:300/auth" />
-                            </div>
-                            <div className='inputs_container'>
-                                <label htmlFor={""} className="inputs_container_label"  >Access Token URL</label>
-                                <InputText className=' p-inputtext-sm' placeholder="http:localhost:300/token" style={{ width: '70%' }} />
-                            </div>
-                        </div> */}
                     </div>}
 
                     {/* -----------Certificate----------------- */}

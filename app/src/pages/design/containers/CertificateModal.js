@@ -113,8 +113,8 @@ const CertificateModal = props => {
             </div>
 
 
-            <div className='flex flex-row' style={{ justifyContent: 'left' }}>
-                <Button label="Reset" size='small' onClick={resetFields} className="p-button-text" text />
+            <div className='flex flex-row' style={{ justifyContent: 'left', gap: '1rem', paddingLeft:'1rem'}}>
+                <Button label="Reset" size='small' onClick={resetFields} className="p-button-text" outlined />
                 <Button label="Submit" size='small' onClick={submitCert}  />
             </div>
 

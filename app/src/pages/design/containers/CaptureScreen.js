@@ -2396,8 +2396,10 @@ const screenOption = screenData?.map((folder) => ({
                 }
                 {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
                 {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
-                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
-                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                { NameOfAppType.appType !== 'Webservice' && <> 
+                    <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
+                    <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                </> }
                 {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
                 <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
             </div>
