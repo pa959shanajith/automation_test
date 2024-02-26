@@ -311,7 +311,7 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Paste',
           icon: <img
-                 src="static/imgs/paste_icon.svg"
+                 src="static/imgs/paste_icon.svg" className='paste-icon'
                 />,
           command: () => pasteRow(accordionId),
           disabled: (copiedRow === null)
@@ -328,7 +328,7 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Paste',
           icon: <img
-                  src="static/imgs/paste_icon.svg"
+                  src="static/imgs/paste_icon.svg" className='paste-icon'
                 />,
           command: () => pasteRow(accordionId),
           disabled: (copiedRow === null)
