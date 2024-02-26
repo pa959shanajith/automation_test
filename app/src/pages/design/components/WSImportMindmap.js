@@ -190,7 +190,9 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "method" : data['method'],
             "endPointURL" : data['endPointURL'],
             "header" : data['requestHeader'],
-            "param" : ""
+            "param" : "",
+            "authInput" : "",
+            "authKeyword":""
         }
       }
       if(type == 'testcases' && data != '') {

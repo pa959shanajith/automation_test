@@ -571,7 +571,10 @@ const elementTypeProp =(elementProperty) =>{
 
               let localRespBody = "";
               if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
-              let [basicAuthUsername, basicAuthPassword] = data.authInput[0] != "" ? data.authInput[0].split(";") : ""
+              let basicAuthUsername ='', basicAuthPassword =''
+              if(data?.authInput){
+                [basicAuthUsername, basicAuthPassword] = data?.authInput.split(';') 
+              }
               dispatch(WsData({
                 endPointURL: data.endPointURL,
                 method: data.method,
@@ -591,8 +594,8 @@ const elementTypeProp =(elementProperty) =>{
               setSaved({ flag: false });
               // setHideSubmit(true);
               dispatch(WsData({
-                endPointURL: "", method: "0", opInput: "", reqHeader: "",
-                reqBody: "", respHeader: "", respBody: "", paramHeader: "",
+                endPointURL: "", method: "", opInput: "", reqHeader: "", reqAuthKeyword:'',
+                reqBody: "", respHeader: "", respBody: "", paramHeader: "", basicAuthUsername:'', basicAuthPassword: '',
               }));
             }
             setOverlay("");
@@ -809,7 +812,7 @@ const elementTypeProp =(elementProperty) =>{
 
       let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
 
-      if (error) dispatch(actionError(error));
+      if (error) toastError(error)
 
       if (proceed) {
           dispatch(actionError([]));
@@ -2120,7 +2123,8 @@ const screenOption = screenData?.map((folder) => ({
             : null
         }
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} 
+          toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -2318,7 +2322,7 @@ const screenOption = screenData?.map((folder) => ({
 
 
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"

@@ -242,8 +242,8 @@ const WebserviceScrape = (props) => {
         let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
         let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-        if (!endPointURL) dispatch(actionError(["endPointURL"])); // error
-        else if (method === "0") dispatch(actionError(["method"])); // error
+        if (!endPointURL ||  method === "0") props.toastError("Please fill the mandatory fields"); // error
+        // else if () props.toastError("Please fill the mandatory fields"); // error
         else {
             dispatch(actionError([]));
             let temp_flag = true; // someflag
@@ -303,7 +303,7 @@ const WebserviceScrape = (props) => {
                                     }
                                 }
                                 catch (Exception) {
-                                    setMsg(MSG.SCRAPE.ERR_REQBODY_INVALID);
+                                    props.toastError(MSG.SCRAPE.ERR_REQBODY_INVALID);
                                     console.error("Invalid Request body.");
                                     callApi = false;
                                 }
@@ -333,7 +333,7 @@ const WebserviceScrape = (props) => {
                     "header": rReqHeader,
                     "param": rParamHeader,
                     "authKeyword": authKeyword,
-                    "authInput": `${basicAuthUsername};${basicAuthPassword}`
+                    "authInput": basicAuthPassword && basicAuthPassword ? `${basicAuthUsername+';'}${basicAuthPassword}` : ''
                 };
 
                 if (viewArray.length > 0) scrapeData.view = viewArray;
@@ -366,13 +366,13 @@ const WebserviceScrape = (props) => {
                     if (data === "Success") {
                         // $("#enbledWS").prop("checked", false)
                         props.fetchScrapeData()
-                            .then(data => setMsg(MSG.SCRAPE.SUCC_WS_TEMP_SAVE))
-                            .catch(error => setMsg(MSG.SCRAPE.ERR_WS_TEMP_SAVE));
+                            .then(data => props.toastSuccess(MSG.SCRAPE.SUCC_WS_TEMP_SAVE))
+                            .catch(error => props.toastError(MSG.SCRAPE.ERR_WS_TEMP_SAVE));
                         // props.startScrape()
                     } else if (data === "Invalid Input") {
-                        setMsg(MSG.SCRAPE.ERR_WS_TEMP_SAVE);
+                        props.toastError(MSG.SCRAPE.ERR_WS_TEMP_SAVE);
                     } else {
-                        setMsg(MSG.SCRAPE.ERR_WS_TEMP);
+                        props.toastError(MSG.SCRAPE.ERR_WS_TEMP);
                     }
                 })
                 .catch(error => {
@@ -407,16 +407,16 @@ const WebserviceScrape = (props) => {
                             placeholder='Select'
                             style={{ width: "10%" }}
                             onChange={methodHandler}
-                            disabled={!appendCheck}
+                            disabled={!appendCheck && method }
                         />
                         <InputText
                             className='p-inputtext-sm'
                             placeholder="Enter URL"
                             type='text'
                             onChange={endpointURLHandler}
-                            value={endPointURL}
+                            value={endPointURL} 
                             style={{ width: "50%" }}
-                            disabled={!appendCheck}
+                            disabled={!appendCheck && !endPointURL}
                         />
                         <InputText className='p-inputtext-sm '
                             placeholder="operation"
@@ -424,14 +424,14 @@ const WebserviceScrape = (props) => {
                             onChange={opInputHandler}
                             value={opInput}
                             style={{ width: "20%" }}
-                            disabled={!appendCheck}
+                            disabled={!appendCheck && !opInput}
                         />
                         <div className='flex' style={{ gap: "1rem", width: "fitContent" }}>
                             <Button label="send" size="small"
                                 onClick={() => props.startScrape()}
                             ></Button>
                             <Button label="save" size="small"
-                                disabled={!appendCheck}
+                                disabled={!appendCheck && !method && !endPointURL}
                                 onClick={onSave}
                             ></Button>
                             <div className='flex' style={{ alignItems: "center" }}>
