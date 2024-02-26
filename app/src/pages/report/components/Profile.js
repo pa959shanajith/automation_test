@@ -15,6 +15,11 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Menu } from "primereact/menu";
 import { FooterTwo } from "../../global";
 import { Divider } from "primereact/divider";
+import { Dialog } from 'primereact/dialog';
+import { RadioButton } from "primereact/radiobutton";
+import { Tooltip } from 'primereact/tooltip';
+import moment from "moment";
+import { Toast } from "primereact/toast";
 
 const Profile = () => {
   const [searchScenario, setSearchScenario] = useState("");
@@ -27,7 +32,14 @@ const Profile = () => {
   const [selectedExe, setSelectedExe] = useState(0);
   const location = useLocation();
   const downloadRef = useRef(null);
-  const [scenarioName, setScenarioName] = useState("")
+  const [scenarioName, setScenarioName] = useState("");
+  const [visibleDownloadPopup, setVisibleDownloadPopup] = useState(false);
+  const [exportLevel, setExportLevel] = useState("summary");
+  const [fileType, setFileType] = useState("pdf");
+  const [downloadLoading, setDownloadLoading] = useState(false);
+  const [downloadLevel, setDownloadLevel] = useState("row");
+  const [executionListId, setExecutionListId] = useState("");
+  const toast = useRef(null);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -71,7 +83,7 @@ const Profile = () => {
             id: el._id,
             key: ind.toString(),
             name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
-            dateTime: el.startDate,
+            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm:ss A"),
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -357,7 +369,7 @@ const Profile = () => {
             };
             return {
               key: i,
-              testSuite: el?.modulename,
+              testSuite: testSuiteTemplate(el),
               testSuiteBar: (
                 <Tree value={[nestedtreeArr]} showGridlines className="modules_tree" />
               ),
@@ -688,6 +700,7 @@ const Profile = () => {
                       onClick={(e) => {
                         setDownloadId(item?._id);
                         setScenarioName(item?.scenarioname)
+                        setDownloadLevel("testCase")
                         downloadRef.current.toggle(e);
                       }}
                     ></i>
@@ -720,7 +733,7 @@ const Profile = () => {
       };
       return {
         key: i,
-        testSuite: el?.modulename,
+        testSuite: testSuiteTemplate(el),
         testSuiteBar: (
           <Tree
             value={[nestedtreeArr]}
@@ -807,6 +820,7 @@ const Profile = () => {
       key: e.key,
       label: (
         <div className="flex">
+          <div className="flex">
           <div className="flex testSuite_col1">
             <Badge
               className="badge_icon"
@@ -893,7 +907,7 @@ const Profile = () => {
             ></Badge>
             <span className="badge_txt">Terminated</span>
           </div>
-          <div className="flex testSuite_col2">
+          <div className="flex testSuite_col2" style={{borderRight:"1px solid #dee2e6"}}>
             <Badge
               className="badge_icon"
               value={`${
@@ -973,6 +987,19 @@ const Profile = () => {
             ></Badge>
             <span className="badge_txt">Terminated</span>
           </div>
+          </div>
+          <div className="actions_container">
+            <i
+              className="pi pi-download"
+              onClick={(event) => {
+                setVisibleDownloadPopup(true);
+                setExportLevel("executiveSummary");
+                setFileType("pdf");
+                setDownloadLevel("row");
+                setExecutionListId(e?._id)
+              }}
+            ></i>
+          </div>
         </div>
       ),
       data: e.id,
@@ -992,6 +1019,27 @@ const Profile = () => {
 
   const iconBodyTemplate = (event) => {
     return <span className="pi pi-angle-right" onClick={() => handleOnAccessibility(event)}></span>
+  }
+
+  const testSuiteTemplate = (e) => {
+    return <div className="flex justify-content-between">
+      <div>{e?.modulename}</div>
+      {/* Commented for time being */}
+      {/* <div>
+        <i
+          className="pi pi-download"
+          onClick={(e) => {
+            setDownloadId(e?.reportid);
+            // getExportLevelOptions("testSuiteLevel")
+            setVisibleDownloadPopup(true);
+            setExportLevel("summary");
+            setFileType("pdf");
+            setDownloadLevel("testSuite")
+            
+          }}
+        ></i>
+      </div> */}
+    </div>
   }
 
   const statusAccessBodyTemplate = (event) => {
@@ -1048,7 +1096,7 @@ const Profile = () => {
   };
 
   const onDownload = async (getId,SS) => {
-    let data = await downloadReports({ id: downloadId, type: getId }, SS);
+    let data = await downloadReports({ id: downloadId, type: getId, exportLevel: exportLevel, downloadLevel: downloadLevel, executionListId: executionListId }, SS);
     
     // if (getId === "json") data = JSON.stringify(data, undefined, 2);
 
@@ -1069,13 +1117,82 @@ const Profile = () => {
     }
   };
 
+  const onDownloadClick = () => {
+    setDownloadLoading(true)
+    onDownload(fileType, false)
+    setTimeout(() => {
+      setDownloadLoading(false);
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'Data Saved' });
+      setVisibleDownloadPopup(false)
+    }, 2000);
+
+  }
+
+  const OpenPdfPopup = () => {
+    return <>
+      <Dialog
+        visible={visibleDownloadPopup}
+        modal
+        header={<h4>Download</h4>}
+        footer={<><Toast ref={toast}></Toast><Button
+          label="Download"
+          icon="pi"
+          onClick={onDownloadClick}
+          autoFocus
+          loading={downloadLoading}
+        /></>}
+        style={{ width: '30rem' }}
+        onHide={() => setVisibleDownloadPopup(false)}
+        className="download_popup_container"
+        draggable={false}
+      >        
+        <div className="flex flex-column m-3">
+          <div className="flex flex-row mb-3">
+            <div className="w-3 font-bold">Export Level:</div>
+            <div className="flex flex-column flex-wrap gap-3 w-9 pl-2">
+              {downloadLevel == "row" && <div className="flex align-items-center">
+                <RadioButton inputId="exportLevelZero" name="Executive Summary" value="executiveSummary" onChange={(e) => setExportLevel(e?.value)} checked={exportLevel === "executiveSummary"} />
+                <label htmlFor="exportLevelZero" className="ml-2">Executive Summary</label>
+              </div>}
+              <div className="flex align-items-center">
+                <RadioButton inputId="exportLevelOne" name="summary" value="summary" onChange={(e) => setExportLevel(e?.value)} checked={exportLevel === "summary"} />
+                <label htmlFor="exportLevelOne" className="ml-2">Summary</label>
+              </div>
+              <div className="flex align-items-center">
+                <RadioButton inputId="exportLevelTwo" name="detailed" value="detailed" onChange={(e) => setExportLevel(e?.value)} checked={exportLevel === "detailed"} />
+                <label htmlFor="exportLevelTwo" className="ml-2">Detailed</label>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row mb-3">
+            <div className="w-3 font-bold">File Type:</div>
+            <div className="flex flex-column flex-wrap gap-3 w-9 pl-2">
+              <div className="flex align-items-center">
+                <RadioButton inputId="ingredient1" name="pdf" value="pdf" onChange={(e) => { setFileType(e?.value) }} checked={fileType === "pdf"} />
+                <label htmlFor="ingredient1" className="ml-2">Export PDF</label>
+              </div>
+              {/* {exportLevel == "detailed" && <div className="flex align-items-center">
+                <RadioButton inputId="ingredient1" name="pdfss" value="pdfss" onChange={(e) => { setFileType(e?.value) }} checked={fileType === "pdfss"} />
+                <label htmlFor="ingredient1" className="ml-2">Export PDF with Screenshots</label>
+              </div>} */}
+              {exportLevel == "detailed" && <div className="flex align-items-center">
+                <RadioButton inputId="ingredient1" name="json" value="json" onChange={(e) => { setFileType(e?.value) }} checked={fileType === "json"} />
+                <label htmlFor="ingredient1" className="ml-2">Export JSON</label>
+              </div>}
+            </div>
+          </div>
+        </div>
+      </Dialog>
+    </>
+  }
+
   return (
     <>
       <div className="profile_container">
         {location?.state?.viewBy !== "Accessibility" ? (
           <DataTable
             value={reportsTable}
-            tableStyle={{ minWidth: "50rem" }}
+            // tableStyle={{ minWidth: "50rem" }}
             header={tableHeader}
             globalFilter={searchScenario}
             className="reports_table"
@@ -1131,7 +1248,7 @@ const Profile = () => {
             className="flex downloadItem"
             onClick={() => onDownload("pdf", false)}
           >
-            <span className="pi pi-fw pi-file"></span>
+            <span className="pi pi-fw pi-file-pdf"></span>
             <span>PDF</span>
           </div>
           <div
@@ -1146,6 +1263,7 @@ const Profile = () => {
       <div>
         <FooterTwo />
       </div>
+      {visibleDownloadPopup && OpenPdfPopup()}
     </>
   );
 };

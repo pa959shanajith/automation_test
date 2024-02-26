@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectedModuleReducer } from '../../design/designSlice';
 import { showGenuis, showSmallPopup, allProjectsList } from '../../global/globalSlice';
 import CreateProject from './CreateProject';
+import { migrateProject as migrateProjectSlice } from "../../global/globalSlice";
 
 
 let port = null;
@@ -1162,6 +1163,7 @@ const toastSuccess = (successMessage) => {
               setDisplayCreateProject(true)
               setVisibleProjectPopup(true)
               setSelectedModule(null)
+              dispatch(migrateProjectSlice(""))
             }}>Create Project</div>}
             </div>
            
@@ -1221,8 +1223,8 @@ const toastSuccess = (successMessage) => {
           <div style={{ position: "relative",display:'flex',flexDirection:'column' }}>
           <div style={geniusMigrate?{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)',width:'300px'}:{ display: 'flex',justifyContent: 'space-between',color: 'rgb(95, 51, 143)'}} >
             <div> <label className="label_genius"  htmlFor="project">Test Suite</label></div>
-            {userInfo.rolename=="Quality Engineer"?<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={!(selectedProject && selectedProject.key) ? "disabled" : ""} onClick={() => { setDisplayCreateModule(true); }}>Create Test Suite</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
-            </div>
+            {userInfo.rolename=="Quality Engineer"?<div style={{ display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>:!props.selectedModule?<div className="create__button" style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }} data-attribute={migrateProject?"": "disabled"} onClick={() => { setDisplayCreateModule(true); }}>Create Test Suite</div>:<div style={{  display:'flex',justifyContent:'end', color: "#5F338F", cursor: "pointer" }}></div>}
+              </div>
             {/* <NormalDropDown
               label="Module"
               options={projModules.map((mod) => {
