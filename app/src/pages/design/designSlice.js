@@ -62,7 +62,10 @@ const initialState = {
   updateScreenModuleId:{},
   isCreateProjectVisible: false,
   elementRepoModuleID:{},
-  tagtestcase:false
+  tagtestcase:false,
+  debuggerPoints:[],
+  advanceDebug:false,
+  enablePlayButton:false
 }
 
 export const designSlice = createSlice({
@@ -247,8 +250,28 @@ export const designSlice = createSlice({
     },
     SetTagTestCases:(state,action)=>{
       state.tagtestcase=action.payload
-    }
+    },
+    SetDebuggerPoints:(state,action)=>{
+      if(action.payload.push=='push'){
+        state.debuggerPoints.push(action.payload.stepNo)
+        state.debuggerPoints=state.debuggerPoints.sort((a,b)=>a-b)
+      }
+      else if (action.payload.push=='pop'){
+        let newDubbugerPoint=state.debuggerPoints.filter(step=>step!==action.payload.stepNo)
+        state.debuggerPoints=newDubbugerPoint.sort((a,b)=>a-b)
+      }
+      else{
+        state.debuggerPoints=action.payload.points
+      }
+    },
+    SetAdvanceDebug:(state,action)=>{
+      state.advanceDebug=action.payload
+    },
+
+    SetEnablePlayButton:(state,action)=>{
+      state.enablePlayButton=action.payload
   }
+}
 })
 
 // Action creators are generated for each case reducer function
@@ -291,6 +314,8 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   SetOldModuleForReset,
   typeOfOprationInFolder,
   selectedScreenOfStepSlice,
-  setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases} = designSlice.actions
+  setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
+  SetAdvanceDebug,
+  SetEnablePlayButton} = designSlice.actions
 
 export default designSlice.reducer

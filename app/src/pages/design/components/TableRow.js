@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch ,useSelector} from 'react-redux';
 import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
 import { Tag } from 'primereact/tag'
 import Select, { components } from "react-select";
+import { SetDebuggerPoints } from '../designSlice';
 import { Icon } from '@mui/material';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
@@ -31,6 +33,7 @@ import { Column } from 'primereact/column';
 */
 
 const TableRow = (props) => {
+    const dispatch=useDispatch()
   const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
@@ -54,6 +57,12 @@ const TableRow = (props) => {
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [objetListOption,setObjetListOption] = useState(null);
+    const [debuggerPoint,setDebuggerPoint]=useState(false);
+    const [debugeerInLightMode,setDebugeerInLightMode]=useState(false);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
+   
     const [elementData, setElementData] = useState([]);
     const [visible, setVisible] = useState(false);
     let objList = props.objList;
@@ -165,7 +174,13 @@ const TableRow = (props) => {
       setTCDetails(newTcDetails);
     }
   }, [props.rowChange, props.testCase]);
-
+  useEffect(()=>{
+    if(!debuggerPoints.length){
+      setDebuggerPoint(false)
+      setDebugeerInLightMode(false)
+     
+    }
+    },[debuggerPoints])
   useEffect(() => {
     setChecked(props.stepSelect.check.includes(props.idx));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -588,11 +603,25 @@ const TableRow = (props) => {
               <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
             )
            }
+           const ActivateDebuggerPoint=()=>{
+            setDebuggerPoint(debuggerPoint=>!debuggerPoint)
+            if(!debuggerPoint){
+              dispatch(SetDebuggerPoints({push:'push',stepNo:props.idx+1}))
+            }
+              else{
+                dispatch(SetDebuggerPoints({push:'pop',stepNo:props.idx+1}))
+              }
+              
+          }
 
     return (
         <>
-        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col">{props.idx + 1}</span>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+                <span className="step_col" onMouseEnter={!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null} onMouseLeave={!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
+                onClick={ActivateDebuggerPoint}>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero'} /></span>
+                  <span>{props.idx + 1}</span>
+                  </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
