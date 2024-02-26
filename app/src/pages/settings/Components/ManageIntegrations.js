@@ -225,7 +225,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
 
     const callLogin_zephyr = async()=>{
-        setDomainDetails([]);
         var zephyrPayload = {};
         zephyrPayload.authtype = authType;
         zephyrPayload.zephyrURL = zephyrLoginDetails.url;
@@ -656,6 +655,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     
     const acceptFunc = () => {
         setIsShowConfirm(false);
+        setDomainDetails([]);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -1055,13 +1055,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                     </div>
                                 </div>
                             )
-
-                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
-                }
-                {
-                    selectedscreen && selectedscreen.name == "TestRail" && Index === 0 && <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
-                }
-
+                        : selectedscreen.name === "Zephyr" && Index === 0 ? 
+                            <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name === "Azure DevOps" && Index === 0 ?
+                            <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name == "TestRail" && Index === 0 ? 
+                            <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
+                        : null
+                    }
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>

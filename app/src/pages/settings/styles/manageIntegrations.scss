@@ -501,6 +501,11 @@ height: 2.5rem !important;
             .p-treenode-content{
                 padding: 0 !important;
             }
+            
+            .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+                background: #eef2ff0a !important;
+                color: #333 !important;
+            }
         }
         .p-treenode{
             padding: 0 !important;

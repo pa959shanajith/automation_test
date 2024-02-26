@@ -311,7 +311,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                 } else if (testCaseNames != null) {
                     unSyncObj.push({
                         'mapid': items._id,
-                        'testCaseNames': items?.testname?.filter((name) => name == testCaseNames)
+                        'testscenarioid': [testCaseNames]
                     });
                 }
 
@@ -474,16 +474,17 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                                 <div className="accordion_testcase">
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
-                                            item.testscenarioname?.map((testname) => (
+                                            item.testscenarioname?.map((testname, index) => (
                                                 <AccordionTab key={item._id} header={<span>{testname}</span>}>
-                                                    {item.testname?.map((test, index) => (
-                                                        <div className='unsync-icon' key={index}>
+                                                    {item.testname?.map((test, i) => (
+                                                        <div className='unsync-icon' key={i}>
                                                             <p>{test}</p>
-                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, null, item.testname[index])} />
+                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, null, item.testscenarioid[index])} />
                                                         </div>
                                                     ))}
                                                 </AccordionTab>
-                                            ))
+                                            )
+                                            )
                                         )
                                         )}
                                     </Accordion>
