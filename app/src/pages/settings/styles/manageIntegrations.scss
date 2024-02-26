@@ -91,6 +91,10 @@ height: 2.5rem !important;
 
 .scenario_label{
     font: $f6_regular !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
 }
 
 .cancel__btn{

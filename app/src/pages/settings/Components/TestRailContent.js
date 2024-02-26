@@ -8,6 +8,7 @@ import { Button } from 'primereact/button';
 import { Tree } from 'primereact/tree';
 import { Paginator } from 'primereact/paginator';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from "primereact/tooltip";
 import { useSelector, useDispatch } from 'react-redux';
 import * as api from '../api.js';
 import { selectedProject, mappedTree } from '../settingSlice';
@@ -226,6 +227,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                     onChange={(e) => handleNodeToggleSecondTree(e, node)}
                     disabled={!Object.keys(selectedTestRailNodeFirstTree)?.length}
                 />
+                <Tooltip target=".scenario_label" position='bottom'>{node.name} - {node.testSuite?.name}</Tooltip>
                 <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
             </>
         }
