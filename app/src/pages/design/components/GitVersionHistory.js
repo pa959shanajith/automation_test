@@ -37,8 +37,9 @@ useEffect(() => {
         "version": item.version,
         "datetime": item.modifiedon,
         "comments": item.commitmessage,
-        "status": item.gittask,
         "selectedProject": {},
+        "status": item.gittask === "pull" ? "Pull" : item.gittask === "push" ? "Push" : '' 
+       
       }));
       setData(mappedData);
       setDataLoading(false);
@@ -57,7 +58,7 @@ useEffect(() => {
 const panelFooterTemplate = () => {
   return (
     <div className="py-2 px-3">
-      <Button label="create a project" icon="pi pi-plus" size="small" onClick={openCreateProjectModal} />
+      <Button label="Create Project" icon="pi pi-plus" size="small" onClick={openCreateProjectModal} />
     </div>
   );
 };
@@ -134,7 +135,7 @@ const handleRestore = (rowdata) => {
           ResetSession.end();
           return;
         }
-        toast.current.show({ severity: 'success', summary: 'Success', detail: ' Testsuites Restored sucessfully  ', life: 3000 });
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Test suite(s) restored', life: 3000 });
         setRestorebtnDisable(false);
         // setBlockui({ show: false });
       }
@@ -231,12 +232,12 @@ const bodyTemplate = (rowData) => {
         scrollHeight="53vh"
         // virtualScrollerOptions={{ itemSize: 46 }}  
       >
-        <Column field="sno" header='Sl.NO.'  />
+        <Column field="sno" header='Sl.no.'  />
         <Column field="version" header='Version' />
         <Column field="datetime" header='Date & Time'  />
         <Column field="comments" header='Comments' />
         <Column field="status" header='Status' />
-        <Column field="SelectDestination" header='SelectDestination' body={bodyTemplate} />
+        <Column field="SelectDestination" header='Select Destination' body={bodyTemplate} />
       </DataTable>
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
     </div>
