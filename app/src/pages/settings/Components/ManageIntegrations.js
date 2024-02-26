@@ -19,7 +19,7 @@ import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree,enableSaveButton
+    selectedAvoproject, mappedTree,enableSaveButton, updateTestrailMapping
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -268,12 +268,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
         };
 
         const testrailProjects = await api.getProjectsTestrail_ICE(testrailPayload);
+        setIsSpin(false);
 
         if (testrailProjects.error) setToast('error','Error', testrailProjects.error.CONTENT);
         else if (testrailProjects === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
         else if (testrailProjects === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
         else if (testrailProjects === "Invalid Session"){
-            setToast('error','Error','Invalid session')
+            setToast('error','Error','Invalid session');
+            setIsSpin(false);
         }
         else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
         // else if (testrailProjects === "noprojectfound") setLoginError("Invalid credentials or no project found");
@@ -281,14 +283,12 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
         else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
         // else if (testrailProjects === "Error:Failed in running testrail") setLoginError("Host not reachable");
-        // else if (testrailProjects === "Error:testrail Operations") setLoginError("Failed during execution");
+        else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
         else if (testrailProjects) {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(testrailProjects);
-            // getProjectScenarios();
             testrailRef.current.callViewMappedFiles();
-            // setLoginSuccess(true);
         }
         setIsSpin(false);
     }
@@ -575,8 +575,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 setToast("error", "Error", response.error);
             } else if (response === "scheduleModeOn")
                 setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
-            else if (response.status == 201 || response.status == 200 || response.message.length > 0 || response == "success") {
+            else if (response.status == 201 || response.status == 200 || response == "success") {
                 setToast("success", "Success", 'Tests mapped successfully!');
+                dispatchAction(updateTestrailMapping(true));
             }
         }
         else {
@@ -676,6 +677,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTreeData([]);
         setCompleteTreeData([]);
         setSelectedNodes([]);
+        dispatchAction(updateTestrailMapping(false));
     };
 
     const rejectFunc = () => {
@@ -1059,7 +1061,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                         : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
                 }
                 {
-                    selectedscreen && selectedscreen.name == "TestRail" && Index === 0 && <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} />
+                    selectedscreen && selectedscreen.name == "TestRail" && Index === 0 && <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
                 }
 
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />

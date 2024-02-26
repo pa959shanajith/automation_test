@@ -14,6 +14,8 @@ const ExecutionCard = ({ cardData, configData }) => {
       return 'Zephyr';
     } else if (integrationData?.azure?.url) {
       return 'Azure';
+    } else if (integrationData?.testrail?.url) {
+      return 'TestRail';
     }
     else {
       return 'NA';

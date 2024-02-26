@@ -285,7 +285,7 @@ const CreateProject = (props) => {
     setQueryDisplayUser(""); 
     props.onHide();
     setRefreshData(!refreshData);
-    props.setHandleManageProject(false);
+    props?.setHandleManageProject(false);
    
   };
 
@@ -444,9 +444,9 @@ const CreateProject = (props) => {
         props.toastSuccess("Project Created Successfully");
         dispatch(loadUserInfoActions.savedNewProject(true));
         dispatch(migrateProject(value.trim()));
-        props.onHide();
         setRefreshData(!refreshData);
         if(props?.setProjectName) (props.setProjectName(projData.projectName));
+        props.onHide();
       }
       
     } catch (error){
