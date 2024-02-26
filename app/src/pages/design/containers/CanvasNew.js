@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -189,7 +189,9 @@ const CanvasNew = (props) => {
     const [visibleCaptureAndDesign,setVisibleCaptureAndDesign] = useState(false);
     const [captureClick, setCaptureClick] = useState(false);
     const [designClick, setDesignClick] = useState(false);
-
+    const [enteredTags, setEnteredTags] = useState([]);
+    const [tagAdded, setTagAdded] = useState(false);
+    const [saveDisabled, setSaveDisabled] = useState(true);
 
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -372,7 +374,7 @@ const CanvasNew = (props) => {
         dispatch(SetOldModuleForReset(tree.dNodes[0]._id))
         localStorage.setItem('OldModuleForReset',tree.dNodes[0]._id)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.module,props.reload,props.verticalLayout,analyzeScenario,typeOfView]);
+    }, [props.module,props.reload,props.verticalLayout,analyzeScenario,typeOfView,]);
     useEffect(()=>{
         if(createnew === 'save'){
             setCreateNew(false)
@@ -416,9 +418,19 @@ const CanvasNew = (props) => {
     const showToast = (severity, summary) => {
       toast.current.show({ severity, summary, life: 3000 });
     };
-   
+    useEffect(() => {
+      setTagAdded(false);
+    }, [visibleTag]);
+    
+    useEffect(() => {
+      const shouldDisableSave = inputValue.trim() !== '' || (!tagAdded && tags[fetchingDetails?._id]?.length === 0) ||!tagAdded;
+      setSaveDisabled(shouldDisableSave);
+    }, [inputValue, tagAdded, tags, fetchingDetails]);
+    
+    
       const handleSaveTags = async () => {
         setLoading(true);
+        // dispatch(SetTagTestCases(true))
         const filteredTags = tags[fetchingDetails._id].filter(tag => tag !== null && tag !== undefined);
         const data = {
             testscenarioId: fetchingDetails["_id"],
@@ -430,17 +442,24 @@ const CanvasNew = (props) => {
           // setTags(tagdata);
           if(response==="pass"){
             setTags(tags)
-            // console.log("tagsinsave",tags)
+            showToast('success', 'Tag(s) saved successfully.',3000);
           }else{
             setTags('')
+            showToast('error', 'Failed to save tag(s). Please try again.',6000);
           }
            
           setVisibleTag(false) 
+          setTagAdded(false);
+          setInputValue('');
+          dispatch(dontShowFirstModule(true))
+          dispatch(SetTagTestCases(false))
       };
       const handleDialogHide = () => {
         setVisibleTag(false)
         setInputValue('');
-    
+        setTagAdded(true);
+        dispatch(dontShowFirstModule(true))
+        dispatch(SetTagTestCases(false))
       };
 
     const menuItemsModule = [
@@ -455,9 +474,10 @@ const CanvasNew = (props) => {
         { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
         {separator: true},
-        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
+        { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:true,command:()=>{confirm1()},title:(agsLicense.msg)},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
         { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
+        {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -466,7 +486,7 @@ const CanvasNew = (props) => {
       { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
       { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
       {separator: true},
-      { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value),command:()=>{confirm1()},title:(agsLicense.msg)},
+      { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value || typeOfView !== "mindMapView"),command:()=>{confirm1()},title:(agsLicense.msg)},
       { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
       { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
       {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
@@ -568,12 +588,14 @@ const CanvasNew = (props) => {
     const handleSuggestionSelect = (e) => {
       setInputValue(e.value);
       setShowSuggestions(false);
+      setTagAdded(true);
     };
   
  
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleAddTag();
+      setTagAdded(true);
     }
   };
   const handleAddTag = () => {
@@ -583,6 +605,7 @@ const CanvasNew = (props) => {
       if (tags[fetchingDetails._id].includes(inputValue)) {
         showToast('error', 'Tag already exists');
       } else {
+        setEnteredTags([...enteredTags, inputValue]);
         setTags({ ...tags, [fetchingDetails._id]: updatedTags });
         for (let i = 0; i < dNodes[0].children.length; i++) {
           if (dNodes[0].children[i]._id === fetchingDetails._id) {
@@ -591,6 +614,7 @@ const CanvasNew = (props) => {
           }
         }
         setInputValue('');
+        setTagAdded(true);
       }
     }
   };
@@ -598,12 +622,14 @@ const CanvasNew = (props) => {
   const handleRemoveTag = (indexToRemove) => {
     const updatedTags = tags[fetchingDetails._id].filter((_, index) => index !== indexToRemove);
   setTags({ ...tags, [fetchingDetails._id]: updatedTags });
+  setTagAdded(true);
     for (let i = 0; i < dNodes[0].children.length; i++) {
           if (dNodes[0].children[i]._id === fetchingDetails._id) {
             const data = { ...dNodes[0].children[i], tag: updatedTags };
             dNodes[0].children[i] = data; 
           }
         }
+        showToast('success', 'Tag(s) removed successfully.',3000);
   };  
 
   const renderTags = () => {
@@ -639,10 +665,11 @@ const CanvasNew = (props) => {
     return taglist
   })
   
-    const handleTags = async() => {
+    const handleTags = () => {
       
       if (toastData !== true) {
         setVisibleTag(true);
+        dispatch(SetTagTestCases(true))
         d3.select('#' + box).classed('node-highlight', false);
       } else {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save Mindmap before proceeding', life: 2000 });
@@ -1353,8 +1380,10 @@ const CanvasNew = (props) => {
     setBox(e.target.parentElement.id)
     if(type === "teststepsgroups"){
       setFetchingDetailsForGroup(dNodes[e.target.parentElement.id.split("_")[1]])
+      dispatch(setElementRepoModuleID({id:dNodes[0]._id, key:"repo"}))
     }else{
       setFetchingDetails(dNodes[e.target.parentElement.id.split("_")[1]])
+      dispatch(setElementRepoModuleID({id:dNodes[0]._id, key:"repo"}))
     }
     const element = d3.select('#'+e.target.parentElement.id)
     if(type==="modules"){ menuRef_module.current.show(e);element.classed('node-highlight',!0)}
@@ -1898,7 +1927,8 @@ const footerContentScreen =(
   // functions for tag a testcase 
   const footerContentTag=(
     <div>
-            <Button label="Save"  className="savetag" onClick={handleSaveTags} /> 
+            <Button label="Save"  className="savetag" onClick={handleSaveTags}  disabled={saveDisabled}
+ /> 
         </div>
   ) 
   const updateObjects = (tab) => {
@@ -2689,6 +2719,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                       <div className='tagname'>Tags</div>
                       <div>
                         <AutoComplete
+                        key={visibleTag ? 'visible' : 'hidden'}
                           id="username"
                           className='inputtag'
                           value={inputValue}
@@ -2723,7 +2754,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </Card>
                 {fetchingDetails && fetchingDetails._id && tags[fetchingDetails._id]?.length === 0 && (
-                  <p className='taginstruction'>Provide a tag name and press enter to tag your testcase.</p>
+                  <p className='taginstruction'>Provide a tag name and press enter to add tag(s).</p>
                 )}
               </div>
             </div>

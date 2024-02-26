@@ -68,7 +68,6 @@ const TableRow = (props) => {
     setInputEditor(child.props.data.isCode);
   }
   const CustomMenu = (value) => {
-    console.log(value, 'value');
     return (
       <MenuList {...value} style={{ width: '100%' }}>
         {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
@@ -254,7 +253,6 @@ const TableRow = (props) => {
   const onObjSelect = event => {
     const caseData = props.getKeywords(event.value);
     const placeholders = props.getRowPlaceholders(caseData.obType, caseData.keywords[0]);
-    console.log(caseData,'caseData',event.value);
     setInput("");
     setOutput("");
     setKeywordList(caseData.keywords);
@@ -423,7 +421,7 @@ const TableRow = (props) => {
         return option;
       }
       );
-console.log(optionKeyword,'optionKeyword',keywordList);
+// console.log(optionKeyword,'optionKeyword',keywordList);
   const handleOption = () => {
     var optionKeyword_2 = keywordList?.slice(startIndex, keywordList.length).map((keyword, i) => {
       const option = {
@@ -606,7 +604,7 @@ console.log(optionKeyword,'optionKeyword',keywordList);
                     <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
-                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onMouseEnter={()=>showCard(objName)} className='pi pi-eye'></span>}</>}</div>
+                        <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
                         {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
         {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
                         </div>
@@ -637,7 +635,9 @@ console.log(optionKeyword,'optionKeyword',keywordList);
         </div>
         {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
         <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
-          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          <span>
+          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon3'></span>}</>}</span>
         </span>
       </div>
         <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>

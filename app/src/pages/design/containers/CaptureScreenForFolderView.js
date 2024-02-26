@@ -131,6 +131,7 @@ const CaptureModal = (props) => {
     const [parentId, setParentId] = useState(null);
     const [screenChange, setScreenChange] = useState(false);
     const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+    const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
   
@@ -528,6 +529,10 @@ const CaptureModal = (props) => {
                                 setCapturedDataToSave([...newScrapeList]);
                                 viewString = newScrapeList;
                             }
+                        }
+                        if(parentId !== null){
+                            setCapturedDataToSave(newScrapeList);
+                            viewString = newScrapeList;
                         }
 
                         setMainScrapedData(data);
@@ -995,45 +1000,56 @@ const CaptureModal = (props) => {
       };
 
 
-    const handleDelete = (rowData, confirmed) => {
+      const handleDelete = (rowData,confirmed) => {
         // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
         if (mainScrapedData.reuse && !confirmed) {
-            setShowConfirmPop({ 'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': () => { setShowConfirmPop(false); onDelete(null, true); } })
-            return;
+          setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
+          return;
         }
-        if (rowData.objectDetails.objId !== undefined && !rowData.objectDetails.duplicate) {
-            let deletedArr = [...deleted];
-            let scrapeItemsL = [...captureData];
-            let newOrderList = [];
-
-            const capturedDataAfterDelete = captureData.filter(item =>
-                item.objectDetails.objId !== rowData.objectDetails.objId
-            );
-
-            deletedArr.push(rowData.objectDetails.objId);
-
-            let notused = scrapeItemsL.filter(item => {
-                if (deletedArr.includes(item.objectDetails.objId)) {
-                    return false
-                }
-                else {
-                    newOrderList.push(item.objectDetails.objId)
-                }
-            })
-            let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
-            setCaptureData(capturedDataAfterDelete)
-            setDeleted(deletedArr)
-            setOrderList(newOrderList)
-            setCapturedDataToSave(newCapturedDataToSave)
-            setSelectedCapturedElement([])
-            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-        }
-        else {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
-        }
+        if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
+        let deletedArr = [...deleted];
+        let scrapeItemsL = [...captureData];
+        let newOrderList = [];
+    
+        const capturedDataAfterDelete = captureData.filter(item =>
+          item.objectDetails.objId !== rowData.objectDetails.objId
+        );
+    
+        deletedArr.push(rowData.objectDetails.objId);
+    
+        // var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+    
+        //   return !selectedElement.find(function (objFromB) {
+        //     if (item.objectDetails.val === objFromB.objectDetails.val) {
+        //       if(item.objectDetails.objId){
+        //         deletedArr.push(item.objectDetails.objId)}
+        //       return true
+        //     }
+        //   })
+        // })
+    
+        let notused = scrapeItemsL.filter(item => {
+          if (deletedArr.includes(item.objectDetails.objId)) {
+            return false
+          }
+          else {
+            newOrderList.push(item.objectDetails.objId)
+          }
+        })
+        let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
+        setCaptureData(capturedDataAfterDelete)
+        setDeleted(deletedArr)
+        setOrderList(newOrderList)
+        setCapturedDataToSave(newCapturedDataToSave)
+        setSelectedCapturedElement([])
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+      }
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
+      }
         // setCaptureData(updatedData);
         setSaveDisable(false);
-    };
+      };
 
     const handleEdit = (rowData) => {
         const updatedData = captureData.map((item) => {
@@ -1070,45 +1086,45 @@ const CaptureModal = (props) => {
 
 
     const renderActionsCell = (rowData) => {
-        let selectedElement = []
+        let selectedElement=[]
         selectedElement.push(rowData)
         setScrapeDataForIris(rowData)
-        let scrapeType = rowData?.objectDetails?.xpath?.split(';') !== undefined ? rowData?.objectDetails?.xpath?.split(';') : " "
-        //  setIrisObject(scrapeType[0]);
+       let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
+      //  setIrisObject(scrapeType[0]);
         return (
-            <div >
-
-
-                {!saveDisable ?
-                    <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." /> : <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
-                {(scrapeType[0] === "iris" || typesOfAppType === "Web") &&
-                    <button
-                        disabled={!saveDisable}
-                        onClick={() => { setSelectedCapturedElement(selectedElement); openElementProperties(rowData); }}
-                    >
-                        <img
-                            src="static/imgs/ic-edit.png"
-                            alt="Edit Icon"
-                            style={{ height: "20px", width: "20px", opacity: !saveDisable ? 0.6 : 1 }}
-                            className="edit__icon"
-                        />
-                    </button>
-
-                }
-                <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
-                <img
-
-                    src="static/imgs/ic-delete-bin.png"
-                    style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-                    className="delete__icon" onClick={() => handleDelete(rowData)} />
-
-
-
-
-            </div>
+          <div >
+            
+            
+            {!saveDisable?
+            <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
+            {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
+            <button
+            disabled={!saveDisable}
+            onClick={() => {setSelectedCapturedElement(selectedElement);openElementProperties(rowData);}}
+          >
+            <img
+              src="static/imgs/ic-edit.png"
+              alt="Edit Icon"
+              style={{ height: "20px", width: "20px", opacity: !saveDisable? 0.6 : 1}}
+              className="edit__icon"
+            />
+          </button>
+          
+            }
+            <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
+            <img
+    
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+              
+    
+            
+    
+          </div>
         )
-
-    };
+    
+      };
 
 
     const handleMouseLeaveRow = () => {
@@ -1795,7 +1811,7 @@ const CaptureModal = (props) => {
         // const selectedFolderValue = e.value;
         // setSelectedScreen(selectedFolderValue);
       
-        if(captureData.length > 0){
+        if(captureData.length >= 0){
           setScreenChange(true);
         }
       
@@ -1822,7 +1838,7 @@ const CaptureModal = (props) => {
               let params = {
                 param : "updateMindmapTestcaseScreen",
                 projectID :  NameOfAppType.projectId,
-                moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+                moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
                 parent:props.fetchingDetails["parent"]["_id"],
                 currentScreen:parentData.id,
                 updateScreen:selectedFolderValue.id
@@ -1830,9 +1846,9 @@ const CaptureModal = (props) => {
       
               const res = await scrapeApi.updateScreen_ICE(params);
               if(res === 'fail') {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the repository, try again!!.', life: 5000 });}
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
               else {
-                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repsotory updated and saved', life: 5000 });
+                
                 var req={
                   tab:"createdTab",
                   projectid:NameOfAppType.projectId,
@@ -1850,7 +1866,7 @@ const CaptureModal = (props) => {
                     data.children.forEach((child)=>{
                       if(child._id === props.fetchingDetails["parent"]["_id"]){
                         child.children.forEach((subChild)=>{
-                          if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                          if(subChild._id === selectedFolderValue.id){
                             if(subChild.children.length > 0){
                                const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
                                   return {
@@ -1858,7 +1874,8 @@ const CaptureModal = (props) => {
                                     parent:{...subChild,parent:{...child,parent:data}}
                                   }
                                })}
-                               sd.push(newData);
+                               const childData = {...newData.children[0], type:'teststepsgroups', parent:newData}
+                               sd.push(childData);
                             }
                             else{
                               sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
@@ -1875,10 +1892,18 @@ const CaptureModal = (props) => {
                     return sd;
                   }
                   
-                  console.log(screenData_1);
-                  props.setFetchingDetails(screenData_1[0].children[0])
-                  props.setModuleData({id:res, key:uuid()})
-                  setParentId(uuid());
+                //   console.log(screenData_1);
+                  if(screenData_1.length>0){
+                    props.setFetchingDetails(screenData_1[0])
+                    props.setModuleData({id:res, key:uuid()})
+                    setParentId(uuid());
+                    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+                  }else{
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+                  }
+                  // props.setFetchingDetails(screenData_1[0])
+                  // props.setModuleData({id:res, key:uuid()})
+                  // setParentId(uuid());
                 }
               }
               }
@@ -2037,7 +2062,7 @@ const CaptureModal = (props) => {
                 </div>}
                 <div onClick={togglePanel} className="expandCollapseIconWrapper">
                   <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-                  <i className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
                 </div>
               </div>
             </div>

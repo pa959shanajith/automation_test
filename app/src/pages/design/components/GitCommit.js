@@ -71,19 +71,19 @@ const GitCommit = (props) => {
    
     return (
     <div className='flex flex-column gap-3'>
-        <div className='flex flex-column'>
+        <div className='flex flex-column pt-1'>
             <label>Version <span className='text-red-500'>*</span></label>
             <InputText
                 value={versionName}
                 onChange={(e) => {props.versionChange(e.target.value.trim()); setVersionName(e.target.value.trim());}}
-                className='w-full md:w-20rem p-inputtext-sm mb-2'
+                className={`w-full md:w-20rem p-inputtext-sm mb-2 ${props.versionNameError ? 'p-invalid' : ''}`}
                 placeholder="Enter version name"
             ></InputText>
         </div>
 
         <div className='flex flex-row gap-3'>
             <div className='commit_testcase_list card'>
-                <label>Unstaged Changes</label>
+                <label style={{fontWeight:'600'}}>Unstaged Changes</label>
                 <div className="test_list pl-4 pt-3 pb-2" style={{overflow:"auto"}}>
                     <div className="pb-3">
                         {LhsModuleList.length > 0 ? LhsModuleList.map(element => (
@@ -98,7 +98,7 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : "No test suite Found"
+                        ) : "No unstaged test suites yet"
                         }
                     </div>
                 </div>
@@ -111,8 +111,8 @@ const GitCommit = (props) => {
             </div>
 
             <div className='commit_testcase_list card'>
-                <label>Staged Changes</label>
-                <div className="pb-3"  style={{overflow:"auto"}}>
+                <label style={{fontWeight:'600'}}>Staged Changes</label>
+                <div className="pb-3 pt-3"  style={{overflow:"auto"}}>
                     {RhsModuleList.length > 0 ? RhsModuleList.map(element => (
                             <div key={element._id} className="flex align-items-center pb-3">
                                 <Checkbox inputId={element._id}
@@ -125,18 +125,18 @@ const GitCommit = (props) => {
                                     {element.name}
                                 </label>
                             </div>)
-                        ) : <span className="pt-3">No test suite Found</span>
+                        ) : <span>No staged test suites yet</span>
                     }
                 </div>
             </div>
         </div>
 
         <div className='flex flex-column'>
-            <label>Comment</label>
+            <label>Comment <span className='text-red-500'>*</span></label>
             <InputText
                 value={commitMsg}
                 onChange={(e) => {props.commitMsgChange(e.target.value); setCommitMsg(e.target.value)}}
-                className='w-full md:w-19rem p-inputtext-sm mb-2'
+                className={`w-full md:w-19rem p-inputtext-sm mb-2 ${props.commentError ? 'p-invalid' : ''}`}
                 placeholder="Enter your comment here"
             ></InputText>
         </div>

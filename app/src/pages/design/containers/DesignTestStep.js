@@ -1366,7 +1366,6 @@ const DesignModal = (props) => {
           setIsNameValid(false);
         }
     }, [inputKeywordName, AllOptions]);
-    console.log(isSpaceError,'space',isNameValid);
     const rowExpansionTemplate = (data) => {
         function handleArrow(){
             setArrow(!arrow)
@@ -1668,11 +1667,11 @@ const DesignModal = (props) => {
                         <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
 
                             <div className="flex align-items-center" >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
                                 <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
                             </div>
                             <div className="flex align-items-center"  >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
                                 <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
                             </div>
                         </div>

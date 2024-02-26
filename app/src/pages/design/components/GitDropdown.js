@@ -53,11 +53,15 @@ const GitDropdown = (props) => {
   const [projectListForCreateProject, setProjectListForCreateProject] = useState([]);
   const projectName = useRef();
   const [createdProjectDetails, setCreatedProjectDetails] = useState({})
-  const [projectlistRefresher, setProjectlistRefresher ] = useState(false);
+  const [projectlistRefresher, setProjectlistRefresher] = useState(false);
+  const [versionNameError, setversionNameError] = useState(false);
+  const [commentError, setCommentError] = useState(false);
+  if(CreateProjectVisible) {projectName.current = ''}
+
 
   useEffect(() => {
     (async () => {
-      if(selectedImage=== "version_history" ){
+      if (selectedImage === "version_history") {
         const projectList = await fetchProjects({ readme: "projects" });
         setProjectListForCreateProject(projectList);
         const projectListForDropdown = [];
@@ -193,6 +197,28 @@ const GitDropdown = (props) => {
     }
   };
 
+  const validateCommitAndPushInputs = async () => {
+    if (versionName === '' || commitModuleList.length <= 0 || commitMsg === '') {
+      if (versionName === '' || commitMsg === '') {
+        if (commitMsg === '') setCommentError(true);
+        if (versionName === '') setversionNameError(true);
+        props.toastWarn("Please fill all the mandatory fields.");
+      }
+      if (versionName !== '' && commitMsg !== '' && commitModuleList.length <= 0) {
+        setversionNameError(false);
+        setCommentError(false);
+        props.toastWarn("Please select at least one test suite.");
+      }
+    }
+    else {
+      setversionNameError(false);
+      setCommentError(false);
+      setLoading(true);
+      commitAndPushOnClick();
+    }
+  }
+
+
   const commitAndPushOnClick = async () => {
     setLoading(true);
     try {
@@ -208,11 +234,11 @@ const GitDropdown = (props) => {
           "exportProjAppType": props.appType,
           "projectId": props.projectId,
           "projectName": props.projectName,
-          gitComMsgRef: commitMsg
+          gitComMsgRef: commitMsg.trim()
         });
         if (res.error) { props.toastError(res.error); return; }
         else {
-          toast.current.show({ severity: 'success', summary: 'Success Message', detail: 'Test Suite committed successfully' });
+          toast.current.show({ severity: 'success', summary: 'Success Message', detail: 'Test suite(s) pushed to Git' });
           setDialogVisible(false);
           setSelectedImage("")
           setCommitModuleList([]);
@@ -232,30 +258,20 @@ const GitDropdown = (props) => {
   const dialogFooter = () => (
     <div> {isData ?
       <>
-        <Button data-test="git_reset" label='reset' title="reset" onClick={() => gitReset()} />
-        <Button data-test="git_create" label='save' onClick={() => gitConfigAction('update')} className="btn-edit" title="Create" />
+        <Button data-test="git_reset" size="small" label='Reset' onClick={() => gitReset()} outlined />
+        <Button data-test="git_create" size="small" label='Save' onClick={() => gitConfigAction('update')} className="btn-edit" />
       </> : <>
-        <Button data-test="git_create" label='Create' onClick={() => gitConfigAction('create')} className="btn-edit" title="Create" />
-
+        <Button data-test="git_create" size="small" label='Create' onClick={() => gitConfigAction('create')} className="btn-edit" />
       </>
     }</div>
   );
   const commitFooter = () => (
-    <Button label={loading ? "Committing..." : "Commit & Push"} size="small" onClick={commitAndPushOnClick} disabled={loading} />
+    <Button label={loading ? "Committing..." : "Commit & Push"} size="small" onClick={validateCommitAndPushInputs} disabled={loading} />
   )
-
-  const renderIcon = (icon) => {
-    if (typeof icon === 'string' && icon.startsWith('<')) {
-      return <div dangerouslySetInnerHTML={{ __html: icon }} />;
-    } else if (typeof icon === 'object' && React.isValidElement(icon)) {
-      return icon;
-    }
-    return null;
-  };
 
   const createProjectCloseDialogHandler = () => {
     dispatch(isCreateProjectVisible(false));
-    setVisibleGitconfFormAfterCreatePrj(true);
+    if(projectName.current !== '')  setVisibleGitconfFormAfterCreatePrj(true);
     setIsData(false);
     setProjectlistRefresher(true);
   }
@@ -265,7 +281,7 @@ const GitDropdown = (props) => {
     setCreatedProjectDetails({});
     setSelectedImage(null);
     if (isData) setDropdownVisible(true);
-    if(projectlistRefresher) {
+    if (projectlistRefresher) {
       projectListUpdateHandler()
       setProjectlistRefresher(false);
     }
@@ -274,27 +290,28 @@ const GitDropdown = (props) => {
     <div className='GitVersion_cls'>
       {moduleLists?.length > 0 ?
         <>
-          {dropdownVisible ? <Dropdown
-            value={selectedImage}
-            options={dropdownOptions}
-            onChange={handleDropdownChange}
-            className='p-inputtext-sm'
-            optionLabel="label"
-            style={{ height: '2rem', display: "flex", alignItems: "center" }}
-            placeholder={"Select"}
-          // itemTemplate={(option) => (
-          //   <div>
-          //     {renderIcon(option.icon)}
-          //     {option.label}
-          //   </div>
-          // )}
-          />
+          {dropdownVisible ?
+            <div className="p-inputgroup">
+              <span className="p-inputgroup-addon">
+                <img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" />
+              </span>
+              <Dropdown
+                value={selectedImage}
+                options={dropdownOptions}
+                onChange={handleDropdownChange}
+                className='p-inputtext-sm'
+                optionLabel="label"
+                style={{ height: '2rem', display: "flex", alignItems: "center" }}
+                placeholder={"Select"}
+              />
+            </div>
+
             : <div onClick={clickhandler} style={{ width: "6rem" }}> <span className='git_icon_and_icon'><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
       }
 
       <Toast ref={toast} position="bottom-center" />
       <Dialog
-        header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configurations'}
+        header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configuration'}
         visible={dialogVisible}
         style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={DialogCloseHandle}
@@ -318,6 +335,8 @@ const GitDropdown = (props) => {
             commitId={commitIdChange}
             versionChange={versionChange}
             moduleListChange={moduleListChange}
+            commentError={commentError}
+            versionNameError={versionNameError}
           />
         ) : selectedImage === 'version_history' ? (
           <GitVersionHistory {...props} commitId={commitID} setSelectedImage={setSelectedImage} allProjectlist={allProjectlist} projectListDropdown={projectListDropdown} />

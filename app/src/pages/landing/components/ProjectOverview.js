@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import '../styles/ProjectOverview.scss';
 import Analysis from './Analysis';
-import Settings from '../../settings/components/Settings';
+import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
 import CustomKeyword from './CustomKeyword';
 import { useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ const ProjectOverview = (props) => {
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
-        { label: 'Element Repository', command: ()=>handleElementRepository()},
+        { label: 'Element Repository', command: ()=>handleElementRepository(), disabled: defaultselectedProject.appType==="Webservice"},
         { label: 'AI Testcase' },
         { label: 'Capabalities'},
     ];

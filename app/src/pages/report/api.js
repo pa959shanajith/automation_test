@@ -345,7 +345,7 @@ export const getAccessibilityScreens = async(projId, relName, cycId) =>{
     }
 }
 
-export const viewReport = async (reportid, reportType="json", screenshotFlag) => { 
+export const viewReport = async (reportid, reportType="json", screenshotFlag, downloadLevel, viewReport ) => { 
     try{
         const res = await axios(url+'/viewReport', {
             method: 'GET',
@@ -353,7 +353,7 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, fileType: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag, downloadLevel, viewReport },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -647,7 +647,7 @@ export const viewAzureMappedList_ICE = async(userID, scenario) => {
     }
 }
 
-export const publicViewReport = async (reportid, reportType="json", screenshotFlag) => { 
+export const publicViewReport = async (reportid, reportType="json", screenshotFlag, downloadLevel = "testCase") => { 
     try{
         const res = await axios(url+'/devopsReports/viewReport', {
             method: 'GET',
@@ -655,7 +655,7 @@ export const publicViewReport = async (reportid, reportType="json", screenshotFl
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, fileType: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag, downloadLevel },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){

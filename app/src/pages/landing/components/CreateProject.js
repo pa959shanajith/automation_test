@@ -256,7 +256,7 @@ const CreateProject = (props) => {
     const inputValue= event.target.value.toLowerCase();
     setQuery(inputValue);
     if (inputValue !== "") {
-      const filterData = items.filter((item) =>
+      const filterData = unFilteredData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setItems(filterData);
@@ -271,7 +271,7 @@ const CreateProject = (props) => {
     setQueryDisplayUser(inputValue);
   
     if (inputValue !== "") {
-      const filterDataDisplayUser = displayUser.filter((item) =>
+      const filterDataDisplayUser = unFilteredAssaignedData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setDisplayUser(filterDataDisplayUser);
@@ -280,24 +280,12 @@ const CreateProject = (props) => {
     }
   }
 
-  // function handleSearchDisplayUser(event) {
-  //   setQueryDisplayUser(event.target.value);
-  //   if(event.target.value !== ""){
-  //   const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-  //   setDisplayUser(filterDataDisplayUser)
-  //   }
-  //   else{
-  //     setDisplayUser(unFilteredAssaignedData)
-  //   }
-  // }
-
-
   const handleClose = () => {
     setQuery("");
     setQueryDisplayUser(""); 
     props.onHide();
     setRefreshData(!refreshData);
-    props.setHandleManageProject(false);
+    props?.setHandleManageProject(false);
    
   };
 
@@ -456,9 +444,9 @@ const CreateProject = (props) => {
         props.toastSuccess("Project Created Successfully");
         dispatch(loadUserInfoActions.savedNewProject(true));
         dispatch(migrateProject(value.trim()));
-        props.onHide();
         setRefreshData(!refreshData);
         if(props?.setProjectName) (props.setProjectName(projData.projectName));
+        props.onHide();
       }
       
     } catch (error){
