@@ -238,6 +238,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [emailNotificationSender, setEmailNotificationSender] = useState(null);
   const [batchInfo, setBatchInfo] = useState([]);
   const [profileName, setProfileName] = useState(null);
+  const [configbtnsave,setConfigbtnsave]=useState(null);
   
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
@@ -245,7 +246,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
   const languages = [
     { label: "cURL", value: "curl" },
-    { label: "HTTP", value: "http" },
     { label: "Javascript", value: "javascript" },
     { label: "Python", value: "python" },
     { label: "PowerShell - RestMethod", value: "powershell" },
@@ -315,6 +315,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   };
 
   const getConfigData = useSelector((store) => store.configsetup);
+  localStorage.setItem("configData",JSON.stringify(getConfigData))
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -427,16 +428,6 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     \"executionType\": \"${executionTypeInRequest}\"
 }"`,
 
-    http: `POST /execAutomation HTTP/1.1
-Host: ${url.slice(8, -15)}
-Content-Type: application/json
-Content-Length: 93
-
-{
-    "key": "${currentKey}",
-    "executionType": "${executionTypeInRequest}"
-}`,
-
     javascript: `var myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/json");
 
@@ -477,13 +468,14 @@ headers = {
 try:
     response = requests.request("POST", url, headers=headers, data=payload, verify=False)
     response = response.json()
-    pretty_json = json.dumps(response, indent=4)
-    print(pretty_json)
+    print(f"status :            {response['status']}")
+    print(f"ReportLink :        {response['reportLink']}")
+    print(f"RunningStatusLink : {response['runningStatusLink']}")
     status = response["status"]
 
     if status == "pass":
         running_status_link = response["runningStatusLink"]
-        status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+        status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
         status_response = status_response.json()
         running_status = status_response["status"]
         completed = status_response["Completed"]
@@ -491,7 +483,7 @@ try:
         while running_status == "Inprogress":
             print(f"Executing... {completed}")
 
-            status_response = requests.request("POST", running_status_link, headers=headers, verify=False)
+            status_response = requests.request("GET", running_status_link, headers=headers, verify=False)
             status_response = status_response.json()
             running_status = status_response["status"]
             if "Completed" in status_response:
@@ -525,20 +517,22 @@ $body = @"
     
 try {
     $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
-    $response | ConvertTo-Json -Depth 10
     $status = $response.status
     
     # Check if status is pass or fail
     if ($status -ne "fail") {
+        Write-Host "Status            :" $response.status
+        Write-Host "ReportLink        :" $response.reportLink
+        Write-Host "RunningStatusLink :" $response.runningStatusLink
         $runningStatusLink = $response.runningStatusLink
-        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
         $runningStatus = $statusResponse.status
         $complete = $statusResponse.Completed
         
         while ($runningStatus -eq "Inprogress") {
             Write-Host "Executing... $complete"
     
-            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'POST' -Headers $headers
+            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
             $runningStatus = $statusResponse.status
             if ($statusResponse.PSObject.Properties["Completed"]) {
                 $complete = $statusResponse.Completed
@@ -576,17 +570,20 @@ body='{
 }'
 # Make the POST request with wget
 response=$(wget --quiet --method=POST $headers --body-data="$body" -O - "$url")
-echo "$response"
   
 # Check if the request was successful
 status=$(echo "$response" | jq -r '.status')
   
 if [ "$status" != "fail" ]; then
   runningStatusLink=$(echo "$response" | jq -r '.runningStatusLink')
+  reportLink=$(echo "$response" | jq -r '.reportLink')
+  echo "status            : $status"
+  echo "reportLink        : $reportLink"
+  echo "runningStatusLink : $runningStatusLink"
 
   # Check the execution status in a loop
   while true; do
-    statusResponse=$(wget --quiet --method=POST $headers -O - "$runningStatusLink")
+    statusResponse=$(wget --quiet --method=GET $headers -O - "$runningStatusLink")
     runningStatus=$(echo "$statusResponse" | jq -r '.status')
     complete=$(echo "$statusResponse" | jq -r '.Completed')
 
@@ -1356,6 +1353,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
+                setRunningStatusTimer("")
               }}
                 disabled={projectInfo.appType !== "Web" || cicdLicense.value}
             >  
@@ -1421,10 +1419,11 @@ const showToast = (severity, detail) => {
 };
 
   const configModal = (getType, getData = null) => {
+    const lsGetConfigData = JSON.parse(localStorage.getItem("configData"))
     if (getType === "CancelUpdate") {
       const getAvogrid = [
-        ...getConfigData?.avoAgentAndGrid?.avoagents,
-        ...getConfigData?.avoAgentAndGrid?.avogrids,
+        ...lsGetConfigData?.avoAgentAndGrid?.avoagents,
+        ...lsGetConfigData?.avoAgentAndGrid?.avogrids,
       ];
       getAvogrid.forEach((el, index, arr) => {
         if (Object.keys(el).includes("Hostname")) {
@@ -1436,7 +1435,7 @@ const showToast = (severity, detail) => {
         ...avodropdown,
         avogrid: getData?.executionRequest?.avoagents[0] ? getAvogrid.filter(
           (el) => el.name === getData?.executionRequest?.avoagents[0]
-        )[0] : getConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
+        )[0] : lsGetConfigData?.avoAgentAndGrid?.avogrids.filter((item) => item?._id === getData?.executionRequest?.avogridId)[0],
         browser: (getData?.executionRequest?.browserType && Array.isArray(getData?.executionRequest?.browserType)) ? browsers.filter((el) =>
           getData?.executionRequest?.browserType.includes(el.key)
         ) : [],
@@ -1457,6 +1456,7 @@ const showToast = (severity, detail) => {
       setDefaultValues({ ...defaultValues, EmailSenderAddress: getData.executionRequest.emailNotificationSender, EmailRecieverAddress: getData.executionRequest.emailNotificationReciever});
       setIsNotifyOnExecutionCompletion(getData.executionRequest.isNotifyOnExecutionCompletion);
       setIsEmailNotificationEnabled(getData.executionRequest.isEmailNotificationEnabled);
+      setCheckedExecution(getData.executionRequest.execType)
     } else {
       setUpdateKey("");
       setAvodropdown({});
@@ -1479,6 +1479,7 @@ const showToast = (severity, detail) => {
   };
 
   const onModalBtnClick = (getBtnType) => {
+    setConfigbtnsave(getBtnType)
     if (getBtnType === "Save" || getBtnType === "Update") {
       const paramPaths = Object.values(dataparam).reduce((ac, cv) => {
         ac[cv.key] = ac[cv.key] || [];
@@ -1538,6 +1539,7 @@ const showToast = (severity, detail) => {
       xpanded?.forEach((item) => {
         if (Object.keys(selectedNodeKeys).includes(item.key)) {
           batchInfoData.push({
+            key:item.key,
             scenarioTaskType: "disable",
             testsuiteName: item.suitename,
             testsuiteId: item.suiteid,
@@ -1563,6 +1565,7 @@ const showToast = (severity, detail) => {
           });
         }
       });
+      batchInfoData.sort((item1,item2)=>item1.key-item2.key)
 
       let executionData = {
         type: "",
@@ -1631,7 +1634,14 @@ const showToast = (severity, detail) => {
 
   useEffect(() => {
     if(getConfigData?.setupExists === "success"){
+      const pagecount=Math.floor(configPages/10);
+      if(configbtnsave=="Save"){
+        const first = (pagecount)*10;
+        onPageChange({first,rows:10,page:pagecount})
+      }
+      else{
       tableUpdate(currentPage);
+      }
       setVisible_setup(false);
       toast.current.show({
         severity: 'success',
@@ -1949,7 +1959,15 @@ const showToast = (severity, detail) => {
               endAfter: startDate ? "" : endDate?.name,
               clientTime: `${new Date().toLocaleDateString("fr-CA").replace(/-/g, "/")} ${new Date().getHours()}:${new Date().getMinutes()}`,
               clientTimeZone: "+0530",
-              scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
+              scheduleThrough: showIcePopup ? "client" : (
+                fetechConfig[configItem]?.executionRequest?.avoagents[0]  
+                    ? (Object.values(fetechConfig[configItem].executionRequest.avoagents)[0])
+                    : getConfigData?.avoAgentAndGrid?.avogrids?.length > 0
+                      ? (getConfigData?.avoAgentAndGrid?.avogrids?.filter((item) => item?._id === fetechConfig[configItem]?.executionRequest?.avogridId)[0]?.name)
+                      : "Any Agent" 
+                         
+              ),
+              // scheduleThrough: showIcePopup ? "client" : fetechConfig[configItem]?.executionRequest?.avoagents[0] ?? "Any Agent",
               testsuiteId: readTestSuite?.testSuiteDetails[el?.testsuiteId]?.testsuiteid
             })),
             scenarioFlag: false,
@@ -2087,7 +2105,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            // globalFilter={searchProfile}
+            globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",

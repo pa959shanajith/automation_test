@@ -399,7 +399,7 @@ module.exports.forgotPasswordEmail = async (req, res) => {
 			if (userUpd == "fail") return res.send("internal_api_error");
 			else {
 				// users[0].defaultpassword = default_password
-				notifications.notify("forgotPassword", {field: "password", user: users[0]});
+				notifications.notify("forgotPassword", {field: "password", user: users[0], hostName: req.headers.host});
 				result = "success";
 			}
 		}
@@ -466,7 +466,7 @@ module.exports.unlockAccountEmail = async (req, res) => {
 			if (userUpd == "fail") return result = "fail";
 			else {
 				userInfo.verificationpassword = default_password
-				notifications.notify("unlockAccount", {field: "password", user: userInfo});
+				notifications.notify("unlockAccount", {field: "password", user: userInfo, hostName: req.headers.host});
 				result = "success";
 			}
 		}

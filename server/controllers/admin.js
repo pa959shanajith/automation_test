@@ -200,6 +200,115 @@ exports.manageUserDetails = async (req, res) => {
 	}
 };
 
+exports.createMultipleLdapUsers = async (req, res) => {
+    const fnName = "createMulitpleLdapUsers";
+    logger.info("Inside UI Service: " + fnName);
+    try {
+        let flag = ['2','0','0','0','0','0','0','0','0'];
+        let regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+        const action = req.body.action;
+        const validUsers = {
+            'users': [],
+            'action': 'createMulitpleLdapUsers'
+        }
+        for(let ldapuser of req.body.user) {
+            const reqData = ldapuser;
+            const internalUser = reqData.type == "inhouse";
+ 
+            let inputs = {
+                action: action,
+                createdby: req.session.userid,
+                createdbyrole: req.session.activeRoleId,
+                userimage: reqData.userimage || '',
+                isadminuser : reqData.isadminuser,
+                name: (reqData.username || "").trim(),
+                auth: {
+                    type: reqData.type,
+                    password: reqData.password || ""
+                },
+            };
+            const username = inputs.name;
+            let input_pass = {
+                username
+            };
+   
+            if (!validator.isLength(inputs.name,1,100) || regEx.test(reqData.username)) {
+                logger.error("Error occurred in admin/"+fnName+": Invalid User name.");
+                flag[2]='1';
+            }
+            if (action != "create") {
+                inputs.userid = (reqData.userid || "").trim();
+            }
+            if (action != "delete") {
+                if (inputs.auth.password != '') {
+                    const salt = bcrypt.genSaltSync(10);
+                    inputs.auth.password = bcrypt.hashSync(inputs.auth.password, salt);
+                }
+                // else delete inputs.auth.password;
+                inputs.firstname = (reqData.firstname || "").trim();
+                inputs.lastname = (reqData.lastname || "").trim();
+                inputs.email = (reqData.email || "").trim();
+                inputs.defaultrole = (reqData.role || "").trim();
+   
+                if (!validator.isLength(inputs.firstname,1,100) || regEx.test(reqData.firstname)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid First name.");
+                    flag[3]='1';
+                }
+                if (!validator.isLength(inputs.lastname,1,100) || regEx.test(reqData.lastname)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid Last name.");
+                    flag[4]='1';
+                }
+                if (!validator.isLength(inputs.email,1,100) || !regEx_email.test(reqData.email)) {
+                    logger.error("Error occurred in admin/"+fnName+": Invalid Email Address.");
+                    flag[6]='1';
+                }
+                if (!internalUser) {
+                    inputs.auth.server = reqData.server;
+                    if (!inputs.auth.server || validator.isEmpty(inputs.auth.server)) {
+                        logger.error("Error occurred in admin/"+fnName+": Invalid Authentication Server.");
+                        flag[7]='1';
+                    }
+                    if (inputs.auth.type == "ldap") {
+                        inputs.auth.user = reqData.ldapUser;
+                        if (validator.isEmpty(inputs.auth.user)) {
+                            logger.error("Error occurred in admin/"+fnName+": Invalid User Domain Name.");
+                            flag[8]='1';
+                        }
+                    }
+                }
+            }
+            flag = flag.join('');
+            if (flag == "200000000") {
+                // return res.send(flag);
+                validUsers['users'].push(inputs)
+            } else {
+				validUsers['users'].push('InvalidUser')
+			}
+        }
+ 
+        const result = await utils.fetchData(validUsers, "admin/manageUserDetails", fnName);
+        if (result == "fail" || result == "forbidden") res.status(500).send("fail");
+        // else if (action==="create"){
+        //  if(result["userData"]){
+        //      res.send(result["status"]);        
+        //      let uData = result["userData"];
+        //      try{
+        //          // notifications.notify("verifyUser", {field: "verifyUser", user: uData});
+        //          // notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+        //      }catch(error) {
+        //          logger.error("Error occurred in admin/"+fnName,error);
+        //      }
+        //  }else{
+        //      res.send(result)
+        //  }
+        // }
+        else res.send(result);
+    } catch (exception) {
+        logger.error("Error occurred in admin/"+fnName, exception);
+        res.status(500).send("fail");
+    }
+};
+
 // Fetch Users or a specific user details
 exports.getUserDetails = async (req, res) => {
 	logger.info("Inside UI Service: getUserDetails");
@@ -358,10 +467,10 @@ exports.manageSessionData = async (req, res) => {
 	try {
 		const currUser = req.session.username;
 		const action = req.body.action;
+		var clientName=utils.getClientName(req.headers.host);
 		if (action == "get") {
 			logger.info("Inside UI service: manageSessionData/getSessions");
 			const data = {sessionData: [], clientData: []};
-			var clientName=utils.getClientName(req.headers.host);
 			const connectusers = mySocket.allSocketsMap[clientName]
 			const allICEIPMap = mySocket.allICEIPMap[clientName]
 			for (ice in connectusers){
@@ -402,7 +511,7 @@ exports.manageSessionData = async (req, res) => {
 				if (key != '?') key = Buffer.from(req.body.key, "base64").toString();
 				else {
 					try {
-						key = await utils.findSessID(user);
+						key = await utils.findSessID(user,clientName);
 					} catch (err) {
 						logger.error("Error occurred in admin/manageSessionData: Fail to "+action+" "+user);
 						logger.debug(err);
@@ -667,7 +776,6 @@ exports.getLDAPConfig = async (req, res) => {
 	try {
 		const action = req.body.action;
 		const name = req.body.args;
-		const opts = (req.body.opts || "").trim();
 		let inputs = {};
 		if (action != "server") inputs.name = name;
 		const resConf = await utils.fetchData(inputs, "admin/getLDAPConfig", fnName);
@@ -705,29 +813,39 @@ exports.getLDAPConfig = async (req, res) => {
 		const filter = dataMaps.uname;
 		const ad = new activeDirectory(adConfig);
 		let resSent = false;
+		const opts = (req.body.opts || "");
 		if (opts.length > 0) {
-			ad.findUser(opts, function (err, result) {
-				if (resSent) return;
-				resSent = !resSent;
-				if (err) {
-					var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
-					logger.debug("Error occurred in admin/"+fnName+": " + errStack);
-					if (data == "fail") data = "server_error";
-				}
-				else if (result) {
-					data = {
-						username: result[filter],
-						firstname: result[dataMaps.fname],
-						lastname: result[dataMaps.lname],
-						email: result[dataMaps.email],
-						ldapname: result.dn
-					};
-				} else {
-					logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
-					data = "empty";
-				}
-				return res.send(data);
-			});
+			let multipleUsers = []
+			for(let user of opts){
+				multipleUsers.push(
+					new Promise((resolve,reject)=>{	
+						ad.findUser(user.trim(), function (err, result) {
+						//if (resSent) return;
+						//resSent = !resSent;
+							if (err) {
+								var [data, errStack] = parseLDAPErrors(err, resConf.auth, fnName);
+								logger.debug("Error occurred in admin/"+fnName+": " + errStack);
+								if (data == "fail") data = "server_error";
+							}
+							else if (result) {
+								data = {
+									username: result[filter],
+									firstname: result[dataMaps.fname],
+									lastname: result[dataMaps.lname],
+									email: result[dataMaps.email],
+									ldapname: result.dn
+								};
+							} else {
+								logger.error("Error occurred in admin/getLDAPConfig: Fetch User Details: User not Found");
+								data = "empty";
+							}
+							resolve(data);
+						});
+					})
+				)
+			}
+
+			Promise.all(multipleUsers).then((data)=>{return res.send(data);});
 		} else {
 			ad.find(filter+"=*", function (err, result) {
 				if (resSent) return;
@@ -1803,10 +1921,63 @@ exports.fetchICE = async (req, res) => {
 	}
 };
 
+let multipleProvisionIce = async (requestData) => {
+	let fnName = 'multipleProvisionIce'
+	let inputs = {
+		'query': 'multipleProvisionIce',
+		'tokensInfo':[]
+	}
+	for(tokenData of requestData['tokeninfo']['userList']) {
+		const tokeninfo = tokenData;
+		if (regEx.test(tokeninfo.icename)) {
+			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
+			inputs['tokensInfo'].push('invalidUsername')
+			continue
+		}
+		inputs['tokensInfo'].push({
+			provisionedto: tokeninfo.userid,
+			icename: tokeninfo.icename.toLowerCase(),
+			icetype: tokeninfo.icetype,
+			query: tokeninfo.action,
+			uid: tokeninfo.userid,
+			email: tokeninfo.email,
+			url:tokeninfo.url,
+			firstname: tokeninfo.firstName,
+			lastname: tokeninfo.lastName,
+		    username: tokeninfo.username
+		});
+	}
+	const multipleResult = await utils.fetchData(inputs, "admin/multipleProvisionICE", fnName);
+	if(multipleResult == 'fail') return multipleResult;
+
+	// Will get ice tokens for each user
+	for(let result of multipleResult) {
+		if(result !== 'fail' && result !== 'invalidUsername' && result !== 'DuplicateIceName'){
+			const uData = {
+				uid: result.tokeninfo.uid,
+				email: result.tokeninfo.email,
+				token:result.generatedToken,
+				url:result.tokeninfo.url,
+			    firstname: result.tokeninfo.firstName,
+			    lastname: result.tokeninfo.lastName,
+				username: result.tokeninfo.username
+			}
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+			delete result.tokeninfo
+		}
+	}
+	return multipleResult
+}
 exports.provisionICE = async (req, res) => {
 	const fnName = "provisionICE";
 	logger.info("Inside UI service: " + fnName);
 	try {
+		// To provide multiple ice provision feature
+		if(req.body.action == 'multipleProvisionIce') {
+			const result = multipleProvisionIce(req.body);
+			return res.send(result);
+		}
+
 		const tokeninfo = req.body.tokeninfo;
 		if (regEx.test(tokeninfo.icename)) {
 			logger.error("Error occurred in admin/"+fnName+": Special characters found in icename");
@@ -1829,7 +2000,7 @@ exports.provisionICE = async (req, res) => {
 			    lastname: tokeninfo.lastName,
 				username: tokeninfo.username,
 			}
-			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData});
+			notifications.notify("welcomenewuser", {field: "welcomenewuser", user: uData, hostName: req.headers.host});
 		}
 		res.send(result);
 	} catch (exception) {
@@ -2198,7 +2369,8 @@ exports.manageNotificationChannels = async (req, res) => {
 			action: action,
 			name: (conf.name || "").trim(),
 			channel: (conf.channel || "").trim(),
-			provider: (conf.provider || "").trim()
+			provider: (conf.provider || "").trim(),
+			host: req.headers.host
 		};
 
 		if (validator.isEmpty(action) || ["create","update","delete","enable","disable"].indexOf(action) == -1) {
@@ -2250,6 +2422,7 @@ exports.getNotificationChannels = async (req, res) => {
 		const channel = req.body.channel;
 		const args = req.body.args;
 		let inputs = { action };
+		inputs.host = req.headers.host;
 		if (action != "list") {
 			inputs.name = args;
 			inputs.channel = channel;
@@ -2347,6 +2520,7 @@ exports.gitSaveConfig = async (req, res) => {
 		const gitUrl = data.gitUrl;
 		const gitUsername = data.gitUsername;
 		const gitEmail = data.gitEmail;
+		const gitbranch =data.gitBranch;
 		const inputs = {
 			"action":action,
 			"userId":userId,
@@ -2355,7 +2529,8 @@ exports.gitSaveConfig = async (req, res) => {
 			"gitAccToken": gitAccToken,
 			"gitUrl":gitUrl,
 			"gitUsername":gitUsername,
-			"gitEmail":gitEmail
+			"gitEmail":gitEmail,
+			"gitbranch":gitbranch
 		};
 		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
 		return res.send(result);
@@ -2382,7 +2557,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else {
 			let data = [];
-			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail']);
+			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail'], result['gitbranch']);
 			return res.send(data);
 		}
 	} catch (exception){
@@ -2485,6 +2660,59 @@ exports.getDetails_Zephyr = async (req, res) => {
 	}
 
 };
+
+/** 
+* @function : getDetails_Testrail
+* @description : the function is responsible for getting the saved credentials for a respective client.
+				It calls DAS and gets the credentials and sends the same to FE.
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : Incase of failure
+			 A String with fail or empty message with statusCode => 500
+            Incase of success
+			 An object with url,username and apikey with statusCode => 200
+
+*/
+exports.getDetails_Testrail = async(req,res) => {
+	try{
+		const actionName = "getDetails_Testrail";
+
+		// add into the info log
+		logger.info("Inside UI service: " + actionName);
+
+		// get userId from session
+		const userId = req.session.userid
+
+		let inputs = {
+			userId: userId
+		};
+
+		// call DAS service to get the data.
+		const result = await utils.fetchData(inputs, "admin/getDetails_TestRail", actionName);
+		
+		let response 
+
+		// handle all the possible responses from DAS
+		if(result == 'fail') {
+			return res.send('fail')
+		} else if(result == 'empty') {
+			return res.send('empty')
+		} else {
+			response = {
+				url : result.url,
+				username : result.username,
+				apiKey : result.API_Key
+			}
+			return res.send(response)
+		}
+
+	}catch (exception) {
+		logger.error("Exception in the service getDetails_Testrail: %s", exception);
+		return res.status(500).send("fail");
+	}
+}
+
+
 exports.getDetails_Azure= async (req, res) => {
 	const actionName = "getDetails_Azure";
 	logger.info("Inside UI service: " + actionName);
@@ -2576,6 +2804,69 @@ exports.manageZephyrDetails = async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+/** 
+* @function : manageTestrailDetails
+* @description : the function is responsible for logging into the Testrail,
+               it takes the payload from front end and calls the DAS and returns the response to FE.
+* @param : TestRailUrl:
+		   Url of the test rail, comes in body.
+* @param : TestRailUsername :
+           User name of the test rail, comes in body.
+* @param : TestRailToken :
+	       Token for test rail, comes in body.
+* @param : action : 
+           Create or Update, comes in body.
+* @param : userId :
+           Encrypted id of the user, comes from session.
+* @return : A String of success or fail with respective status code
+             200 => success
+			 500 => fail
+*/
+ 
+exports.manageTestrailDetails = async (req, res) => {
+	try {
+	  const actionName = "manageTestrailDetails";
+	
+	  // add into the info log
+	  logger.info("Inside UI service: " + actionName);
+	  
+	  // get userId from session
+	  const userId = req.session.userid;
+	  
+	  // get remaining data from body
+	  let { TestRailUrl, TestRailUsername, TestRailToken, action } = req.body;
+	  
+	  // using fetchData function to call DAS service.
+	  const result = await utils.fetchData(
+		{
+		  TestRailUrl: TestRailUrl,
+		  TestRailUsername: TestRailUsername,
+		  TestRailToken: TestRailToken,
+		  action: action,
+		  userId: userId,
+		},
+		"admin/manageTestRailDetails",
+		actionName
+	  );
+	
+	  // set the appropriate status code on the basis of response
+	  let statusCode 
+	  if(result == 'fail') {
+		statusCode = 500
+	  } else {
+		statusCode = 200
+	  }
+	  
+	  // return the response
+	  return res.status(statusCode).send(result);
+	} catch (exception) {
+	  // add the error message into the error log
+	  logger.error("Exception in the service manageTestrailDetails: %s", exception);
+	  return res.status(500).send("fail");
+	}
+  };
+
 exports.manageAzureDetails = async (req, res) => {
 	const actionName = "manageAzureDetails";
 	logger.info("Inside UI service: " + actionName);
@@ -2702,6 +2993,7 @@ exports.adminPrivilegeCheck =  async (req,res,next) =>{
 				if (req.body.CIUser.userId) return next();
 				break;
 			case "/provisionIce":
+				if(req.body.tokeninfo.action == 'multipleProvisionIce') return next();
 				if (req.body.tokeninfo.userid) return next();
 				break;
 			case "/gitSaveConfig":

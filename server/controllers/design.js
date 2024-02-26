@@ -201,6 +201,7 @@ exports.debugTestCase_ICE = function (req, res) {
                 mySocket.emit("debugTestCase", dataToIce.responsedata);
 										function result_debugTestCase_listener(message) {
 											data = message;
+											mySocket.removeListener('result_debugTestCase', result_debugTestCase_listener);
 											//LB: make sure to send recieved data to corresponding user
 											
 											try {
@@ -457,6 +458,8 @@ exports.debugTestCase_ICE = function (req, res) {
 						mySocket.emit("playDebug",dataToIce );
 										function result_playDebug_listener(message) {
 											data = message;
+											mySocket.removeListener('result_playDebug_listener', result_playDebug_listener);
+
 											//LB: make sure to send recieved data to corresponding user
 											
 
@@ -475,6 +478,8 @@ exports.debugTestCase_ICE = function (req, res) {
 										function result_moveToNextStep_listener(message) {
 											data = message;
 											//LB: make sure to send recieved data to corresponding user
+											mySocket.removeListener('result_moveToNextStep_listener', result_moveToNextStep_listener);
+
 											
 											
 											try {
@@ -549,6 +554,21 @@ exports.getTestcasesByScenarioId_ICE = async (req, res) => {
 		}
 		logger.info("Sending testcase details from design/"+fnName+" service");
 		res.send(testcasesArr);
+	} catch (exception) {
+		logger.error("Error occurred in design/"+fnName+":", exception);
+        res.status(500).send("fail");
+	}
+};
+exports.createKeyword = async (req, res) => {
+	const fnName = "createKeyword";
+	logger.info("Inside UI service: " + fnName);
+    try {
+		const inputs = req.body.data;
+		// Query 1 fetching the objecttype,keywords basked on projecttypename
+		const result = await utils.fetchData(inputs, "design/createKeyword", fnName);
+		if (result == "fail") return res.send("Server data rendering failed: Fail");
+
+		res.send("Pass");
 	} catch (exception) {
 		logger.error("Error occurred in design/"+fnName+":", exception);
         res.status(500).send("fail");

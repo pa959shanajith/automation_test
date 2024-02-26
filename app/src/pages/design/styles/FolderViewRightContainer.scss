@@ -1,12 +1,15 @@
 .folderViewRightMaincontainer {
-    width: 76.9%;
+    width: 82%;
+    position: absolute;
+    left: 40vh;
+    top: 8vh;
 
     .card {
-        height: 85vh;
-        width: 77vw;
+        height: 81vh;
+        width: 81vw;
 
         .p-component {
-            height: 99.9%;
+            // height: 99.9%;
 
             .p-card-body {
                 padding: 0rem;
@@ -139,6 +142,15 @@
 
 
                 }
+
+                .saveButton {
+                    height: 2.5rem;
+                    left: 72.3rem;
+                    position: absolute;
+                    top: 0.2rem;
+                    width: 5rem;
+                }
+
 
                 .centerField {
                     align-items: center;

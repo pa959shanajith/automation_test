@@ -17,6 +17,8 @@ import AvoInput from "../../../globalComponents/AvoInput";
 import { useDispatch, useSelector } from "react-redux";
 import { checkRequired, readTestSuite } from "../configureSetupSlice";
 import { Tooltip } from 'primereact/tooltip';
+import { AutoComplete } from 'primereact/autocomplete';
+
 const ConfigureSetup = ({
   configData,
   tabIndex,
@@ -60,6 +62,10 @@ const ConfigureSetup = ({
   const [configTable, setConfigTable] = useState([]);
   const [tableFilter, setTableFilter] = useState("");
   const [useDefault, setUseDefault] = useState("");
+  const [selectedOption, setSelectedOption] = useState('option1');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [filteredTags, setFilteredTags] = useState([]);
   
   const dispatch = useDispatch();
   const getProjectData = useSelector((store) => store.configsetup);
@@ -67,13 +73,69 @@ const ConfigureSetup = ({
   const isModuleRequired = modules === "e2eExecution";
   const isTestsuiteRequired = modules === "normalExecution";
 
+  const tags = configData?.configureData?.normalExecution?.flatMap(execution =>
+    execution.scenarios.map(scenario => scenario.tag)
+  );
+  const flattenedTags = tags?.flat();
+
+  
+  const searchOptions = [
+    { label: 'search by names', value: 'option1' },
+    { label: 'search by tags', value: 'option2' }
+  ];
+
+  const handleDropdownChange = (e) => {
+    setSelectedOption(e.value);
+    setSearchQuery('');
+    setFilteredTags([]);
+    setSelectedTags([]);
+  };
+
+  const handleAutoCompleteInputChange = (e) => {
+    setSearchQuery(e.query);
+  
+    const allTags = configData?.configureData?.normalExecution
+      .map((scenario) => scenario?.scenarios.map((tags) => tags.tag))
+      .flat(2);
+  
+    const uniqueTags = [...new Set(allTags)];
+  
+    const filteredTags = uniqueTags.filter((tag) =>
+      tag?.toLowerCase().startsWith(e.query.toLowerCase())
+    );
+  
+    setFilteredTags(filteredTags);
+  };
+  
+
+  const handleAutoCompleteSelect = (e) => {
+    if (!selectedTags.includes(e.value)) {
+      setSelectedTags([...selectedTags, e.value]);
+    }
+    setSearchQuery('');
+    setFilteredTags([]);
+  };
+
+  const handleRemoveTag = (tag) => {
+    setSelectedTags(selectedTags.filter(selectedTag => selectedTag !== tag));
+  };
+
+  const handleClearAllTags = () => {
+    setSelectedTags([]);
+  };
+  
+
 
   useEffect(() => {
     const mainTree = [];
     configData?.configureData && configData?.configureData[modules]?.map((el, index) => {
       const childTree = [];
       if (!!el?.scenarios.length) {
-        el?.scenarios.forEach((e, ind) => {
+        el?.scenarios.filter((scenario) => {
+          const result = selectedTags.length === 0 || scenario.tag?.some((newTag) => selectedTags.includes(newTag));
+          return result;
+          
+        }).forEach((e, ind) => {
           const dataParamName = `dataParamName${ind}${index}`;
           const conditionName = `conditionName${ind}${index}`;
           const accessibilityName = `accessibilityName${ind}${index}`;
@@ -115,6 +177,7 @@ const ConfigureSetup = ({
                   optionLabel="name"
                 />
               ),
+              tags: e.tag
             },
           });
         });
@@ -129,7 +192,7 @@ const ConfigureSetup = ({
       });
     });
     setConfigTable(mainTree);
-  }, [configData?.configureData, modules, dataparam, condition, accessibility]);
+  }, [configData?.configureData, modules, dataparam, condition, accessibility,selectedTags]);
 
   // useEffect(() => {
   //   dispatch(checkRequired({ configName: configTxt }));
@@ -197,7 +260,7 @@ const ConfigureSetup = ({
       const getNotExe = dotNotExe?.executionRequest?.donotexe?.current;
       const nodeObj = {};
       const getXpanded = [...xpanded];
-      getExecutions.forEach((el, ind) => {
+      getExecutions?.forEach((el, ind) => {
         if (Object.keys(getNotExe).includes(el.moduleid)) {
           nodeObj[ind] = {
             checked: true,
@@ -281,8 +344,8 @@ const ConfigureSetup = ({
   };
 
   const tableTreeHeader = (
-    <div className="flex align-items-center justify-content-between">
-      <div className="flex align-items-center">
+    <div className="flex  justify-content-between treehead">
+      <div className="flex ">
       <div className="radioButton"
         tooltipOptions={{ showOnDisabled: true }}>
           {typeOfExecution === "normalExecution" && <Tooltip target=".radioButton" position="bottom" content="You cannot switch between the test suite and end-to-end flow while editing."/>}
@@ -300,7 +363,7 @@ const ConfigureSetup = ({
           End to End Flow{isModuleRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
-      <div className="flex align-items-center">
+      <div className="flex ">
         <div className="radioButton"
         tooltipOptions={{ showOnDisabled: true }}>
           {typeOfExecution === "e2eExecution" && <Tooltip target=".radioButton" position="bottom" content="You cannot switch between the test suite and end-to-end flow while editing."/>}
@@ -317,15 +380,65 @@ const ConfigureSetup = ({
           Test Suites{isTestsuiteRequired && <span className="required-asterisk">*</span>}
         </label>
       </div>
-      <div className="flex align-items-center config_text">
-        <AvoInput
-          icon="pi pi-search"
-          placeholder="Search"
-          inputTxt={tableFilter}
-          setInputTxt={setTableFilter}
-          inputType="searchIcon"
-        />
-      </div>
+     
+      <div className="dropdown-container">
+          <div className="searchdropdowncontainer">
+            <Dropdown
+              icon="pi pi-search"
+              value={selectedOption}
+              options={searchOptions}
+              onChange={handleDropdownChange}
+              placeholder="Select Option"
+              className="searchdropdown"
+            />
+
+            <div className="searchbox">
+              {selectedOption === 'option2' && (
+                <div className="autocomplete-container">
+                  <AutoComplete
+                    value={searchQuery}
+                    suggestions={filteredTags}
+                    completeMethod={handleAutoCompleteInputChange}
+                    onSelect={handleAutoCompleteSelect}
+                    placeholder="Search by tags"
+                    className="searchtag"
+                  />
+                  <div className="selected-tags-container ">
+                    {selectedTags.map((tag, index) => (
+
+                      <div className="chip" key={index}>
+                        {tag}
+
+                        <span className="close-icon" onClick={() => handleRemoveTag(tag)}>
+                          &#10006;
+                        </span>
+                      </div>
+                    ))}
+                     {selectedTags.length > 1 && (
+                        <div >
+                        <img className="clear-all-button" src="static/imgs/clear all_icon.svg" onClick={handleClearAllTags} ></img>
+                        <Tooltip target=".clear-all-button" position="right" content="Clear all tag(s)."/>
+                       </div>
+                      )}
+                  </div>
+                </div>
+              )}
+
+              {selectedOption === 'option1' && (
+                <div className="search-input-container">
+                  <AvoInput
+                    icon="pi pi-search"
+                    placeholder="Search"
+                    inputTxt={tableFilter}
+                    setInputTxt={setTableFilter}
+                    inputType="searchIcon"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
     </div>
   );
 
@@ -362,7 +475,7 @@ const ConfigureSetup = ({
               onExpand={(e) => onNodeXpand(e)}
               onSelect={(e) => onNodeXpand(e)}
               header={tableTreeHeader}
-              value={configTable}
+              value={!!selectedTags.length ? configTable.filter((item) => item.children.filter(child => child.data && child.data.tags && child.data.tags.some(tag => selectedTags.includes(tag))).length > 0).map(item => ({...item, children: item.children.filter(child=> child.data.tags.some((tag => selectedTags.includes(tag))))})) : configTable}
               selectionMode="checkbox"
               selectionKeys={selectedNodeKeys}
               loading={configData.loading}

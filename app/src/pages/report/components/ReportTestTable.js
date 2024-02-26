@@ -33,6 +33,7 @@ import { Toast } from "primereact/toast";
 import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
 import NetworkOperation from "./NetworkOperation";
+import { Tooltip } from 'primereact/tooltip';
 
 export default function BasicDemo() {
   const [reportData, setReportData] = useState([]);
@@ -71,6 +72,7 @@ export default function BasicDemo() {
   const [networkDialog, setNewtorkDialog] = useState(false);
   const [networkData, setNetworkData] = useState([]);
   const [description, setDescription] = useState(null);
+  const [downloadLevel, setDownloadLevel] = useState(null);
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -85,9 +87,11 @@ export default function BasicDemo() {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get("reportID");
-      return id;
+      const downloadLevel = urlParams.get("downloadLevel");
+      return { id, downloadLevel, viewReport };
     };
-    const id = getQueryParam();
+    const { id, downloadLevel } = getQueryParam();
+    setDownloadLevel(downloadLevel);
     const getUrl = new URLSearchParams(window.location.search);
     const execution = getUrl.get("execution");    
     const accessibilityID = getUrl.get("accessibilityID");
@@ -104,7 +108,7 @@ export default function BasicDemo() {
 
   const getReportsTable = async () => {
     if (reportid) {
-      const view = await viewReport(reportid);
+      const view = await viewReport(reportid, "json", false, downloadLevel, true);
       setReportData(JSON.parse(view));
     }
   };
@@ -580,6 +584,19 @@ export default function BasicDemo() {
       />
     );
   };
+  function getActualResult (status, tcDetails) {
+    let result = "";
+    if ( status === "Pass" ){
+        result = tcDetails.actualResult_pass || "As Expected";
+    }
+    else if ( status === "Fail" ) {
+        result = tcDetails.actualResult_fail || "Fail";
+    }
+    else if ( status === "Terminated" ) {
+        result = "Terminated";
+    }
+    return result;
+}
   const convertDataToTree = (data) => {
     const treeDataArray = [];
     for (let i = 0; i < data.length; i++) {
@@ -622,12 +639,13 @@ export default function BasicDemo() {
           }
         }
         modifiedChild.flag = modifiedChild.status;
+        modifiedChild.testcase_details = getActualResult(modifiedChild.status, modifiedChild.testcase_details)
         const statusIcon =
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
             : modifiedChild.status === "Fail"
             ? "static/imgs/fail.png"
-            : "static/imgs/treminated.png";
+            : "";
         const statusDesc = modifiedChild.status;
         modifiedChild.status = (
           <div key={modifiedChild.key} style={{ display: "flex", justifyContent: "center" }}>
@@ -782,6 +800,7 @@ export default function BasicDemo() {
   const screenShotLink = (getLink) =>{
     return (
     <div className="action_items">
+      <div className={`screenshot-container ${getLink?.data?.screenshot_path ? '' : 'empty-container'}`}>
       {getLink?.data?.screenshot_path && (
         <div
           className="screenshot_view"
@@ -792,14 +811,18 @@ export default function BasicDemo() {
             setVisibleScreenShot(image);
           }}
         >
-         <img src="static/imgs/view_screenshot_icon_before.svg" />
+        <Tooltip target=".screenshot" position="bottom" />
+         <img className="screenshot" src="static/imgs/ViewScreenshot.svg" data-pr-tooltip="View Screenshot" />
         </div>
       )}
+      </div>
+      <div className="network-icon-container">
       {getLink?.data?.Network_Data && (
       <div>
+        <Tooltip target=".Network_icon" position="bottom" />
         <img
-          className="plug_icon"
-          src="static/imgs/plug_icon.svg"
+          className="Network_icon"
+          src="static/imgs/Network_icon.svg" data-pr-tooltip="View Network Operation" 
               onClick={() => { setNewtorkDialog(true);
                  setNetworkData(getLink?.data?.Network_Data);
                   setDescription(reportData?.rows.filter((el) => el?.slno === getLink?.data?.slno)[0]?.StepDescription);
@@ -807,6 +830,7 @@ export default function BasicDemo() {
         />
       </div>
       )}
+       </div>
     </div>
   )}
 
@@ -929,21 +953,26 @@ export default function BasicDemo() {
         >
           <Column
             field="slno"
-            header="S No."
+            header="#"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
-            header="Steps"
+            header="Step"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
-            header="Description"
+            header="Step Details"
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
+          />
+          <Column
+          field="testcase_details"
+          header="Remarks"
+          style={{ width: "10rem", padding: "0rem", textAlign: "center", wordWrap:'break-word' }}
           />
           <Column
             field="EllapsedTime"
@@ -994,11 +1023,13 @@ export default function BasicDemo() {
               : []
           }
           tableStyle={{ minWidth: "50rem" }}
+          scrollable
+          scrollHeight="325px"
           // globalFilter={searchTest}
           header={getTableHeader}
           className="ruleMap_table"
         >
-          <Column field="slno" header="Sl. No."></Column>
+          <Column field="slno" header="#"></Column>
           <Column field="description" header="Description"></Column>
           <Column field="status" header="Status"></Column>
           <Column field="impact" header="Impact"></Column>

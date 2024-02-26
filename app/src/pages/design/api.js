@@ -434,6 +434,10 @@ export const importGitMindmap = async(data) => {
             console.error(res.data)
             return {error:res.data}
         }
+        if(res.data === "Unable to find the given commit in GIT repository."){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_COMMIT_GIT}
+        }
         // if (!('testscenarios' in res.data)){
         //     console.error(res.data)
         //     return {error:MSG.MINDMAP.ERR_JSON_INCORRECT_IMPORT}
@@ -486,9 +490,14 @@ export const exportToGit = async(data) => {
             console.error(res.data)
             return {error:MSG.MINDMAP.ERR_GIT_BRANCH_EXIST}
         }
+        
         else if(res.data==='Invalid url'){
             console.error(res.data)
             return {error:MSG.MINDMAP.ERR_INVALID_GIT_CLONE_PATH}
+        }
+        else if(res.data==="Unable to connect GIT"){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_PROJECT_GIT_CON}
         }
         else if(res.data==='Invalid token'){
             console.error(res.data)
@@ -724,6 +733,27 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
+export const launchAndServerConnectSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/launchAndServerConnectSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'launchAndServerConnectSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
 
 
 /*Component 
@@ -1728,4 +1758,117 @@ export const insertScreen = arg => {
         })
         .catch(error=>reject(error));
     });
+}
+
+export const startScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/startScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'startScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+export const stopScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/stopScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'stopScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+export const createKeyword = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/createKeyword", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const saveTag = async(tagsData) => {
+    try{
+        const res = await axios(url+'/saveTag', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:tagsData,
+            credentials: 'include',
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data; 
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+}
+export const fetch_git_exp_details = async(projectId) => { 
+    try{
+        const res = await axios(url+'/fetch_git_exp_details', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+				projectId: projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
+    }
 }

@@ -315,17 +315,18 @@ const FormInpDropDown = ({ data, setFilter, clickInp, inpRef, type, setNewOption
 */
 
 const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEdit, errBorder, resetVal }) => {
-    // const inputRef = inpRef
+    const inputRef = inpRef
     const defaultValue = defVal
     const [list, setList] = useState([]);
     const [dropDown, setDropDown] = useState(false);
     const [dropdownValue, setDropdownValue] = useState('');
 
     useEffect(() => {
-        if (defaultValue && document.getElementById("ldapServerName").selectedIndex !== 0 && ldapEdit) {
-            // inputRef.current = defaultValue;
-            var items = [...data].filter((e) => e.toUpperCase().indexOf(defaultValue.toUpperCase()) !== -1)
-            setList(items)
+        if (defaultValue !== "None" && ldapEdit) {
+            inputRef.current = defaultValue;
+            setDropdownValue(defaultValue);
+            // var items = [...data].filter((e) => e.toUpperCase().indexOf(defaultValue.toUpperCase()) !== -1)
+            setList([...data]);
         }
         else {
             // var items = [...data].filter((e) => e.toUpperCase().indexOf(inputRef.current.toUpperCase()) !== -1)
@@ -335,17 +336,17 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
     }, [defaultValue, data])
 
     useEffect(() => {
-        // inputRef.current = "";
-        document.getElementById("ldapServerName").selectedIndex = "0";
+        inputRef.current = "";
+        // document.getElementById("ldapServerName").selectedIndex = "0";
         setList([...data]);
     }, [resetVal])
 
-    // const inputFilter = (e) => {
-    //     setFilter(e);
-    //     var val = inputRef.current
-    //     var items = [...data].filter((e) => e.toUpperCase().indexOf(val.toUpperCase()) !== -1)
-    //     setList(items)
-    // }
+    const inputFilter = (e) => {
+        setFilter(e);
+        var val = inputRef.current
+        // var items = [...data].filter((e) => e.toUpperCase().indexOf(val.toUpperCase()) !== -1)
+        setList([...data])
+    }
 
     const resetField = () => {
         setDropDown(true)
@@ -353,7 +354,7 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
     }
     const selectOption = (e) => {
         var text = e.currentTarget.innerText
-        // inputRef.current = text
+        inputRef.current = text
         setDropdownValue(text)
         setDropDown(false)
         setFilter(e)
@@ -367,7 +368,13 @@ const FormInpDropDownLdap = ({ data, setFilter, clickInp, inpRef, defVal, ldapEd
                 {/* {list.map((e) => (
                             <option key={e} onClick={selectOption} value={e}> {e}</option>
                         ))} */}
-                        <Dropdown value={dropdownValue} onChange={(e) => setDropdownValue(e.value)} options={list} placeholder="Select"
+                        <Dropdown 
+                            id="ldapServerName"
+                            value={dropdownValue} 
+                            ref={inputRef} 
+                            onChange={(e) => {setDropdownValue(e.target.value); inputFilter(e)}} 
+                            options={list} 
+                            placeholder="Select"
                             filter className="w-full md:w-29rem" />
 
                 {/* </div> */}

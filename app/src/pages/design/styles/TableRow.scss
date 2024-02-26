@@ -121,7 +121,17 @@
     pointer-events: none;
     cursor: default;
 }
-
+.optionstyle{
+    display: flex;
+    align-items: center;
+    background-color: #e3caff;
+    justify-content: space-between;
+}
+.optionstyle_img{
+    height: 24px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
 
 // @media screen and (min-width: 1400px) and (min-height: 770px){        
 //     .d__table_row{
@@ -159,4 +169,12 @@
 // }
 .p-tag-value{
     width:4rem ;
+}
+.eyeIconImg{
+    position: sticky;
+    left: 3rem;
+}
+.eyeIcon3{
+    position: sticky;
+    left: 5rem;
 }

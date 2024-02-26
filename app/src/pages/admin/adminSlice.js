@@ -15,19 +15,21 @@ const initialState = {
     addRole: {},
     nocreate: false,
     confExpired: false,
-    ldapUserFilter: '',
+    ldapUserFilter: [],
     allUserFilter: '',
     type: "inhouse",
     allRoles: [],
     allAddRoles: [],
     server: "",
+    ldapEditUserDomainName: "",
     ldap: { fetch: "map", user: '' },
     confServerList: [],
     ldapAllUserList: [],
     allUsersList: [],
     fType: "Default",
     rolename: "",
-    editUser: false
+    editUser: false,
+    ldapFetchUsersData: [],
 }
 
 export const adminSlice = createSlice({
@@ -117,7 +119,7 @@ export const adminSlice = createSlice({
             state.ldapAllUserList = action.payload
         },
         UPDATE_LDAP_USER: (state, action) => {
-            state.ldap = { fetch: state.ldap.fetch, user: action.payload }
+            state.ldapEditUserDomainName =  action.payload ;
         },
         UPDATE_LDAP_FETCH: (state, action) => {
             state.ldap = { fetch: state.ldap.user, fetch: action.payload }
@@ -145,7 +147,7 @@ export const adminSlice = createSlice({
             state.allRoles = [];
             state.nocreate = false;
             state.confExpired = false;
-            state.ldapUserFilter = "";
+            state.ldapUserFilter = [];
             state.ldapAllUserList = [];
             state.allUserFilter = "";
         },
@@ -164,11 +166,13 @@ export const adminSlice = createSlice({
             state.confExpired = false;
         },
         UPDATE_LDAP_DATA: (state, action) => {
-            state.userName = action.payload.username;
-            state.firstname = action.payload.firstname;
-            state.lastname = action.payload.lastname;
-            state.email = action.payload.email;
-            state.ldap = { fetch:state.ldap.fetch, user: action.payload.ldapname };
+
+            state.ldapFetchUsersData = action.payload
+            // state.userName = action.payload.username;
+            // state.firstname = action.payload.firstname;
+            // state.lastname = action.payload.lastname;
+            // state.email = action.payload.email;
+            // state.ldap = { fetch:state.ldap.fetch, user: action.payload.ldapname };
             state.nocreate = false;
         }
 

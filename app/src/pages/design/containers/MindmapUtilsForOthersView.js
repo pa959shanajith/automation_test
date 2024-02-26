@@ -49,106 +49,108 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
     });
 };
 
-const getNewPosition = (dNodes, node, pi, arr_co, layout_vertical, sections) => {
+const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     //dNodes[pi].children are arranged in increasing
     // order of x/y disance depending on layout
     var index;
     var new_one;
-    if (dNodes[pi].children.length > 0) { // new node has siblings
+    if (dNodes[pi].children.length > 0) { 
         if (dNodes[pi].type === "scenarios") {
             if (dNodes[pi].children[0].id !== node.id) {
-                index = node.parentID
-                new_one = {
-                    x: sections[node.type] + 200,
-                    y: parseInt(dNodes[index].y)
-                };
-            } else {
+                index = node.parentID !== undefined?node.parentID:pi
+                if(dNodes[pi].children[0]._id !== undefined){
+                    new_one = {
+                        x: parseInt(dNodes[index].x) + 200,
+                        y: parseInt(dNodes[index].y)
+                    }
+                }else{
+                    new_one = {
+                        x: sections[node.type] + 200,
+                        y: parseInt(dNodes[index].y)
+                    };
+                }
+            }else{
                 index = dNodes[pi].children.length - 1
                 new_one = {
                     x: sections[node.type],
                     y: parseInt(dNodes[pi].y)
                 };
             }
-
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
-        } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
-            var index1 = dNodes[pi].id
-            var new_one1 = {
-                x: sections[node.type],
-                y: parseInt(dNodes[index1].y)
-            };
-            // node = getNonOverlappingPosition_1(node, arr_co, new_one1,layout_vertical);
-            if (node.children.length > 0) {
-                var index2 = node.children[0].id - 1
-                var new_one2 = {
-                    x: sections[node.type],
-                    y: parseInt(dNodes[index2].y)
-                };
-                // node = getNonOverlappingPosition_2(node.children[0], arr_co, new_one2,layout_vertical);
-            } else {
-                index2 = node.id - 1
-                new_one2 = {
-                    x: parseInt(dNodes[index2].x) + 200,
-                    y: parseInt(dNodes[index2].y) 
-                };
-                node = getNonOverlappingPosition_2(node, arr_co, new_one2, layout_vertical);
+        }// new node has siblings
+        else{
+            index = dNodes[pi].children.length - 1;
+            if(dNodes[pi].state !== "created"){
+                if(dNodes[pi].type === "modules"){
+                    new_one = {
+                        x: sections[node.type],
+                        y: parseInt(dNodes[pi].children[index].y + 80)
+                    };
+                }
+                else{
+                    new_one = {
+                        x:  parseInt(dNodes[pi].children[index].x),
+                        y: parseInt(dNodes[pi].children[index].y + 180)
+                    };
+                }
+            }else{
+                    new_one = {
+                        x: sections[node.type],
+                        y: parseInt(dNodes[pi].children[index].y + 80)
+                    }
             }
         }
-        else {
-            index = dNodes[pi].children.length - 1
-            new_one = {
-                x: sections[node.type],
-                y: parseInt(dNodes[pi].children[index].y)
-            };
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
-        }
-        if (layout_vertical) {
-            if ((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 100
-                };// Go beside last sibling node
-            } else if ((dNodes[pi].type === "teststepgroups") && (dNodes[pi]?.parent?.parent?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 90
-                };// Go beside last sibling node
-            } else if ((dNodes[pi].type === "modules") && (dNodes[pi]?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 120
-                };// Go beside last sibling node
-            } else {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type]
-                }; // Go beside last sibling node
-            }
-        }
-        else {
-            // new_one = {
-            //     x: sections[node.type],
-            //     y: parseInt(dNodes[pi].children[index].y)
-            // };
-        }
-        // node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
+        node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
     } else { //first kid of any node
         if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
             // var arr = dNodes[pi].parent.children;
             index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
             if (layout_vertical) {
-                new_one = {
-                    x: parseInt(dNodes[pi].x),
-                    y: parseInt(sections[node.type])
-                }; // go directly below parent
-            } else {
+                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                    if(dNodes[pi].childIndex === 1){
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])
+                        };
+                    }else{
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])-100
+                        };
+                    }
+                }
+                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null)){
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                }
+                else{
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                } // go directly below parent
+            } else if(dNodes[pi].type === "teststepsgroups"){
+                if(dNodes[pi]._id === undefined){
+                    new_one = {
+                        x: parseInt(sections[node.type]) + 150,
+                        y: parseInt(dNodes[pi].y)
+                    };
+                }
+                else {
+                    new_one = {
+                        x: parseInt(dNodes[pi].x) + 150,
+                        y: parseInt(dNodes[pi].y)
+                    };
+                }
+            }else {
                 new_one = {
                     x: parseInt(sections[node.type]),
                     y: parseInt(dNodes[pi].y)
                 }; // go directly below parent
             }
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
+            node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
         } else {
             //Module's kid
             //layout_change
@@ -165,44 +167,18 @@ const getNewPosition = (dNodes, node, pi, arr_co, layout_vertical, sections) => 
     return node;
 }
 
-const getNonOverlappingPosition = (node, arr_co, new_one, verticalLayout) => {
+const getNonOverlappingPosition = (node, arr_co, new_one,verticalLayout) => {
     var dist = 0;
     dist = closestCord(arr_co, new_one);
     while (dist < 60) {
         if (verticalLayout) {
             new_one.x = new_one.x + 80;
         } else {
-            new_one.y = new_one.y + 80;
-        }
-        dist = closestCord(arr_co, new_one);
-    }
-    node.x = new_one.x;
-    node.y = new_one.y;
-    return node;
-}
-const getNonOverlappingPosition_1 = (node, arr_co, new_one, verticalLayout) => {
-    var dist = 0;
-    dist = closestCord(arr_co, new_one);
-    while (dist < 60) {
-        if (verticalLayout) {
-            new_one.x = new_one.x + 80;
-        } else {
-            new_one.y = new_one.y + 80;
-        }
-        dist = closestCord(arr_co, new_one);
-    }
-    node.x = new_one.x;
-    node.y = new_one.y;
-    return node;
-}
-const getNonOverlappingPosition_2 = (node, arr_co, new_one, verticalLayout) => {
-    var dist = 0;
-    dist = closestCord(arr_co, new_one);
-    while (dist < 60) {
-        if (verticalLayout) {
-            new_one.x = new_one.x + 80;
-        } else {
-            new_one.y = new_one.y + 80;
+            if(node.type === "scenarios"){
+                new_one.y = new_one.y + 80;
+            }else{
+                new_one.x = new_one.x + 200;
+            }
         }
         dist = closestCord(arr_co, new_one);
     }
@@ -247,11 +223,32 @@ const checkchildrentask = (childNode, children_flag) => {
     return children_flag;
 }
 
+const recurseDelParent = (d, d1, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) => {
+    if (d.children) d.children.forEach((e) => { recurseDelParent(d1, e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
+    if (d.state === "deleted") return;
+    if (d._id) {
+        var parentid = d.parent._id;
+        deletedNodes.push([d._id, d.type, parentid]);
+    }
+    d.parent = null;
+    d.children = null;
+    d.task = null;
+    delete nodeDisplay[d.id];
+    // deletednode_info.push(d);
+    dNodes[d.id].state = 'deleted';
+    var temp = dLinks;
+    for (var j = temp.length - 1; j >= 0; j--) {
+        if (temp[j].source.id === d.id) {
+            delete linkDisplay['link-' + temp[j].source.id + '-' + temp[j].target.id];
+            temp[j].deleted = !0;
+        }
+    }
+};
 const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) => {
     if (d.children) d.children.forEach((e) => { recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
     if (d.state === "deleted") return;
     if (d._id) {
-        var parentid = dNodes[d.parent.id]._id;
+        var parentid = d.parent._id;
         deletedNodes.push([d._id, d.type, parentid]);
     }
     d.parent = null;
@@ -295,7 +292,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
     childCounter(1, tree);
     if (tree.type !== "endtoend") {
         var newHeight = d3.max(levelCount) * 90;
-        const d3Tree = d3.tree().size([newHeight * 2, cSize[0] / 3]);
+        const d3Tree = d3.tree().size([newHeight * 2, cSize[0]]);
         const hierarchyLayout = d3.hierarchy(tree);
         const data = d3Tree(hierarchyLayout);
         data.each((node, idx) => {
@@ -316,7 +313,8 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                         parent: {
                             ...child.parent.data,
                             id: child.parent.id ? child.parent.id : parentId,
-                            parent: child.parent ? child.data.parent : null // Use the parent's ID as the unique identifier
+                            parent: child.parent ? child.data.parent : null, // Use the parent's ID as the unique identifier
+                            children: [{ ...child.data, id: child.id ? child.id : generateId(parentId, childIdx + 1) }] // Use the parent's ID as the unique identifier
                         }
                     };
 
@@ -332,7 +330,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                 ...d.data,
                 x: d.x,
                 y: d.y,
-                id: idx,
+                id: d.id ? d.id : idx,
                 parent: d.parent ? d.data.parent ? {
                     ...d.data.parent,
                 } : {
@@ -743,109 +741,108 @@ export const moveNodeEnd = (pi, dNodes, dLinks, linkDisplay, temp, verticalLayou
     p.classed('ct-movable', !1);
     return { linkDisplay }
 }
-export const moveNodeBeginForJourney = (idx,linkDisplay,dLinks,temp,pos,verticalLayout,CanvasFlag) => {
-        dLinks.forEach(function(d, i) {
-                if (d.source.id === parseInt(idx)) {      
-                        if(!linkDisplay['link-' + d.source.id + '-' + d.target.id]){
-                                temp.deleted.push(i)
-                        }
-                        else if(linkDisplay['link-' + d.source.id + '-' + d.target.id].hidden === true){
-                                temp.hidden.push(i)
-                                temp.s.push(i);
-                                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
-                        }else{
-                                temp.s.push(i);
-                                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
-                        }
-                } else if (d.target.id === parseInt(idx)) {
-                        temp.t = i;
-                        delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
-                }
-        });
-        const svg = d3.select(`.mp__canvas_svg`);
-        d3.select('#node_' + idx).classed('ct-movable', !0);
-        svg.on('mousemove.nodemove', (event)=>{
-                event.stopImmediatePropagation();
-                var t = {} ;
-                if(CanvasFlag==='createnew')pos=readCtScale();
-                // else if(CanvasFlag==='assign')pos=readCtScaleAssign();
-                // else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
-                const cSpan = [pos.x, pos.y];
-                const cScale = pos.k;
-                const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();
-                if(verticalLayout){
-                        t.x = parseFloat((event.x - svgOff.left - cSpan[0]) / cScale - 20)
-                        t.y = parseFloat((event.y - svgOff.top - cSpan[1]) / cScale + 2)
-                }else{
-                        t.x = parseFloat((event.x - svgOff.left - cSpan[0]) / cScale + 2)
-                        t.y = parseFloat((event.y - svgOff.top - cSpan[1]) / cScale - 20)
-                }
-                d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
-        })
-        return {linkDisplay,temp}
+export const moveNodeBeginForJourney = (idx, linkDisplay, dLinks, temp, pos, verticalLayout, CanvasFlag) => {
+    dLinks.forEach(function (d, i) {
+        if (d.source.id === parseInt(idx)) {
+            if (!linkDisplay['link-' + d.source.id + '-' + d.target.id]) {
+                temp.deleted.push(i)
+            }
+            else if (linkDisplay['link-' + d.source.id + '-' + d.target.id].hidden === true) {
+                temp.hidden.push(i)
+                temp.s.push(i);
+                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+            } else {
+                temp.s.push(i);
+                delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+            }
+        } else if (d.target.id === parseInt(idx)) {
+            temp.t = i;
+            delete linkDisplay['link-' + d.source.id + '-' + d.target.id];
+        }
+    });
+    const svg = d3.select(`.mp__canvas_svg`);
+    d3.select('#node_' + idx).classed('ct-movable', !0);
+    svg.on('mousemove.nodemove', (event) => {
+        event.stopImmediatePropagation();
+        var t = {};
+        if (CanvasFlag === 'createnew') pos = readCtScale();
+        // else if(CanvasFlag==='assign')pos=readCtScaleAssign();
+        // else if(CanvasFlag==='endtoend')pos=readCtScaleEnE();
+        const cSpan = [pos.x, pos.y];
+        const cScale = pos.k;
+        const svgOff = document.getElementById('mp__canvas_svg').getBoundingClientRect();
+        if (verticalLayout) {
+            t.x = parseFloat((event.x - svgOff.left - cSpan[0]) / cScale - 20)
+            t.y = parseFloat((event.y - svgOff.top - cSpan[1]) / cScale + 2)
+        } else {
+            t.x = parseFloat((event.x - svgOff.left - cSpan[0]) / cScale + 2)
+            t.y = parseFloat((event.y - svgOff.top - cSpan[1]) / cScale - 20)
+        }
+        d3.select('.ct-movable').attr('transform', "translate(" + t.x + "," + t.y + ")");
+    })
+    return { linkDisplay, temp }
 }
 
-export const moveNodeEndForJourney = (pi,dNodes,dLinks,linkDisplay,temp,verticalLayout) => {
-        const svg = d3.select(`.mp__canvas_svg`);
-        svg.on('mousemove.nodemove', null);
-        // svg.on('zoom', null);
-        var p = d3.select("#node_" + pi);
-        var l = p.attr('transform').slice(10, -1).split(',');
-        dNodes[pi].x = parseFloat(l[0]);
-        dNodes[pi].y = parseFloat(l[1]);
-        let f;
-        let g;
-        let h;
-        console.log(dNodes[0])
-        if (dNodes[pi].type === 'teststepsgroups'){
-            for(let d = 0; d<dNodes.length; d++){
-                if(dNodes[d].children.length>0 && dNodes[d].children[0].name === dNodes[pi].name){
-                    g = d
-                    // const newData = {...dNodes[g], children:[{...dNodes[pi].children[0],parent:{...dNodes[pi].children[0].parent.parent, childIndex:dNodes[g].children[0].parent.parent.childIndex},children:[{...dNodes[g].children[0],parent:{...dNodes[pi].parent, childIndex:dNodes[pi].children[0].parent.parent.childIndex},children:[]}]}]}
-                    // for(let f = 0; f<dNodes[0].children.length;f++){
-                    //     if(dNodes[0].children[f].id === newData.id){
-                    //         dNodes[0].children[f] = newData
-                    //     }  
-                    // }
+export const moveNodeEndForJourney = (pi, dNodes, dLinks, linkDisplay, temp, verticalLayout) => {
+    const svg = d3.select(`.mp__canvas_svg`);
+    svg.on('mousemove.nodemove', null);
+    // svg.on('zoom', null);
+    var p = d3.select("#node_" + pi);
+    var l = p.attr('transform').slice(10, -1).split(',');
+    dNodes[pi].x = parseFloat(l[0]);
+    dNodes[pi].y = parseFloat(l[1]);
+    let f;
+    let g;
+    let h;
+    if (dNodes[pi].type === 'teststepsgroups') {
+        for (let d = 0; d < dNodes.length; d++) {
+            if (dNodes[d].children.length > 0 && dNodes[d].children[0].name === dNodes[pi].name) {
+                g = d
+                // const newData = {...dNodes[g], children:[{...dNodes[pi].children[0],parent:{...dNodes[pi].children[0].parent.parent, childIndex:dNodes[g].children[0].parent.parent.childIndex},children:[{...dNodes[g].children[0],parent:{...dNodes[pi].parent, childIndex:dNodes[pi].children[0].parent.parent.childIndex},children:[]}]}]}
+                // for(let f = 0; f<dNodes[0].children.length;f++){
+                //     if(dNodes[0].children[f].id === newData.id){
+                //         dNodes[0].children[f] = newData
+                //     }  
+                // }
+                continue;
+            }
+            else if (dNodes[pi].children.length > 0) {
+                if (dNodes[d].name === dNodes[pi].children[0].name) {
+                    f = d
+                    var link = addLinkNew(dNodes[d], dNodes[pi], verticalLayout);
+                    var lid = 'link-' + dNodes[d].id + '-' + dNodes[pi].id
+                    linkDisplay[lid] = link
+                    // const newData1 = [{...dNodes[f], children:dNodes[0].children[0].children[0].parent.children.filter(child=>child._id !== dNodes[d]._id),childIndex:dNodes[0].children[0].children[0].parent.children.filter(child=>child._id === dNodes[d]._id)[0].childIndex,parent:dNodes[0].children[0].children[0].parent}]
+                    // const newData2 = [{...newData1[0],children:[{...newData1[0].children[0], parent:dNodes[0].children[0].children[0].parent}]}]
+                    // dNodes[0].children[0].children = newData2
                     continue;
                 }
-                else if(dNodes[pi].children.length>0) {
-                    if(dNodes[d].name === dNodes[pi].children[0].name){
-                        f = d
-                        var link = addLinkNew(dNodes[d], dNodes[pi],verticalLayout);
-                        var lid = 'link-' + dNodes[d].id + '-' + dNodes[pi].id
-                        linkDisplay[lid] = link
-                        // const newData1 = [{...dNodes[f], children:dNodes[0].children[0].children[0].parent.children.filter(child=>child._id !== dNodes[d]._id),childIndex:dNodes[0].children[0].children[0].parent.children.filter(child=>child._id === dNodes[d]._id)[0].childIndex,parent:dNodes[0].children[0].children[0].parent}]
-                        // const newData2 = [{...newData1[0],children:[{...newData1[0].children[0], parent:dNodes[0].children[0].children[0].parent}]}]
-                        // dNodes[0].children[0].children = newData2
-                        continue;
-                    }
-                }
-                else if (dNodes[d].name === dNodes[pi].name ){
-                    h = d;
-                    link = addLinkNew(dNodes[d].children[0], dNodes[pi],verticalLayout);
-                    lid = 'link-' + dNodes[d].children[0].id + '-' + dNodes[pi].id
-                    linkDisplay[lid] = link
-                    break;
-                }
-            } 
-        }else {
-            var links = addLink(dLinks[temp.t].source, dNodes[pi],verticalLayout);
-            var lids= 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
-            linkDisplay[lids] = links
+            }
+            else if (dNodes[d].name === dNodes[pi].name) {
+                h = d;
+                link = addLinkNew(dNodes[d].children[0], dNodes[pi], verticalLayout);
+                lid = 'link-' + dNodes[d].children[0].id + '-' + dNodes[pi].id
+                linkDisplay[lid] = link
+                break;
+            }
         }
-        temp.s.forEach(function(d) {
-                // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
-                        var link = addLinkNew_1(dNodes[g], dLinks[d].target,verticalLayout);
-                        var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
-                        linkDisplay[lid] = link
-                        if(temp.hidden.indexOf(d) !== -1){
-                                linkDisplay[lid].hidden =  true
-                        }
-                //}
-        });
-        p.classed('ct-movable', !1);
-        return {linkDisplay}
+    } else {
+        var links = addLink(dLinks[temp.t].source, dNodes[pi], verticalLayout);
+        var lids = 'link-' + dLinks[temp.t].source.id + '-' + dLinks[temp.t].target.id
+        linkDisplay[lids] = links
+    }
+    temp.s.forEach(function (d) {
+        // if (deletednode_info.indexOf(dLinks[d].target) == -1) {
+        var link = addLinkNew_1(dNodes[g], dLinks[d].target, verticalLayout);
+        var lid = 'link-' + dLinks[d].source.id + '-' + dLinks[d].target.id
+        linkDisplay[lid] = link
+        if (temp.hidden.indexOf(d) !== -1) {
+            linkDisplay[lid].hidden = true
+        }
+        //}
+    });
+    p.classed('ct-movable', !1);
+    return { linkDisplay }
 };
 
 export const toggleNode = (nid, nodeDisplay, linkDisplay, dNodes, dLinks) => {
@@ -870,7 +867,7 @@ const generateScenarioData = (data, item) => {
         target = target.children[target.children.length - 1];
     }
     // Add the newData to the last empty 'children' array
-    target.children.push({ ...item, parentID: target.id, parent: { ...item.parent, children: [item] } });
+    target.children.push({ ...item, parentID: target.id,x:data._id?data.y:item.x, parent: { ...item.parent, children: [item] } });
 
     return data;
 }
@@ -884,7 +881,7 @@ const updateScenarioData = (dataUpdate, item) => {
             // Check if the current child's id matches the target ID (item.id)
             if (child.id === item.id) {
                 // Update the child's properties with the data from 'item'
-                nodeItem = { ...item, parentID: node.children[index].parentID, parent: { ...item.parent, children: [item] } };
+                nodeItem = { ...item, parentID: node.children[index].parentID,x:node._id !== undefined?node.y:item.x, parent: { ...item.parent, children: [item] } };
             } else {
                 // If the child has children, recursively update them
                 if (child.children && child.children.length > 0) {
@@ -965,9 +962,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         state: 'created',
         path: '',
         name: nNext[pt][0] === 'Scenario' ? tempName : tempName,
-        parent: nNext[pt][0] === 'Scenario' ? dNodes[pi] : (dNodes[pi].parent && dNodes[pi].parent.type === 'screens') ? {
-            ...dNodes[pi].parent
-        } : {
+        parent: nNext[pt][0] === 'Scenario' ? dNodes[pi] : {
             id: uNix,
             children: [],
             y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
@@ -979,9 +974,10 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             childIndex: '',
             type: 'screens'
         },
-        childIndex: nNext[pt][0] === 'Scenario' ? '' : (dNodes[pi].parent && dNodes[pi].parent.type === 'screens') ? dNodes[pi].parent.children.length + 1 : '',
+        childIndex: '',
         type: (nNext[pt][0]).toLowerCase() + 's'
     };
+    getNewPosition(dNodes, node, pi, arr_co, verticalLayout, sections);
     if (nodeID) {
         node._id = nodeID
     }
@@ -996,8 +992,10 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                 // Update the id of the current node
                 node.id = node.id + level;
                 if (level === 1) {
-                    node.y = node.y + 150
+                    node.y = dNodes[pi].children[0]._id !== undefined?node.y + 150:node.y
+                    node.x = dNodes[pi].children[0]._id !== undefined?node.x:node.x + 150
                 }
+                dNodes[node.id] = node
                 if (node.children && node.children.length > 0) {
                     // Update IDs in the children array
                     node.children.forEach(child => {
@@ -1014,7 +1012,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     x: dNodes[pi].children[0].x,
                     y: dNodes[pi].children[0].y,
                     children: [...dNodes[pi].children],
-                    parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}
+                    parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [{ ...dNodes[uNix], id: dNodes[pi].children[0].id }] }
                 }]
             };
 
@@ -1024,13 +1022,15 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             // Assign the updated object back to dNodes[pi]
             dNodes[pi] = new_obj_data;
             const new_obj_data_for_uNix = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
-            dNodes[uNix] = new_obj_data_for_uNix
+            // dNodes[uNix] = new_obj_data_for_uNix
         } else {
-            if(dNodes[pi].type === 'teststepsgroups'){
-                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, children: [dNodes[uNix]] } }], parent:{...dNodes[pi].parent, children:[{...dNodes[pi].parent.children[0],children:[dNodes[uNix]]},dNodes[uNix]]} };
+            if (dNodes[pi].type === 'teststepsgroups') {
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent: { ...dNodes[pi].parent, children: [{ ...dNodes[pi].parent.children[0], children: [dNodes[uNix]] }] } };
                 getChildUpdate(dNodes, newObject)
+                const new_obj_data_for_uNix = newObject.children[0]
+                dNodes[uNix] = new_obj_data_for_uNix
                 dNodes[pi] = newObject;
-            }else{
+            } else {
                 const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, children: [dNodes[uNix]] } }] };
                 getChildUpdate(dNodes, newObject)
                 dNodes[pi] = newObject;
@@ -1045,19 +1045,18 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         dNodes[uNix].childIndex = dNodes[pi].children.length;
     }
     dNodes[uNix].cidxch = 'true'; // child index updated
-    getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
-    if(dNodes[pi].type === 'modules'){
-        for(let r = 0; r<dNodes[0].children.length; r++){
-          if(dNodes[0].children[r].id === dNodes[uNix].id){
-             dNodes[0].children[r] = dNodes[uNix]
-          }
+    if (dNodes[pi].type === 'modules') {
+        for (let r = 0; r < dNodes[0].children.length; r++) {
+            if (dNodes[0].children[r].id === dNodes[uNix].id) {
+                dNodes[0].children[r] = dNodes[uNix]
+            }
         }
-     }
-     dNodes[uNix].cidxch = 'true'; // child index updated
-     getNewPosition(dNodes,dNodes[uNix], pi, arr_co,verticalLayout,sections);
+    }
+    dNodes[uNix].cidxch = 'true'; // child index updated
     var currentNode;
     if (dNodes[pi].type === "scenarios") {
-        if (dNodes[pi].children[0] === dNodes[uNix].id) {
+        getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
+        if (dNodes[pi].children[0].id === dNodes[uNix].id) {
             var link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -1084,7 +1083,35 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         }
     } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
         // Assuming dNodes is an array of nodes
-        if (dNodes[uNix].children.length > 0) {
+        if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined && dNodes[0].children[0].children.length>0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined) {
             getChildUpdate(dNodes, dNodes[pi])
             createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
             function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
@@ -1112,7 +1139,91 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     }
                 }
             }
-        } else {
+        } else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0 && dNodes[pi].children[0].children[0]._id !== undefined) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLink(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode_1(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else {
             link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -1164,7 +1275,24 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
     //     setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
     //     return;
     // }
-    recurseDelChild(dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+    if (dNodes[sid].type === 'teststepsgroups') {
+        if (dNodes[sid].children.length > 0) {
+            dNodes[sid].children = []
+        }
+        if (dNodes[sid].parent.children.length > 1) {
+            for (let w = 0; w < dNodes[sid].parent.children.length; w++) {
+                if (dNodes[sid].parent.children[w]._id === dNodes[sid]._id) {
+                    recurseDelChild(dNodes[sid].parent.children[w], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+                } else {
+                    recurseDelChild(dNodes[sid].parent.children[w], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+                }
+            }
+        } else {
+            recurseDelParent(dNodes[sid].parent, dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+        }
+    } else {
+        recurseDelChild(dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
+    }
     for (var j = dLinks.length - 1; j >= 0; j--) {
         if (dLinks[j].target.id === sid) {
             dLinks[j].deleted = !0;
@@ -1172,13 +1300,16 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
             break;
         }
     }
-    p.children.some((d, i) => {
-        if (d.id === sid) {
-            p.children.splice(i, 1);
-            return !0;
-        }
-        return !1;
-    });
+    if (p.children !== null) {
+        p.children.some((d, i) => {
+            if (d.id === sid) {
+                p.children.splice(i, 1);
+                return !0;
+            }
+            return !1;
+        });
+    }
+
     if (dNodes[sid].type === 'scenarios') {
         dNodes[0].children = dNodes[0].children.filter(child => child.name !== dNodes[sid].name);
     } else if (dNodes[sid].type === 'teststepsgroups') {
@@ -1186,13 +1317,19 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
             children.forEach(child => {
                 if (child.children.length > 0) {
                     if (child.children[0].id === dNodes[sid].id) {
-                        if(child.children.length>0){
-                            child.children = child.children[0].children;
-                            child.parent.children[0].children = child.children[0].children
-                        }else{
+                        if (child.children.length > 0) {
+                            child.children = child.children[0].children !== null?child.children[0].children:[];
+                            if (child.parent.children.length > 1) {
+                                child.parent.children = child !== null?[child]:[]
+                            } else {
+                                child.parent.children[0].children = child.children !== null?child.children:[]
+                            }
+                        } else {
                             child.children = [];
                             child.parent.children[0].children = [];
-                        }   
+                        }
+                    }else if(child.children.length>0 && child.children !== null && child.id === dNodes[sid].id){
+                        child.children = dNodes[sid].children !=null?dNodes[sid].children:[]
                     }
                 }
                 if (child.children && child.children.length > 0) {
@@ -1461,37 +1598,37 @@ export function restructureData(data) {
                 if (scenariosChildren.length >= 1 && scenariosChildren[0].type === "screens") {
                     function findChildrenIndicesWithId(parent, childId) {
                         const indices = [];
-                    
+
                         function searchChildren(children, path = []) {
                             children.forEach((child, index) => {
                                 const currentPath = path.concat(index);
-                    
+
                                 if (child.id === childId) {
                                     indices.push(currentPath);
                                 }
-                    
+
                                 if (child.children && child.children.length > 0) {
                                     searchChildren(child.children, currentPath.concat('children'));
                                 }
                             });
                         }
-                    
+
                         searchChildren(parent.children);
                         return indices;
                     }
-                    
+
                     const parentIdToUpdate = parentData.id;
-                    
+
                     // Find the parent with the specified id
                     const parentToUpdate = scenariosChildren.find(item => item.id === parentIdToUpdate);
-                    
+
                     if (parentToUpdate) {
                         // Iterate over the children array
                         parentData.children.forEach(child => {
-                            if(child.state === 'created'){
+                            if (child.state === 'created') {
                                 // Find all occurrences of children with the specified id
                                 const existingChildrenIndices = findChildrenIndicesWithId(parentToUpdate, child.id);
-                                                    
+
                                 if (existingChildrenIndices.length > 0) {
                                     // Update all occurrences of the child
                                     existingChildrenIndices.forEach(path => {
@@ -1505,25 +1642,27 @@ export function restructureData(data) {
                                         });
 
                                         // Update the child
-                                        parentToUpdate.children.push({
-                                            ...child,
-                                            children: [],
-                                            type: 'testcases',
-                                        });
-                                    });
-                                } else {
-                                    // Add the new child
-                                    parentToUpdate.children.forEach((child1)=>{
-                                        if(child1.name !== child.name){
+                                        const data = parentToUpdate.children.some((child1) => child1.name !== child.name)
+                                        if (data) {
                                             parentToUpdate.children.push({
                                                 ...child,
                                                 children: [],
                                                 type: 'testcases',
                                             });
-                                        }  
-                                    })
+                                        }
+                                    });
+                                } else {
+                                    // Add the new child
+                                    const data = parentToUpdate.children.some((child1) => child1.name !== child.name)
+                                    if (data) {
+                                        parentToUpdate.children.push({
+                                            ...child,
+                                            children: [],
+                                            type: 'testcases',
+                                        });
+                                    }
                                 }
-                            }     
+                            }
                         });
                     } else {
                         scenariosChildren.push({
@@ -1576,7 +1715,7 @@ export function restructureData(data) {
                     });
                 }
                 // Recursively process nested "teststepsgroups"
-                teststepsgroup.children.forEach(moveParentData);
+                teststepsgroup.children?.forEach(moveParentData);
             }
         }
 
@@ -1596,7 +1735,7 @@ export function transformDataFromTreetoJourney(data) {
                 for (let s1 = 0; s1 < newData.children[m].children[s].children.length; s1++) {
                     const newObject = {
                         ...newData.children[m].children[s].children[s1],
-                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m], id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
+                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m],parent:{...newData, id:m}, id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
                     };
 
                     // Make changes in the deep copy
@@ -1662,11 +1801,31 @@ export function transformDataFromTreetoJourney(data) {
                     }
                     parent.push(childItem);
                 }
+            }else if (childItem.parent && childItem.childIndex === 1) {
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
+                }else{
+                    const parentIndex = childItem.parent.childIndex;
+                    const parentData = findParent(parentIndex, newItem);
+
+                    if (parentData) {
+                        if (!parentData.children) {
+                            parentData.children = [];
+                        }
+                        parent.push(childItem);
+                    }
+                }
             } else {
-                if (parent[0].children.length === 0) {
-                    parent[parent.length - 1].children.push(childItem);
-                } else {
-                    newItem.children[i - 1].children.push(childItem);
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
                 }
             }
         }
@@ -1736,11 +1895,35 @@ export function transformDataFromTreetoFolder(data) {
     return fullData;
 }
 // to show tree structure data when clicked on suite to show its child case and stepgroup
-export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps) {
+export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, operationOnTestSteps, renameTC, recievingRenamingData, selectedTSGInfo) {
+    let keyForRenamingTC;
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_2') {
+        if (renameTC && renameTC?.length) {
+            keyForRenamingTC = key;
+            key = key.slice(0, 1)
+            const keyTCForModifiedData = keyForRenamingTC.slice(2 - 3)
+            //    if(valueOfRenamingTC !== null){
+
+            modifiedData.children[keyTCForModifiedData].name = recievingRenamingData;
+            // }
+        }
+    }
+    let keyForRenamingTSG;
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_3') {
+        const renameTSG = renameTC;
+        if (renameTSG && renameTSG?.length) {
+            keyForRenamingTSG = key;
+            key = key.slice(0, 1)
+            const keyOfTC = keyForRenamingTSG.slice(2, 3)
+            const keyTSGForModifiedData = keyForRenamingTSG.slice(3 - 4)
+            modifiedData.children[keyOfTC].children[keyTSGForModifiedData].name = recievingRenamingData;
+        }
+
+    }
     const testCases = [];
     const childData = modifiedData.children;
     // testCase loop
-    for (let i = 0; i < childData.length; i++) {
+    for (let i = 0; i < childData?.length; i++) {
         const childComponent = childData[i];
         const children = [];
         // testStep loop
@@ -1757,7 +1940,7 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
                         textOverflow: "ellipsis"
                     }} className='teststepName'>{child.name}</div>, <Button onMouseDownCapture={(e) => operationOnTestSteps.current.show(e)} className='buttonForMoreTestSteps' label="..." text />
                 ],
-                data: [{ layer: "layer_3", testSuitName: modifiedData.name, testCaseName: childComponent.name, testStepGroupId: child._id, testStepGroupName: child.name, parentScreenName: child.parent.name, parentScreenId: child.parent._id }],
+                data: [{ layer: "layer_3", testSuitName: modifiedData.name, testSuitId: modifiedData._id, testCaseName: childComponent.name, testStepGroupId: child._id, testStepGroupName: child.name, parentScreenName: child.parent.name, parentScreenId: child.parent._id }],
                 // featchData:[child,"2rdloop"],
                 // children: stepChild, // Added stepChild here
             });
@@ -1773,10 +1956,30 @@ export function handlingTreeOfTestSuite(key, modifiedData, operationOnCases, ope
                     textOverflow: "ellipsis"
                 }}>{childComponent.name}</div>, <Button onMouseDownCapture={(e) => { operationOnCases.current.show(e) }} className='buttonForMoreTestCases' label="..." text />
             ],
-            data: [{ layer: "layer_2", testSuitName: modifiedData.name, testCaseName: childComponent.name, testCaseId: childComponent._id }],
+            data: [{ layer: "layer_2", testSuitName: modifiedData.name, testSuitId: modifiedData._id, testCaseName: childComponent.name, testCaseId: childComponent._id }],
             children: children,
         });
     }
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_2') {
+        if (renameTC && renameTC?.length) {
+            const indexToRenameTC = keyForRenamingTC
+            const TSIndex = indexToRenameTC.slice(0, 1);
+            const TCIndex = indexToRenameTC.slice(2 - 3);
+            testCases[TCIndex].label = renameTC
+
+        }
+    }
+    if (selectedTSGInfo?.data[0]?.layer === 'layer_3') {
+        const renameTSG = renameTC
+        if (renameTSG && renameTSG?.length) {
+            const indexToRenameTSG = keyForRenamingTSG
+            const TCIndex = indexToRenameTSG.slice(2, 3);
+            const TSGIndex = indexToRenameTSG.slice(3 - 4);
+            testCases[TCIndex].children[TSGIndex].label = renameTC
+
+        }
+    }
+
     return (testCases);
 }
 
@@ -1803,21 +2006,21 @@ export const parseProjList = (res) => {
       use: paste input value to the dNodes list
  */
 
-export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout) =>{
+export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLinks, sections, count, obj, verticalLayout) => {
 
     var uNix = dNodes.length
     var pi = activeNode.attr('id').split('node_')[1];;
     var pt = nodeDisplay[pi].type;
     var lt = false;
     if (false && nodeDisplay[pi]._children != null)
-        return ;// openDialogMindmap('Error', 'Expand the node');
+        return;// openDialogMindmap('Error', 'Expand the node');
     if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
-    if(dNodes[pi].type === 'scenarios'){
-        if(dNodes[pi]._id === obj[0].parent.parent._id){
+    if (dNodes[pi].type === 'scenarios') {
+        if (dNodes[pi]._id === obj[0].parent.parent._id) {
             lt = true
         }
-    }else {
-        if(dNodes[pi].parent.parent._id === obj[0].parent.parent._id){
+    } else {
+        if (dNodes[pi].parent.parent._id === obj[0].parent.parent._id) {
             lt = true
         }
     }
@@ -1825,73 +2028,76 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
         'endtoend': ['Scenario', 1],
         'modules': ['Scenario', 1],
         'scenarios': ['Teststepsgroup', 2],
-        'teststepsgroups':['Teststepsgroup',4]
+        'teststepsgroups': ['Teststepsgroup', 4]
     };
     var mapSvg = d3.select('.mp__canvas_svg');
     var w = parseFloat(mapSvg.style('width'));
     var h = parseFloat(mapSvg.style('height'));
     var arr_co = [];
-    dNodes.forEach(function(d) {
-            if(d.state !== 'deleted'){
-                    var objj = {
-                            x: parseInt(d.x),
-                            y: parseInt(d.y)
-                    };
-                    arr_co.push(objj);
-            }
+    dNodes.forEach(function (d) {
+        if (d.state !== 'deleted') {
+            var objj = {
+                x: parseInt(d.x),
+                y: parseInt(d.y)
+            };
+            arr_co.push(objj);
+        }
     });
     count[(nNext[pt][0]).toLowerCase() + 's'] += 1
-    const pasetNode = lt === false?{...obj[0],
-        childIndex:1,
-        children:[],
-        id:uNix,
-        parent:{...obj[0].parent, 
-            childIndex:1, 
-            children:[{...obj[0], children:[]}], 
+    const pasetNode = lt === false ? {
+        ...obj[0],
+        childIndex: 1,
+        children: [],
+        id: uNix,
+        parent: {
+            ...obj[0].parent,
+            childIndex: 1,
+            children: [{ ...obj[0], children: [] }],
             state: 'created',
             path: '',
-            parent:dNodes[pi].type === 'scenarios'?dNodes[pi]: obj[0].parent.parent,
-            reuse:true,
-            id:uNix,
+            parent: dNodes[pi].type === 'scenarios' ? dNodes[pi] : obj[0].parent.parent,
+            reuse: true,
+            id: uNix,
             y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
             x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
-            _id:null
+            _id: null
         },
         state: 'created',
         path: '',
-        reuse:true ,
+        reuse: true,
         y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
         x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
-        _id:null
-    }:{
+        _id: null
+    } : {
         ...obj[0],
-        parent:{
+        parent: {
             ...obj[0].parent,
-            childIndex:dNodes[pi].type === 'scenarios'? 1 : dNodes[pi].children[0].parent.parent.childIndex
+            childIndex: dNodes[pi].type === 'scenarios' ? 1 : dNodes[pi].children.length > 0 ? dNodes[pi].children[0].parent.parent.childIndex : dNodes[pi].parent.childIndex
         }
     }
-    if(lt===true){
-        for(let p = 0; p<dNodes.length;p++){
-            if(dNodes[p]._id === pasetNode._id){
-                uNix=p
+    getNewPosition(dNodes, pasetNode, pi, arr_co, verticalLayout, sections);
+    if (lt === true) {
+        for (let p = 0; p < dNodes.length; p++) {
+            if (dNodes[p]._id === pasetNode._id) {
+                uNix = p
                 dNodes[p] = pasetNode
-                
+
             }
         }
-    }else{
+    } else {
         dNodes.push(pasetNode);
     }
-    if(Object.isExtensible(dNodes[pi])){
-        if(dNodes[pi].type === 'scenarios'){
-            if(dNodes[pi].children.length>0){
+    if (Object.isExtensible(dNodes[pi])) {
+        if (dNodes[pi].type === 'scenarios') {
+            if (dNodes[pi].children.length > 0) {
                 // Recursive function to update IDs
                 function updateIdsRecursive(node, level) {
                     // Update the id of the current node
                     node.id = node.id + level;
-                    if(level === 1){
-                        node.y = node.y+150
+                    if (level === 1) {
+                        node.y = node.y + 150
                     }
-                    if(lt === true && node.children[0]._id === obj[0]._id){
+                    if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                         node.children = obj[0].children
                     }
                     if (node.children && node.children.length > 0) {
@@ -1902,7 +2108,7 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
                     }
                 }
 
-                const new_obj_data = 
+                const new_obj_data =
                 // lt===true?{
                 //     ...dNodes[pi],
                 //     children: [{
@@ -1918,8 +2124,8 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
                     children: [{
                         ...dNodes[uNix],
                         id: dNodes[pi].children[0].id,
-                        x:dNodes[pi].children[0].x,
-                        y:dNodes[pi].children[0].y,
+                        x: dNodes[pi].children[0].x,
+                        y: dNodes[pi].children[0].y,
                         children: [...dNodes[pi].children]
                     }]
                 };
@@ -1929,23 +2135,23 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
 
                 // Assign the updated object back to dNodes[pi]
                 dNodes[pi] = new_obj_data;
-                const new_obj_data_for_uNix = {...dNodes[pi].children[0], children:dNodes[pi].children[0].children}
+                const new_obj_data_for_uNix = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
                 dNodes[uNix] = new_obj_data_for_uNix
-            }else{
-                const pasteData = {...dNodes[pi], children:[{...dNodes[uNix], children:dNodes[pi].children, parent:{...dNodes[uNix].parent, children:[{...dNodes[uNix],children:dNodes[pi].children}]}}]}
-                dNodes[uNix] = {...dNodes[uNix], children:[{...dNodes[pi].children[0], parent:{...dNodes[uNix].parent, children:[{...dNodes[uNix],children:dNodes[pi].children}]}}]}
+            } else {
+                const pasteData = { ...dNodes[pi], children: [{ ...dNodes[uNix], children: dNodes[pi].children, parent: { ...dNodes[uNix].parent, children: [{ ...dNodes[uNix], children: dNodes[pi].children }] } }] }
+                dNodes[uNix] = { ...dNodes[uNix], children: dNodes[pi].children, x:dNodes[uNix] + 100 }
                 dNodes[pi] = pasteData
                 getChildUpdate(dNodes, pasteData)
             }
-        }else if(dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length>0){
-           // Recursive function to update IDs
+        } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
+            // Recursive function to update IDs
             function updateIdsRecursive(node, level) {
                 // Update the id of the current node
                 node.id = node.id + level;
-                if(level === 1){
-                    node.y = node.y+150
+                if (level === 1) {
+                    node.y = node.y + 150
                 }
-                if(lt === true && node.children[0]._id === obj[0]._id){
+                if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                     node.children = obj[0].children
                 }
                 if (node.children && node.children.length > 0) {
@@ -1961,8 +2167,8 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
                 children: [{
                     ...dNodes[uNix],
                     id: dNodes[pi].children[0].id,
-                    x:dNodes[pi].children[0].x,
-                    y:dNodes[pi].children[0].y,
+                    x: dNodes[pi].children[0].x,
+                    y: dNodes[pi].children[0].y,
                     children: [...dNodes[pi].children]
                 }]
             };
@@ -1972,22 +2178,33 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
 
             // Assign the updated object back to dNodes[pi]
             dNodes[pi] = new_obj_data_1;
-            const new_obj_data_for_uNix_1 = {...dNodes[pi].children[0], children:dNodes[pi].children[0].children}
+            const new_obj_data_for_uNix_1 = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
             dNodes[uNix] = new_obj_data_for_uNix_1
         }else{
-        const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
-        getChildUpdate(dNodes, newObject)
-        dNodes[pi] = newObject;
+            if(lt === true && dNodes[pi].type === 'teststepsgroups'){
+                const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObject)
+                dNodes[pi] = newObject;
+            }else if(dNodes[pi].type === 'teststepsgroups'){
+                const newObject_1 = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix],children:[], parent:{...dNodes[uNix].parent, parent:dNodes[pi].parent.parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObject_1)
+                dNodes[pi] = newObject_1;
+            }else{
+                const newObject_2 = { ...dNodes[pi], children: [...dNodes[pi].children, {...dNodes[uNix], parent:{...dNodes[uNix].parent, children:[dNodes[uNix]]}}] };
+                getChildUpdate(dNodes, newObject_2)
+                dNodes[pi] = newObject_2;
+            }
+
         }
 
     }
     dNodes[uNix].cidxch = 'true'; // child index updated
-    getNewPosition(dNodes,dNodes[uNix], pi, arr_co,verticalLayout,sections);
-    if(dNodes[pi].type === "scenarios"){
-        if(dNodes[uNix].children.length>0){
+    if (dNodes[pi].type === "scenarios") {
+        getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
+        if (dNodes[uNix].children.length > 0) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout,true);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout,sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
                 var link = {
                     id: uuid(),
                     source: node,
@@ -1995,24 +2212,25 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
-                if(sel){
+                if (sel) {
                     var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
-                }else{
+                } else {
                     currentLink = addLink(link.source, link.target, verticalLayout);
                 }
-                    
-                    
-                var currentNode = addNode_1(parentLinkTarget);
+
+
+                var currentNode = addNode(parentLinkTarget);
                 nodeDisplay[parentLinkTarget.id] = currentNode;
                 linkDisplay[linkId] = currentLink;
-                
+
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout,false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
                     }
                 }
             }
-        }else{
+        } else {
+            dNodes[uNix] = {...dNodes[uNix], x:dNodes[uNix].x + 100}
             var link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -2020,17 +2238,17 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
             };
             var lid = 'link-' + link.source.id + '-' + link.target.id
             dLinks.push(link);
-            var currentLink = addLinkNew(dNodes[pi], dNodes[uNix],verticalLayout);
+            var currentLink = addLinkNew(dNodes[pi], dNodes[uNix], verticalLayout);
             linkDisplay[lid] = currentLink;
             var currentNode = addNode(dNodes[uNix]);
             nodeDisplay[uNix] = currentNode;
-          }
-    }else if(dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length>0){
-          // Assuming dNodes is an array of nodes
-          if(dNodes[uNix].children.length>0){
+        }
+    } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
+        // Assuming dNodes is an array of nodes
+        if (dNodes[uNix].children.length > 0) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout,true);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout,sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
                 var link = {
                     id: uuid(),
                     source: node,
@@ -2038,24 +2256,24 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
-                if(sel){
+                if (sel) {
                     var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
-                }else{
+                } else {
                     currentLink = addLink(link.source, link.target, verticalLayout);
                 }
-                
-                
+
+
                 var currentNode = addNode_1(parentLinkTarget);
                 nodeDisplay[parentLinkTarget.id] = currentNode;
                 linkDisplay[linkId] = currentLink;
-            
+
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout,false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
                     }
                 }
             }
-          }else{
+        } else {
             link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -2063,13 +2281,13 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
             };
             lid = 'link-' + link.source.id + '-' + link.target.id
             dLinks.push(link);
-            currentLink = addLinkNew(dNodes[pi], dNodes[uNix],verticalLayout);
+            currentLink = addLinkNew(dNodes[pi], dNodes[uNix], verticalLayout);
             linkDisplay[lid] = currentLink;
             currentNode = addNode(dNodes[uNix]);
             nodeDisplay[uNix] = currentNode;
-          }
-        
-    }else{
+        }
+
+    } else {
         link = {
             id: uuid(),
             source: dNodes[pi],
@@ -2077,10 +2295,10 @@ export const pasteNodeData = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,s
         };
         lid = 'link-' + link.source.id + '-' + link.target.id
         dLinks.push(link);
-        currentLink = addLinkNew(dNodes[pi], dNodes[uNix],verticalLayout);
+        currentLink = addLinkNew(dNodes[pi], dNodes[uNix], verticalLayout);
         linkDisplay[lid] = currentLink;
         currentNode = addNode(dNodes[uNix]);
         nodeDisplay[uNix] = currentNode;
     }
-    return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
+    return { nodeDisplay, linkDisplay, dNodes, dLinks, count }
 }

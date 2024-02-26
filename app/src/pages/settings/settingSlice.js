@@ -13,6 +13,11 @@ const initialState = {
         password:'',
         token:''
     },
+    testRailLogin: {
+        username:'',
+        apiKey:'',
+        url:''
+    },
     AzureLogin:{
         username:'',
         password:'',
@@ -51,7 +56,8 @@ const initialState = {
     checkedProjectIds:[],
     checkedReleaseIds:[],
     reference:'',
-    enableSaveButton:false
+    enableSaveButton:false,
+    updateTestrailMapping: true
 }
 
 // const saucelabsInitialState = {
@@ -154,6 +160,13 @@ export const settingSlice=createSlice({
             const { fieldName, value } = action.payload;
             state.zephyrLogin[fieldName] = value;
         },
+        testRailLogin:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.testRailLogin[fieldName] = value;
+        },
+        resetTestRailLogin:(state,action) => {
+            state.testRailLogin = initialState.testRailLogin;
+        },
         resetZephyrLogin: (state) => {
             state.zephyrLogin = initialState.zephyrLogin;
           },
@@ -190,6 +203,9 @@ export const settingSlice=createSlice({
         },
         resetAzureLogin : (state, action) =>{
             state.AzureLogin = initialState.AzureLogin;
+        },
+        updateTestrailMapping : (state, action) => {
+            state.updateTestrailMapping = action.payload
         }
     }
 })
@@ -224,6 +240,8 @@ export const {
     mappedTree,
     showOverlay,
     zephyrLogin,
+    testRailLogin,
+    resetTestRailLogin,
     resetZephyrLogin,
     AzureLogin,
     saucelabsInitialState,
@@ -237,7 +255,8 @@ export const {
     checkedProjectIds,
     checkedReleaseIds,
     enableSaveButton,
-    resetAzureLogin
+    resetAzureLogin,
+    updateTestrailMapping
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

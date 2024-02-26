@@ -3,6 +3,8 @@ import '../styles/LdapConfigurationForm.scss'
 import { InputText } from 'primereact/inputtext';
 import { RadioButton } from 'primereact/radiobutton';
 import { FileUpload } from 'primereact/fileupload';
+import { Tooltip } from 'primereact/tooltip';
+
 
 
 /*Component LdapConfigurationForm
@@ -12,7 +14,8 @@ import { FileUpload } from 'primereact/fileupload';
 
 const LdapConfigurationForm = (props) => {
 
-    const [certificateUpdate, setCertificateUpdate] = useState(false)
+    const [certificateUpdate, setCertificateUpdate] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const switchSecureUrl = (secureOpt) => {
         let url1 = props.url.trim();
@@ -64,7 +67,7 @@ const LdapConfigurationForm = (props) => {
         <Fragment>
             <div className='adminControl-ldap'>
                 <div className='flex flex-column'>
-                    <span className="leftControl" title="Directory Provider URL (Eg: ldap://example.com:389)">Server URL</span>
+                    <span className="leftControl-ldap" title="Directory Provider URL (Eg: ldap://example.com:389)">Server URL</span>
                     <InputText
                         autoComplete="off"
                         id="ldapServerURL"
@@ -82,7 +85,8 @@ const LdapConfigurationForm = (props) => {
                         autoComplete="off" 
                         id="ldapBaseDN"
                         name="ldapBaseDN" 
-                        onChange={(event) => { props.setBasedn(event.target.value) }} value={props.basedn}
+                        onChange={(event) => { props.setBasedn(event.target.value) }} 
+                        value={props.basedn}
                         className= {`"p-inputtext-sm " ${props.ldapBaseDNErrBor ? "p-invalid" : "" } `}
                         placeholder="Base Domain Name (Eg: DC=EXAMPLE,DC=COM)" />
                 </div>
@@ -91,17 +95,17 @@ const LdapConfigurationForm = (props) => {
                 <div className='flex flex-column'>
                     <span className="leftControl-ldap" title="Secure Connection (ldaps protocol)">Secure Connection</span>
                     <div className='flex flex-row'>
-                        <label className="adminFormRadio" title="Disable Secure LDAP (No ldaps)">
+                        <label className="flex flex-row" title="Disable Secure LDAP (No ldaps)">
                             <RadioButton checked={props.secure === "false"} value="false" name="ldapSecure" onChange={() => { props.setSecure("false"); switchSecureUrl("false") }} />
-                            <span className="ml-2 mr-6">Disable</span>
+                            <span className="ml-2 mr-3">Disable</span>
                         </label>
-                        <label className="adminFormRadio" title="Enable Secure LDAP (ldaps)">
+                        <label className="flex flex-row" title="Enable Secure LDAP (ldaps)">
                             <RadioButton checked={props.secure === "secure"} value="secure" name="ldapSecure" onChange={() => { props.setSecure("secure"); switchSecureUrl("secure") }} />
-                            <span className="ml-2 mr-6">Enable</span>
+                            <span className="ml-2 mr-3">Enable</span>
                         </label>
-                        <label className="adminFormRadio" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
+                        <label className="flex flex-row" title="Enable Secure LDAP (ldaps) but ignore TLS errors">
                             <RadioButton checked={props.secure === "insecure"} value="insecure" name="ldapSecure" onChange={() => { props.setSecure("insecure"); switchSecureUrl("insecure") }} />
-                            <span className="ml-2 mr-6">Enable Insecure</span>
+                            <span className="ml-2 mr-3">Enable Insecure</span>
                         </label>
                     </div>
                 </div>
@@ -112,20 +116,16 @@ const LdapConfigurationForm = (props) => {
                     {/* {props.secure !== "false" ? <label id="ldapCert" className="ldapCert__lable" for="certInput"><span className="fa fa-upload ldapcert-upload"></span>{props.certName}</label> : null}
                     {props.secure === "false" ? <label id="ldapCert" className="ldapCert__lable-false"><span className="ldapcert-span" >Secure Option needs to be enabled</span></label> : null} */}
                     <FileUpload 
+                        id="certInput"
                         autoComplete="off"
-                        name="demo[]" url={'/api/upload'} y
-                        multiple accept=".cer,.crt,.cert,.pem"
+                        name="ldapCert" url={''}
+                        multiple={false}
+                        accept=".cer,.crt,.cert,.pem"
                         maxFileSize={1000000}
                         emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>} 
                         disabled={props.secure === 'false'}
+                        onUpload={(e) => certInputClick(e)}
                     />
-
-                    {/* <InputText onChange={(event) => { certInputClick(event) }} 
-                    type="file" accept=".cer,.crt,.cert,.pem" 
-                    autoComplete="off" id="certInput" name="ldapCert" 
-                    className={"no-disp certInput-ldap" + (props.ldapCertErrBor ? " InputTextErrorBorder" : "")} 
-                    disabled={props.secure === 'false'} /> */}
-                    {props.ldapEdit ? <textarea autoComplete="off" id="ldapCertValue" name="ldapCertValue" disabled="" readOnly="readOnly" className="certTextarea-ldap certTextarea-edit" value={props.cert} /> : null}
                 </div>
             </div>
             <div className='adminControl-ldap admin-ldap__secure'>
@@ -146,19 +146,27 @@ const LdapConfigurationForm = (props) => {
             <div className='adminControl-ldap'>
                 <div className='flex flex-column'>
                     <span className="leftControl-ldap" >Bind Principal</span>
-                    <InputText className="p-inputtext-sm" autoComplete="off" name="binddn" id="binddn" disabled={props.auth !== 'simple'}
+                    <InputText autoComplete="off" name="binddn" id="binddn" disabled={props.auth !== 'simple'}
                         value={props.binddn} onChange={(event) => { props.setBinddn(event.target.value) }}
-                        // className={"form-control-ldap form-control-custom-ldap InputText_border-ldap" + (props.binddnErrBor ? " InputTextErrorBorder" : "")} 
+                        className={"p-inputtext-sm" + (props.binddnErrBor ? " p-invalid" : "")} 
                         placeholder="Authentication Principal" />
                 </div>
             </div>
             <div className='adminControl-ldap ldap-credentials'>
                 <div className='flex flex-column'>
                     <span className="leftControl-ldap" >Bind Credentials</span>
-                    <InputText  className="p-inputtext-sm" type="password" autoComplete="off" name="bindCredentials" id="bindCredentials"
+                    <div className='p-input-icon-right'>
+                        <Tooltip target='.eyeIcon2' content={showConfirmPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
+                        <i
+                            className={`eyeIcon2 cursor-pointer ${showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'}`}
+                            onClick={() => { setShowConfirmPassword(!showConfirmPassword) }}
+                        />
+                        <InputText type={showConfirmPassword ? "text" : "password"} autoComplete="off" name="bindCredentials" id="bindCredentials"
                         disabled={props.auth !== 'simple'} value={props.bindCredentials} onChange={(event) => { props.setBindCredentials(event.target.value) }}
-                        // className={"form-control-ldap form-control-custom-ldap InputText_border-ldap" + (props.bindCredentialsErrBor ? " InputTextErrorBorder" : "")} 
+                        className={" p-inputtext-sm md:w-28rem" + (props.bindCredentialsErrBor ? " p-invalid" : "")} 
                         placeholder="Authentication Credentials" />
+                    </div>
+                    
                 </div>
             </div>
         </Fragment>

@@ -23,7 +23,6 @@ const CreateProject = (props) => {
   const [selectAll, setSelectAll] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [query, setQuery] = useState('');
-  let userInfo = useSelector((state)=> state.landing.userInfo);
   const [selectedAssignedCheckboxes, setSelectedAssignedCheckboxes] = useState([]);
   const [selectallAssaigned, setSelectallAssaigned] = useState(false);
   const [queryDisplayUser, setQueryDisplayUser] = useState('');
@@ -39,6 +38,10 @@ const CreateProject = (props) => {
   const [unFilteredData, setUnFilteredData] = useState([]);
   const [unFilteredAssaignedData, setUnFiltereAssaignedData] = useState([]);
 
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
 
   const isBase64 = (str) => {
     if (typeof str !== 'string') {
@@ -54,7 +57,6 @@ const CreateProject = (props) => {
 
 
   const userDetails = async () => {
-    userInfo = JSON.parse(localStorage.getItem('userInfo'));
   if(userInfo){
     try {
       let userData = [];
@@ -157,35 +159,35 @@ const CreateProject = (props) => {
 
   const applicationLicenseCheck = {
     webLicense :{
-      value: userInfo?.licensedetails?.WEBT === false,
+      value:String(userInfo?.licensedetails?.WEBT) === "false",
       msg: 'You do not have access to create WEB project'
     },
     sapLicense : {
-      value: userInfo?.licensedetails?.ETSAP === false,
+      value: String(userInfo?.licensedetails?.ETSAP) === "false",
       msg: 'You do not have access to create SAP project'
     },
     oebsLicense : {
-      value: userInfo?.licensedetails?.ETOAP === false,
+      value:String(userInfo?.licensedetails?.ETOAP) === "false",
       msg: 'You do not have access to create OEBS project'
     },
     desktopLicense : {
-      value: userInfo?.licensedetails?.DAPP === false,
+      value: String(userInfo?.licensedetails?.DAPP) === "false",
       msg: 'You do not have access to create Desktop project'
     },
     webserviceLicense :{
-      value: userInfo?.licensedetails?.APIT === false,
+      value: String(userInfo?.licensedetails?.APIT) === "false",
       msg: 'You do not have access to create Webservice project'
     },
     mainframeLicense : {
-      value: userInfo?.licensedetails?.MF === false,
+      value: String(userInfo?.licensedetails?.MF) === "false",      
       msg: 'You do not have access to create Mainframe project'
     },
     mobilewebLicense : {
-      value: userInfo?.licensedetails?.MOBWT === false,
+      value: String(userInfo?.licensedetails?.MOBT) === "false",
       msg: 'You do not have access to create MobileWeb project'
     },
     mobileAppLicense  : {
-      value: userInfo?.licensedetails?.MOBT === false,
+      value: String(userInfo?.licensedetails?.MOBT) === "false",
       msg: 'You do not have access to create MobileApplication project'
     }
   }
@@ -254,7 +256,7 @@ const CreateProject = (props) => {
     const inputValue= event.target.value.toLowerCase();
     setQuery(inputValue);
     if (inputValue !== "") {
-      const filterData = items.filter((item) =>
+      const filterData = unFilteredData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setItems(filterData);
@@ -269,7 +271,7 @@ const CreateProject = (props) => {
     setQueryDisplayUser(inputValue);
   
     if (inputValue !== "") {
-      const filterDataDisplayUser = displayUser.filter((item) =>
+      const filterDataDisplayUser = unFilteredAssaignedData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setDisplayUser(filterDataDisplayUser);
@@ -278,24 +280,12 @@ const CreateProject = (props) => {
     }
   }
 
-  // function handleSearchDisplayUser(event) {
-  //   setQueryDisplayUser(event.target.value);
-  //   if(event.target.value !== ""){
-  //   const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-  //   setDisplayUser(filterDataDisplayUser)
-  //   }
-  //   else{
-  //     setDisplayUser(unFilteredAssaignedData)
-  //   }
-  // }
-
-
   const handleClose = () => {
     setQuery("");
     setQueryDisplayUser(""); 
     props.onHide();
     setRefreshData(!refreshData);
-    props.setHandleManageProject(false);
+    props?.setHandleManageProject(false);
    
   };
 
@@ -449,15 +439,18 @@ const CreateProject = (props) => {
         setIsInvalidProject(true);
         return;
       }
-      setIsInvalidProject(false)
-      props.toastSuccess("Project Created Successfully");
-      dispatch(loadUserInfoActions.savedNewProject(true));
-      dispatch(migrateProject(value.trim()));
-      props.onHide();
-      setRefreshData(!refreshData);
+      if(projectRes === "success"){
+        setIsInvalidProject(false)
+        props.toastSuccess("Project Created Successfully");
+        dispatch(loadUserInfoActions.savedNewProject(true));
+        dispatch(migrateProject(value.trim()));
+        setRefreshData(!refreshData);
+        if(props?.setProjectName) (props.setProjectName(projData.projectName));
+        props.onHide();
+      }
+      
     } catch (error){
       console.error("API request failed:", error);
-
       props.toastError("Failed to create Project");
       }
     }

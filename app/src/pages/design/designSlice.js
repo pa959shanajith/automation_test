@@ -53,12 +53,16 @@ const initialState = {
   enableExport: false,
   exportProjname: "",
   enableExportMindmapButton: true,
-  typeOfViewMap: 'folderView',
-  typeOfOprationInFolder: { onExpand: null, onCollapse: null, onSelect: null, onUnselect: null, screenDataForCapture: null, addNewTestStepGroup: null },
+  typeOfViewMap: 'mindMapView',
+  typeOfOprationInFolder: { onExpand: null, onCollapse: null, onSelect: null, onUnselect: null, screenDataForCapture: null,addNewTestCase:false, addNewTestStepGroup: null,createNewTestSuit:null,reNamingOfTS:null,reNamingOfTestCase:null},
   selectedScreenOfStepSlice: [],
   oldModuleForReset: "",
   currentModuleId: "",
   currentid: "",
+  updateScreenModuleId:{},
+  isCreateProjectVisible: false,
+  elementRepoModuleID:{},
+  tagtestcase:false,
   debuggerPoints:[],
   advanceDebug:false,
   enablePlayButton:false
@@ -68,6 +72,9 @@ export const designSlice = createSlice({
   name: 'design',
   initialState,
   reducers: {
+    isCreateProjectVisible: (state, action) => {
+      state.isCreateProjectVisible = action.payload
+    },
     projectList: (state, action) => {
       state.projectList = action.payload
     },
@@ -235,6 +242,15 @@ export const designSlice = createSlice({
     selectedScreenOfStepSlice: (state, action) => {
       state.selectedScreenOfStepSlice = action.payload
     },
+     setUpdateScreenModuleId:(state, action) =>{
+      state.updateScreenModuleId = action.payload
+    },
+    setElementRepoModuleID:(state, action) =>{
+      state.elementRepoModuleID = action.payload
+    },
+    SetTagTestCases:(state,action)=>{
+      state.tagtestcase=action.payload
+    },
     SetDebuggerPoints:(state,action)=>{
       if(action.payload.push=='push'){
         state.debuggerPoints.push(action.payload.stepNo)
@@ -254,12 +270,12 @@ export const designSlice = createSlice({
 
     SetEnablePlayButton:(state,action)=>{
       state.enablePlayButton=action.payload
-    }
   }
+}
 })
 
 // Action creators are generated for each case reducer function
-export const { projectList, moduleList, screenData,
+export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedProj,
   SetCurrentModuleId,
   SetCurrentId,
@@ -298,7 +314,7 @@ export const { projectList, moduleList, screenData,
   SetOldModuleForReset,
   typeOfOprationInFolder,
   selectedScreenOfStepSlice,
-  SetDebuggerPoints ,
+  setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
   SetAdvanceDebug,
   SetEnablePlayButton} = designSlice.actions
 

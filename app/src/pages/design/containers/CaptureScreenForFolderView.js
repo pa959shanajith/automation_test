@@ -3,17 +3,17 @@ import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import '../styles/CaptureScreenForFolderView.scss';
+import '../styles/CaptureScreen.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { Tag } from 'primereact/tag'
+import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue, CompareData, CompareFlag, CompareObj, CompareElementSuccessful } from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
-import { RedirectPage, ScreenOverlay, ResetSession, setMsg } from '../../global';
+import { RedirectPage, ScreenOverlay,ResetSession,setMsg } from '../../global';
 import ImportModal from '../../design/containers/ImportModal';
 import ExportModal from '../../design/containers/ExportModal';
 // import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
@@ -26,20 +26,23 @@ import AvoModal from "../../../globalComponents/AvoModal";
 import { RadioButton } from 'primereact/radiobutton';
 // import LaunchApplication from '../components/LaunchApplication';
 import "../styles/LaunchApplication.scss";
-import { getDeviceSerialNumber_ICE, checkingMobileClient_ICE } from "../api";
+import {getDeviceSerialNumber_ICE,checkingMobileClient_ICE} from "../api";
 // import {getDeviceSerialNumber_ICE} from "../api";
 import { treemapSquarify } from 'd3';
 import { TabMenu } from 'primereact/tabmenu';
 import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
+import { Dropdown } from 'primereact/dropdown';
+import { getScreens } from '../../landing/api';
 
 const CaptureModal = (props) => {
     const dispatch = useDispatch();
-    const history = useNavigate()
+    const history=useNavigate()
     const toast = useRef();
     const objValues = useSelector(state => state.design.objValue);
+    const typeOfView = useSelector(state=>state.design.typeOfViewMap)
     const compareSuccessful = useSelector(state => state.design.compareSuccessful);
-    const compareFlag = useSelector(state => state.design.compareFlag);
+    const compareFlag = useSelector(state=>state.design.compareFlag);
     const [visible, setVisible] = useState(false);
     const [visibleOtherApp, setVisibleOtherApp] = useState(false);
     const [showCaptureData, setShowCaptureData] = useState([]);
@@ -62,7 +65,7 @@ const CaptureModal = (props) => {
     const [mainScrapedData, setMainScrapedData] = useState({});
     const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
     const [captureData, setCaptureData] = useState([]);
-    const certificateInfo = useSelector(state => state.design.cert);
+    const certificateInfo = useSelector(state=>state.design.cert);
     const [screenshotData, setScreenshotData] = useState([]);
     const [endScrape, setEndScrape] = useState(false)
     const [showObjModal, setShowObjModal] = useState(false);
@@ -82,8 +85,8 @@ const CaptureModal = (props) => {
     const [modified, setModified] = useState([]);
     const [editingCell, setEditingCell] = useState(null);
     const [deleted, setDeleted] = useState([]);
-    const [browserName, setBrowserName] = useState(null)
-    const [saveDisable, setSaveDisable] = useState(true);
+    const[browserName,setBrowserName]=useState(null)
+    const [saveDisable,setSaveDisable] = useState(true);
     //element properties states 
     const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
     const [elementPropertiesVisible, setElementProperties] = useState(false);
@@ -98,7 +101,7 @@ const CaptureModal = (props) => {
     const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
     const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
     const [identifierModified, setIdentifierModiefied] = useState(false);
-    const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] });
+    const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectID"] });
     const [idx, setIdx] = useState(0);
     const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
     let NameOfAppType = projectAppType
@@ -106,7 +109,7 @@ const CaptureModal = (props) => {
     const imageRef2 = useRef(null);
     const imageRef3 = useRef(null);
     const imageRef4 = useRef(null);
-    const { endPointURL, method, opInput, reqHeader, reqBody, paramHeader } = useSelector(state => state.design.WsData);
+  const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
     const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
     const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
     const [isHovered, setIsHovered] = useState(false);
@@ -114,35 +117,34 @@ const CaptureModal = (props) => {
     const [inputValue, setInputValue] = useState('');
     const [showEmptyMessage, setShowEmptyMessage] = useState(true);
     const [irisObject, setIrisObject] = useState(null);
-    const [scrapeDataForIris, setScrapeDataForIris] = useState();
+    const [scrapeDataForIris,setScrapeDataForIris] = useState();
     const [cordData, setCordData] = useState({});
     const [irisScrapedData, setIrisScrapedData] = useState({});
     let addMore = useRef(false);
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-    if (!userInfo) userInfo = userInfoFromRedux;
-    else userInfo = userInfo;
+    let AppTypeElementIdentifier;
+    const showCaptureScreen = useSelector((state) => state.landing.openCaptureScreen);
+    const [selectedScreen, setSelectedScreen] = useState(null);
+    const [screenData, setScreenData] = useState([]);
+    const [elementRepo, setElementRepo] = useState(false);
+    const [parentId, setParentId] = useState(null);
+    const [screenChange, setScreenChange] = useState(false);
+    const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+    const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
+  
+  const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+  if (localStorageDefaultProject) {
+    NameOfAppType = JSON.parse(localStorageDefaultProject);
+    AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
+}
 
-    // useEffect(() => {
-    //     setParentData({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"] })
-    //     // fetchScrapeData()
-    // }, [props.fetchingDetails.name])
-    // console.log("parntUseEff",parentData)
-    // useEffect(() => {
-    //     fetchScrapeData()
-    // }, [props.fetchingDetails.name])
-    useEffect(() => {
-        setParentData((prevData) => ({
-          ...prevData,
-          id: props.fetchingDetails["_id"],
-          name: props.fetchingDetails["name"]
-        }));
-      }, [props.fetchingDetails]); 
-    
-      useEffect(() => {
-        fetchScrapeData();
-      }, [parentData]);
-      console.log("parntUseEff",parentData)
+
+  useEffect(() => {
+    fetchScrapeData()
+  }, [parentData,parentId])
     useEffect(() => {
         let browserName = (function (agent) {
 
@@ -272,7 +274,7 @@ const CaptureModal = (props) => {
         setInputValue('');
     };
 
-    const parentScreen = props.fetchingDetails["parent"];
+    const parentScreen = showCaptureScreen?"":props.fetchingDetails["parent"]["children"];
     useEffect(() => {
         const parentScreenId = () => {
             for (let i = 0; i < parentScreen.length; i++) {
@@ -292,7 +294,7 @@ const CaptureModal = (props) => {
             return 0;
         }
         parentScreenId();
-    }, [])
+    }, [parentId])
 
 
     const onIncreaseScreen = () => {
@@ -508,11 +510,10 @@ const CaptureModal = (props) => {
             let viewString = capturedDataToSave;
             let haveItems = viewString.length !== 0;
             let newlyScrapeList = [];
-
+            let Id = parentData.id
             // setCapturedDataToSave(viewString);
             // (type, screenId, projectId, testCaseId:optional)
-            console.log("parentData",parentData)
-            scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, parentData.id, parentData.projectId, "")
+            scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
                 .then(data => {
                     // current_task.subTask === "Scrape" (not sure !!)
                     if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -528,6 +529,10 @@ const CaptureModal = (props) => {
                                 setCapturedDataToSave([...newScrapeList]);
                                 viewString = newScrapeList;
                             }
+                        }
+                        if(parentId !== null){
+                            setCapturedDataToSave(newScrapeList);
+                            viewString = newScrapeList;
                         }
 
                         setMainScrapedData(data);
@@ -669,7 +674,9 @@ const CaptureModal = (props) => {
                 newOrderList.push(item.objectDetails.objId)
             }
         })
-        let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
+        let newCapturedDataToSave = capturedDataAfterSave.map(item => 
+            item.isCustom ? {custname:item.selectall,val:item.objectDetails.val,isCustom:item.isCustom,tag:item.objectProperty,tempOrderId:item.objectDetails.val,xpath:'',title:item.selectall} : item.objectDetails
+          );  
         setCaptureData(capturedDataAfterSave)
         setDeleted(deletedArr)
         setOrderList(newOrderList)
@@ -680,7 +687,6 @@ const CaptureModal = (props) => {
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
         setSaveDisable(false);
     }
-    // {console.log(captureData[0].selectall)}
 
     const saveScrapedObjects = () => {
         let scrapeItemsL = [...capturedDataToSave];
@@ -688,341 +694,362 @@ const CaptureModal = (props) => {
         let views = [];
         let orderList = [];
         let modifiedObjects = Object.values(modified);
-
+    
         for (let scrapeItem of scrapeItemsL) {
-            if (!Array.isArray(scrapeItem)) {
-                if (!scrapeItem.objId) {
-                    if (scrapeItem.isCustom) {
-                        views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
-                    } else {
-                        const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
-                        if (foundItem) {
-                            views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-                        }
-                    }
-                    // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
-                    orderList.push(scrapeItem.tempOrderId);
-                }
-                else orderList.push(scrapeItem.objId);
+          if (!Array.isArray(scrapeItem)) {
+            if (!scrapeItem.objId) {
+              if (scrapeItem.isCustom){ 
+                views.push({ custname: scrapeItem.custname, xpath: scrapeItem.xpath, tag: scrapeItem.tag, tempOrderId: scrapeItem.tempOrderId });
+            }else {
+                 const foundItem = newScrapedCapturedData.view.find((item) => item.custname === scrapeItem.custname);
+              if (foundItem) {
+                views.push({ ...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+              }}
+              // views.push({ ...newScrapedCapturedData.view[scrapeItem.objIdx], custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId });
+              orderList.push(scrapeItem.tempOrderId);
             }
-
+            else {
+              if(parentId !== null){
+                const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+                if (foundItem) {
+                  views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+                }
+                orderList.push(scrapeItem.objId);
+      
+              }
+              
+            }
+          }
+    
         }
+        setParentId(null);
         // const newdeleted=deleted.filter(element=>element!==undefined)
-
+    
         let params = {
-            'deletedObj': deleted,
-            'modifiedObj': modifiedObjects,
-            'addedObj': { ...added, view: views },
-            'screenId': parentData.id,
-            'userId': userInfo.user_id,
-            'roleId': userInfo.role,
-            'param': 'saveScrapeData',
-            'orderList': orderList
+          'deletedObj': deleted,
+          'modifiedObj': modifiedObjects,
+          'addedObj': { ...added, view: views },
+          'screenId': parentData.id,
+          'userId': userInfo.user_id,
+          'roleId': userInfo.role,
+          'param': 'saveScrapeData',
+          'orderList': orderList
         }
-
+    
         scrapeApi.updateScreen_ICE(params)
-            .then(response => {
-                if (response === "Invalid Session") return RedirectPage(history);
-                else fetchScrapeData().then(resp => {
-                    addMore.current = false
-                    if (resp === 'success' || typeof (resp) === "object") {
-
-                        typeof (resp) === "object" && resp.length > 0
-                            ? setShowPop({
-                                title: "Saved Scrape Objects",
-                                content: <div className="ss__dup_labels">
-                                    Scraped data saved successfully.
-                                    <br /><br />
-                                    <strong>Warning: Please scrape an IRIS reference object.</strong>
-                                    <br /><br />
-                                    Matching objects found for:
-                                    {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
-                                    <div className="ss__dup_scroll">
-                                        {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
-                                    </div>
-                                    {/* </ScrollBar> */}
-                                </div>,
-                                footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
-                            })
-                            : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
-                        let numOfObj = scrapeItemsL.length;
-                        // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
-                    } else { console.error(resp); addMore.current = true; }
-                }).catch(error => console.error(error));
-            })
-            .catch(error => console.error(error))
-        setSaveDisable(true);
-    }
-
-    const startScrape = (browserType, compareFlag, replaceFlag) => {
+          .then(response => {
+            if (response === "Invalid Session") return RedirectPage(history);
+            else fetchScrapeData().then(resp => {
+              addMore.current=false
+              if (resp === 'success' || typeof (resp) === "object") {
+    
+                typeof (resp) === "object" && resp.length > 0
+                  ? setShowPop({
+                    title: "Saved Scrape Objects",
+                    content: <div className="ss__dup_labels">
+                      Scraped data saved successfully.
+                      <br /><br />
+                      <strong>Warning: Please scrape an IRIS reference object.</strong>
+                      <br /><br />
+                      Matching objects found for:
+                      {/* <ScrollBar hideXbar={true} thumbColor= "#321e4f" trackColor= "rgb(211, 211, 211)"> */}
+                      <div className="ss__dup_scroll">
+                        {resp.map((custname, i) => <span key={i} className="ss__dup_li">{custname}</span>)}
+                      </div>
+                      {/* </ScrollBar> */}
+                    </div>,
+                    footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
+                  })
+                  : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+                let numOfObj = scrapeItemsL.length;
+                // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
+              } else { console.error(resp); addMore.current = true; }
+            }).catch(error => console.error(error));
+          })
+          .catch(error => console.error(error))
+          setSaveDisable(true);
+      }
+    
+      const startScrape = (browserType, compareFlag, replaceFlag) => {
         if (typesOfAppType === "Webservice") {
-            let arg = {}
-            let testCaseWS = []
-            let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
-            let wsdlInputs = [
-                endPointURL, method, opInput, getFormattedValue(reqHeader),
-                getFormattedValue(paramHeader), getFormattedValue(reqBody, true)
-            ];
-            if (Object.keys(certificateInfo).length)
-                wsdlInputs.push(...[certificateInfo.certsDetails + ";", certificateInfo.authDetails]);
-
-            if (endPointURL.indexOf('https') === 0)
-                arg.res = certificateInfo;
-
-            let [error, auth, proceed] = validateWebserviceInputs(wsdlInputs);
-
-            if (error) dispatch(actionError(error));
-
-            if (proceed) {
-                dispatch(actionError([]));
-                if (auth)
-                    keywordVal.push(...["addClientCertificate", "setBasicAuth"])
-
-                if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
-                else wsdlInputs.splice(4, 1);
-
-                setOverlay("Fetching Response Header & Body...");
-                ResetSession.start();
-                for (let i = 0; i < wsdlInputs.length; i++) {
-                    if (wsdlInputs[i] !== "") {
-                        testCaseWS.push(getWSTestCase(i, typesOfAppType, wsdlInputs[i], keywordVal[i]));
-                    }
-                }
-                testCaseWS.push(getWSTestCase(testCaseWS.length, typesOfAppType, "", "executeRequest"));
-                arg.testcasename = "";
-                arg.apptype = "Webservice";
-                arg.testcase = testCaseWS;
-                scrapeApi.initScrapeWS_ICE(arg)
-                    .then(data => {
-                        setOverlay("");
-                        ResetSession.end();
-                        if (data === "Invalid Session") {
-                            return RedirectPage(history);
-                        } else if (data === "unavailableLocalServer") {
-                            setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
-                        } else if (data === "scheduleModeOn") {
-                            setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
-                        } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed") {
-                            setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
-                        } else if (typeof data === "object") {
-                            setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
-                            dispatch(WsData({ respHeader: data.responseHeader[0].split("##").join("\n") }));
-                            let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
-                            dispatch(WsData({ respBody: localRespBody }));
-                        } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
-                    })
-                    .catch(error => {
-                        setOverlay("");
-                        ResetSession.end();
-                        console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-                        setMsg(MSG.SCRAPE.ERR_OPERATION);
-                    });
+          let arg = {}
+          let testCaseWS = []
+          let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+          let wsdlInputs = [ 
+              endPointURL, method, opInput, getFormattedValue(reqHeader), 
+              getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
+          ];
+          if (Object.keys(certificateInfo).length)
+              wsdlInputs.push(...[certificateInfo.certsDetails+";", certificateInfo.authDetails]);
+    
+          if (endPointURL.indexOf('https')===0) 
+              arg.res = certificateInfo;
+    
+          let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
+    
+          if (error) dispatch(actionError(error));
+    
+          if (proceed) {
+              dispatch(actionError([]));
+              if (auth)
+                  keywordVal.push(...["addClientCertificate","setBasicAuth"])
+    
+              if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
+              else wsdlInputs.splice(4, 1);
+    
+              setOverlay("Fetching Response Header & Body...");
+              ResetSession.start();
+              for (let i = 0; i < wsdlInputs.length; i++) {
+                  if (wsdlInputs[i] !== "") {
+                      testCaseWS.push(getWSTestCase(i, typesOfAppType, wsdlInputs[i], keywordVal[i]));
+                  }
+              }
+              testCaseWS.push(getWSTestCase(testCaseWS.length, typesOfAppType, "", "executeRequest"));
+              arg.testcasename = "";
+              arg.apptype = "Webservice";
+              arg.testcase = testCaseWS;
+              scrapeApi.initScrapeWS_ICE(arg)
+              .then(data => {
+                  setOverlay("");
+                  ResetSession.end();
+                  if (data === "Invalid Session") {
+                      return RedirectPage(history);
+                  } else if (data === "unavailableLocalServer") {
+                      setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                  } else if (data === "scheduleModeOn") {
+                      setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                  } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
+                      setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                  } else if (typeof data === "object") {
+                      setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                      dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
+                      let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
+                      dispatch(WsData({respBody: localRespBody}));
+                  } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+              })
+              .catch(error => {
+                  setOverlay("");
+                  ResetSession.end();
+                  console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
+                  setMsg(MSG.SCRAPE.ERR_OPERATION);
+              });
+          }
+      } 
+      else{
+        let screenViewObject = {};
+        let blockMsg = 'Capturing in progress. Please Wait...';
+        if (compareFlag) {
+          blockMsg = 'Comparing Element in progress...';
+          handleClose()
+        };
+        if (replaceFlag) {
+          blockMsg = 'Capture and Replace Element in progress...';
+        };
+        screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
+        setOverlay(blockMsg);
+        scrapeApi.initScraping_ICE(screenViewObject)
+          .then(data => {
+            let err = null;
+            setOverlay("");
+            setVisible(false);
+            // ResetSession.end();
+            if (data === "Invalid Session") return RedirectPage(history);
+            else if (data === "Response Body exceeds max. Limit.")
+              err = 'Scraped data exceeds max. Limit.' ;
+            else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
+              let scrapedItemsLength = scrapeItems.length;
+              if (scrapedItemsLength > 0) dispatch(disableAction(true));
+              else dispatch(disableAction(false));
+              setSaved({ flag: false });
+              err =
+    
+                  data === 'scheduleModeOn' ?
+                    MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
+                    MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
+    
+              
+            } else if (data === "fail")
+              err = MSG.SCRAPE.ERR_SCRAPE;
+            else if (data === "Terminate") {
+              setOverlay("");
+              err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
             }
-        }
-        else {
-            let screenViewObject = {};
-            let blockMsg = 'Capturing in progress. Please Wait...';
-            if (compareFlag) {
-                blockMsg = 'Comparing Element in progress...';
-                handleClose()
-            };
-            if (replaceFlag) {
-                blockMsg = 'Capture and Replace Element in progress...';
-            };
-            screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
-            setOverlay(blockMsg);
-            scrapeApi.initScraping_ICE(screenViewObject)
-                .then(data => {
-                    let err = null;
-                    setOverlay("");
-                    setVisible(false);
-                    // ResetSession.end();
-                    if (data === "Invalid Session") return RedirectPage(history);
-                    else if (data === "Response Body exceeds max. Limit.")
-                        err = 'Scraped data exceeds max. Limit.';
-                    else if (data === 'scheduleModeOn' || data === "unavailableLocalServer") {
-                        let scrapedItemsLength = scrapeItems.length;
-                        if (scrapedItemsLength > 0) dispatch(disableAction(true));
-                        else dispatch(disableAction(false));
-                        setSaved({ flag: false });
-                        err =
-
-                            data === 'scheduleModeOn' ?
-                                MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT :
-                                MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT
-
-
-                    } else if (data === "fail")
-                        err = MSG.SCRAPE.ERR_SCRAPE;
-                    else if (data === "Terminate") {
-                        setOverlay("");
-                        err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
-                    }
-                    else if (data === "wrongWindowName")
-                        err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
-                    else if (data === "ExecutionOnlyAllowed")
-                        err = MSG.GENERIC.WARN_EXECUTION_ONLY;
-
-                    if (err) {
-                        toastError(err)
-                        return false;
-                    }
-                    //COMPARE & UPDATE SCRAPE OPERATION
-                    if (data.action === "compare") {
-                        if (data.status === "SUCCESS") {
-                            let compareObj = generateCompareObject(data, capturedDataToSave.filter(object => object.xpath.substring(0, 4) === "iris"));
-                            let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
-                            //     setScrapeItems(newScrapeList);
-                            setOrderList(newOrderList);
-                            dispatch(CompareFlag(true));
-                            //     setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
-                            dispatch(CompareData(data));
-                            dispatch(CompareObj(compareObj));
-
-                            // } else {
-                            //     if (data.status === "EMPTY_OBJECT")
-                            //         setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
-                            //     else
-                            //         setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
-
-                        }
-                    }
-                    else if (data.action === "replace") {
-                        let viewString = data;
-                        if (viewString.view.length !== 0) {
-                            let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-                            let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-                            setNewScrapedData(scrapeItemList);
-                            handleDialog("replaceObjectPhase2");
-                        } else {
-                            // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                            toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
-                        }
-                    }
-                    else {
-                        let viewString = data;
-                        if (capturedDataToSave.length !== 0 && masterCapture) {
-                            let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
-                            let deleted = capturedDataToSave.map(item => item.objId);
-                            setCaptureData([]);
-                            setCapturedDataToSave([]);
-                            let params = {
-                                'deletedObj': deleted,
-                                'modifiedObj': [],
-                                'addedObj': { ...added, view: [] },
-                                'screenId': props.fetchingDetails["_id"],
-                                'userId': userInfo.user_id,
-                                'roleId': userInfo.role,
-                                'param': 'saveScrapeData',
-                                'orderList': []
-                            }
-                            scrapeApi.updateScreen_ICE(params)
-                                .then(response => {
-                                    console.log('done')
-                                })
-                                .catch(error => console.log(error))
-                        }
-                        // fetchScrapeData();
-
-                        if (viewString.view.length !== 0) {
-
-                            let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
-
-                            let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
-
-                            let updatedNewScrapeData = { ...newScrapedData };
-                            if (updatedNewScrapeData.view) {
-                                let viewArr = [...updatedNewScrapeData.view]
-                                viewArr.push(...viewString.view);
-                                updatedNewScrapeData = { ...viewString, view: viewArr };
-                            }
-                            else updatedNewScrapeData = viewString;
-
-                            setNewScrapedData(updatedNewScrapeData);
-                            setIrisScrapedData(updatedNewScrapeData);
-                            setNewScrapedCapturedData(updatedNewScrapeData);
-
-                            if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
-                                setCapturedDataToSave([...scrapeItemList])
-                            }
-                            else {
-                                if (capturedDataToSave.length > 0) { //when click on addmore
-                                    addMore.current = true;
-                                    setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
-                                }
-                                else { // when captured data is empty  
-                                    addMore.current = false;
-                                    setCapturedDataToSave([...scrapeItemList]);
-                                }
-                            }
-                            updateScrapeItems(scrapeItemList);
-                            setScrapedURL(updatedNewScrapeData.scrapedurl);
-                            setMirror({ scrape: viewString.mirror, compare: null });
-                            setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
-
-                            if (viewString.view.length > 0) setSaved({ flag: false });
-                            setEndScrape(true)
-                        }
-                    }
+            else if (data === "wrongWindowName")
+              err = MSG.SCRAPE.ERR_WINDOW_NOT_FOUND;
+            else if (data === "ExecutionOnlyAllowed")
+              err = MSG.GENERIC.WARN_EXECUTION_ONLY;
+    
+            if (err) {
+              toastError(err)
+              return false;
+            }
+            //COMPARE & UPDATE SCRAPE OPERATION
+            if (data.action === "compare") {
+              if (data.status === "SUCCESS") {
+                  let compareObj = generateCompareObject(data, capturedDataToSave.filter(object => object.xpath.substring(0, 4)==="iris"));
+                  let [newScrapeList, newOrderList] = generateScrapeItemList(0, mainScrapedData);
+              //     setScrapeItems(newScrapeList);
+                  setOrderList(newOrderList);
+                  dispatch(CompareFlag(true));
+              //     setMirror(oldMirror => ({ ...oldMirror, compare: data.mirror}));
+                  dispatch(CompareData(data));
+                  dispatch(CompareObj(compareObj));
+                  
+              // } else {
+              //     if (data.status === "EMPTY_OBJECT")
+              //         setMsg(MSG.SCRAPE.ERR_UNMAPPED_OBJ);
+              //     else
+              //         setMsg(MSG.SCRAPE.ERR_COMPARE_OBJ);
+              
+              }
+            }
+            else if (data.action === "replace") {
+              let viewString = data;
+              if (viewString.view.length !== 0){
+                  let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+                  let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+                  setNewScrapedData(scrapeItemList);
+                  handleDialog("replaceObjectPhase2");
+              } else {
+                  // setMsg(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                  toastError(MSG.SCRAPE.ERR_NO_NEW_SCRAPE);
+                }               
+            }
+    else{
+            let viewString = data;
+            if (capturedDataToSave.length !== 0 && masterCapture) {
+              let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
+              let deleted = capturedDataToSave.map(item => item.objId);
+              setCaptureData([]);
+              setCapturedDataToSave([]);
+              let params = {
+                'deletedObj': deleted,
+                'modifiedObj': [],
+                'addedObj': { ...added, view: [] },
+                'screenId': props.fetchingDetails["_id"],
+                'userId': userInfo.user_id,
+                'roleId': userInfo.role,
+                'param': 'saveScrapeData',
+                'orderList': []
+              }
+              scrapeApi.updateScreen_ICE(params)
+                .then(response => {
+                  console.log('done')
                 })
-                .catch(error => {
-                    setOverlay("");
-                    // ResetSession.end();
-                    toastError(MSG.SCRAPE.ERR_SCRAPE);
-                    console.error("Fail to Load design_ICE. Cause:", error);
-                });
+                .catch(error => console.log(error))
+            }
+            // fetchScrapeData();
+    
+            if (viewString.view.length !== 0) {
+    
+              let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+    
+              let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
+    
+              let updatedNewScrapeData = { ...newScrapedData };
+              if (updatedNewScrapeData.view) {
+                let viewArr = [...updatedNewScrapeData.view]
+                viewArr.push(...viewString.view);
+                updatedNewScrapeData = { ...viewString, view: viewArr };
+              }
+              else updatedNewScrapeData = viewString;
+    
+              setNewScrapedData(updatedNewScrapeData);
+              setIrisScrapedData(updatedNewScrapeData);
+              setNewScrapedCapturedData(updatedNewScrapeData);
+    
+              if (masterCapture) { // click on the capture elements button-- it will erase exist data & captures new data
+                setCapturedDataToSave([...scrapeItemList])
+              }
+              else {
+                if (capturedDataToSave.length > 0) { //when click on addmore
+                  addMore.current = true;
+                  setCapturedDataToSave([...capturedDataToSave, ...scrapeItemList])
+                }
+                else { // when captured data is empty  
+                  addMore.current = false;
+                  setCapturedDataToSave([...scrapeItemList]);
+                }
+              }
+              updateScrapeItems(scrapeItemList);
+              setScrapedURL(updatedNewScrapeData.scrapedurl);
+              setMirror({ scrape: viewString.mirror, compare: null });
+              setOrderList(oldOrderList => [...oldOrderList, ...newOrderList]);
+    
+              if (viewString.view.length > 0) setSaved({ flag: false });
+              setEndScrape(true)
+            }
+          }
+          })
+          .catch(error => {
+            setOverlay("");
+            // ResetSession.end();
+            toastError(MSG.SCRAPE.ERR_SCRAPE);
+            console.error("Fail to Load design_ICE. Cause:", error);
+          });
         }
-
-    }
-
-    const updateScrapeItems = newList => {
+    
+      }
+    
+      const updateScrapeItems = newList => {
         setScrapeItems([...scrapeItems, ...newList])
-    }
-
-    const handleMouseEnterRow = (rowData) => {
+      }
+    
+      const handleMouseEnterRow = (rowData) => {
         setHoveredRow(rowData.index);
-    };
+      };
 
 
-    const handleDelete = (rowData, confirmed) => {
+      const handleDelete = (rowData,confirmed) => {
         // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
         if (mainScrapedData.reuse && !confirmed) {
-            setShowConfirmPop({ 'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': () => { setShowConfirmPop(false); onDelete(null, true); } })
-            return;
+          setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
+          return;
         }
-        if (rowData.objectDetails.objId !== undefined && !rowData.objectDetails.duplicate) {
-            let deletedArr = [...deleted];
-            let scrapeItemsL = [...captureData];
-            let newOrderList = [];
-
-            const capturedDataAfterDelete = captureData.filter(item =>
-                item.objectDetails.objId !== rowData.objectDetails.objId
-            );
-
-            deletedArr.push(rowData.objectDetails.objId);
-
-            let notused = scrapeItemsL.filter(item => {
-                if (deletedArr.includes(item.objectDetails.objId)) {
-                    return false
-                }
-                else {
-                    newOrderList.push(item.objectDetails.objId)
-                }
-            })
-            let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
-            setCaptureData(capturedDataAfterDelete)
-            setDeleted(deletedArr)
-            setOrderList(newOrderList)
-            setCapturedDataToSave(newCapturedDataToSave)
-            setSelectedCapturedElement([])
-            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-        }
-        else {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
-        }
+        if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
+        let deletedArr = [...deleted];
+        let scrapeItemsL = [...captureData];
+        let newOrderList = [];
+    
+        const capturedDataAfterDelete = captureData.filter(item =>
+          item.objectDetails.objId !== rowData.objectDetails.objId
+        );
+    
+        deletedArr.push(rowData.objectDetails.objId);
+    
+        // var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+    
+        //   return !selectedElement.find(function (objFromB) {
+        //     if (item.objectDetails.val === objFromB.objectDetails.val) {
+        //       if(item.objectDetails.objId){
+        //         deletedArr.push(item.objectDetails.objId)}
+        //       return true
+        //     }
+        //   })
+        // })
+    
+        let notused = scrapeItemsL.filter(item => {
+          if (deletedArr.includes(item.objectDetails.objId)) {
+            return false
+          }
+          else {
+            newOrderList.push(item.objectDetails.objId)
+          }
+        })
+        let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
+        setCaptureData(capturedDataAfterDelete)
+        setDeleted(deletedArr)
+        setOrderList(newOrderList)
+        setCapturedDataToSave(newCapturedDataToSave)
+        setSelectedCapturedElement([])
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+      }
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
+      }
         // setCaptureData(updatedData);
         setSaveDisable(false);
-    };
+      };
 
     const handleEdit = (rowData) => {
         const updatedData = captureData.map((item) => {
@@ -1059,45 +1086,45 @@ const CaptureModal = (props) => {
 
 
     const renderActionsCell = (rowData) => {
-        let selectedElement = []
+        let selectedElement=[]
         selectedElement.push(rowData)
         setScrapeDataForIris(rowData)
-        let scrapeType = rowData?.objectDetails?.xpath?.split(';') !== undefined ? rowData?.objectDetails?.xpath?.split(';') : " "
-        //  setIrisObject(scrapeType[0]);
+       let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
+      //  setIrisObject(scrapeType[0]);
         return (
-            <div >
-
-
-                {!saveDisable ?
-                    <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." /> : <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
-                {(scrapeType[0] === "iris" || typesOfAppType === "Web") &&
-                    <button
-                        disabled={!saveDisable}
-                        onClick={() => { setSelectedCapturedElement(selectedElement); openElementProperties(rowData); }}
-                    >
-                        <img
-                            src="static/imgs/ic-edit.png"
-                            alt="Edit Icon"
-                            style={{ height: "20px", width: "20px", opacity: !saveDisable ? 0.6 : 1 }}
-                            className="edit__icon"
-                        />
-                    </button>
-
-                }
-                <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
-                <img
-
-                    src="static/imgs/ic-delete-bin.png"
-                    style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-                    className="delete__icon" onClick={() => handleDelete(rowData)} />
-
-
-
-
-            </div>
+          <div >
+            
+            
+            {!saveDisable?
+            <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
+            {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
+            <button
+            disabled={!saveDisable}
+            onClick={() => {setSelectedCapturedElement(selectedElement);openElementProperties(rowData);}}
+          >
+            <img
+              src="static/imgs/ic-edit.png"
+              alt="Edit Icon"
+              style={{ height: "20px", width: "20px", opacity: !saveDisable? 0.6 : 1}}
+              className="edit__icon"
+            />
+          </button>
+          
+            }
+            <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
+            <img
+    
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+              
+    
+            
+    
+          </div>
         )
-
-    };
+    
+      };
 
 
     const handleMouseLeaveRow = () => {
@@ -1134,7 +1161,7 @@ const CaptureModal = (props) => {
                 <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3', cursor: 'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
                 </h4>
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn'>
-                    <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} >Add more</button>
+                    <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable}>Add more</button>
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1149,7 +1176,7 @@ const CaptureModal = (props) => {
             <div className='empty_msg flex flex-column align-items-center justify-content-center'>
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">Elements not captured</p>
-                {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} >Capture Elements</Button>}
+                {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
                 <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
             </div>
         </div>
@@ -1413,8 +1440,8 @@ const CaptureModal = (props) => {
             objects.objectProperty = element.tag;
             objects.screenshots = '';
             objects.actions = '';
-            objects.objectDetails = {};
-            objects.isCustom = true
+            objects.objectDetails = {val:element.val};
+            objects.isCustom = element.isCustom;
             addElementData.push(objects)
         })
         setCaptureData([...captureData, ...addElementData])
@@ -1488,7 +1515,7 @@ const CaptureModal = (props) => {
         elementVals.find(v => v.key === key).value = value;
 
 
-        console.log(elementVals)
+        // console.log(elementVals)
     };
     const textEditor = (options) => {
         return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
@@ -1667,10 +1694,7 @@ const CaptureModal = (props) => {
     };
     // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
 
-    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    if (localStorageDefaultProject) {
-        NameOfAppType = JSON.parse(localStorageDefaultProject);
-    }
+
 
 
     const isWebApp = NameOfAppType.appType === "Web";
@@ -1692,7 +1716,7 @@ const CaptureModal = (props) => {
                     <div
                         className={`tooltip__target-${rowdata.objectDetails.objId}
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
                     {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
                     {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
                 </div>
@@ -1721,7 +1745,7 @@ const CaptureModal = (props) => {
     }
 
 
-
+    const AddElement = capturedDataToSave.every(item => item.isCustom === true);
 
     const modifyScrapeItem = (value, newProperties, customFlag) => {
         let localScrapeItems = [...capturedDataToSave];
@@ -1755,140 +1779,295 @@ const CaptureModal = (props) => {
         if (!(newProperties.tag && newProperties.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
         setCapturedDataToSave(localScrapeItems);
     }
+    const elementValuetitle=(rowdata)=>{
+        return (
+          <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
+        )
+       }
+       useEffect(() => {
+        (async () => {
+            try {
+                let params = {
+                  param : "globalRepo",
+                  projectId :  NameOfAppType.projectId
+                }
+      
+                const screens = await getScreens(params);
+                if(screens === 'fail') {
+                  setScreenData([]);
+                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'Empty Element Repository.', life: 5000 });}
+                else if(screens === "no orderlist present") {
+                  setScreenData([]);
+                  toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
+                else setScreenData(screens.screenList);
+            } catch (error) {
+                console.error('Error fetching User list:', error);
+            }
+        })();
+      }, [NameOfAppType.projectId]);
+      
+      const handleScreenChange = (e) => {
+        setSelectedFolderValue(e.value)
+        // const selectedFolderValue = e.value;
+        // setSelectedScreen(selectedFolderValue);
+      
+        if(captureData.length >= 0){
+          setScreenChange(true);
+        }
+      
+        // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+        else{
+        setSelectedScreen(e.value);
+        // setParentId(e.value.id);
+        // fetchScrapeData();
+        setSaveDisable(false);
+        setElementRepo(true);
+        }
+        // addMore.current = true;
+        // let newData = capturedDataToSave;
+        // newData.push(...selectedFolderValue.related_dataobjects)
+        // setCapturedDataToSave(newData);
+        // // setCaptureData(newData);
+        // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+      
+      };
+      
+      const confirmScreenChange = () => {
+        (async () => {
+          try {
+              let params = {
+                param : "updateMindmapTestcaseScreen",
+                projectID :  NameOfAppType.projectId,
+                moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
+                parent:props.fetchingDetails["parent"]["_id"],
+                currentScreen:parentData.id,
+                updateScreen:selectedFolderValue.id
+              }
+      
+              const res = await scrapeApi.updateScreen_ICE(params);
+              if(res === 'fail') {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+              else {
+                
+                var req={
+                  tab:"createdTab",
+                  projectid:NameOfAppType.projectId,
+                  version:0,
+                  cycId: null,
+                  modName:"",
+                  moduleid:res
+                }
+                const dataScreen = await scrapeApi.getModules(req)
+                if(dataScreen.error)return;
+                else {
+                  const screenData_1 = getReqScreen (dataScreen)
+                  function getReqScreen (data){
+                    let sd = []
+                    data.children.forEach((child)=>{
+                      if(child._id === props.fetchingDetails["parent"]["_id"]){
+                        child.children.forEach((subChild)=>{
+                          if(subChild._id === selectedFolderValue.id){
+                            if(subChild.children.length > 0){
+                               const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+                                  return {
+                                    ...item,
+                                    parent:{...subChild,parent:{...child,parent:data}}
+                                  }
+                               })}
+                               const childData = {...newData.children[0], type:'teststepsgroups', parent:newData}
+                               sd.push(childData);
+                            }
+                            else{
+                              sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+                                return{
+                                  ...data,parent:{...child,parent:data}
+                                }
+      
+                              })}})
+                            }
+                          }
+                        })
+                      }
+                    })
+                    return sd;
+                  }
+                  
+                //   console.log(screenData_1);
+                  if(screenData_1.length>0){
+                    props.setFetchingDetails(screenData_1[0])
+                    props.setModuleData({id:res, key:uuid()})
+                    setParentId(uuid());
+                    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+                  }else{
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+                  }
+                  // props.setFetchingDetails(screenData_1[0])
+                  // props.setModuleData({id:res, key:uuid()})
+                  // setParentId(uuid());
+                }
+              }
+              }
+           catch (error) {
+              console.error('Error fetching User list:', error);
+          }
+      })();
+      };
+      
+      const screenOption = screenData?.map((folder) => ({
+        label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
+        id:folder["_id"],
+        related_dataobjects: folder.related_dataobjects,
+        orderlist:folder.orderlist,
+        parent:folder.parent
+      }));
+      
+
     return (
         <>
-            {overlay && <ScreenOverlay content={overlay} />}
-            {showPop && <PopupDialog />}
-            {showConfirmPop && <ConfirmPopup />}
-            <Toast ref={toast} position="bottom-center" baseZIndex={1000} className='toastOfCapture' style={{ maxWidth: "35rem", height: '8rem' }} />
-            {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
-            {typesOfAppType != "Webservice" && !props.testSuiteInUse ? <div className="card_modal">
-                <Card className='panel_card'>
-                    <div className="action_panelCard">
-                        {!showPanel && <div className='insprint__block1'>
-                            <div>
-                                <p className='insprint__text1'>In Sprint Automation</p></div>
-                        </div>}
-                        {showPanel && <div className='insprint__block'>
-                            <p className='insprint__text'>In Sprint Automation</p>
-                            <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
-                            <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
-                            <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                                <img className='add_obj_insprint' src='static/imgs/ic-add-object.png' alt='add element' />
-                                {isWebApp && <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
-                                <p>Add Element</p>
-                            </span>
-                            <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                                <img className='map_obj_insprint' src="static/imgs/ic-map-object.png" alt='map element' ></img>
-                                {isWebApp && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
+     {overlay && <ScreenOverlay content={overlay} />}
+      {showPop && <PopupDialog />}
+      {showConfirmPop && <ConfirmPopup />}
+      <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
+      {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
 
-                                <p>Map Element</p>
-                            </span>
-                            {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
-                            {/* {isInsprintHovered &&
-               
-                (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>InSprint Automation</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)
-                } */}
-                        </div>}
-                        {!showPanel && <div className='upgrade__block'>
-                            <div className='panel_head'>
-                                <p className='insprint__text'>Upgrade Analyzer</p>
-                            </div>
-                        </div>}
-
-                        {showPanel && <div className='upgrade__block'>
-                            <p className='insprint__text'>Upgrade Analyzer</p>
-                            <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
-                            <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                            <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCompareClick}>
-                                <img className='add_obj_upgrade' src="static/imgs/ic-compare.png" ></img>
-                                {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
-                                <p>Compare Element</p>
-                            </span>
-                            <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                                <img className='map_obj_upgrade' src="static/imgs/ic-replace.png" ></img>
-                                {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
-                                <p>Replace Element</p>
-                            </span>
-                            {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Upgrade Analyzer</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a href='docs.avoautomation.com'>Learn More</a>
-                </div>)} */}
-                        </div>}
-                        {!showPanel && <div className='utility__block'>
-                            <div className='panel_head1'>
-                                <p className='insprint__text text-500'>Capture from PDF</p> </div>
-                        </div>}
-                        {showPanel && <div className='utility__block'>
-                            <p className='insprint__text text-500'>Capture from PDF</p>
-                            <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                            <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF." />
-                            <span className="insprint_auto">
-                                <img className='add_obj' src="static/imgs/ic-pdf-utility.png"></img>
-                                <p className='text-600'>PDF Utility</p>
-                            </span>
-                            {/* {isPdfHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 850}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Capture from PDF</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)} */}
-                        </div>}
-
-                        {!showPanel && <div className='createManual__block'>
-                            <div className='panel_head2'>
-                                <p className='insprint__text'>Create Manually</p> </div>
-                        </div>}
-
-                        {showPanel && <div className='createManual__block'>
-                            <p className='insprint__text'>Create Manually</p>
-                            <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
-                            <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                            <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
-                                <img className='map_obj' src="static/imgs/ic-create-object.png"></img>
-                                <p>Create Element</p>
-                            </span>
-                            {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Create Manually</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)} */}
-                        </div>}
-
-                        {showPanel && <div className='imp_exp__block'>
-                            <span className='insprint_auto'>
-                                <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                                    <img className=' pi-file-import add_obj_import' src="static/imgs/Import_new_icon_grey.svg" />
-                                    {/* <i className="pi pi-file-import add_obj_import "  ></i> */}
-                                    <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
-                                    <p className='imp__text'>Import Screen</p>
-                                </span>
-                                <span className="export__block" onClick={handleExportClick}>
-                                    <img className="add_obj_export" src="static/imgs/Export_new_icon_grey.svg" />
-                                    {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
-                                    <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
-                                    <p className='imp__text'>Export Screen</p>
-
-                                </span>
-                            </span>
-                        </div>}
-                        <div style={{ display: 'flex' }}>
-                            <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
-                                <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-                                <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow icon-tooltip' : 'pi pi-chevron-circle-down down_arrow icon-tooltip'} style={{ fontSize: '1rem' }}></i>
-                            </span>
-                        </div>
+{
+          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+            <div className="capture_card_modal">
+              {/* Select From Repository */}
+              <div className="capture_card">
+                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Select Repository</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                </div>}
+              </div>
+              {/* In Sprint Automation */}
+              <div className="capture_card">
+                <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
+                {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">In Sprint Automation</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
                     </div>
-
-                </Card>
+                    <p className="capture_bottom_heading">Add Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Map Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Upgrade Analyzer */}
+              <div className="capture_card">
+                <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
+                {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
+                {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Upgrade Analyzer</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Compare Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Replace Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Capture From Pdf */}
+              <div className="capture_card disabled">
+                <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
+                {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Capture from PDF</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn">
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">PDF <br/>Utility</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Create Manually */}
+              <div className="capture_card">
+                <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Create Manually</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Import Export Screen */}
+              <div className="capture_card import_export">
+                <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
+                {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
+                {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">File Handling</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Import Screen</p>
+                  </div>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Export Screen</p>
+                  </div>
+                </div>}
+                <div onClick={togglePanel} className="expandCollapseIconWrapper">
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+                </div>
+              </div>
             </div>
-                : null}
-
-
+            : null
+        }
             <div className="card-table" style={{ width: '100%', display: "flex", justifyContent: 'center' }}>
                 {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
                     <DataTable
@@ -1908,7 +2087,7 @@ const CaptureModal = (props) => {
                         headerCheckboxToggleAllDisabled={false}
                         emptyMessage={showEmptyMessage ? emptyMessage : null}
                         scrollable
-                        scrollHeight="372px"
+                        scrollHeight={typeOfView === 'journeyView'?"350px":"265px"}
                         columnResizeMode="expand"
                         virtualScrollerOptions={{ itemSize: 20 }}
                     >
@@ -1943,10 +2122,30 @@ const CaptureModal = (props) => {
                     </div>
                 </Dialog>
             </div>
-            <div>
+            <AvoConfirmDialog
+        visible={screenChange}
+        onHide={() => setScreenChange(false)}
+        showHeader={false}
+        message="Choosing the repository will overwrite the current data. Are you sure you want to proceed?"
+        icon="pi pi-exclamation-triangle"
+        accept={confirmScreenChange} />
+        
+
+            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
-                <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
-                <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
+                {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
+                    <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
+                    <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
+                    <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
+                </div> : null
+                }
+                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
+                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
+                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+                <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
             </div>
             {/* </Dialog> */}
 
@@ -1967,174 +2166,174 @@ const CaptureModal = (props) => {
            </span>}
          customClass="OEBS"
         />: null} */}
-            {typesOfAppType === "OEBS" ? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={() => setVisibleOtherApp(false)} appPop={{ appType: typesOfAppType, startScrape: startScrape }} /> : null}
-            {typesOfAppType === "Mainframe" ? <AvoModal
-                visible={visibleOtherApp}
-                setVisible={setVisibleOtherApp}
-                onModalBtnClick={onLaunchBtn}
-                headerTxt="MainFrames"
-                footerType="Launch"
-                modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
-                content={"hello"}
-                customClass="Mainframes"
-            /> : null}
-            {typesOfAppType === "MobileApp" ? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={() => setVisibleOtherApp(false)} appPop={{ appType: typesOfAppType, startScrape: startScrape }} /> : null}
-            {typesOfAppType === "System" ? <AvoModal
-                visible={visibleOtherApp}
-                setVisible={setVisibleOtherApp}
-                onModalBtnClick={onLaunchBtn}
-                headerTxt="System_application"
-                footerType="Launch"
-                content={"hello"}
-                customClass="MobileWeb"
-            /> : null}
-            {typesOfAppType === "Web" ? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible === 'compare' ? footerCompare : footerCapture} draggable={false}>
-                <div className={"compare__object"}>
-                    <span className='compare__btn'>
-                        <p className='compare__text'>List of Browsers</p>
-                    </span>
-                    <span className='browser__col'>
-                        {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-                        <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                    </span>
-                </div>
-                {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
-            </Dialog> : null}
-            {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
-            <AvoConfirmDialog
-                visible={showNote}
-                onHide={() => setShowNote(false)}
-                showHeader={false}
-                message={confirmPopupMsg}
-                icon="pi pi-exclamation-triangle"
-                accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        {typesOfAppType === "OEBS"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "Mainframe"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="MainFrames"
+          footerType="Launch"
+          modalSytle={{ width: "32vw", height: "43vh", background: "#FFFFFF" }}
+         content = {"hello"}
+         customClass="Mainframes"
+        />: null}
+        {typesOfAppType === "MobileApp"? <LaunchApplication visible={visible} toastError={toastError} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
+        {typesOfAppType === "System"? <AvoModal
+          visible={visibleOtherApp}
+          setVisible={setVisibleOtherApp}
+          onModalBtnClick={onLaunchBtn}
+          headerTxt="System_application"
+          footerType="Launch"
+         content = {"hello"}
+         customClass="MobileWeb"
+        />: null}
+      {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header="Select Browser " style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'capture' || visible === 'add more' || visible === 'replace' || visible === 'compare'} onHide={handleBrowserClose} footer={visible==='compare'?footerCompare:footerCapture} draggable={false}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+        {/* {visible === 'capture' && <div className='recapture__note'><img className='not__captured' src='static/imgs/not-captured.png' /><span style={{ paddingLeft: "0.2rem" }}><strong>Note :</strong>This will completely refresh all Captured Objects on the screen. In case you want to Capture only additional elements use the "Add More" option</span></div>} */}
+      </Dialog> : null}
+      {/* <ConfirmPopup visible={showNote} onHide={() => setShowNote(false)} message={confirmPopupMsg} icon="pi pi-exclamation-triangle" accept={() => {setMasterCapture(true);handleAddMore('capture')}} reject={()=>setShowNote(false)} position="Center" /> */}
+      <AvoConfirmDialog
+        visible={showNote}
+        onHide={() => setShowNote(false)}
+        showHeader={false}
+        message={confirmPopupMsg}
+        icon="pi pi-exclamation-triangle"
+        accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        
+        {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
+        <div className={"compare__object"}>
+          <span className='compare__btn'>
+            <p className='compare__text'>List of Browsers</p>
+          </span>
+          <span className='browser__col'>
+            {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
+            <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+            <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
+          </span>
+        </div>
+      </Dialog> : null}
 
-            {typesOfAppType === "Web" ? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
-                <div className={"compare__object"}>
-                    <span className='compare__btn'>
-                        <p className='compare__text'>List of Browsers</p>
-                    </span>
-                    <span className='browser__col'>
-                        {/* <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/ic-explorer.png' onClick={() => { startScrape(selectedSpan) }}></img>Internet Explorer {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span> */}
-                        <span onClick={() => handleSpanClick(1)} className={selectedSpan === 1 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/chrome.png' />Google Chrome {selectedSpan === 1 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(2)} className={selectedSpan === 2 ? 'browser__col__selected' : 'browser__col__name'}><img className='browser__img' src='static/imgs/fire-fox.png' />Mozilla Firefox {selectedSpan === 2 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                        <span onClick={() => handleSpanClick(8)} className={selectedSpan === 8 ? 'browser__col__selected' : 'browser__col__name'} ><img className='browser__img' src='static/imgs/edge.png' />Microsoft Edge {selectedSpan === 8 && <img className='sel__tick' src='static/imgs/ic-tick.png' />}</span>
-                    </span>
-                </div>
-            </Dialog> : null}
+      {currentDialog === 'addObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        addCustomElement={addedCustomElement}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        elementTypeProp ={elementTypeProp}
+        captureData={captureData}
+        capturedDataToSave={capturedDataToSave}
+      />}
 
-            {currentDialog === 'addObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                addCustomElement={addedCustomElement}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-                captureData={captureData}
-                capturedDataToSave={capturedDataToSave}
-            />}
+      {currentDialog === 'mapObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        captureList={capturedDataToSave}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        setShow={setCurrentDialog}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        elementTypeProp ={elementTypeProp}
+      />}
 
-            {currentDialog === 'mapObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                captureList={capturedDataToSave}
-                fetchingDetails={props.fetchingDetails}
-                fetchScrapeData={fetchScrapeData}
-                setShow={setCurrentDialog}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-            />}
+      {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        fetchingDetails={props.fetchingDetails}
+        fetchScrapeData={fetchScrapeData}
+        captureList={capturedDataToSave}
+        setShow={setCurrentDialog}
+        newScrapedData={newScrapedData}
+        startScrape={startScrape}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setOverlay={setOverlay}
+        setShowPop={setShowPop}
+        parentData={parentData}
+      />}
 
-            {(currentDialog === 'replaceObject' || currentDialog === 'replaceObjectPhase2') && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                fetchingDetails={props.fetchingDetails}
-                fetchScrapeData={fetchScrapeData}
-                captureList={capturedDataToSave}
-                setShow={setCurrentDialog}
-                newScrapedData={newScrapedData}
-                startScrape={startScrape}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setOverlay={setOverlay}
-                setShowPop={setShowPop}
-                parentData={parentData}
-            />}
+      {currentDialog === 'createObject' && <ActionPanel
+        isOpen={currentDialog}
+        OnClose={handleClose}
+        scrapeItems={scrapeItems}
+        capturedDataToSave={capturedDataToSave}
+        setCapturedDataToSave={setCapturedDataToSave}
+        setNewScrapedData={setNewScrapedData}
+        updateScrapeItems={updateScrapeItems}
+        setOrderList={setOrderList}
+        setSaved={setSaved}
+        setShow={setCurrentDialog}
+        setCaptureData={setCaptureData}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setSaveDisable={setSaveDisable}
+      />}
 
-            {currentDialog === 'createObject' && <ActionPanel
-                isOpen={currentDialog}
-                OnClose={handleClose}
-                scrapeItems={scrapeItems}
-                capturedDataToSave={capturedDataToSave}
-                setCapturedDataToSave={setCapturedDataToSave}
-                setNewScrapedData={setNewScrapedData}
-                updateScrapeItems={updateScrapeItems}
-                setOrderList={setOrderList}
-                setSaved={setSaved}
-                setShow={setCurrentDialog}
-                setCaptureData={setCaptureData}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setSaveDisable={setSaveDisable}
-            />}
-
-            {(currentDialog === 'compareObject' || compareFlag) && <ActionPanel
-                isOpen={'compareObject'}
-                OnClose={handleClose}
-                startScrape={startScrape}
-                mainScrapedData={mainScrapedData}
-                fetchingDetails={props.fetchingDetails}
-                orderList={orderList}
-                fetchScrapeData={fetchScrapeData}
-                setShow={setCurrentDialog}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                elementTypeProp={elementTypeProp}
-            />}
+      {(currentDialog === 'compareObject' || compareFlag)&& <ActionPanel 
+       isOpen={'compareObject'} 
+       OnClose={handleClose} 
+      startScrape={startScrape} 
+      mainScrapedData={mainScrapedData} 
+      fetchingDetails={props.fetchingDetails} 
+      orderList={orderList}
+      fetchScrapeData={fetchScrapeData}
+      setShow={setCurrentDialog}
+      toastSuccess={toastSuccess}
+      toastError={toastError}
+      elementTypeProp={elementTypeProp}
+      />}
 
 
-            {showObjModal === "importModal" && <ImportModal
-                fetchScrapeData={fetchScrapeData}
-                setOverlay={setOverlay}
-                show={showObjModal}
-                setShow={setShowObjModal}
-                appType={typesOfAppType}
-                fetchingDetails={props.fetchingDetails}
-                toastSuccess={toastSuccess}
-                toastError={toastError}
-                setSaveDisable={setSaveDisable}
-            />}
-            {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
-            {/* //Element properties  */}
-            {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData} toastSuccess={toastSuccess}
-                toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects} />
-                :
-                <>
-                    {typesOfAppType === "Web" ?
-                        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
-                            <div className="card">
-                                <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
-                                    <Column rowReorder style={{ width: '3rem' }} />
-                                    <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
-                                    {/* <column ></column> */}
-                                    <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-                                    <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem' }} style={{}}></Column>
-                                </DataTable>
-                            </div>
-                        </Dialog> : null}</>}
-            {/* Element reorder */}
-            <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => { setShowIdentifierOrder(false); setSelectedCapturedElement([]) }} footer={footerContentIdentifier} >
-                <div className="card" >
-                    <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
-                        <Column rowReorder style={{ width: '3rem' }} />
-                        {dynamicColumns}
-                    </DataTable>
-                </div>
-            </Dialog>
-        </>
+      {showObjModal === "importModal" && <ImportModal
+        fetchScrapeData={fetchScrapeData}
+        setOverlay={setOverlay}
+        show={showObjModal}
+        setShow={setShowObjModal}
+        appType={typesOfAppType}
+        fetchingDetails={props.fetchingDetails}
+        toastSuccess={toastSuccess}
+        toastError={toastError}
+        setSaveDisable={setSaveDisable}
+      />}
+      {showObjModal === "exportModal" && <ExportModal appType={typesOfAppType} fetchingDetails={props.fetchingDetails} setOverlay={setOverlay} setShow={setShowObjModal} show={showObjModal} toastSuccess={toastSuccess} toastError={toastError} />}
+      {/* //Element properties  */}
+      {irisObject === "iris" ? <EditIrisObject utils={scrapeDataForIris} cordData={cordData} setElementProperties={setElementProperties} elementPropertiesVisible={elementPropertiesVisible} setShow={setShowObjModal} setCapturedDataToSave={setCapturedDataToSave} setModified={setModified} capturedDataToSave={capturedDataToSave} setNewScrapedCapturedData={setNewScrapedCapturedData}  toastSuccess={toastSuccess}
+        toastError={toastError} newCapturedDataToSave={newScrapedCapturedData} setShowPop={setShowPop} taskDetails={{ projectid: props.fetchingDetails.projectID, screenid: props.fetchingDetails["_id"], screenname: props.fetchingDetails.name, versionnumber: 0 /** version no. not avail. */, appType: typesOfAppType }} saveScrapedObjects={saveScrapedObjects}/>
+        :
+        <>
+        {typesOfAppType ==="Web"?
+        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
+          <div className="card">
+            <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
+              <Column rowReorder style={{ width: '3rem' }} />
+              <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
+              {/* <column ></column> */}
+              <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+            </DataTable>
+          </div>
+        </Dialog>: null }</>}
+      {/* Element reorder */}
+      <Dialog header={Header} style={{ width: '52vw', marginRight: '3rem' }} position="right" visible={showIdentifierOrder} onHide={() => {setShowIdentifierOrder(false);setSelectedCapturedElement([])}} footer={footerContentIdentifier} >
+        <div className="card" >
+          <DataTable value={identifierList} reorderableColumns reorderableRows onRowReorder={onRowReorderIdentifier} >
+            <Column rowReorder style={{ width: '3rem' }} />
+            {dynamicColumns}
+          </DataTable>
+        </div>
+      </Dialog>
+    </>
     );
 }
 

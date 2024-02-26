@@ -17,9 +17,15 @@
     position: absolute;
 }
 
-.release_dropdown {
+.type_dropdown {
     position: relative !important;
     left: 1.5rem !important;
+    width: 12rem;
+}
+
+.release_dropdown {
+    position: relative !important;
+    left: 3rem !important;
     width: 12rem;
 }
 
@@ -123,14 +129,15 @@
 .zephyr__mapping {
     display: flex;
     flex-direction: row;
-    height: 20rem;
-    gap: 4rem;
+    gap: 1rem;
+    height: 65vh;
+    width: 100%;
 }
 
 .card_zephyr1 {
-    margin-left: -1rem;
-    position: relative;
-    right: 0.7rem;
+    // margin-left: -1rem;
+    // position: relative;
+    // right: 0.7rem;
 
     .p-component {
         box-shadow: none !important;
@@ -148,15 +155,41 @@
     }
 }
 
-.mapping_zephyr_card1,
-.mapping_zephyr_card2 {
-    width: 30rem;
-
-    .p-card-body {
-        height: 30.5rem;
-        width: 30rem;
-
+.testcase__AVO__jira__paginator__zephyr{
+    position: absolute;
+    top: 38rem;
+    left: 52rem;
+    .p-paginator-first {
+        display: none !important;
     }
+    .p-paginator-last {
+        display: none !important;
+    }
+}
+
+.jira__paginator__zephyr{
+    position: absolute;
+    top: 38rem;
+    left: 19rem;
+    .p-paginator-first {
+        display: none !important;
+    }
+    .p-paginator-last {
+        display: none !important;
+    }
+}
+
+.mapping_zephyr_card1{
+    width: 65%;
+}
+.mapping_zephyr_card2 {
+    width: 35%;
+
+    // .p-card-body {
+    //     height: 30.5rem;
+    //     width: 30rem;
+
+    // }
 }
 
 .dropdown-zephyr {
@@ -164,9 +197,14 @@
     flex-direction: row;
 }
 
-.release_span {
+.type_span {
     position: relative;
     left: 7rem;
+}
+
+.release_span {
+    position: relative;
+    left: 14.5rem;
 }
 
 // .dropdown_release{
@@ -250,11 +288,11 @@
 
     display: flex;
 
-    flex-direction: row;
+    flex-direction:  column;
 
-    position: relative;
+    height: 90%;
 
-    top: 3rem;
+    gap : 2rem;
 
     .p-component {
 
@@ -262,6 +300,10 @@
 
     }
 
+    .integration-card {
+        display: flex;
+        flex-direction: column;
+    }
 }
 
 .manage_integrations {
@@ -332,14 +374,12 @@
 }
 
 .map__btn__zephyr {
-    position: relative;
-    top: 13rem;
-    right: 7rem;
-    cursor: pointer;
-
-    &:hover {
-        opacity: 0.5;
-    }
+    // position: relative;
+    // top: 13rem;
+    // right: 7rem;
+    // cursor: pointer;
+    display: flex;
+    align-items: center;
 }
 
 .view_map_zephyr {

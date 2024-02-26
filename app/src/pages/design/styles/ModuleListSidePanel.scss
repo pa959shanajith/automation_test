@@ -2,7 +2,7 @@
 .CollapseWholeCont{ 
     max-height: 100%;
     min-height: 60%;
-    overflow-y: auto;
+    // overflow-y: auto;
     display: flex;
     flex-direction: row-reverse;
 
@@ -20,7 +20,7 @@
     border-bottom: 0.5px solid #C7C7C7;
     background-color: rgb(255, 255, 255);
     z-index: 1;
-    overflow: auto;
+    // overflow: auto;
 
     .project_name_section {
         max-height: 7%;
@@ -33,14 +33,14 @@
     }
 
     .normalModule_main_container {
-        height: 70%;
+        height: 65.5%;
         border-top: 0.5px solid #c7c7c7;
         border-bottom: 0.5px solid #C7C7C7;
 
     }
 
     .E2E_main_container {
-        height: 30%;
+        height: calc(100% - 70%);
         border-bottom: 1px solid rgb(91, 89, 89);
     }
 
@@ -149,7 +149,7 @@
     }
 
     .NorModuleList {
-        max-height: 84%;
+        max-height: calc(100% - 17%);
         // border: 1px solid black;
         overflow-y: auto;
     }
@@ -544,17 +544,18 @@
                                                 // padding-left: 0.5rem;
                                                 overflow: hidden;
                                                 text-overflow: ellipsis;
-                                                width: 9rem;
+                                                width: 7rem;
                                                 margin-top: 1px;
                                             }
                                         }
 
                                     }
-
+                                                      
+                                                      
                                     .projIconSce {
                                         display: flex;
                                         width: 30%;
-                                        align-items: center;
+                                   align-items: center;
 
                                         h5 {
                                             display: flex;
@@ -562,8 +563,7 @@
                                             position: absolute;
                                             margin-left: 4rem;
 
-                                            img {
-
+*                                            img {
                                                 height: 15px;
                                                 width: 15px;
                                                 // margin-top: 3px;
@@ -577,8 +577,18 @@
                                                 // padding-left: 0.5rem;
                                                 overflow: hidden;
                                                 text-overflow: ellipsis;
-                                                // width: 9rem;
+                                                width: 7rem;
                                                 margin-top: 1px;
+                                                white-space:nowrap;
+                                               
+                                                &:hover {
+                                                    white-space: normal; 
+                                                    width: auto; 
+                                                    border:2px solid #c7c7c7;
+                                                    padding: 5px;
+                                                    margin-left: -75px;
+
+                                                }
                                             }
                                         }
 

@@ -36,8 +36,8 @@ const SearchBox = (props) => {
         } else {
             idxSearch = 0;
         }
-        nodeID = filter[idxSearch].parentElement.id
-        var nodetf = filter[idxSearch].parentElement.attributes.transform?.value
+        nodeID = filter[idxSearch].parentElement.id !== ""?filter[idxSearch].parentElement.id:filter[idxSearch+1].parentElement.id
+        var nodetf = filter[idxSearch].parentElement.id !== ""?filter[idxSearch].parentElement.attributes.transform?.value:filter[idxSearch+1].parentElement.attributes.transform?.value
         var mptf =  d3.select('.ct-container').attr('transform')
         var s = d3.select('.mp__canvas_svg');
         var center = [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];

@@ -2,7 +2,7 @@ import React, { Fragment, useState, useEffect } from 'react';
 import { ScreenOverlay, RedirectPage, Messages, VARIANT, ValidationExpression, setMsg } from '../../global'
 import { getUserICE } from '../../global/api';
 
-import { getUserDetails, provisions, fetchICE, manageSessionData} from '../api';
+import { getUserDetails, provisions, fetchICE, manageSessionData } from '../api';
 import { useNavigate } from 'react-router-dom';
 import '../styles/IceProvisionForm.scss'
 import { Button } from 'primereact/button';
@@ -10,6 +10,8 @@ import { InputText } from 'primereact/inputtext';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Tooltip } from 'primereact/tooltip';
 import { useSelector } from 'react-redux';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
 
 
@@ -26,68 +28,134 @@ const IceProvisionForm = (props) => {
 	const [downloadToolTip, setDownloadToolTip] = useState("Download Token")
 	const [icenameErrBorder, setIcenameErrBorder] = useState(false)
 	const [selAssignUser2ErrBorder, setSelAssignUser2ErrBorder] = useState(false)
+	const [selectUsersForIceProvision, setSelectUsersForIceProvision] = useState(null);
 	const isUsrSetting = props.userConfig //for user settings
-    const editUser = useSelector(state => state.admin.editUser);
-	const [ editUserICEData, setEditUserICEData] = useState({});
+	const editUser = useSelector(state => state.admin.editUser);
+	const [editUserICEData, setEditUserICEData] = useState({});
+	const type = useSelector(state => state.admin.type);
 
 
 	useEffect(() => {
 		props.setTokeninfoIcename("");
 		props.setTokeninfoToken("");
+		console.log(props.ldapIceProvisionUserList)
 	}, [props.selectProvisionType])
 
 
-	const provisionsIce = async () => {
-		props.toast.current.clear()
-		setIcenameErrBorder(false);
-		setSelAssignUser2ErrBorder(false);
-		const icetype = props.op;
-		props.setToken("");
-		if (props.icename.trim() === "") {
-			setIcenameErrBorder(true);
-			return false;
+	const provisionsIce = (rowData) => {
+		if (type === 'ldap' && rowData !== '') {
+			(async () => {
+				let tokeninfo = {
+					userid: rowData?.userid,
+					icename: rowData?.username?.trim(),
+					icetype: 'normal',
+					action: "provision",
+					email: rowData?.email,
+					username: rowData?.username,
+					firstName: rowData?.firstname,
+					lastName: rowData?.lastname,
+					url: new URL(window.location.href).origin,
+				};
+				setLoading("Provisioning Token...");
+				const data = await provisions(tokeninfo);
+				setLoading(false);
+				if (data.error) { props.toastError(data.error); return; }
+				if (data === "Invalid Session") return RedirectPage(navigate);
+				else if (data === 'fail') props.toastError(Messages.ADMIN.ERR_PROVISION_ICE);
+				else if (data === 'DuplicateIceName') {
+					props.toastError(Messages.ADMIN.ERR__ICE_EXIST);
+					setLoading(false);
+				} else {
+					props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client - " + rowData.username, VARIANT.SUCCESS));
+				}
+			})();
 		}
-		if (icetype === "normal" && (!props.userid[1] || props.userid[1].trim() === "")) {
-			setSelAssignUser2ErrBorder(true);
-			return false;
+		else if (type === 'ldap' && rowData === '') {
+			(async () => {
+				let iceProvisionUserList = [];
+				props.ldapIceProvisionUserList.map(userData => {
+					let tokeninfo = {
+						userid: userData.userid,
+						icename: userData.username.trim(),
+						icetype: 'normal',
+						email: userData.email,
+						username: userData.username,
+						firstName: userData.firstname,
+						lastName: userData.lastname,
+						url: new URL(window.location.href).origin,
+					}
+					iceProvisionUserList.push(tokeninfo);
+				});
+				let ldapIceProvisionUserData = { action: "multipleProvisionIce", userList: iceProvisionUserList }
+				setLoading("Provisioning Token...");
+				const data = await provisions(ldapIceProvisionUserData);
+				setLoading(false);
+				let errMsg = '';
+				let failErrMsg = '';
+				let duplicateErrorMsg = '';
+				let successMsg = '';
+				data.map((token, index) => {
+					if (token.error) { errMsg = token.error }
+					if (token === "Invalid Session") return RedirectPage(navigate);
+					else if (token === 'fail') failErrMsg = failErrMsg +" " + iceProvisionUserList[index].username
+					else if (token === 'DuplicateIceName') {
+						duplicateErrorMsg = duplicateErrorMsg + " " + iceProvisionUserList[index].username;
+						setLoading(false);
+					} else {
+						successMsg = successMsg + " " + iceProvisionUserList[index].username;
+					}
+				})
+				if (successMsg !== '')  props.toastSuccess(Messages.CUSTOM("User created and token generated successfully for these users -->" + successMsg, VARIANT.SUCCESS));
+				if (errMsg !== '') props.toastError(Messages.CUSTOM(errMsg, VARIANT.ERROR));
+				if (failErrMsg !== '') props.toastError(Messages.CUSTOM("ICE provision is failed for " + failErrMsg , VARIANT.ERROR));
+				if (duplicateErrorMsg !== '') props.toastError(Messages.CUSTOM('ICE name already exists for these users ' + duplicateErrorMsg, VARIANT.ERROR));
+				props.createUserDialogHide();
+			})();
 		}
+		else if (type === 'inhouse' || type === "saml") {
+			(async () => {
+				props.toast.current.clear()
+				setIcenameErrBorder(false);
+				setSelAssignUser2ErrBorder(false);
+				const icetype = props.op;
+				props.setToken("");
+				if (props.icename.trim() === "") {
+					setIcenameErrBorder(true);
+					return false;
+				}
+				if (icetype === "normal" && (!props.userid[1] || props.userid[1].trim() === "")) {
+					setSelAssignUser2ErrBorder(true);
+					return false;
+				}
 
-		let tokeninfo = {
-			userid: props.userid[1],
-			icename: props.icename.trim(),
-			icetype: icetype,
-			action: "provision",
-			email:props.userid[6],
-			username:props.userid[0],
-			firstName: props.userid[4],
-			lastName: props.userid[5],
-			url:new URL(window.location.href).origin,
-// ------------need it for reference----------- 
-			// userid: props.edit?props.edit.userId:props.userid[1],
-			// icename: props.icename.trim(),
-			// icetype: icetype,
-			// action: "provision",
-			// email:props.edit? props.edit.email:props.userid[6],
-			// username:props.edit?props.edit.userName:props.userid[0],
-			// firstName: props.edit?props.edit.firstName:props.userid[4],
-			// lastName: props.edit?props.edit.lastName:props.userid[5],
-			// url:new URL(window.location.href).origin,
-		};
-		setLoading("Provisioning Token...");
-		const data = await provisions(tokeninfo);
-		setLoading(false);
-		if (data.error) { props.toastError(data.error); return; }
-		if (data === "Invalid Session") return RedirectPage(navigate);
-		else if (data === 'fail') props.toastError(Messages.ADMIN.ERR_PROVISION_ICE);
-		else if (data === 'DuplicateIceName'){
-			props.toastError(Messages.ADMIN.ERR__ICE_EXIST) ;
-		    setLoading(false);
-		} else {
-			props.setIcename(props.icename);
-			props.setTokeninfoToken(data);
-			props.setToken(data);
-			props.setRefreshIceList(!props.refreshIceList);
-			props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client- '" + props.icename + "'.  Copy or Download the token", VARIANT.SUCCESS));
+				let tokeninfo = {
+					userid: props.userid[1],
+					icename: props.icename.trim(),
+					icetype: icetype,
+					action: "provision",
+					email: props.userid[6],
+					username: props.userid[0],
+					firstName: props.userid[4],
+					lastName: props.userid[5],
+					url: new URL(window.location.href).origin,
+				};
+				setLoading("Provisioning Token...");
+				const data = await provisions(tokeninfo);
+				setLoading(false);
+				if (data.error) { props.toastError(data.error); return; }
+				if (data === "Invalid Session") return RedirectPage(navigate);
+				else if (data === 'fail') props.toastError(Messages.ADMIN.ERR_PROVISION_ICE);
+				else if (data === 'DuplicateIceName') {
+					props.toastError(Messages.ADMIN.ERR__ICE_EXIST);
+					setLoading(false);
+				} else {
+					props.setIcename(props.icename);
+					props.setTokeninfoToken(data);
+					props.setToken(data);
+					props.setRefreshIceList(!props.refreshIceList);
+					props.toastSuccess(Messages.CUSTOM("Token generated Successfully for Avo Assure Client- '" + props.icename + "'.  Copy or Download the token", VARIANT.SUCCESS));
+				}
+			})();
 		}
 	}
 
@@ -154,69 +222,54 @@ const IceProvisionForm = (props) => {
 	// 	setMsg(error)
 	// }
 
+	const iceProvisionTokenGeneration = (rowData) => (
+		<Button label='Generate' onClick={() => provisionsIce(rowData)} size='small'></Button>
+	);
+
 	return (
 		<Fragment>
 			{loading ? <ScreenOverlay content={loading} /> : null}
-
-			<div className="col-xs-9" style={{ width: "83%" }}>
+			{(type === 'ldap' && !editUser) && <div className='flex flex-column'>
+				<div className='pt-2 pb-2' style={{ alignSelf: 'self-end' }}>
+					<Button label='Generate to all' onClick={() => provisionsIce('')} size='small'></Button>
+				</div>
+				<div className='ldap_ice_provision'>
+					<DataTable value={props.ldapIceProvisionUserList} editMode="row" size='normal'
+						selectionMode={null}
+						// loading={loading}
+						// globalFilter={globalFilter}
+						// header={header}
+						emptyMessage="No users found"
+						scrollable
+						selection={selectUsersForIceProvision}
+						onSelectionChange={(e) => setSelectUsersForIceProvision(e.value)} dataKey="userid"
+					// scrollHeight='60vh'
+					>
+						{/* <Column selectionMode="multiple" headerStyle={{ width: '2%' }}></Column> */}
+						<Column field="username" header="User Name" style={{ width: '5%' }} bodyClassName={"ellipsis-column"}></Column>
+						<Column field="roleName" header="Role" style={{ width: '5%' }} bodyClassName={"ellipsis-column"} ></Column>
+						<Column header="" body={iceProvisionTokenGeneration} headerStyle={{ width: '3%' }} ></Column>
+					</DataTable>
+				</div>
+			</div>}
+			{(type === 'inhouse'|| type === "saml" || (type === "ldap" && editUser)) && <div className="col-xs-9" style={{ width: "83%" }}>
 				<div className='flex flex-column pb-4'>
 					<label className="pb-2 font-medium" title="Token Name">Avo Assure Client Name</label>
 					<div className="flex flex-row">
-					<InputText
-						type="text"
-						autoComplete="off"
-						id="icename"
-						name="icename"
-						value={props.icename}
-						onChange={(event) => { updateIceName(event.target.value) }} maxLength="100"
-						placeholder="Avo Assure Client Name"
-						className={`w-full md:w-20rem ${icenameErrBorder ? "p-invalid" : ''}`}
-					/>
-				
-					<Button className="a__btn pull-right ml-3" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
+						<InputText
+							type="text"
+							autoComplete="off"
+							id="icename"
+							name="icename"
+							value={props.icename}
+							onChange={(event) => { updateIceName(event.target.value) }} maxLength="100"
+							placeholder="Avo Assure Client Name"
+							className={`w-full md:w-20rem ${icenameErrBorder ? "p-invalid" : ''}`}
+						/>
+
+						<Button className="a__btn pull-right ml-3" size='small' onClick={() => { provisionsIce() }} label="Generate" title="Generate"></Button>
+					</div>
 				</div>
-				</div>
-				{/* {!isUsrSetting
-					&& <div data-test="ice-type-test" className={'adminControl-ip adminControl-ip-cust'} ><div>
-						<span className="leftControl-ip" title="ICE Type">ICE Type</span>
-						<label className="adminFormRadio">
-							<input type="radio" checked={props.op === "normal"} value="normal" name="provisionType" onChange={() => { props.setOp("normal"); props.setSelectProvisionType(!props.selectProvisionType); refreshForm() }} />
-							<span>Normal</span>
-						</label>
-						<label className="adminFormRadio">
-							<input type="radio" checked={props.op === "ci-cd"} value="ci-cd" name="provisionType" onChange={() => { props.setRefreshIceList(!props.refreshIceList); props.setOp("ci-cd"); refreshForm() }} />
-							<span>CI/CD</span>
-						</label>
-					</div></div>}
-				<div className='adminControl-ip'><div>
-					<span className="leftControl-ip" title={isUsrSetting ? "Default ICE" : "ICE Name"}>{isUsrSetting ? "Default ICE" : "ICE Name"}</span>
-					{!isUsrSetting ?
-						<input type="text" autoComplete="off" id="icename" name="icename" value={props.icename} onChange={(event) => { updateIceName(event.target.value) }} maxLength="100" className={icenameErrBorder ? "inputErrorBorder border_input-ip form-control-ip form-control-custom-ip" : "border_input-ip form-control-ip form-control-custom-ip"} placeholder="ICE Name" />
-						: <span>{props.defaultICE !== "" ? props.defaultICE : "No Default ICE"}</span>
-					}
-				</div></div>
-
-
-				{!isUsrSetting && <div data-test="user-test" className='userForm adminControl-ip' ><div>
-					<span className="leftControl-ip" title="User">User</span>
-					<select value={props.userid} onChange={(event) => { props.setUserid(event.target.value) }} disabled={props.op !== 'normal'} id="selAssignUser2" className={selAssignUser2ErrBorder ? 'selectErrorBorder adminSelect-ip form-control-ip' : 'adminSelect-ip form-control-ip'}>
-						{users.map((entry, index) => (
-							<option disabled={entry[0] === 'Select User' ? true : false} key={index} value={entry[1]}>{entry[0]}</option>
-						))}
-					</select>
-				</div></div>}
-
-				<div data-test="token-test" className='adminControl-ip' id="icetokenarea"><div>
-					<span className="leftControl-ip" title="Token">Token</span>
-					<textarea autoComplete="off" id="iceToken" value={props.token} name="iceToken" readOnly="readonly"></textarea>
-					<label className="lable-cust-ip" >
-						<ReactTooltip id="copy" effect="solid" backgroundColor="black" getContent={[() => { return copyToolTip }, 0]} />
-						<ReactTooltip id="download" effect="solid" backgroundColor="black" getContent={[() => { return downloadToolTip }, 0]} />
-						<span className="fa fa-files-o action-cust-ip" data-for="copy" data-tip={copyToolTip} onClick={() => { copyTokenFunc() }}></span>
-						<span className="fa fa-download action-cust-ip" data-for="download" data-tip={downloadToolTip} onClick={() => { downloadToken() }} ></span>
-					</label>
-				</div></div> */}
-
 				<div className='flex flex-row'>
 					<InputTextarea
 						autoResize
@@ -224,7 +277,7 @@ const IceProvisionForm = (props) => {
 						name="iceToken"
 						value={props.token}
 						rows={4} cols={70}
-						placeholder="Click on Provision/ Register to generate token" 
+						placeholder="Click on Provision/ Register to generate token"
 						readOnly
 					/>
 					<label className='pl-3 flex flex-column justify-content-between '>
@@ -244,7 +297,7 @@ const IceProvisionForm = (props) => {
 						<Tooltip target=".downlod_token" content={downloadToolTip} position="right" />
 					</label>
 				</div>
-			</div>
+			</div>}
 		</Fragment>
 	);
 }

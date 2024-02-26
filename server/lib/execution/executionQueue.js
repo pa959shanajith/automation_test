@@ -131,6 +131,8 @@ module.exports.Execution_Queue = class Execution_Queue {
         let targetICE = EMPTYUSER;
         let projectid = "";
         let response = {}
+        const steps = await utils.fetchData({'host':batchExecutionData.host,'executionData':batchExecutionData},"/hooks/validateExecutionSteps")
+        if(steps.status == "fail") return {status:"fail",error:steps.message};
         response['status'] = "fail";
         response["message"] = "N/A"
         response['error'] = "None"
@@ -908,6 +910,9 @@ module.exports.Execution_Queue = class Execution_Queue {
         try {
             let dataFromIce = req.body,checkInCache = false;
             let resultData = 'exce_data' in dataFromIce ? dataFromIce.exce_data : dataFromIce;
+
+            // set host in dataFromIce
+            dataFromIce["hostName"] = req.headers.host;
             
             // To store the data from cache if key list is empty.
             if(this.key_list && Object.keys(this.key_list).length === 0 && Object.getPrototypeOf(this.key_list) === Object.prototype) {
@@ -992,7 +997,7 @@ module.exports.Execution_Queue = class Execution_Queue {
                                         reportExecutionData.reportData.push({ suiteDetails: suiteDetailsInfo });
                                     })
                                     if (executionData[0].executionData.isEmailNotificationEnabled === true) {
-                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough });
+                                        notifications.notify("reportOnCICDExecution", { reportExecutionData, recieverEmailAddress: executionData[0].executionData.emailNotificationReciever, profileName: executionData[0].executionData.configurename, configKey: executionData[0].executionData.configurekey, executionThrough: executionData[0].executionData.executionThrough, hostName: req.headers.host });
                                     }
                                 }
                                 

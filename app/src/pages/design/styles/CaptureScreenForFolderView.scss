@@ -153,7 +153,7 @@
   // overflow: auto;
   // max-height: 24rem;
   position: relative;
-  top: 1rem;
+  // top: 1rem;
 
   .p-datatable-table {
     padding: 0 1.5rem !important;
@@ -1157,4 +1157,8 @@
 .panel_head2{
   position: relative;
   right: 4rem;
+}
+.p-dialog-content{
+  overflow:auto;
+  flex-grow: 1;
 }

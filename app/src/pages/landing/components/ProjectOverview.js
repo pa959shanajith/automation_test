@@ -4,6 +4,7 @@ import '../styles/ProjectOverview.scss';
 import Analysis from './Analysis';
 import Settings from '../../settings/Components/Settings';
 import ProjectCreation from './ProjectCreation'
+import CustomKeyword from './CustomKeyword';
 import { useSelector } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
 import ElementRepository from './ElementRepository';
@@ -29,8 +30,9 @@ const ProjectOverview = (props) => {
         { label: 'Overview' },
         { label: 'Analysis' },
         { label: 'Settings' },
-        { label: 'Element Repository', command: ()=>handleElementRepository()},
-        { label: 'AI Testcase' }
+        { label: 'Element Repository', command: ()=>handleElementRepository(), disabled: defaultselectedProject.appType==="Webservice"},
+        { label: 'AI Testcase' },
+        { label: 'Capabalities'},
     ];
     
 
@@ -57,6 +59,7 @@ const ProjectOverview = (props) => {
             {activeIndex === 2 && <Settings />}
             {activeIndex === 3 && <ElementRepository setOverlay={setOverlay} overlay={overlay}/>}
             {activeIndex === 4 && <AiTestcase/>}
+            {activeIndex === 5 && <CustomKeyword toastError={props.toastError} toastSuccess={props.toastSuccess} toastWarn={props.toastWarn}/>}
         </div>
     )
 }

@@ -24,6 +24,7 @@ export const loadUserInfo = createSlice({
         updatedProject: false,
         openCaptureScreen: false,
         updateElementRepository: false,
+        sapGeniusScrapeData: {},
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -70,7 +71,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, action) => {
             state.socket = action.payload
         },
-
+        setSAPGeniusScrapeData: (state, action) => {
+            state.sapGeniusScrapeData = action.payload;
+        },
         updateNotify: (state, action) => {
             var value = action.payload
             value.dateTime = new Date().toLocaleString();

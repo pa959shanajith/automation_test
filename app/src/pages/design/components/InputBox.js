@@ -54,7 +54,6 @@ const InputBox = (props) => {
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
-    console.log(screenData);
 
     useEffect(()=>{
         (async ()=>{
@@ -170,14 +169,69 @@ const InputBox = (props) => {
                             child.name = dNodes[pi].name;
                             child.parent.name = dNodes[pi].name;
                             // Use map on child.parent.children to update specific child
-                            child.parent.children = child.parent.children.map(subChild => {
-                                if (subChild.childIndex === dNodes[pi].childIndex) {
-                                    subChild.name = dNodes[pi].name;
-                                }else if(subChild.id === dNodes[pi].id){
-                                    subChild.name = dNodes[pi].name;
-                                }
-                                return subChild;
-                            });
+                            if(child.parent.children[0].id === dNodes[pi].id){
+                                child.parent.children = child.parent.children.map(subChild => {
+                                    if (subChild.childIndex === dNodes[pi].childIndex) {
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }else if(subChild.id === dNodes[pi].id){
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }
+                                    return subChild;
+                                });
+                            }else{
+                                child.parent.children[0].children = child.parent.children[0].children.map(subChild => {
+                                    if (subChild.childIndex === dNodes[pi].childIndex) {
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }else if(subChild.id === dNodes[pi].id){
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }
+                                    return subChild;
+                                });
+                            }
                         } else {
                             node.children.forEach(subChild => updateData(subChild));
                         }

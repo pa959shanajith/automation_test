@@ -292,14 +292,14 @@ export const fetchScenarioInfo = async(executionId) => {
     }
 }
 
-export const downloadReports = async(getDownload, type) => {
+export const downloadReports = async(payload, type) => {
     try{
-        const res = await axios(`/viewReport?reportID=${getDownload?.id}&type=${ getDownload?.type === 'json' ? 'json' : 'pdf' }&images=${type}`, {
+        const res = await axios(url+`/viewReport?reportID=${payload?.id}&fileType=${ payload?.type === 'json' ? 'json' : 'pdf' }&images=${type}${payload?.exportLevel ? `&exportLevel=${payload?.exportLevel}`:""}&executionListId=${payload?.executionListId}&downloadLevel=${payload?.downloadLevel}`, {
             method: 'GET',
             headers: {
             'Content-type': 'application/json',
             },
-            responseType:(getDownload?.type === 'json')? 'application/json' : 'arraybuffer',
+            responseType:(payload?.type === 'json')? 'application/json' : 'arraybuffer',
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -345,7 +345,7 @@ export const getAccessibilityScreens = async(projId, relName, cycId) =>{
     }
 }
 
-export const viewReport = async (reportid, reportType="json", screenshotFlag) => { 
+export const viewReport = async (reportid, reportType="json", screenshotFlag, downloadLevel, viewReport ) => { 
     try{
         const res = await axios(url+'/viewReport', {
             method: 'GET',
@@ -353,7 +353,7 @@ export const viewReport = async (reportid, reportType="json", screenshotFlag) =>
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag, downloadLevel, viewReport },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -647,7 +647,7 @@ export const viewAzureMappedList_ICE = async(userID, scenario) => {
     }
 }
 
-export const publicViewReport = async (reportid, reportType="json", screenshotFlag) => { 
+export const publicViewReport = async (reportid, reportType="json", screenshotFlag, downloadLevel = "testCase") => { 
     try{
         const res = await axios(url+'/devopsReports/viewReport', {
             method: 'GET',
@@ -655,7 +655,7 @@ export const publicViewReport = async (reportid, reportType="json", screenshotFl
                 'Content-type': 'application/json',
             },
             responseType:(reportType === 'pdf')? 'arraybuffer':'application/json',
-            params: { reportID: reportid, type: reportType, images: screenshotFlag  },
+            params: { reportID: reportid, fileType: reportType, images: screenshotFlag, downloadLevel },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session"){
@@ -686,6 +686,7 @@ export const getFunctionalReportsDevops = async(configurekey, executionListId) =
                     'configurekey': configurekey,
                     'executionListId': executionListId,
                     "type":"allmodules",
+                    "cycleId":''
                 }
             },
             credentials: 'include'
@@ -744,7 +745,7 @@ export const getOpenfetchScenarioInfoDevOps = async(executionIds) => {
             },
             data: {
                 // "param": "reportStatusScenarios_ICE",
-                "executionId":[executionIds]
+                "executionId": executionIds
             },
             credentials: 'include'
         });

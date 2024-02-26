@@ -1065,7 +1065,7 @@ export const unlockUser = async(user) => {
   api returns
 */
 
-export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAccToken,gitUrl,gitUsername,gitEmail) => { 
+export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAccToken,gitUrl,gitUsername,gitEmail,gitBranch) => { 
     try{
         const res = await axios(url+'/gitSaveConfig', {
             method: 'POST',
@@ -1079,7 +1079,9 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
                     gitAccToken: gitAccToken,
                     gitUrl: gitUrl,
                     gitUsername:gitUsername,
-                    gitEmail:gitEmail},
+                    gitEmail:gitEmail,
+                    gitBranch:gitBranch
+                },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1419,6 +1421,32 @@ export const deleteAvoGrid = async(props) => {
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
     }
 }
+
+// Multiple Ldap user creation
+export const createMulitpleLdapUsers = async(action, userObj) => { 
+    try{
+        const res = await axios(url+'/createMulitpleLdapUsers', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {action: action,user: userObj},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Failed to "+action+" user."}
+    }catch(err){
+        console.error(err)
+        return {error:"Failed to "+action+" user."}
+    }
+}
 //APi for upload
 /* Component
   Genarative AI api returns string ex. "success"
@@ -1543,5 +1571,30 @@ export const save_testcase = async(props) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_MODULES}
+    }
+}
+
+export const fetch_git_exp_details = async(projectId) => { 
+    try{
+        const res = await axios(url+'/fetch_git_exp_details', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+				projectId: projectId},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }

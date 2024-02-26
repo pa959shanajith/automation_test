@@ -59,6 +59,65 @@ const formatDate = (date) => {
     return arr.join('-') + " " + [hour,minute,seconds].join(':');
     
 };
+const getCurrentReportDate = () => {
+    // Get current date
+    const currentDate = new Date();
+    // Get day, month, and year
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1; // January is 0
+    const year = currentDate.getFullYear();
+    // Format day and month to have leading zeros if needed
+    const formattedDay = day < 10 ? '0' + day : day;
+    const formattedMonth = month < 10 ? '0' + month : month;
+    // Concatenate day, month, and year with '-' separator
+    const presentDate = formattedDay + '-' + formattedMonth + '-' + year;
+    return presentDate;
+};
+const getCurrentReportTime = () => {
+    // Get current time
+    const currentTime = new Date();
+    // Extract hours, minutes, and seconds
+    let hours = currentTime.getHours();
+    const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+    const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+    // Determine AM or PM
+    const meridiem = hours >= 12 ? 'pm' : 'am';
+    // Convert hours to 12-hour format
+    hours = hours % 12 || 12;
+    // Format the time as HH:MM:SS AM/PM
+    const presentTime = `${hours}:${minutes}:${seconds} ${meridiem}`;
+    return presentTime;
+};
+// Function to format date to dd-mm-yyyy railway time
+const formatDateToRailwayTime = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+};
+const generateReportDateTime = (startDateTime, endDateTime) => {
+    // Convert date strings to Date objects
+    const startDate = new Date(startDateTime);
+    const endDate = new Date(endDateTime);
+    // Format start date
+    const formattedStartDateTime = formatDateToRailwayTime(startDate);
+    // Format end date
+    const formattedEndDateTime = formatDateToRailwayTime(endDate);
+    // Calculate difference between dates
+    const timeDifference = endDate - startDate;
+    const millisecondsInSecond = 1000;
+    const millisecondsInMinute = millisecondsInSecond * 60;
+    const millisecondsInHour = millisecondsInMinute * 60;
+    const hoursDifference = Math.floor(timeDifference / millisecondsInHour);
+    const minutesDifference = Math.floor((timeDifference % millisecondsInHour) / millisecondsInMinute);
+    const secondsDifference = Math.floor((timeDifference % millisecondsInMinute) / millisecondsInSecond);
+    // Format difference in ~hh:mm:ss format
+    const formattedDifference = `~${hoursDifference}:${minutesDifference.toString().padStart(2, '0')}:${secondsDifference.toString().padStart(2, '0')}`;
+    return { formattedStartDateTime, formattedEndDateTime, formattedDifference }
+};
 
 
 
@@ -138,6 +197,13 @@ exports.openScreenShot = async (req, res) => {
     }
 };
 
+function calculatePercentage(value, total) {
+    if (isNaN(value) || isNaN(total) || total === 0) {
+        return 0; // Return 0 if value or total is not a number, or if total is 0
+    }
+    return parseFloat((value / total) * 100) ? parseFloat((value / total) * 100) : 0;
+}
+
 const prepareReportData = (reportData, embedImages) => {
     let pass = fail = terminated = 0;
     const remarksLength = [];
@@ -214,6 +280,475 @@ const prepareReportData = (reportData, embedImages) => {
     }
 
     return { report, scrShots };
+};
+
+const prepareExecutionReportData = async(exportLevel = "", downloadLevel = "", executionListId = "", reportId = "",embedImages = "", isViewReport = false) => {
+    // row Level Data
+    if (downloadLevel == "row") {
+        let commonFields = {};
+        // to get description Data
+        const descriptionData = await utils.fetchData({ executionListId }, "download/downloadReport", "prepareReportData");
+
+        commonFields["projectName"] = descriptionData.length ? descriptionData[0]["projectname"][0] : "";
+        commonFields["browser"] = descriptionData.length ? descriptionData[0]["overallstatusReport"][0]["browserType"] : "";
+        commonFields["browserVersion"] = descriptionData.length ? descriptionData[0]["overallstatusReport"][0]["browserVersion"] : "";
+        commonFields["overallStatus"] = descriptionData.length ? (descriptionData[0]["status"]).toUpperCase() : "";
+        if (descriptionData.length) {
+            const result = generateReportDateTime(descriptionData[0]["starttime"], descriptionData[descriptionData.length - 1]["endtime"])
+            commonFields["startDateTime"] = result.formattedStartDateTime ? result.formattedStartDateTime : "";
+            commonFields["endDateTime"] = result.formattedEndDateTime ? result.formattedEndDateTime : "";
+            commonFields["ellapsedTime"] = result.formattedDifference ? result.formattedDifference : "";
+        };
+        commonFields["reportGeneratedDate"] = getCurrentReportDate();
+        commonFields["reportGeneratedTime"] = getCurrentReportTime();
+        if (exportLevel == "executiveSummary") {
+            // to get testSuite Data
+            const inputs = {
+                "query": "fetchModSceDetails",
+                param: "modulestatus",
+                executionListId: executionListId,
+                executionId: undefined
+            };
+            const testSuiteResults = await utils.fetchData(inputs, "reports/fetchModSceDetails", "fetchModSceDetails");
+            let totalTs = testSuiteResults.length;
+            let executedTs = 0;
+            let passedTs = 0;
+            let failedTs = 0;
+            let terminatedTs = 0;
+            let executedTsPercent = 1;
+            let passedTsPercent = 1;
+            let failedTsPercent = 1;
+            let terminatedTsPercent = 1;
+
+            let totalTc = 0;
+            let executedTc = 0;
+            let passedTc = 0;
+            let failedTc = 0;
+            let terminatedTc = 0;
+            let executedTcPercent = 1;
+            let passedTcPercent = 1;
+            let failedTcPercent = 1;
+            let terminatedTcPercent = 1;
+
+            for (const result of testSuiteResults) {
+                switch (result.status) {
+                    case "pass":
+                        passedTs++;
+                        executedTs++;
+                        break;
+                    case "fail":
+                        failedTs++;
+                        executedTs++;
+                        break;
+                    case "terminate":
+                        terminatedTs++;
+                        break;
+                }
+                result.scenarioStatus.forEach((tcStatus) => {
+                    totalTc++;
+                    switch (tcStatus) {
+                        case "Pass":
+                            passedTc++;
+                            executedTc++;
+                            break;
+                        case "Fail":
+                            failedTc++;
+                            executedTc++;
+                            break;
+                        case "Terminate":
+                            terminatedTc++;
+                        default:
+                            break;
+                    }
+                })
+            }
+
+            // TestSuite Percentage Calculation
+            executedTsPercent = calculatePercentage(testSuiteResults.length, testSuiteResults.length);
+            passedTsPercent = calculatePercentage(passedTs, totalTs);
+            failedTsPercent = calculatePercentage(failedTs, totalTs);
+            terminatedTsPercent = calculatePercentage(terminatedTs, totalTs);
+            // TestCase Percentage Calculation
+            executedTcPercent = calculatePercentage(executedTc, executedTc);
+            passedTcPercent = calculatePercentage(passedTc, totalTc);
+            failedTcPercent = calculatePercentage(failedTc, totalTc);
+            terminatedTcPercent = calculatePercentage(terminatedTc, totalTc);
+            // Executive Level Data
+            const replacements = {
+                ...commonFields,
+                "testSuiteResults": {
+                    totalTs,
+                    executedTs,
+                    passedTs,
+                    failedTs,
+                    terminatedTs,
+                    executedTsPercent,
+                    passedTsPercent,
+                    failedTsPercent,
+                    terminatedTsPercent,
+                },
+                "testCaseResults": {
+                    totalTc,
+                    executedTc,
+                    passedTc,
+                    failedTc,
+                    terminatedTc,
+                    executedTcPercent,
+                    passedTcPercent,
+                    failedTcPercent,
+                    terminatedTcPercent
+                },
+                rawHtmlPath: htmlPaths.executive_report_path
+            }
+            return replacements;
+        } else if (exportLevel == "summary") {
+            const inputs = {
+                "query": "fetchModSceDetails",
+                param: "modulestatus",
+                executionListId: executionListId,
+                executionId: undefined
+            };
+            const testSuiteResults = await utils.fetchData(inputs, "reports/fetchModSceDetails", "fetchModSceDetails");
+
+            let totalTs = testSuiteResults.length;
+            let executedTs = 0;
+            let passedTs = 0;
+            let failedTs = 0;
+            let terminatedTs = 0;
+            let executedTsPercent = 1;
+            let passedTsPercent = 1;
+            let failedTsPercent = 1;
+            let terminatedTsPercent = 1;
+
+            let totalTc = 0;
+            let executedTc = 0;
+            let passedTc = 0;
+            let failedTc = 0;
+            let terminatedTc = 0;
+            let executedTcPercent = 1;
+            let passedTcPercent = 1;
+            let failedTcPercent = 1;
+            let terminatedTcPercent = 1;
+            let reportData = {};
+            const tsExecutionStatusArr = [];
+
+            for (const result of testSuiteResults) {
+                switch (result.status) {
+                    case "pass":
+                        passedTs++;
+                        executedTs++;
+                        break;
+                    case "fail":
+                        failedTs++;
+                        executedTs++;
+                        break;
+                    case "terminate":
+                        terminatedTs++;
+                        break;
+                }
+                // Calculate Tc for a particular Ts
+                let iTotalTc = 0;
+                let iExecutedTc = 0;
+                let iPassedTc = 0;
+                let ifailedTc = 0;
+                let iterminatedTc = 0;
+                let iSNo = 1;
+                result.scenarioStatus.forEach((tcStatus) => {
+                    totalTc++;
+                    iTotalTc++;
+                    switch (tcStatus) {
+                        case "Pass":
+                            passedTc++;
+                            iPassedTc++;
+                            executedTc++;
+                            iExecutedTc++;
+                            break;
+                        case "Fail":
+                            failedTc++;
+                            ifailedTc++;
+                            executedTc++;
+                            iExecutedTc++;
+                            break;
+                        case "Terminate":
+                            terminatedTc++;
+                            iterminatedTc++
+                        default:
+                            break;
+                    }
+                })
+
+                const inputs = {
+                    "query": "fetchModSceDetails",
+                    param: "scenarioStatus",
+                    executionListId: undefined,
+                    executionId: result._id
+                };
+
+                const tcResult = await utils.fetchData(inputs, "reports/fetchModSceDetails", "fetchModSceDetails");
+                const iTcArr = [];
+                if (tcResult.length) {
+                    for (tc of tcResult) {
+                        iTcArr.push({
+                            sNo: iSNo++,
+                            tcName: tc["scenarioname"],
+                            tcStatus: tc["status"]
+                        })
+                    }
+                }
+                tsExecutionStatusArr.push({ tsName: result.modulename, totalTc: iTotalTc, executedTc: iExecutedTc, passedTc: iPassedTc, failedTc: ifailedTc, terminatedTc: iterminatedTc, iTcArr });
+
+            }
+            // TestSuite Percentage Calculation
+            executedTsPercent = calculatePercentage(testSuiteResults.length, testSuiteResults.length);
+            passedTsPercent = calculatePercentage(passedTs, totalTs);
+            failedTsPercent = calculatePercentage(failedTs, totalTs);
+            terminatedTsPercent = calculatePercentage(terminatedTs, totalTs);
+            // TestCase Percentage Calculation
+            executedTcPercent = calculatePercentage(executedTc, executedTc);
+            passedTcPercent = calculatePercentage(passedTc, totalTc);
+            failedTcPercent = calculatePercentage(failedTc, totalTc);
+            terminatedTcPercent = calculatePercentage(terminatedTc, totalTc);
+            // Executive Level Data
+            const replacements = {
+                ...commonFields,
+                "testSuiteResults": {
+                    totalTs,
+                    executedTs,
+                    passedTs,
+                    failedTs,
+                    terminatedTs,
+                    executedTsPercent,
+                    passedTsPercent,
+                    failedTsPercent,
+                    terminatedTsPercent,
+                },
+                "testCaseResults": {
+                    totalTc,
+                    executedTc,
+                    passedTc,
+                    failedTc,
+                    terminatedTc,
+                    executedTcPercent,
+                    passedTcPercent,
+                    failedTcPercent,
+                    terminatedTcPercent
+                },
+                tsExecutionStatusArr,
+                rawHtmlPath: htmlPaths.summary_report_path
+            }
+            return replacements;
+        } else if (exportLevel == "detailed") {
+            const inputs = {
+                "query": "fetchModSceDetails",
+                param: "modulestatus",
+                executionListId: executionListId,
+                executionId: undefined
+            };
+            const testSuiteResults = await utils.fetchData(inputs, "reports/fetchModSceDetails", "fetchModSceDetails");
+            let totalTs = testSuiteResults.length;
+            let executedTs = 0;
+            let passedTs = 0;
+            let failedTs = 0;
+            let terminatedTs = 0;
+            let executedTsPercent = 1;
+            let passedTsPercent = 1;
+            let failedTsPercent = 1;
+            let terminatedTsPercent = 1;
+
+            let totalTc = 0;
+            let executedTc = 0;
+            let passedTc = 0;
+            let failedTc = 0;
+            let terminatedTc = 0;
+            let executedTcPercent = 1;
+            let passedTcPercent = 1;
+            let failedTcPercent = 1;
+            let terminatedTcPercent = 1;
+            let reportData = {};
+            const iTcArr = [];
+            let tcNo = 1;
+            for (const result of testSuiteResults) {
+                switch (result.status) {
+                    case "pass":
+                        passedTs++;
+                        executedTs++;
+                        break;
+                    case "fail":
+                        failedTs++;
+                        executedTs++;
+                        break;
+                    case "Terminate":
+                        terminatedTs++;
+                        executedTs++;
+                        break;
+                }
+                result.scenarioStatus.forEach((tcStatus) => {
+                    totalTc++;
+                    switch (tcStatus) {
+                        case "Pass":
+                            passedTc++;
+                            executedTc++;
+                            break;
+                        case "Fail":
+                            failedTc++;
+                            executedTc++;
+                            break;
+                        case "Terminate":
+                            terminatedTc++;
+                        default:
+                            break;
+                    }
+                });
+
+                const inputs = {
+                    "query": "fetchModSceDetails",
+                    param: "scenarioStatus",
+                    executionListId: undefined,
+                    executionId: result._id
+                };
+
+                const tcResult = await utils.fetchData(inputs, "reports/fetchModSceDetails", "fetchModSceDetails");
+
+                if (tcResult.length) {
+
+                    for (tc of tcResult) {
+                        const inputTcData = { reportid: tc["_id"] };
+                        const tcData = await utils.fetchData(inputTcData, "reports/getReport", "viewReport");
+                        const tcInfoArr = [];
+                        let tcSubNo = 1;
+                        for (const info of tcData.report.rows) {
+                            tcInfoArr.push({
+                                sNo: `${tcNo}.${tcSubNo++}`,
+                                description: info.Keyword,
+                                timeEllapsed: info.EllapsedTime ? (info.EllapsedTime).split(":").slice(0, 3).join(":") : "",
+                                status: info.status ? info.status : "",
+                                comment: info.Comments ? info.Comments : (info.StepDescription ? info.StepDescription : ""),
+                                defectId: ""
+                            })
+                        }
+                        iTcArr.push({
+                            sNo: tcNo++,
+                            tcName: tcData.testscenarioname,
+                            timeElapsed: tcData.report.overallstatus.EllapsedTime,
+                            overAllStatus: tcData.report.overallstatus.overallstatus,
+                            tcInfoArr
+                        })
+                    }
+                }
+
+            }
+            // TestSuite Percentage Calculation
+            executedTsPercent = calculatePercentage(testSuiteResults.length, testSuiteResults.length);
+            passedTsPercent = calculatePercentage(passedTs, totalTs);
+            failedTsPercent = calculatePercentage(failedTs, totalTs);
+            terminatedTsPercent = calculatePercentage(terminatedTs, totalTs);
+            // TestCase Percentage Calculation
+            executedTcPercent = calculatePercentage(executedTc, executedTc);
+            passedTcPercent = calculatePercentage(passedTc, totalTc);
+            failedTcPercent = calculatePercentage(failedTc, totalTc);
+            terminatedTcPercent = calculatePercentage(terminatedTc, totalTc);
+            // Executive Level Data
+            const replacements = {
+                ...commonFields,
+                "testSuiteResults": {
+                    totalTs,
+                    executedTs,
+                    passedTs,
+                    failedTs,
+                    terminatedTs,
+                    executedTsPercent,
+                    passedTsPercent,
+                    failedTsPercent,
+                    terminatedTsPercent,
+                },
+                "testCaseResults": {
+                    totalTc,
+                    executedTc,
+                    passedTc,
+                    failedTc,
+                    terminatedTc,
+                    executedTcPercent,
+                    passedTcPercent,
+                    failedTcPercent,
+                    terminatedTcPercent,
+                },
+                rawHtmlPath: htmlPaths.detailed_report_path,
+                iTcArr
+            }
+            return replacements;
+        }
+    } else if (downloadLevel == "testCase") {
+        const inputs = { reportid: reportId };
+        const reportData = await utils.fetchData(inputs, "reports/getReport", "viewReports");
+        let pass = fail = terminated = 0;
+        const remarksLength = [];
+        const commentsLength = [];
+        const scrShots = { "idx": [], "paths": [] };
+
+        const report = reportData.report;
+        const endTimeStamp = report.overallstatus.EndTime.split(".")[0];
+        let elapTime = (report.overallstatus.EllapsedTime.split(".")[0]).split(":");
+        report.overallstatus.version = reportData.version;
+        report.overallstatus.domainName = reportData.domainname;
+        report.overallstatus.projectName = reportData.projectname;
+        report.overallstatus.releaseName = reportData.releasename;
+        report.overallstatus.cycleName = reportData.cyclename;
+        report.overallstatus.scenarioName = reportData.testscenarioname;
+        report.overallstatus.reportId = reportData.reportId;
+        report.overallstatus.executionId = reportData.executionid;
+        report.overallstatus.moduleName = reportData.testsuitename;
+        report.overallstatus.browserVersion = report.overallstatus.browserVersion || '-';
+        report.overallstatus.browserType = report.overallstatus.browserType || '-';
+        report.overallstatus.StartTime = formatDate(report.overallstatus.StartTime.split(".")[0]) || '-';
+        report.overallstatus.EndTime = formatDate(endTimeStamp) || '-';
+        report.overallstatus.date = report.overallstatus.EndTime && report.overallstatus.EndTime.split(" ")[0] || '-';
+        report.overallstatus.time = endTimeStamp.split(" ")[1] || '-';
+        report.overallstatus.EllapsedTime = "~" + ("0" + elapTime[0]).slice(-2) + ":" + ("0" + elapTime[1]).slice(-2) + ":" + ("0" + elapTime[2]).slice(-2)
+        report.overallstatus.video = report.overallstatus.video || '-'
+
+        if (embedImages != 'removeReportItems') {
+            report.rows.forEach((row, i) => {
+                row.slno = i + 1;
+                if (row["Step "]) row.Step = row["Step "];
+
+                if (embedImages && row.screenshot_path) {
+                    scrShots.idx.push(i);
+                    scrShots.paths.push(row.screenshot_path);
+                }
+
+                if (row.testcase_details) {
+                    if (typeof (row.testcase_details) == "string" && row.testcase_details != "undefined")
+                        row.testcase_details = JSON.parse(row.testcase_details);
+                } else if (row.testcase_details === "") {
+                    row.testcase_details = {
+                        "actualResult_pass": "",
+                        "actualResult_fail": "",
+                        "testcaseDetails": ""
+                    }
+                }
+                if (row.status == "Pass") pass++;
+                else if (row.status == "Fail") fail++;
+                else if (row.Step && row.Step == "Terminated") terminated++
+                if (row.Remark && row.Remark !== " ") remarksLength.push(row.Remark)
+                if (row.Comments && row.Comments !== " ") commentsLength.push(row.Remark)
+            });
+            const total = pass + fail + terminated;
+            const passPercent = parseFloat(100 * pass / total).toFixed(2);
+            const otherPercent = (100 - passPercent).toFixed(2);
+            const totalRemaining = (fail + terminated) || 1;
+            const failPercent = parseFloat(otherPercent * fail / totalRemaining).toFixed(2);
+            const termPercent = (otherPercent - failPercent).toFixed(2);
+            report.overallstatus.pass = passPercent > 0 ? passPercent : "0.00";
+            report.overallstatus.fail = failPercent > 0 ? failPercent : "0.00";
+            report.overallstatus.terminate = termPercent > 0 ? termPercent : "0.00";
+            report.remarksLength = remarksLength;
+            report.commentsLength = commentsLength;
+        }
+        report["rawHtmlPath"] =  htmlPaths.tc_report_path;
+        report["overallstatus"] =  isViewReport ? report["overallstatus"] : [report["overallstatus"]];
+        report["scrShots"] = scrShots;
+        return report;
+    }
 };
  
 //Connect to Jira
@@ -1196,6 +1731,65 @@ Handlebars.registerHelper('getDataURI', function(uri) {
     else return f + uri;
 });
 
+Handlebars.registerHelper('statusClassName', function(tcStatus) {
+    let statusText = '';
+    switch(tcStatus) {
+        case 'Pass':
+            statusText = 'passed';
+            break;
+        case 'Fail':
+            statusText = 'failed';
+            break;
+        case 'Terminate':
+            statusText = 'terminated';
+            break;
+        default:
+            statusText = '';
+    }
+    return statusText;
+});
+
+Handlebars.registerHelper('ifEquals', function(arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifnotEquals', function(arg1, arg2, options) {
+    return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
+});
+
+// pdfReport 
+Handlebars.registerHelper("getColor", function (overAllStatus) {
+	if (overAllStatus == "Pass") return "#28a745";
+	else if (overAllStatus == "Fail") return "#dc3545";
+	else if (overAllStatus == "Terminate") return "#ffc107";
+});
+
+Handlebars.registerHelper("validateImageID", function (path, slno) {
+	if (path != null) return "#img-" + slno;
+	else return '';
+})
+
+Handlebars.registerHelper("validateImagePath", function (path) {
+	if (path != null) return 'block';
+	else return 'none';
+})
+
+Handlebars.registerHelper("getDataURI", function (uri) {
+	var f = "data:image/PNG;base64,";
+	if (uri == "fail" || uri == "unavailableLocalServer") return f;
+	else return f + uri;
+});
+
+Handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
+	return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
+Handlebars.registerHelper('ifnotEquals', function (arg1, arg2, options) {
+	return (arg1 != arg2) ? options.fn(this) : options.inverse(this);
+});
+
+
+
 fs.readFile('./templates/pdfReport/content.handlebars', 'utf8', function(err, data) {
     templatepdf = Handlebars.compile(data);
 });
@@ -1204,131 +1798,97 @@ fs.readFile('./templates/specificReport/content.handlebars', 'utf8', function(er
     templateweb = Handlebars.compile(data);
 });
 
+// Injecting Data to Reports Html Template.
+const htmlDoc = async (replacementData, rawHtmlPath) => {
+    const rawHtml = fs.readFileSync(`${process.cwd()}${rawHtmlPath}`, 'utf8');
+    return Handlebars.compile(rawHtml)(replacementData);
+};
+const htmlPaths = {
+    executive_report_path: "/assets/html/executive_report.html",
+    summary_report_path: "/assets/html/summary_report.html",
+    detailed_report_path: "/assets/html/detailed_report.html",
+    tc_report_path: "/assets/html/testCaseReport.html",
+};
+
+const getScreenshots = async(replacements, scrShots, username, client) => {
+    try{
+        let webserverURL = "https://"+(process.env.NGINX_URL || "127.0.0.1")+":"+(process.env.NGINX_PORT || "8443")
+        const instance = axios.create({
+            httpsAgent: new https.Agent({  
+                rejectUnauthorized: false,
+                requestCert: true,
+            })
+        });
+        let dataURIs = await instance(webserverURL+'/openScreenShot_API', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                "absPath": scrShots.paths,
+                "username": username,
+                "client": client
+            },
+            credentials: 'include',
+        })
+        if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(dataURIs.data)) {
+            scrShots.paths.forEach((d, i) => replacements.rows[scrShots.idx[i]].screenshot_dataURI = '');
+        } else {
+            dataURIs.data.forEach((d, i) => replacements.rows[scrShots.idx[i]].screenshot_dataURI = d);
+        }
+        return replacements;
+    }
+    catch(err){
+        console.log("ERROR:", err)
+        logger.error("Exception occurred in " + fnName + " when trying to access screenshots: %s", err);
+    }
+}
+
 exports.viewReport = async (req, res, next) => {
     const fnName = "viewReport";
     logger.info("Inside UI function: " + fnName);
-    // const url = req.url.split('/');
-    // let reportName = url[1] || "";
-    // if (reportName.split('.').length == 1) reportName += ".html";
-    // const reportId =  reportName.split('.')[0];
-    // const typeWithQuery = (reportName.split('.')[1] || 'html').toLowerCase().split('?')
-    // const type = typeWithQuery[0];
-    // const embedImages = typeWithQuery[1] == 'images=true';
     const embedImages = req.query.images === 'true';
     const reportId = req.query.reportID;
-    const type = req.query.type;
-    // const nfs = new reportNFS();
-    let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
-    logger.info("Requesting report type - " + type);
-    // if (url.length > 2) {
-    //     return res.redirect('/404');
-    // } 
-    // else if (!req._passport.instance.verifySession(req) && type == 'html') {
-    //     report.error = {
-    //         ecode: "INVALID_SESSION",
-    //         emsg: "Authentication Failed! No Active Sessions found. Please login and try again.",
-    //         status: 401
-    //     }
-    // } else
+    const fileType = req.query.fileType;
+    const exportLevel = req.query.exportLevel;
+    const downloadLevel = req.query.downloadLevel;
+    const executionListId = req.query.executionListId; // required for row-level downloads
+    const isViewReport = req.query.viewReport === "true" ? true : false;
+
+    logger.info("Requesting report type - " + fileType);
     var statusCode = 400;
-    if (!['pdf', 'json'].includes(type)) {
-        report.error = {
+    let replacements = [];
+    let scrShots = [];
+    if (!['pdf', 'json'].includes(fileType)) {
+        return res.status(statusCode).send({
             ecode: "BAD_REQUEST",
             emsg: "Requested Report Type is not Available",
             status: 400
-        }
-        return res.status(statusCode).send(report.error);
-    } 
-    else {
-        const inputs = { reportid: reportId };
-        const reportData = await utils.fetchData(inputs, "reports/getReport", fnName);
-        if (reportData == "fail") {
-            report.error = {
-                ecode: "SERVER_ERROR",
-                emsg: "Error while loading Report due to an internal error. Try again later!",
-                status: 500
-            }
-            return res.status(statusCode).send(report.error);
-        } else if (reportData.length == 0) {
-            report.error = {
-                ecode: "NOT_FOUND",
-                emsg: "Requested Report is not Available!",
-                status: 404
-            }
-            return res.status(statusCode).send(report.error);
-        } else {
-            reportData.reportId = reportId;
-            const newData = prepareReportData(reportData, embedImages);
-            var scrShots = newData.scrShots;
-            report = newData.report;
-        }
+        });
     }
-    if (type == "json") {
-        statusCode = report.error && report.error.status || 200;
+    // generate Report Data
+    replacements = await prepareExecutionReportData(exportLevel, downloadLevel, executionListId, reportId, embedImages, isViewReport);
+    scrShots = replacements.scrShots ? replacements.scrShots : [];
+    // if filetype is json
+    if (fileType == "json") {
         res.setHeader("Content-Type", "application/json");
-        return res.status(statusCode).send(JSON.stringify(report, null, 2));
-    } else if (type == "pdf") {
-        if (report.error) {
-            res.setHeader("X-Render-Error", report.error.emsg);
-            return res.status(report.error.status || 200).send(report.error);
-        }
+        return res.status(200).send(JSON.stringify(replacements, null, 2));
+    } else if (fileType == "pdf") {
         res.setHeader("Content-Type", "application/pdf");
-        report.overallstatus = [report.overallstatus]
-        report.remarksLength = report.remarksLength.length;
-        report.commentsLength = report.commentsLength.length;
-
-        if (scrShots && scrShots.paths.length > 0) {
-            // for (let i=0; i < scrShots.idx.length; i++) {
-            //     let image = 'fail';
-            //     let scrIndex = scrShots.idx[i];
-            //     if (nfs && scrShots.paths[i]!=="9cc33d6fe25973868b30f4439f09901a") {
-            //         try{
-            //             let respData = await nfs.getSSObject('screenshots', `${scrShots.paths[i]}`);
-            //             if (!respData.error) image=respData;
-            //         }
-            //         catch(e){
-            //             console.error("Failed to Fetch Image!")
-            //         }
-            //     }
-            // }
-            // report.rows[scrIndex].screenshot_dataURI = image;
-            let webserverURL = "https://"+(process.env.NGINX_URL || "127.0.0.1")+":"+(process.env.NGINX_PORT || "8443")
-            try{
-                const instance = axios.create({
-                    httpsAgent: new https.Agent({  
-                        rejectUnauthorized: false,
-                        requestCert: true,
-                    })
-                });
-                let dataURIs = await instance(webserverURL+'/openScreenShot_API', {
-                    method: 'POST',
-                    headers: {
-                        'Content-type': 'application/json',
-                    },
-                    data: {
-                        "absPath": scrShots.paths,
-                        "username": req.session.username,
-                        "client": req.session.client
-                    },
-                    credentials: 'include',
-                })
-                if (["fail", "unavailableLocalServer", "scheduleModeOn"].includes(dataURIs.data)) {
-                    scrShots.paths.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = '');
-                } else {
-                    dataURIs.data.forEach((d, i) => report.rows[scrShots.idx[i]].screenshot_dataURI = d);
-                }
-            }
-            catch(err){
-                console.log("ERROR:", err)
-                logger.error("Exception occurred in " + fnName + " when trying to access screenshots: %s", err);
-            }
+        if (scrShots && scrShots.paths && scrShots.paths.length > 0) {
+            replacements = await getScreenshots(replacements, scrShots, req.session.username, req.session.client)
         }
         try {
+            let rawHtmlPath = replacements.rawHtmlPath;
+            // inject data to raw html using handlebars
+            const dataInjectedHtml = await htmlDoc(replacements, rawHtmlPath);
+            // create pdf
             const pdf = new Readable({read: ()=>{}});
-            pdf.push(templatepdf(report));
+            pdf.push(dataInjectedHtml);
             pdf.push(null);
             wkhtmltopdf(pdf).pipe(res);
         } catch (exception) {
+            let report = { overallstatus: [{}], rows: [], remarksLength: 0, commentsLength: 0 };
             report.error = {
                 ecode: "SERVER_ERROR",
                 emsg: "Error while generating report due to an internal error. Try again later!",
@@ -1575,8 +2135,112 @@ exports.getall_uploadfiles = async (req, res) => {
         logger.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+  };
 
-}
+
+
+  
+  exports.teststepLevel_ExecutionStatus = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.executionid ) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "teststep_execution_analysis",
+            "executionid": req.body.executionid
+        };
+        const result = await utils.fetchData(inputs, "/teststepLevel_ExecutionStatus", " teststep_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("testcase fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  exports.defect_analysis = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.projectid || !req.body.userid ) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_defect_execution_analysis",
+            "projectid": req.body.projectid,
+            "userid": req.body.userid,
+            // "allflag":req.body.allflag,
+            "start_time": req.body.start_time || '',
+            "end_time": req.body.end_time || ''
+        };
+        const result = await utils.fetchData(inputs, "/defect_analysis", " api_defect_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("defects fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], 
+            start_time:result && result[0].start_time ? result[0].start_time:'' ,
+            end_time:result && result[0].end_time ? result[0].end_time:'',
+            message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+  exports.rasa_prompt_model = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+        var inputs = {
+            "projectid": req.body.projectid,
+            "sender": req.body.sender,//"64e86e9f94d8d4c4811f1a9c",69a42e17-d4b1-41a7-8c4b-5ac69a7dcfad
+            "roleid": req.body.roleid, // 5db0022cf87fdec084ae49aa (Lead), 5db0022cf87fdec084ae49ab (Manager)
+            "message": req.body.message,
+            "metadata": {
+                "profileid": req.body.profileid || "",
+                "moduleid": req.body.moduleId || "",
+                "scenarioid": req.body.scenarioId || ""
+            },
+            "host": req.headers.host
+        }
+
+        
+        const result = await utils.fetchData(inputs, "/rasa_prompt_model","",true);
+
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result.status).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("defects fetched successfully");
+        res.status(200).send({ 
+            data:JSON.parse(result[0].rows) || []
+         });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
 exports.getJiraJSON_ICE = function (req, res) {
     logger.info("Inside UI service: getJiraJSON_ICE");
     try {
@@ -1683,5 +2347,67 @@ exports.getGenarate_testcase = async (req, res) => {
     } catch (exception) {
         logger.error("Error occurred in "+fnName+". Error: " + exception.message);
         res.status(500).send("fail");
+    }
+}
+
+exports.moduleLevel_ExecutionStatus = async function (req, res) {
+
+    logger.info("Inside report analysis module service ");
+    try {
+         if ( !req.body.execlistid || !req.body.start_time || !req.body.end_time) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_modulelevel_execution_analysis",
+            "execlistid": req.body.execlistid,
+            "start_time": req.body.start_time,
+            "end_time": req.body.end_time
+        };
+        const result = await utils.fetchData(inputs, "/moduleLevel_ExecutionStatus", "api_modulelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("modules fetched successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [], message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+  exports.reportAnalysis = async (req, res) => {
+    logger.info("Inside report analysis service ");
+    try {
+         if ( !req.body.projectid || !req.body.userid) {
+            return res.status(400).json({ error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "query": "api_profilelevel_execution_analysis",
+            "projectid": req.body.projectid,
+            "userid": req.body.userid,
+            "start_time": req.body.start_time || '',
+            "end_time": req.body.end_time || ''
+        };
+        const result = await utils.fetchData(inputs, "/profileLevel_ExecutionStatus", "api_profilelevel_execution_analysis", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("testcases generated successfully");
+        res.status(200).send({ success: true, data: result && result[0].data && result[0].data.length  ? result[0].data: [],
+            start_time:result && result[0].start_time ? result[0].start_time:'' ,
+            end_time:result && result[0].end_time ? result[0].end_time:'', message: 'data found' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 }

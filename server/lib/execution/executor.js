@@ -76,18 +76,28 @@ class TestSuiteExecutor {
                 "testscenarioid": scenarioid,
                 "userid":userid
             };
+            
             const integ = integrationType[k];
             if (integ == 'qTest') inputs.query = "qtestdetails";
             else if (integ == 'ALM') inputs.query = "qcdetails";
             else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
             else if (integ == 'Azure') inputs.query = "azuredetails";
+            else if (integ == 'Testrail') inputs.query = "TestrailDetails"
+            
             if (inputs.query) {
                 const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+                
                 if (integ == 'ALM' && Array.isArray(qcdetails)) {
                     for (let i = 0; i < qcdetails.length; ++i) {
                         if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
                     }
                     if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList);
+                } else if (integ == 'Testrail' && Array.isArray(qcdetails) ){
+                    for (let i = 0; i < qcdetails.length; ++i) {
+                        if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+                    }
+                    if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList)
+
                 } else {
                     if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails.push(JSON.parse(JSON.stringify(qcdetails[0])));
                 }
@@ -188,6 +198,7 @@ class TestSuiteExecutor {
             for (const tsco of suiteDetails) {
                 var integrationType = [];
                 var dtparam = [];
+
                 if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
@@ -199,6 +210,9 @@ class TestSuiteExecutor {
                 }
                 if (batchData.integration && batchData.integration.azure && batchData.integration.azure.url) {
                    integrationType.push("Azure");
+                }
+                if (batchData.integration && batchData.integration.testrail && batchData.integration.testrail.url  && batchData.integration.testrail.apitoken)  {
+                    integrationType.push("Testrail");
                 }
                 if (tsco.dataparam != "") {
                     var dt = tsco.dataparam[0].split(';')[0].split('/');
@@ -318,7 +332,7 @@ class TestSuiteExecutor {
                 }
                 suite.reportData.push(reportItem);
             };
-            notifications.notify("report", { ...suite, user: userInfo, status, suiteStatus: "fail" });
+            notifications.notify("report", { ...suite, user: userInfo, status, suiteStatus: "fail", hostName: userInfo.host});
         }
         await this.updateExecutionStatus(executionIds, { status: "fail" });
     };
@@ -335,7 +349,7 @@ class TestSuiteExecutor {
         const scenarioFlag = execReq.scenarioFlag;
         const channel = "normal";
         var reportType = "accessiblityTestingOnly";
-        
+        execReq.execType = execType;
         const dataToIce = { "emitAction": "executeTestSuite", "username": icename, "executionRequest": execReq };
         if(execReq['executingOn'] && execReq['executingOn'] =='Agent'){
             // const status = await utils.fetchData(dataToIce, "devops/executionList", fnName);
@@ -345,8 +359,10 @@ class TestSuiteExecutor {
         }
         else{
             var socket = require('../socket');
+            const socketUtils = require("../socketUtils.js")
             var mySocket;
             var clientName=utils.getClientName(host);
+            execReq.userInfo = userInfo;
             mySocket = socket.allSocketsMap[clientName][icename];	
             logger.info("Sending request to ICE for executeTestSuite");
             mySocket.emit("executeTestSuite", execReq);
@@ -385,10 +401,16 @@ class TestSuiteExecutor {
                     } else if (status === "finished") {
                         const testsuiteIndex = execReq.testsuiteIds.indexOf(resultData.testsuiteId);
                         const testsuite = execReq.suitedetails[testsuiteIndex];
+                        const reportData = socketUtils.getExecInfo();
+                        execReq.suitedetails[testsuiteIndex].reportData = reportData;
                         const exeStatus = resultData.executionStatus ? "pass" : "fail";
                         await _this.updateExecutionStatus([executionid], { endtime: resultData.endTime, status: exeStatus });
-                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1)
-                            notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
+                        if (testsuiteIndex === execReq.testsuiteIds.length - 1) {
+                            if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
+                        }
+                        if (reportType != "accessiblityTestingOnly" && testsuiteIndex === execReq.testsuiteIds.length - 1) {
+                            notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, profileName: execReq.configurename || execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType, hostName: host });
+                        }
                     }
                 });
                 mySocket.on("result_executeTestSuite", async (message)=>{
@@ -398,82 +420,14 @@ class TestSuiteExecutor {
                     const batchId = (resultData) ? resultData.batchId : "";
                     const executionid = (resultData) ? resultData.executionId : "";
                     const status = resultData.status;
-                        if (!status) { // This block is for report data
-                            if ("accessibility_reports" in resultData) {
-                                const accessibility_reports = resultData.accessibility_reports
-                                reports.saveAccessibilityReports(accessibility_reports);
-                            }
-                            if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
-                            const scenarioid = resultData.scenarioId;
-                            const testsuiteid = resultData.testsuiteId;
-                            const testsuiteIndex = execReq.testsuiteIds.indexOf(testsuiteid);
-                            const testsuite = execReq.suitedetails[testsuiteIndex];
-                            const scenarioIndex = testsuite.scenarioIds.indexOf(scenarioid);
-                            const scenarioname = testsuite.scenarioNames[scenarioIndex];
-                            if (!testsuite.reportData) testsuite.reportData = [];//Array.from({length: testsuite.scenarioIds.length}, () => {});
-                            try {
-                                const reportData = JSON.parse(JSON.stringify(resultData.reportData).replace(/'/g, "''"));
-                                if (execType == "API") {
-                                    if (d2R[testsuiteid] === undefined) d2R[testsuiteid] = { "testsuiteName": testsuite.testsuitename, "testsuiteId": testsuiteid, "scenarios": {} };
-                                    if (d2R[testsuiteid].scenarios[scenarioid] === undefined) d2R[testsuiteid].scenarios[scenarioid] = [];
-                                    d2R[testsuiteid].scenarios[scenarioid].push({ scenarioname, scenarioid, "overallstatus": "Not Executed" });
-                                }
-                                if (Object.keys(reportData.overallstatus).length !== 0) {
-                                    const appTypes = ["OEBS", "MobileApp", "System", "Webservice", "Mainframe", "SAP", "Desktop"];
-                                    const browserType = (appTypes.indexOf(execReq.apptype) > -1) ? execReq.apptype : reportData.overallstatus.browserType;
-                                    reportData.overallstatus.browserType = browserType;
-                                    if (execType == "API") {
-                                        const cidx = d2R[testsuiteid].scenarios[scenarioid].length - 1;
-                                        d2R[testsuiteid].scenarios[scenarioid][cidx] = { ...d2R[testsuiteid].scenarios[scenarioid][cidx], ...reportData.overallstatus };
-                                    }
-                                    const reportStatus = reportData.overallstatus.overallstatus;
-                                    const reportid = await _this.insertReport(executionid, scenarioid, browserType, userInfo, reportData);
-                                    const reportItem = { reportid, scenarioname, status: reportStatus, terminated: reportData.overallstatus.terminatedBy, timeEllapsed: reportData.overallstatus.EllapsedTime };
-                                    if (reportid == "fail") {
-                                        logger.error("Failed to insert report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-                                        reportItem[reportid] = '';
-                                    } else {
-                                        logger.info("Successfully inserted report data");
-                                        logger.debug("Successfully inserted report data for scenario (id: " + scenarioid + ") with executionid " + executionid);
-                                    }
-                                    // testsuite.reportData[scenarioIndex] = reportItem;
-                                    testsuite.reportData.push(reportItem);
-                                }
-                            } catch (ex) {
-                                logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-                                if (reportType != "accessiblityTestingOnly") notifications.notify("report", { testsuite: execReq.suitedetails, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, profileName: execReq.profileName, recieverEmailAddress: execReq.recieverEmailAddress, executionType: execType });
-                                await this.updateExecutionStatus([executionid], { status: "fail" });
-                            }
-                        } else { // This block will trigger when resultData.status has "success or "Terminate"
-                            try {
-                                let result = status;
-                                let report_result = {};
-                                mySocket.removeAllListeners('return_status_executeTestSuite');
-                                mySocket.removeAllListeners('result_executeTestSuite');
-                                report_result["status"] = status
-                                report_result["configurekey"] = execReq["configurekey"]
-                                report_result["configurename"] = execReq["configurename"]
-                                if (reportType == 'accessiblityTestingOnly' && status == 'success') report_result["status"] = 'accessibilityTestingSuccess';
-                                if (reportType == 'accessiblityTestingOnly' && status == 'Terminate') report_result["status"] = 'accessibilityTestingTerminate';
-                                report_result["testSuiteDetails"] = execReq["suitedetails"]
-                                if (resultData.userTerminated) result = "UserTerminate";
-                                if (execType == "API") result = [d2R, status, resultData.testStatus];
-                                if (resSent && notifySocMap[invokinguser] && notifySocMap[invokinguser].connected) { // This block is only for active mode
-                                    notifySocMap[invokinguser].emit("result_ExecutionDataInfo", report_result);
-                                    rsv(constants.DO_NOT_PROCESS);
-                                } else if (resSent) {
-                                    queue.Execution_Queue.add_pending_notification("", report_result, username);
-                                    rsv(constants.DO_NOT_PROCESS);
-                                } else {
-                                    rsv(result);
-                                }
-                            } catch (ex) {
-                                logger.error("Exception while returning execution status from function " + fnName + ": %s", ex);
-                                rej("fail");
-                            }
-                        }
-                        
+                    const iceExecReq=resultData.execReq;
+                    if (!status) {
+                        if (resultData.report_type != "accessiblityTestingOnly") reportType = "functionalTesting";
+                    }
+                    if(!iceExecReq || mySocket.listenerCount("result_executeTestSuite") == 1) socketUtils.result_executeTestSuite(resultData,execReq,execType,userInfo,invokinguser,this.insertReport,notifySocMap,resSent,mySocket);
                 });
+            
+            
             }));
 
             const notifySocMap = socket.socketMapNotify[clientName];
@@ -560,6 +514,7 @@ class TestSuiteExecutor {
             'userid':'267ad96f374e4b06344f039c',
             'username':dataFromIce.exce_data.agentname,
         }
+        userInfo.host = dataFromIce.hostName;
         logger.info("Inside " + fnName + " function");
         const username = userInfo.username;
         const invokinguser = userInfo.invokingusername;
@@ -620,7 +575,7 @@ class TestSuiteExecutor {
                 await _this.updateExecutionStatus([executionid], { endtime: data.endTime, status: exeStatus });
                 if (execType == "SCHEDULE") await scheduler.updateScheduleStatus(execReq.scheduleId, "Completed", batchId);
                 if (reportType != "accessiblityTestingOnly")
-                    notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag});
+                    notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: exeStatus, scenarioFlag: scenarioFlag, hostName: dataFromIce.hostName});
             }
         } else if (event == "result_executeTestSuite") {
             if (!status) { // This block is for report data
@@ -666,7 +621,7 @@ class TestSuiteExecutor {
                     }
                 } catch (ex) {
                     logger.error("Exception in the function " + fnName + ": insertreportquery: %s", ex);
-                    if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag});
+                    if (reportType != "accessiblityTestingOnly") notifications.notify("report", { ...testsuite, user: userInfo, status, suiteStatus: "fail", scenarioFlag: scenarioFlag, hostName: dataFromIce.hostName});
                     await this.updateExecutionStatus([executionid], { status: "fail" });
                 }
             } else { // This block will trigger when resultData.status has "success or "Terminate"
@@ -719,3 +674,8 @@ module.exports.setExecStatus = async (dataFromIce) => {
     }
     return await testSuiteExecutor.setExecStatus(dataFromIce);
 };
+
+if (!testSuiteExecutor){
+    testSuiteExecutor =  new TestSuiteExecutor();
+}
+module.exports.insertReport= testSuiteExecutor.insertReport;

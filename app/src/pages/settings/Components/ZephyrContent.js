@@ -77,7 +77,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const [releaseArr, setReleaseArr] = useState([]);
     const [importReleaseArr, setImportReleaseArr] = useState([]);
     const [avoProjects , setAvoProjects]= useState(null);
-    const [selectedRel, setSelectedRel] = useState("Select Release");
+    const [selectedRel, setSelectedRel] = useState("Select Repo/Release");
     const [importSelectedRel, setImportSelectedRel] = useState("Select Release");
     const [testCases, setTestCases] = useState([]);
     const [modules, setModules] = useState([]);
@@ -151,6 +151,18 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
             ],
         },
     ]);
+
+    const [repoTypes, setRepoType] = useState([
+        {
+            id: 1,
+            name: "Project Repository"
+        },
+        {
+            id: 2,
+            name: "Release"
+        }
+    ])
+    const [selectedRepoType, setSelectedRepoType] = useState("Select Type");
 
     useEffect(() => {
         setMultipleSelected(false);
@@ -256,7 +268,8 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                     testid: selectedZphyrTCIds,
                     testname: selectedZphyrTCNames,
                     reqdetails: selectedZphyrTCReqs, 
-                    scenarioId: checkedScnIds
+                    scenarioId: checkedScnIds,
+                    selectionType: selectedRepoType.name
             }
             ];
             dispatchAction(mappedPair(mappedPairObj));
@@ -315,14 +328,17 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const handleUnSync = async (node,parentNode) => {
         let unSyncObj = [];
         if (Object.keys(node).length) {
-            let findMappedId = rows.filter((item) => item.scenarioId.includes(parentNode.props.parent.key)).filter((item) => item.testid.includes(node.key))
+                        let findMappedId = rows.filter((item) => item.scenarioId.includes(parentNode.props.parent.key)).filter((item) => item.testid.includes(node.key))
             // let findMappedId = findScnArray.filter((item) => item.testid.includes(node.key))
             if (findMappedId && findMappedId.length) {
                 unSyncObj.push({
                     'mapid': findMappedId[0].mapId,
-                    'testCaseNames': [].concat(node.label),
-                    'testid': [].concat(node.key)
+                    [parentNode.props.parent.children &&  parentNode.props.parent.children.length === 1 ? "testscenarioid" : 'testCaseNames']: parentNode.props.parent.children &&  parentNode.props.parent.children.length === 1 ? [].concat(parentNode.props.parent.key) : [].concat(node.label),
+                    // 'testid': [].concat(node.key)
                 })
+                if(parentNode.props.parent.children &&  parentNode.props.parent.children.length > 1){
+                    unSyncObj[0].testid = [].concat(node.key) || []
+                }
                 let args = Object.values(unSyncObj);
                 args['screenType'] = 'Zephyr'
                 const saveUnsync = await api.saveUnsyncDetails(args);
@@ -348,7 +364,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
 
             }
             const removeTestCase = completeTreeData.map((scenario) => {
-                if (scenario.children && scenario.children.length > 0) {
+                if (scenario.key === parentNode.props.parent.key && scenario.children && scenario.children.length > 0) {
                     const filteredChildren = scenario.children.filter((child) => child.key !== node.key);
                     return {
                         ...scenario,
@@ -372,29 +388,36 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
         }
     }
 
-    const handleUnSyncmappedData = async(items, testname)=>{
+    const handleUnSyncmappedData = async(items, testname,currentTestId,currentScnId)=>{
         let unSyncObj = [];
+        let scnLength = items.scenarioId.length || 0;
+        let testcaseLen = items.testid.length || 0;
         if (Object.keys(items).length) {
-            let filteredItem=rows.filter((item) => {return item.scenarioId.some((scenarioId) => item.scenarioId.includes(scenarioId));})
-            // item.scenarioId.includes(items.scenarioId))
-            let newfilter=filteredItem.filter((item) => item.testCaseNames.includes(testname))
-            let unsyncedTestcaseName;
-            let unsyncedTestId;
-            for(let singleFilteredItem of newfilter) {
-                for(let singleTestCaseIndex in singleFilteredItem.testCaseNames) {
-                    if(singleFilteredItem.testCaseNames[singleTestCaseIndex] === testname) {
-                        unsyncedTestcaseName = singleFilteredItem.testCaseNames[singleTestCaseIndex];
-                        unsyncedTestId = singleFilteredItem.testid[singleTestCaseIndex];
-                    }
-                }
-            }
-            // let findMappedId = findScnArray.filter((item) => item.testid.includes(node.key))
-            if (newfilter && newfilter.length) {
+            // let filteredItem=rows.filter((item) => {return item.scenarioId.some((scenarioId) => item.scenarioId.includes(scenarioId));})
+            // // item.scenarioId.includes(items.scenarioId))
+            // let newfilter=filteredItem.filter((item) => item.testCaseNames.includes(testname))
+            // let unsyncedTestcaseName;
+            // let unsyncedTestId;
+            // for(let singleFilteredItem of newfilter) {
+            //     for(let singleTestCaseIndex in singleFilteredItem.testCaseNames) {
+            //         if(singleFilteredItem.testCaseNames[singleTestCaseIndex] === testname) {
+            //             unsyncedTestcaseName = singleFilteredItem.testCaseNames[singleTestCaseIndex];
+            //             unsyncedTestId = singleFilteredItem.testid[singleTestCaseIndex];
+            //         }
+            //     }
+            // }
+            let findMappedObj = rows.filter((eachObj) => eachObj.scenarioId.includes(currentScnId) && eachObj.testid.includes(currentTestId))
+            if (findMappedObj && findMappedObj.length) {
                 unSyncObj.push({
-                    'mapid': newfilter[0].mapId,
-                    'testCaseNames': [unsyncedTestcaseName],
-                    'testid': [unsyncedTestId]
+                    'mapid': findMappedObj[0].mapId
                 })
+                    if(scnLength === 1 && testcaseLen > 1){
+                        unSyncObj[0].testCaseNames = [].concat(testname);
+                        unSyncObj[0].testid = [].concat(currentTestId);
+                    }
+                    else if((scnLength > 1 && testcaseLen === 1) || (scnLength === 1 && testcaseLen === 1)){
+                        unSyncObj[0].testscenarioid = [].concat(currentScnId);
+                    }
                 let args = Object.values(unSyncObj);
                 args['screenType'] = 'Zephyr'
                 const saveUnsync = await api.saveUnsyncDetails(args);
@@ -417,11 +440,11 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                     // callViewMappedFiles()
                     setToast("success", "Success", 'Unsynced');
                 }
-
+                callViewMappedFiles();
             }
             const removeTestCase = completeTreeData.map((scenario) => {
                 if (scenario.children && scenario.children.length > 0) {
-                    const filteredChildren = scenario.children.filter((child) => child.key !== unsyncedTestId);
+                    const filteredChildren = scenario.children.filter((child) => child.key !== currentTestId);
                     return {
                         ...scenario,
                         children: filteredChildren
@@ -434,15 +457,15 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
 
             // let unsyncMap = treeData.map((item) => item.key == node.key ? { ...item, checked: false, children: [] } : item);
             // console.log(unsyncMap, 'its unsyncMap');
-            let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== unsyncedTestId);
+            let unsyncMappedData = mappedData.filter((item) => item.scenarioId !== currentTestId);
             setTreeData(removeTestCase.slice(indexOfFirstScenario, indexOfFirstScenario+scenariosPerPage));
-            // let filteredRows=rows.filter(element=>element.testid.some((testids) =>testids===unsyncedTestId))
+            // let filteredRows=rows.filter(element=>element.testid.some((testids) =>testids===currentTestId))
             let filteredRows=[];
             for(let singleRow of rows) {
                 const testCaseIdData = [];
                 const testCaseNamesData = [];
                 for(let testidIdx in singleRow.testid) {
-                    if(singleRow.testid[testidIdx] !== unsyncedTestId) {
+                    if(singleRow.testid[testidIdx] !== currentTestId) {
                         testCaseIdData.push(singleRow.testid[testidIdx]);
                         testCaseNamesData.push(singleRow.testCaseNames[testidIdx]);
                     }
@@ -614,7 +637,38 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     // };
     const handleProject= async(e)=>{
         const projectId = e.target.value;
-        const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        setSelectZephyrProject(projectId);
+        // const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        // if (releaseData.error)
+        //     setToast('error','Error',releaseData.error);
+        // else if (releaseData === "unavailableLocalServer")
+        //     setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        // else if (releaseData === "scheduleModeOn")
+        //     setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        // else if (releaseData === "Invalid Session"){
+        //     setToast('error','Error','Invalid Session');
+        // }
+        // else if (releaseData === "invalidcredentials")
+        //     setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
+        // else if (releaseData) {
+        //     setProjectDetails([]);
+        //     setReleaseArr(releaseData);
+        //     setSelectZephyrProject(projectId);
+        //     getProjectScenarios();
+        //     // setSelectedRel("Select Release");
+        //     // clearSelections();
+        // }
+    }
+
+    const handleType = async (e) => {
+        const repoType = e.value;
+        let releaseData = ""
+        if (repoType.name == "Release") {
+            releaseData = await api.zephyrProjectDetails_ICE(selectZephyrProject.id, '6440e7b258c24227f829f2a4');
+        }
+        else {
+            releaseData = await api.zephyrRepoDetails_ICE(selectZephyrProject.id, '6440e7b258c24227f829f2a4');
+        }
         if (releaseData.error)
             setToast('error','Error',releaseData.error);
         else if (releaseData === "unavailableLocalServer")
@@ -627,12 +681,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
         else if (releaseData === "invalidcredentials")
             setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
         else if (releaseData) {
-            setProjectDetails([]);
+            setSelectedRepoType(repoType);
             setReleaseArr(releaseData);
-            setSelectZephyrProject(projectId);
             getProjectScenarios();
-            // setSelectedRel("Select Release");
-            // clearSelections();
         }
     }
 
@@ -662,7 +713,13 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
 
     const onReleaseSelect = async(event) => {
         const releaseId = event.target.value;
-        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        let testAndScenarioData = ""
+        if (selectedRepoType.name == "Release") {
+            testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        }
+        else {
+            testAndScenarioData = await api.zephyrModuleUnderRepo_ICE({repoId: releaseId.id, projectId: selectZephyrProject.id}, '6440e7b258c24227f829f2a4');
+        }
         if (testAndScenarioData.error)
              setToast('error','Error',testAndScenarioData.error);
         else if (testAndScenarioData === "unavailableLocalServer")
@@ -1092,8 +1149,14 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const handleNodeToggle = async (nodeobj) => {
         if(Object.keys(nodeobj).length && nodeobj.node && !isNaN(parseInt(nodeobj.node.key))){
             setEnableBounce(true);
-            const data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
-        if (data.error)
+            let data = ""
+            if (selectedRepoType.name == "Release") {
+                data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
+            }
+            else {
+                data = await api.zephyrRepoTestcaseDetails_ICE("repotestcase", nodeobj.node.key);
+            }
+            if (data.error)
                 setToast('error','Error',data.error);
             else if (data === "unavailableLocalServer")
                 setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
@@ -1274,25 +1337,28 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                             <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                 <TabPanel header="Mapping">
                                     <div className="zephyr__mapping">
-                                        <div className="card_zephyr1">
+                                        {/* <div className="card_zephyr1"> */}
                                             <Card className="mapping_zephyr_card1">
-                                                {enableBounce && <div className="bouncing-loader">
+                                                {/* {enableBounce && <div className="bouncing-loader">
                                                     <div></div>
                                                     <div></div>
                                                     <div></div>
-                                                </div>}
+                                                </div>} */}
                                                 
                                                 <div className="dropdown_div1">
                                                     <div className="dropdown-zephyr1">
                                                         <span>Select Project <span style={{ color: 'red' }}>*</span></span>
-                                                        <span className="release_span"> Select Release<span style={{ color: 'red' }}>*</span></span>
+                                                        <span className="type_span"> Select Type<span style={{ color: 'red' }}>*</span></span>
+                                                        <span className="release_span"> Select Repo/Release<span style={{ color: 'red' }}>*</span></span>
                                                     </div>
                                                     <div className="dropdown-zephyr2">
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrProject} className="dropdown_project" options={zephyrProj} onChange={(e) => setSelectZephyrProject(e)} placeholder="Select Project" /> */}
                                                         <Dropdown value={selectZephyrProject} onChange={(e) => handleProject(e)} options={domainDetails} optionLabel="name"
                                                             placeholder="Select Project" className="project_dropdown" />
+                                                        <Dropdown value={selectedRepoType} onChange={(e) => handleType(e)} options={repoTypes} optionLabel="name"
+                                                            placeholder="Select Type" className="type_dropdown" />
                                                         <Dropdown value={selectedRel} onChange={(e) => onReleaseSelect(e)} options={releaseArr} optionLabel="name"
-                                                            placeholder="Select Release" className="release_dropdown" />
+                                                            placeholder="Select Repo/Release" className="release_dropdown" />
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrRelease} className="dropdown_release" options={zephyrRelease} onChange={(e) => setSelectZephyrRelease(e)} placeholder="Select Release" /> */}
                                                     </div>
 
@@ -1307,7 +1373,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                         onExpand={handleNodeToggle}
 
                                                     />
-                                                 <div className="jira__paginator">
+                                                 <div className="jira__paginator__zephyr">
                                                 <Paginator
                                                     first={currentZepPage - 1}
                                                     rows={itemsPerPage}
@@ -1318,10 +1384,10 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                 </div>
                                                 </div>)}
                                             </Card>
-                                        </div>
+                                        {/* </div> */}
 
-                                        <div>
-                                            <div className="card_zephyr2">
+                                        {/* <div> */}
+                                            {/* <div className="card_zephyr2"> */}
                                                 <Card className="mapping_zephyr_card2">
                                                     <div className="dropdown_div1">
                                                         <div className="dropdown-zephyr">
@@ -1336,7 +1402,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                         <div className="avotest__zephyr">
                                                             <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                         </div>
-                                                        <div className="testcase__AVO__jira__paginator">
+                                                        <div className="testcase__AVO__jira__paginator__zephyr">
 
                                                         <Paginator
                                                             first={indexOfFirstScenario}
@@ -1347,11 +1413,11 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                     </div>
                                                     </div>
                                                 </Card>
-                                            </div>
-                                        </div>
-                                        <span>
+                                            {/* </div> */}
+                                        {/* </div> */}
+                                        <span className="map__btn__zephyr">
                                             {/* <img className="map__btn__zephyr" src="static/imgs/map_button_icon.svg" /> */}
-                                            <Button className="map__btn__zephyr" label='Map' severity='primary' size='small' onClick={()=>handleSync()}></Button>
+                                            <Button  label='Map' size='small' onClick={()=>handleSync()}></Button>
                                         </span>
                                     </div>
 
@@ -1375,7 +1441,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                             {item.testCaseNames.map((testCaseName, index) => (
                                                                 <div className='accordion__tab__expand'>
                                                                 <span key={index}>{testCaseName}</span>
-                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName,item.testid[index],item.scenarioId[scenarioIndex])}/>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -1396,7 +1462,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                                     {item.scenarioNames.map((scenarioName, scenarioIndex) => (
                                                                         <div className='accordion__tab__expand'>
                                                                         <span key={scenarioIndex}>{scenarioName} </span>
-                                                                        <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName)}/>
+                                                                        <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, testCaseName,item.testid[index],item.scenarioId[scenarioIndex])}/>
                                                                         </div>
                                                                     ))}
                                                                 </div>

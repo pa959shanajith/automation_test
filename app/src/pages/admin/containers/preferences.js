@@ -20,16 +20,18 @@ const Privileges = () => {
 
 
       const CustomCellRenderer = (rowData, column) => {
-        const isTrue = (rowData[column.field] === 'true');
+        const isTrue = (rowData[column.field]);
         
         return (
-            <span>
-              {isTrue ? (
-                <i className="pi pi-check" style={{ color: 'green' }}></i>
-              ) : (
-                <i className="pi pi-times" style={{ color: 'red' }}></i>
-              )}
-            </span>
+          <span>
+          {isTrue=== 'true' ? (
+            <i className="pi pi-check" style={{ color: 'green' }}></i>
+          ) : isTrue === 'false' ? (
+            <i className="pi pi-times" style={{ color: 'red' }}></i>
+          ) : (
+           null
+          )}
+        </span>
           );
       };
 
@@ -43,8 +45,11 @@ const Privileges = () => {
                         sortMode="single" 
                         sortField="area.name" 
                         sortOrder={1} 
-                        tableStyle={{ width: '69rem', padding:'1rem' }}
-                        showGridlines>
+                        tableStyle={{ width: '69rem', paddingLeft:'1rem' }}
+                        showGridlines
+                        scrollable
+                        scrollHeight="35rem"
+                        >
                 <Column field="area.name" header="Area"></Column>
                 <Column field="features" header="Features"></Column>
                 <Column field="admin" header="Admin" body={CustomCellRenderer}></Column>

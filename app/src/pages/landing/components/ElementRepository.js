@@ -15,12 +15,14 @@ import * as scrapeApi from '../../design/api';
 import { v4 as uuid } from 'uuid';
 import { insertScreen } from '../../design/api';
 import { Tag } from 'primereact/tag';
-import { ScreenOverlay } from '../../global';
+import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
-
+import { useNavigate } from 'react-router-dom';
+import { Tooltip } from 'primereact/tooltip';
 
 const ElementRepository = (props) => {
+  const history = useNavigate();
   const [copiedRow, setCopiedRow] = useState(null);
   const contextMenuRef = useRef(null);
   const [contextMenuModel, setContextMenuModel] = useState([]);
@@ -59,6 +61,10 @@ const ElementRepository = (props) => {
   const refreshRepository = useSelector((state) => state.landing.updateElementRepository);
   const [updatePastedData, setUpdatPastedData] = useState(false);
   const [updateDeleteCurrentElements, setUpdateDeleteCurrentElements] = useState(false);
+  const [deleteScreens, setDeleteScreens] = useState(false);
+  const [overlay, setOverlay] = useState(null);
+  const [screenRename,setScreenRename] =  useState("");
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -75,6 +81,7 @@ const ElementRepository = (props) => {
               projectId :  defaultselectedProject.projectId
             }
 
+            setOverlay("Fetching Repository Details...")
             const screens = await getScreens(params);
             if(screens === 'fail') {
               setScreenData([]);
@@ -82,8 +89,14 @@ const ElementRepository = (props) => {
             else if(screens === "no orderlist present") {
               setScreenData([]);
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
-            else setScreenData(screens.screenList);
+            else if(screens === "invalid session") return RedirectPage(history);
+            else {
+              setOverlay("")
+              setScreenData(screens.screenList);
+              setScreenId(false);
+            }
         } catch (error) {
+          setOverlay("")
             console.error('Error fetching User list:', error);
         }
     })();
@@ -115,10 +128,15 @@ const ElementRepository = (props) => {
     scrapeApi.updateScreen_ICE(params)
     .then(response =>  {
         if(copiedRow!==null){
-        if (response == "Success") {
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
-        setUpdatPastedData(true);
-   }}})
+        if (response === "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to paste the Data.', life: 5000 });
+        else if(response === "invalid session") return RedirectPage(history);
+        else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
+          setUpdatPastedData(true);
+        }
+        
+        
+  }})
    .catch(error => console.log(error))
     }
     // Use params as needed
@@ -181,12 +199,15 @@ const ElementRepository = (props) => {
     // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
-        <div className={`flex flex-row name__ellipsis ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
-          {rowData.custname}
-          {uniqueArray.map((item)=>(
-            item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
-          ))}
-        </div>
+        <div className='flex justify-content-between'>
+          <div className={`flex flex-row ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
+          </div>
+          <div>{uniqueArray.map((item)=>(
+              item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
+            ))}
+          </div>
+      </div>
       </>
     );
   };
@@ -210,37 +231,71 @@ const ElementRepository = (props) => {
     }
     insertScreen(params)
     .then(response =>  {
-      if (response == "Success") {
+      if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
+      else if(response === "invalid session") return RedirectPage(history);
+      else {
         setScreenData([...screenData, newScreen]);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
-    }
-    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen saved successfully.', life: 5000 });
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added and saved.', life: 5000 });
+      }
+
+    
   })
     
     .catch(error => console.log(error))
   };
 
-const handleAccordionNameEdit = (index, newName) => {
-  const updatedScreenData = [...screenData];
-  updatedScreenData[index].name = newName;
-  // setScreenData(updatedScreenData);
 
+const handleAccordionNameEdit = (index,e) => {
+  if(e.key === 'Enter'){
+ 
+  // setScreenData(updatedScreenData);
+  const updatedScreenData = [...screenData];
+
+  const previousName = updatedScreenData[index].name;
+
+    if (!previousName && screenRename.trim() === '') {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Screen name cannot be empty!', life: 5000 });
+      setScreenRename(previousName);
+      return;
+    }
+    else{
+      setScreenRename(previousName)
+    }
+ 
   let params ={
     projectid: defaultselectedProject.projectId,
-    name: newName,
+    name: screenRename ? screenRename : previousName,
     param : 'update',
     screenid: updatedScreenData[index]["_id"]
   }
-  
+ 
   insertScreen(params)
   .then(response =>  {
-    if (response == "Success") {
-      setScreenData(updatedScreenData);
-  }
-})
+    if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
+    else if(response === "invalid session") return RedirectPage(history);
+    else{
+      setScreenRename("")
+      setEditingIndex(null)
+      screenRename && toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository renamed', life: 5000 });
+    }
+  })
   .catch(error => console.log(error))
 };
+}
+
+const handleChangeScreenName=(index,e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
+  setScreenRename(e.target.value)
+  const updatedScreenData = [...screenData];
+  updatedScreenData[index].name = e.target.value;
+  setScreenData(updatedScreenData);
+}
 
 
 
@@ -254,8 +309,11 @@ const handleAccordionNameEdit = (index, newName) => {
       setContextMenuModel([
         {
           label: 'Paste',
-          icon: 'pi pi-paste',
+          icon: <img
+                 src="static/imgs/paste_icon.svg"
+                />,
           command: () => pasteRow(accordionId),
+          disabled: (copiedRow === null)
         },
       ]);
     } else {
@@ -268,8 +326,11 @@ const handleAccordionNameEdit = (index, newName) => {
         },
         {
           label: 'Paste',
-          icon: 'pi pi-paste',
+          icon: <img
+                  src="static/imgs/paste_icon.svg"
+                />,
           command: () => pasteRow(accordionId),
+          disabled: (copiedRow === null)
         },
       ]);
     }
@@ -283,6 +344,66 @@ const handleAccordionNameEdit = (index, newName) => {
     setShowCaptureElement(true);
   };
 
+  const saveElementProperties = () => {
+    let actualXpath = selectedCapturedElement && Array.isArray(selectedCapturedElement) ? selectedCapturedElement[0].xpath.split(';') : selectedCapturedElement?.xpath.split(';');
+    let arr = elementValues.map(element => (
+      (element.value === 'None') ? { ...element, value: "null" } : element
+    ))
+    let obj = arr.reduce((obj, item) => ({ ...obj, [item.key]: item.value }), {});
+    let newIdentifierList = arr.map(element => (
+      { id: element.id, identifier: element.identifier }
+    )).map((element, idx) => {
+      element.id = idx + 1
+      return element
+    })
+
+
+    let finalXPath = `${obj.xpath};${obj.id};${obj.rxpath};${obj.name};${actualXpath[4]};${obj.classname};${actualXpath[6]};${actualXpath[7]};${actualXpath[8]};${actualXpath[9]};${obj.label};${obj.href};${obj.cssselector}`
+    console.log(finalXPath)
+    let params = {
+      'objectId':selectedCapturedElement && Array.isArray(selectedCapturedElement) ? selectedCapturedElement[0]["_id"]:selectedCapturedElement["_id"],
+      'identifiers': newIdentifierList,
+      'xpath': finalXPath,
+      'param': 'updatedProperties',
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+
+      // 'identifier'
+    }
+    scrapeApi.updateScreen_ICE(params)
+      .then(response => {
+        console.log(response)
+        if (response == "Success") {
+          setElementPropertiesUpdated(true)
+          setElementProperties(false)
+          setScreenId(true);
+
+          // setMsg(MSG.SCRAPE.SUCC_OBJ_PROPERTIES);
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element properties updated successfully', life: 6000 });
+
+
+          // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+
+        }
+      })
+      .catch(error => {
+        console.log(error)
+
+        // setMsg("Some Error occured while updating element properties.");
+        // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+      }
+      )
+      setSelectedCapturedElement([])
+  }
+
+  const footerContent = (
+    <div>
+      <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div>
+      <Button label="Cancel" onClick={() => { setElementProperties(false);setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+      <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} />
+    </div>
+  )
+
   const onCellEditCompleteElementProperties = (e) => {
     const { key, value } = e.newRowData;
     const elementVals = [...elementValues]
@@ -290,8 +411,6 @@ const handleAccordionNameEdit = (index, newName) => {
 
     elementVals.find(v => v.key === key).value = value;
 
-
-    console.log(elementVals)
   };
   const textEditor = (options) => {
     return <InputText classNametype="text" style={{ width: '100%' }} value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
@@ -430,27 +549,18 @@ const handleAccordionNameEdit = (index, newName) => {
           // console.log(hasFlagTrue)
       // Move the return statement outside the forEach loop
       return (
-        <div>
+        <div className='flex flex-row justify-content-evenly'>
           {defaultselectedProject.appType === "Web" ? (
-            <button
-              onClick={() => {
-                setSelectedCapturedElement(selectedElement);
-                openElementProperties(rowData);
-              }}
-            >
-              <img
-                src="static/imgs/ic-edit.png"
-                alt="Edit Icon"
-                style={{ height: "20px", width: "20px" }}
-                className="edit__icon"
-              />
-            </button>
-          ) : null}
-  
-          <img
-            src="static/imgs/ic-delete-bin.png"
-            style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-            className="delete__icon"
+            <div>
+              <i className="pi pi-pencil"
+                onClick={() => {
+                  setSelectedCapturedElement(selectedElement);
+                  openElementProperties(rowData);
+                }}></i>
+          </div>) : null}
+          <div>
+          <i
+            className='pi pi-trash'
             onClick={() => {
               if (result.length>0) {
                 setResusedDeleteElement(true);
@@ -463,6 +573,7 @@ const handleAccordionNameEdit = (index, newName) => {
               }
             }}
           />
+          </div>
         </div>
       );
     }
@@ -489,27 +600,13 @@ const handleAccordionNameEdit = (index, newName) => {
 
 
 const handleSave = (value, cellValue, customFlag = '') => {
-  // let localScrapeItems = screenData.map((screen)=>{
-  //    if(screen["_id"] === value){
-  //     return screen.related_dataobjects;
-  //    }
-  // });
+  const filteredScreens = screenData.filter((screenitem) => { return screenitem.related_dataobjects.find((element) => element._id === value)});
+  const localScrapeItems = [];
+  filteredScreens.forEach(item => {
+    console.log(item.related_dataobjects)
+    localScrapeItems.push(item.related_dataobjects);
+  });
 
-  // const screenWithObject = screenData.find(screen => {
-  //   return screen.related_dataobjects && screen.related_dataobjects.find(obj => obj._id === value);
-  // });
-
-  // if (screenWithObject) {
-  //   const foundObject = screenWithObject.related_dataobjects.find(obj => obj._id === value);
-
-  //   console.log(foundObject);}
-  console.log(screenData);
-
-
-  const filteredScreens = screenData.filter((screenitem) => { return screenitem.related_dataobjects.some((element) => element._id === value)});
-  console.log(filteredScreens)
-  const localScrapeItems = filteredScreens.map((screen) =>{ return screen.related_dataobjects});
-  // let updNewScrapedData = { ...newScrapedCapturedData };
   let objId = "";
   let isCustom = false;
   let obj = null;
@@ -519,8 +616,11 @@ const handleSave = (value, cellValue, customFlag = '') => {
         if (item["_id"] === value) {
           item.title = cellValue;
           item.custname = cellValue;
-          // Additional conditions and updates can be added here
-          if (objId) obj = { ...item["_id"], custname: cellValue };
+          objId = item["_id"];
+          if (item["_id"]) {
+            const id = item["_id"];
+            obj = {id,custname: cellValue };
+          }
         }
       }
     }
@@ -528,18 +628,8 @@ const handleSave = (value, cellValue, customFlag = '') => {
         if (scrapeItem["_id"] === value) {
           scrapeItem.title = cellValue;
           scrapeItem.custname=cellValue
-          // if (customFlag) {
-          //   scrapeItem.tag = cellValue.tag;
-          //   scrapeItem.url = cellValue.url;
-          //   scrapeItem.xpath = cellValue.xpath;
-          //   scrapeItem.editable = true;
-          // }
-          // objId = scrapeItem.objId;
-          // isCustom = scrapeItem.isCustom;
-          // console.log("mainScrapedData.view[scrapeItem.objIdx]", mainScrapedData.view[scrapeItem.objIdx]);
-          if (objId) obj = { ...scrapeItem["_id"], custname: cellValue };
-          // else if (!isCustom) updNewScrapedData.view[scrapeItem.objIdx] = { ...newScrapedCapturedData?.view[scrapeItem.objIdx], custname: cellValue }
-          // else only if customFlag is true
+          if (scrapeItem["_id"]) obj = {...scrapeItem["_id"],custname: cellValue };
+          
         };
       }
   }
@@ -550,11 +640,29 @@ const handleSave = (value, cellValue, customFlag = '') => {
     modifiedDict[objId] = obj;
     setModified(modifiedDict);
   }
-  // else if (!isCustom) setNewScrapedData(updNewScrapedData);
-  // if (!(cellValue.tag && cellValue.tag.substring(0, 4) === "iris")) setSaved({ flag: false });
-  // setScrapeItems(localScrapeItems);
-  // setSaveDisable(false);
 }
+
+  useEffect(()=>{
+    if (Object.keys(modified).length > 0) {
+    let modifiedObjects = Object.values(modified);
+    let params = {
+      'modifiedObj': modifiedObjects,
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'renameElenemt',
+    }
+  
+    scrapeApi.updateScreen_ICE(params)
+      .then(response =>  {
+        if (response == "Success") {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element renamed.', life: 5000 });
+          dispatch(loadUserInfoActions.updateElementRepository(true));
+      }
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to rename the element, try again!', life: 5000 });
+      }
+    })}
+  },[modified])
 
 
 const onCellEditComplete = (e) => {
@@ -747,18 +855,18 @@ const saveScreens = (screenDetails) => {
   
     scrapeApi.deleteScenario(params)
       .then(response =>  {
-        if (response == "Success") {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Screen deleted successfully', life: 5000 });
+        if (response == "success") {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Rpository deleted.', life: 5000 });
       }
       
       else {
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to delet the repository, try again!', life: 5000 });
       }
       dispatch(loadUserInfoActions.updateElementRepository(true));
     })
   }
 
-const deleteScreens = (index, screenDetails)=>{
+const deleteScreen = (index, screenDetails)=>{
     // const allScreenData = [...screenData]
     const updatedScreenData = screenData.filter(screen => screen._id !== screenDetails._id);
       setScreenData(updatedScreenData);
@@ -773,6 +881,7 @@ const deleteScreens = (index, screenDetails)=>{
   return (
     <>
     {/* {props.overlay && <ScreenOverlay content={props.overlay} />} */}
+    {overlay && <ScreenOverlay content={overlay} />}
     <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
     <div className='element-repository'>
       {screenData?.length === 0 ? 
@@ -781,7 +890,8 @@ const deleteScreens = (index, screenDetails)=>{
         <p className="not_captured_message">No Element Repository yet</p>
         <Button label='Create Repository' onClick={handleAddAccordion} />
         </div>)
-      :<Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>}
+      :<><Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
+      <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip></>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
         {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={
@@ -799,13 +909,14 @@ const deleteScreens = (index, screenDetails)=>{
                       // // onChange={(e) => handleAccordionNameEdit(index, e.target.value)}
                       // onChange={(e) => setValue(e.target.value === null || e.target.value === undefined ? '' : e.target.value)}
                       value={screenDetails.name}
-                      onChange={(e) =>  handleAccordionNameEdit(index, e.target.value)}
+                      onChange={(e) =>handleChangeScreenName(index,e) }
+                      onKeyDown={(e)=>handleAccordionNameEdit(index,e)}
                       onBlur={() => {setEditingIndex(null);
                       setValue('');}}
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
-                    <span className='screenname__display'>{screenDetails.name}</span>
+                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>10?screenDetails.name.trim().substring(0,10)+'...':screenDetails.name }</span>
                   )}
                 </span>
               {activeAccordionIndex === index && (
@@ -816,7 +927,7 @@ const deleteScreens = (index, screenDetails)=>{
                   "name": screenDetails.name,
                   "projectId": defaultselectedProject.projectId
                 })}} className='edit-text'/>
-                <Button label="Delete" severity="danger" onClick={()=>deleteScreens(index,screenDetails)} className='delete-text'/>
+                <Button label="Delete" severity="danger" onClick={(e)=>{e.stopPropagation();e.preventDefault();setDeleteScreens(true)}} className='delete-text'/>
                 
               </div>
               </>)}
@@ -834,7 +945,16 @@ const deleteScreens = (index, screenDetails)=>{
               onSelectionChange={onRowClick}
             >
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
-              editor={(options) => cellEditor(options)}
+              editor={(options) => {
+                if (!options.rowData || Object.keys(options.rowData).length === 0) {
+                return null;
+              } 
+              else {
+                return (
+                  cellEditor(options)
+                );
+              }
+                }}
               onCellEditComplete={onCellEditComplete}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}></Column>
               <Column field="tag" header="Element Property" body={(rowData) => rowData?.tag?.includes("iris")? elementTypeProp(rowData.tag.split(";")[1]): rowData?.tag ? elementTypeProp(rowData.tag):""}></Column>
@@ -842,10 +962,18 @@ const deleteScreens = (index, screenDetails)=>{
               {/* <Column field="age" header="Age"></Column> */}
             </DataTable>
             <AvoConfirmDialog
+              visible={deleteScreens}
+              onHide={() => setDeleteScreens(false)}
+              showHeader={false}
+              message="Are you sure you want to delete the repository?"
+              icon="pi pi-exclamation-triangle"
+              accept={()=>deleteScreen(index,screenDetails)} />
+
+            <AvoConfirmDialog
               visible={deleteElements}
               onHide={() => setDeleteElements(false)}
               showHeader={false}
-              message="Are you sure you want to delete the element"
+              message="Are you sure you want to delete the element?"
               icon="pi pi-exclamation-triangle"
               accept={()=>handleDeleteRow(selectedCapturedElement,screenDetails)} />
               {reusedDeleteElement && <Dialog visible={reusedDeleteElement} header='Confirmation' onHide={()=>setResusedDeleteElement(false)} footer={<>
@@ -865,18 +993,18 @@ const deleteScreens = (index, screenDetails)=>{
       {showCaptureElement && <CaptureModal fetchingDetails={{
                 "_id": screenDetails["_id"],
                 "name": screenDetails.name,
-                "projectId":defaultselectedProject.projectId
+                "projectID":defaultselectedProject.projectId
               }} visibleCaptureElement={showCaptureElement} setVisibleCaptureElement={setShowCaptureElement}/>}
       <ContextMenu style={{height: '5.5rem'}} ref={contextMenuRef} model={contextMenuModel} />
       {"Web"?
-        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)}>
+        <Dialog className='element__properties' header={"Element Properties"} draggable={false} position="right" editMode="cell" style={{ width: '66vw', marginRight: '3.3rem' }} visible={elementPropertiesVisible} onHide={() => setElementProperties(false)} footer={footerContent}>
           <div className="card">
             <DataTable value={elementValues} reorderableRows onRowReorder={onRowReorder}  >
               <Column rowReorder style={{ width: '3rem' }} />
               <Column field="id" header="Priority" headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'left', flexGrow: '0.2', minWidth: '4rem' }} style={{ minWidth: '3rem' }} />
               {/* <column ></column> */}
               <Column field="name" header="Properties " headerStyle={{ width: '30%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ flexGrow: '0.2', minWidth: '2rem' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto', width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
+              <Column field="value" header="Value" editor={(options) => textEditor(options)} onCellEditComplete={onCellEditCompleteElementProperties} bodyStyle={{ width: '53%', minWidth: '34rem'}} style={{textOverflow: 'ellipsis', overflow: 'hidden',maxWidth: '16rem'}} body={elementValuetitle}></Column>
             </DataTable>
           </div>
         </Dialog>: null }

@@ -1,6 +1,6 @@
 .design_dialog_box {
     .p-dialog-header {
-        background: #E2E2ED !important;
+        background: #E2E2ED ;
         border-top-right-radius: 4px;
         padding: 0.3rem 0 !important;
         height: 5rem !important;
@@ -32,7 +32,9 @@
         }
     }
 }
-
+// .p-dialog .p-dialog-footer {
+//   padding: 10px !important;
+// }
 .debug__object__modal {
     height: 31.06rem;
      width: 47.06rem;
@@ -753,7 +755,11 @@ bottom: 0.19rem;
     text-overflow: ellipsis;     /* Displays an ellipsis (...) to indicate overflow */
     width: 150px; 
 }
-
+.languageEditor{
+  .ace_editor{
+    height: 336px !important;
+  }
+}
 .p-sidebar, .p-sidebar-mask.p-component-overlay {
     right: 0 ;
     left: unset ;

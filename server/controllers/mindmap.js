@@ -112,7 +112,8 @@ const getModule = async (d) => {
 		"projectid":d.projectid || null,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId || null,
-		"name":"getModules"
+		"name":"getModules",
+		"query":d.query || null
 	}
 	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
 };
@@ -233,7 +234,7 @@ exports.saveData = async (req, res) => {
 		if (flag == 10) 
 		{
 			qpush=[]
-			var uidx = 0, rIndex;
+			var uidx = 0, rIndex, tag;
 			// var idn_v_idc = {};
 			var cycId=inputs.cycId;
 
@@ -242,9 +243,15 @@ exports.saveData = async (req, res) => {
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
+				if (e.type == "scenairos" ) tag = e.tag;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
+				if(e.type == "scenarios" ) {
+					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex ,tag:e.tag||[]});
+				}
+				else{
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
+				}
 				if(e.scrapedurl) {
 					nObj[nObj.length - 1]['scrapedurl'] = e.scrapedurl
 				}
@@ -279,7 +286,7 @@ exports.saveData = async (req, res) => {
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"tag":ts.tag, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
 				
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
@@ -639,10 +646,11 @@ exports.excelToMindmap = function (req, res){
 			var cSheetRow = cSheet.split('\n');
 			excelrows=[]
 			cSheetRow[0].split(',').forEach(function (e, i) {
-				if(i== 0 && e.toLowerCase()!="module") {return res.status(200).send("fail");}
-				if(i== 1 && e.toLowerCase()!="scenario"){return res.status(200).send("fail");}
+				if(i== 0 && !["testsuite","module"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
+				if(i== 1 && !["testcase","scenario"].includes(e.toLowerCase())) {return res.status(200).send("fail");}
 				if(i== 2 && e.toLowerCase()!="screen"){return res.status(200).send("fail");}
-				if(i== 3 && e.toLowerCase()!="script"){return res.status(200).send("fail");}
+				if(i== 3 && !["teststeps","script"].includes(e.toLowerCase())){return res.status(200).send("fail");}
+				
 				if (i==4){return res.status(200).send("fail");}
 			});
 			for (let i = 0; i < cSheetRow.length; i++) {
@@ -932,11 +940,11 @@ exports.exportToExcel = async (req, res) =>{
 				});
 
 		ws.cell(1, 1)
-				.string('Module')
+				.string('Testsuite')
 				.style(style);
 
 		ws.cell(1, 2)
-				.string('Scenario')
+				.string('Testcase')
 				.style(style);
 
 		ws.cell(1, 3)
@@ -944,7 +952,7 @@ exports.exportToExcel = async (req, res) =>{
 				.style(style);
 
 		ws.cell(1, 4)
-				.string('Script')
+				.string('Teststeps')
 				.style(style);
 		var min_mm_idx =1
 		var min_scen_idx = 1;
@@ -1327,10 +1335,10 @@ exports.importGitMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const expProj = req.body.expProj;
-		const projectid = req.body.projectid;
+		const projectid = req.body.projectId;
 		// const gitname = req.body.gitname;
 		// const gitbranch = req.body.gitbranch;
-		const gitversion = req.body.gitversion;
+		const gitversion = req.body.gitVersion;
 		// var gitfolderpath = req.body.gitfolderpath;
 		var appType= req.body.appType;		
 		var projectName = req.body.projectName;
@@ -1340,10 +1348,10 @@ exports.importGitMindmap = async (req, res) => {
 		const inputs= {
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
-			"projectid": projectid,
+			"projectId": projectid,
 			// "gitname": gitname,
 			// "gitbranch": gitbranch,
-			 "gitversion": gitversion,
+			 "gitVersion": gitversion,
 			// "gitfolderpath": gitfolderpath,
 			"appType":appType,			
 			"projectName":projectName,
@@ -1574,10 +1582,10 @@ exports.singleExcelToMindmap = function (req, res) {
             var scoIdx = -1, scrIdx = -1, sctIdx = -1,modIdx=-1;
             var uniqueIndex = 0;
             cSheetRow[0].split(',').forEach(function (e, i) {
-                if(i== 0 && e.toLowerCase()=="module") modIdx = i;
-                if(i== 1 && e.toLowerCase()=="scenario") scoIdx = i;
+                if (i == 0 && (["testsuite","module"].includes(e.toLowerCase()))) {modIdx = i}
+                if(i== 1 && (["testcase","scenario"].includes(e.toLowerCase()))) {scoIdx = i}
                 if(i== 2 && e.toLowerCase()=="screen") scrIdx = i;
-                if(i== 3 && e.toLowerCase()=="script") sctIdx = i;
+                if(i== 3 && (["teststeps","script"].includes(e.toLowerCase()))) { sctIdx = i}
             });
             if (modIdx == -1 || scoIdx == -1 || scrIdx == -1 || sctIdx == -1 || cSheetRow.length < 2) {
                 err = true;
@@ -1692,7 +1700,6 @@ exports.importDefinition = async (req, res) => {
 				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 				var socket = require('../lib/socket');
 				var mySocket;
-				var clientName=utils.getClientName(host);
 				mySocket = socket.allSocketsMap[clientName][icename];
 				if(mySocket.connected){
 
@@ -1734,4 +1741,43 @@ exports.importDefinition = async (req, res) => {
         logger.error("Exception in the service importDefinition: %s", exception);
         res.send("Fail");
     }
+};
+exports.fetch_git_exp_details = async (req, res) => {
+    const fnName = "fetch_git_exp_details";
+    logger.info("Inside UI service: " + fnName);
+    try {
+		
+        const projectId = req.body.projectId
+        const inputs= {"projectId":projectId}
+        const result = await utils.fetchData(inputs, "/git/fetch_git_exp_details", fnName);
+        if (result == "fail") {
+            return res.send('fail');}
+        else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
+    }
+};
+exports.saveTag = async (req, res) => {
+	const fnName = "saveTag";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		const inputs={ 
+			"query": "saveTag",
+			"testscenarioId": req.body.testscenarioId,
+			"tag": req.body.tag
+		 };
+		const result = await utils.fetchData(inputs, "mindmap/saveTag", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
 };

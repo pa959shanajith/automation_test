@@ -1,11 +1,12 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useRef } from 'react';
 import { ScreenOverlay, setMsg, Messages as MSG, VARIANT } from '../../global'
 import { testLDAPConnection, manageLDAPConfig } from '../api';
-import '../styles/OidcConfig.scss'
+// import '../styles/OidcConfig.scss'
 import LdapConfigCreate from '../components/LdapConfigCreate';
 import LdapConfigEdit from '../components/LdapConfigEdit';
 import OriginContainer from './OriginContainer';
 import { useSelector } from 'react-redux';
+import { Toast } from 'primereact/toast';
 
 /*Component LdapConfig
   use: defines Admin middle Section for Ldap Configuration
@@ -42,6 +43,49 @@ const LdapConfig = (props) => {
     const [ldapServerNameErrBor, setLdapServerNameErrBor] = useState(false)
     const popupState = props.popupState
     const currentScreen = useSelector(state => state.admin.screen);
+    const toast = useRef();
+
+
+    const toastError = (erroMessage) => {
+        if (erroMessage.CONTENT) {
+            toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+    }
+
+    const toastWarn = (warnMessage) => {
+        if (warnMessage.CONTENT) {
+            toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
+    }
+
+    const toastSuccess = (successMessage) => {
+        if (successMessage.CONTENT) {
+            toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+    }
+
+    const ldapTestMessage = async (data) => {
+        switch (data) {
+            case "invalid_addr": toastError(MSG.ADMIN.ERR_PORT_INCORRECT); break;
+            case "mismatch_secure": toastError(MSG.ADMIN.ERR_LDAP_PROTOCOL); break;
+            case "invalid_cert": toastError(MSG.ADMIN.ERR_TLS_CERT); break;
+            case "invalid_cacert": toastError(MSG.ADMIN.ERR_ISSUER_CA_CERT); break;
+            case "invalid_cacert_host": toastError(MSG.ADMIN.ERR_NOT_IN_TLS_CERT); break;
+            case "invalid_url": toastError(MSG.ADMIN.ERR_TEST_INVALID_URL); break;
+            case "invalid_auth": toastError(MSG.ADMIN.ERR_ANONYMOUS_ACCESS); break;
+            case "invalid_credentials": toastError(MSG.ADMIN.ERR_INVALID_CRED_TEST); break;
+            case "insufficient_access": toastError(MSG.ADMIN.ERR_PRIVILEGE_TEST); break;
+            case "invalid_basedn": toastError(MSG.ADMIN.ERR_BASE_DOMAIN_TEST); break;
+            case "empty": toastError(MSG.ADMIN.ERR_DIRECTORY_EMPTY); break;
+            case "spl_chars": toastError(MSG.ADMIN.ERR_TEST_SPEC_CHAR); break;
+            case "fail": toastError(MSG.ADMIN.ERR_TEST_CONNECTION); break;
+            default: toastError(MSG.ADMIN.ERR_TEST_CONNECT_UNEXPECTED); break;
+        }
+    
+    }
 
     useEffect(() => {
         setLdapEdit(false);
@@ -111,7 +155,7 @@ const LdapConfig = (props) => {
         if (typeof data !== "string") data = data.flag;
         setTestStatus(data);
         if (data === "success") {
-            setMsg(MSG.ADMIN.SUCC_TEST);
+            toastSuccess(MSG.ADMIN.SUCC_TEST);
             fields = fields.concat("None");
             for (const [key, value] of Object.entries(fieldmap)) {
                 if (!fields.includes(value)) fields.push(value);
@@ -242,40 +286,42 @@ const LdapConfig = (props) => {
     return (
         <Fragment>
             {loading ? <ScreenOverlay content={loading} /> : null}
+            <Toast ref={toast} position={"bottom-center"} style={{ maxWidth: "50rem" }} baseZIndex={2000} />
             {ldapEdit === false ?
-                <LdapConfigCreate manageCreate={manageCreate} ldapManage={ldapManage} 
-                    ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor} 
-                    ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor} 
-                    ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor} 
-                    ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor} 
-                    bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor} 
+                <LdapConfigCreate manageCreate={manageCreate} ldapManage={ldapManage}
+                    ldapTest={ldapTest} ldapServerNameErrBor={ldapServerNameErrBor}
+                    ldapCertErrBor={ldapCertErrBor} ldapFMapEmailErrBor={ldapFMapEmailErrBor}
+                    ldapFMapLnameErrBor={ldapFMapLnameErrBor} ldapFMapFnameErrBor={ldapFMapFnameErrBor}
+                    ldapFMapUnameErrBor={ldapFMapUnameErrBor} ldapBaseDNErrBor={ldapBaseDNErrBor}
+                    bindCredentialsErrBor={bindCredentialsErrBor} binddnErrBor={binddnErrBor}
                     ldapServerURLErrBor={ldapServerURLErrBor} setFieldmap={setFieldmap} cert={cert}
-                     setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} 
-                     testStatus={testStatus} setCert={setCert} auth={auth} 
-                     setAuth={setAuth} binddn={binddn} setBinddn={setBinddn} 
-                     bindCredentials={bindCredentials} setBindCredentials={setBindCredentials} 
-                     setCertName={setCertName} certName={certName} serverName={serverName}
-                      secure={secure} setSecure={setSecure} setServerName={setServerName} 
-                      setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} />
+                    setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts}
+                    testStatus={testStatus} setCert={setCert} auth={auth}
+                    setAuth={setAuth} binddn={binddn} setBinddn={setBinddn}
+                    bindCredentials={bindCredentials} setBindCredentials={setBindCredentials}
+                    setCertName={setCertName} certName={certName} serverName={serverName}
+                    secure={secure} setSecure={setSecure} setServerName={setServerName}
+                    setBasedn={setBasedn} basedn={basedn} url={url} setUrl={setUrl} toastError={toastError} toastSuccess={toastSuccess}/>
 
                 : <LdapConfigEdit setLdapServerNameErrBor={setLdapServerNameErrBor} popupState={popupState}
-                 manageEdit={manageEdit} ldapManage={ldapManage} ldapTest={ldapTest} 
-                 ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor} 
-                 ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor} 
-                 ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor} 
-                 ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor} 
-                 binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor} 
-                 setLdapCertErrBor={setLdapCertErrBor} setLdapFMapEmailErrBor={setLdapFMapEmailErrBor}
-                  setLdapFMapLnameErrBor={setLdapFMapLnameErrBor} setLdapFMapFnameErrBor={setLdapFMapFnameErrBor} 
-                  setLdapBaseDNErrBor={setLdapBaseDNErrBor} setBindCredentialsErrBor={setBindCredentialsErrBor} 
-                  setLdapFMapUnameErrBor={setLdapFMapUnameErrBor} setBinddnErrBor={setBinddnErrBor}
-                   setLdapServerURLErrBor={setLdapServerURLErrBor} setTestStatus={setTestStatus} 
-                   setFieldMapOpts={setFieldMapOpts} setFieldmap={setFieldmap} setSecure={setSecure}
-                    setCert={setCert} setBasedn={setBasedn} setBindCredentials={setBindCredentials} 
+                    manageEdit={manageEdit} ldapManage={ldapManage} ldapTest={ldapTest}
+                    ldapServerNameErrBor={ldapServerNameErrBor} ldapCertErrBor={ldapCertErrBor}
+                    ldapFMapEmailErrBor={ldapFMapEmailErrBor} ldapFMapLnameErrBor={ldapFMapLnameErrBor}
+                    ldapFMapFnameErrBor={ldapFMapFnameErrBor} ldapFMapUnameErrBor={ldapFMapUnameErrBor}
+                    ldapBaseDNErrBor={ldapBaseDNErrBor} bindCredentialsErrBor={bindCredentialsErrBor}
+                    binddnErrBor={binddnErrBor} ldapServerURLErrBor={ldapServerURLErrBor}
+                    setLdapCertErrBor={setLdapCertErrBor} setLdapFMapEmailErrBor={setLdapFMapEmailErrBor}
+                    setLdapFMapLnameErrBor={setLdapFMapLnameErrBor} setLdapFMapFnameErrBor={setLdapFMapFnameErrBor}
+                    setLdapBaseDNErrBor={setLdapBaseDNErrBor} setBindCredentialsErrBor={setBindCredentialsErrBor}
+                    setLdapFMapUnameErrBor={setLdapFMapUnameErrBor} setBinddnErrBor={setBinddnErrBor}
+                    setLdapServerURLErrBor={setLdapServerURLErrBor} setTestStatus={setTestStatus}
+                    setFieldMapOpts={setFieldMapOpts} setFieldmap={setFieldmap} setSecure={setSecure}
+                    setCert={setCert} setBasedn={setBasedn} setBindCredentials={setBindCredentials}
                     setBinddn={setBinddn} setAuth={setAuth} setUrl={setUrl} cert={cert} ldapEdit={ldapEdit}
-                     setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus} 
-                     auth={auth} binddn={binddn} bindCredentials={bindCredentials} setCertName={setCertName} 
-                     certName={certName} serverName={serverName} secure={secure} setServerName={setServerName} basedn={basedn} url={url} />
+                    setLdapEdit={setLdapEdit} fieldmap={fieldmap} fieldMapOpts={fieldMapOpts} testStatus={testStatus}
+                    auth={auth} binddn={binddn} bindCredentials={bindCredentials} setCertName={setCertName}
+                    certName={certName} serverName={serverName} secure={secure} setServerName={setServerName} basedn={basedn} url={url}
+                    toastError={toastError} toastSuccess={toastSuccess} />
             }
 
 
@@ -283,24 +329,6 @@ const LdapConfig = (props) => {
     );
 }
 
-const ldapTestMessage = async (data) => {
-    switch (data) {
-        case "invalid_addr": setMsg(MSG.ADMIN.ERR_PORT_INCORRECT); break;
-        case "mismatch_secure": setMsg(MSG.ADMIN.ERR_LDAP_PROTOCOL); break;
-        case "invalid_cert": setMsg(MSG.ADMIN.ERR_TLS_CERT); break;
-        case "invalid_cacert": setMsg(MSG.ADMIN.ERR_ISSUER_CA_CERT); break;
-        case "invalid_cacert_host": setMsg(MSG.ADMIN.ERR_NOT_IN_TLS_CERT); break;
-        case "invalid_url": setMsg(MSG.ADMIN.ERR_TEST_INVALID_URL); break;
-        case "invalid_auth": setMsg(MSG.ADMIN.ERR_ANONYMOUS_ACCESS); break;
-        case "invalid_credentials": setMsg(MSG.ADMIN.ERR_INVALID_CRED_TEST); break;
-        case "insufficient_access": setMsg(MSG.ADMIN.ERR_PRIVILEGE_TEST); break;
-        case "invalid_basedn": setMsg(MSG.ADMIN.ERR_BASE_DOMAIN_TEST); break;
-        case "empty": setMsg(MSG.ADMIN.ERR_DIRECTORY_EMPTY); break;
-        case "spl_chars": setMsg(MSG.ADMIN.ERR_TEST_SPEC_CHAR); break;
-        case "fail": setMsg(MSG.ADMIN.ERR_TEST_CONNECTION); break;
-        default: setMsg(MSG.ADMIN.ERR_TEST_CONNECT_UNEXPECTED); break;
-    }
 
-}
 
 export default LdapConfig;

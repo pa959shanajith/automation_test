@@ -34,6 +34,8 @@ import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
+import { BlockUI } from 'primereact/blockui';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -47,6 +49,7 @@ const CaptureModal = (props) => {
   const [showCaptureData, setShowCaptureData] = useState([]);
   const [showPanel, setShowPanel] = useState(true);
   const [overlay, setOverlay] = useState(null);
+  const [blocked, setBlocked] = useState(false);
   const [isInsprintHovered, setIsInsprintHovered] = useState(false);
   const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
   const [isPdfHovered, setIsPdfHovered] = useState(false);
@@ -100,7 +103,7 @@ const CaptureModal = (props) => {
   const [showIdentifierOrder, setShowIdentifierOrder] = useState(false)
   const [identifierList, setIdentifierList] = useState([{ id: 1, identifier: 'xpath', name: 'Absolute X-Path ' }, { id: 2, identifier: 'id', name: 'ID Attribute' }, { id: 3, identifier: 'rxpath', name: 'Relative X-Path' }, { id: 4, identifier: 'name', name: 'Name Attribute' }, { id: 5, identifier: 'classname', name: 'Classname Attribute' }, { id: 6, identifier: 'cssselector', name: 'CSS Selector' }, { id: 7, identifier: 'href', name: 'Href Attribute' }, { id: 8, identifier: 'label', name: 'Label' }]);
   const [identifierModified, setIdentifierModiefied] = useState(false);
-  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectId"] });
+  const [parentData, setParentData] = useState({ id: props.fetchingDetails["_id"], name: props.fetchingDetails["name"], projectId:props.fetchingDetails["projectID"] });
   const [idx, setIdx] = useState(0);
   const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
   let NameOfAppType = projectAppType
@@ -128,6 +131,10 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [screenData, setScreenData] = useState([]);
   const [elementRepo, setElementRepo] = useState(false);
   const [parentId, setParentId] = useState(null);
+  const [screenChange, setScreenChange] = useState(false);
+  const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
+
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
 
@@ -290,7 +297,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       return 0;
     }
     parentScreenId();
-  }, [])
+  }, [parentId])
 
 
   const onIncreaseScreen = () => {
@@ -360,6 +367,13 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
       toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
     }
     else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
+  }
+
+  const toastWarn = (warnMessage) => {
+    if (warnMessage.CONTENT) {
+        toast.current.show({ severity: warnMessage.VARIANT, summary: 'Warning', detail: warnMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'warn', summary: 'Warning', detail: warnMessage, life: 5000 });
   }
 
   const onSave = (e, confirmed) => {
@@ -502,11 +516,11 @@ const elementTypeProp =(elementProperty) =>{
   const fetchScrapeData = () => {
     return new Promise((resolve, reject) => {
       setOverlay("Loading...");
-
+      setBlocked(true)
       let viewString = capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
-      let Id = parentId !== null?parentId:parentData.id
+      let Id = parentData.id
 
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
@@ -527,6 +541,10 @@ const elementTypeProp =(elementProperty) =>{
                 viewString = newScrapeList;
               }
             }
+            if(parentId !== null){
+              setCapturedDataToSave(newScrapeList);
+              viewString = newScrapeList;
+            }
 
             setMainScrapedData(data);
             setMirror({ scrape: data.mirror, compare: null });
@@ -536,6 +554,7 @@ const elementTypeProp =(elementProperty) =>{
             setSaved({ flag: true });
             setOrderList(newOrderList);
             setOverlay("");
+            setBlocked(false)
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
             const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
@@ -574,6 +593,7 @@ const elementTypeProp =(elementProperty) =>{
               }));
             }
             setOverlay("");
+            setBlocked(false)
             dispatch(disableAppend(!haveItems));
             dispatch(disableAction(haveItems));
             dispatch(actionError([]));
@@ -583,6 +603,7 @@ const elementTypeProp =(elementProperty) =>{
             dispatch(disableAction(haveItems));
             dispatch(disableAppend(!haveItems));
             setOverlay("");
+            setBlocked(false)
             // screenshot
           }
           resolve("success");
@@ -635,6 +656,7 @@ const elementTypeProp =(elementProperty) =>{
           dispatch(disableAction(haveItems));
           dispatch(disableAppend(!haveItems));
           setOverlay("");
+          setBlocked(false)
           reject("fail")
         })
     });
@@ -666,7 +688,9 @@ const elementTypeProp =(elementProperty) =>{
         newOrderList.push(item.objectDetails.objId)
       }
     })
-    let newCapturedDataToSave = capturedDataAfterSave.map(item => item.objectDetails)
+    let newCapturedDataToSave = capturedDataAfterSave.map(item => 
+      item.isCustom ? {custname:item.selectall,val:item.objectDetails.val,isCustom:item.isCustom,tag:item.objectProperty,tempOrderId:item.objectDetails.val,xpath:'',title:item.selectall} : item.objectDetails
+    );
     setCaptureData(capturedDataAfterSave)
     setDeleted(deletedArr)
     setOrderList(newOrderList)
@@ -676,6 +700,7 @@ const elementTypeProp =(elementProperty) =>{
     // setNewScrapedCapturedData(newCapturedDataToSave)
     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
     setSaveDisable(false);
+    setMasterCapture(true);
   }
   // {console.log(captureData[0].selectall)}
 
@@ -700,14 +725,16 @@ const elementTypeProp =(elementProperty) =>{
           orderList.push(scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid())
         }
         else {
-          // if(parentId !== null){
-          //   const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
-          //   if (foundItem) {
-          //     views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
-          //   }
+          if(parentId !== null){
+            const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
+            if (foundItem) {
+              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+            }
             orderList.push(scrapeItem.objId);
   
-          // }
+          }else{
+             orderList.push(scrapeItem.objId);
+          }
           
         }
       }
@@ -752,6 +779,7 @@ const elementTypeProp =(elementProperty) =>{
                 footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
               })
               : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+              setMasterCapture(false);
             let numOfObj = scrapeItemsL.length;
             // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
           } else { console.error(resp); addMore.current = true; }
@@ -789,6 +817,7 @@ const elementTypeProp =(elementProperty) =>{
           else wsdlInputs.splice(4, 1);
 
           setOverlay("Fetching Response Header & Body...");
+          setBlocked(true)
           ResetSession.start();
           for (let i = 0; i < wsdlInputs.length; i++) {
               if (wsdlInputs[i] !== "") {
@@ -802,31 +831,34 @@ const elementTypeProp =(elementProperty) =>{
           scrapeApi.initScrapeWS_ICE(arg)
           .then(data => {
               setOverlay("");
+              setBlocked(false)
               ResetSession.end();
               if (data === "Invalid Session") {
                   return RedirectPage(history);
               } else if (data === "unavailableLocalServer") {
-                  setMsg(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
+                  toastError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER);
               } else if (data === "scheduleModeOn") {
-                  setMsg(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
+                  toastWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE);
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
-                  setMsg(MSG.SCRAPE.WARN_EXECUTION_ONLY);
+                toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  setMsg(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));
-              } else setMsg(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
+              } else toastError(MSG.SCRAPE.ERR_DEBUG_TERMINATE);
           })
           .catch(error => {
               setOverlay("");
+              setBlocked(false)
               ResetSession.end();
               console.error("Fail to initScrapeWS_ICE. ERROR::::", error);
-              setMsg(MSG.SCRAPE.ERR_OPERATION);
+              toastError(MSG.SCRAPE.ERR_OPERATION);
           });
       }
   } 
   else{
+    
     let screenViewObject = {};
     let blockMsg = 'Capturing in progress. Please Wait...';
     if (compareFlag) {
@@ -838,10 +870,12 @@ const elementTypeProp =(elementProperty) =>{
     };
     screenViewObject = getScrapeViewObject(typesOfAppType, browserType, compareFlag, replaceFlag, mainScrapedData, newScrapedData);
     setOverlay(blockMsg);
+    setBlocked(true)
     scrapeApi.initScraping_ICE(screenViewObject)
       .then(data => {
         let err = null;
         setOverlay("");
+        setBlocked(false)
         setVisible(false);
         // ResetSession.end();
         if (data === "Invalid Session") return RedirectPage(history);
@@ -863,6 +897,7 @@ const elementTypeProp =(elementProperty) =>{
           err = MSG.SCRAPE.ERR_SCRAPE;
         else if (data === "Terminate") {
           setOverlay("");
+          setBlocked(false)
           err = MSG.SCRAPE.ERR_SCRAPE_TERMINATE;
         }
         else if (data === "wrongWindowName")
@@ -933,7 +968,7 @@ else{
 
         if (viewString.view.length !== 0) {
 
-          let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
+          let lastIdx = viewString.view ? viewString.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
 
@@ -974,6 +1009,7 @@ else{
       })
       .catch(error => {
         setOverlay("");
+        setBlocked(false)
         // ResetSession.end();
         toastError(MSG.SCRAPE.ERR_SCRAPE);
         console.error("Fail to Load design_ICE. Cause:", error);
@@ -994,7 +1030,7 @@ else{
   const handleDelete = (rowData,confirmed) => {
     // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
     if (mainScrapedData.reuse && !confirmed) {
-      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false); onDelete(null, true);}})
+      setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
       return;
     }
     if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
@@ -1007,6 +1043,17 @@ else{
     );
 
     deletedArr.push(rowData.objectDetails.objId);
+
+    // var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+
+    //   return !selectedElement.find(function (objFromB) {
+    //     if (item.objectDetails.val === objFromB.objectDetails.val) {
+    //       if(item.objectDetails.objId){
+    //         deletedArr.push(item.objectDetails.objId)}
+    //       return true
+    //     }
+    //   })
+    // })
 
     let notused = scrapeItemsL.filter(item => {
       if (deletedArr.includes(item.objectDetails.objId)) {
@@ -1096,8 +1143,8 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(rowData)} />
-
+          className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+          
 
         
 
@@ -1138,12 +1185,16 @@ else{
         <Tooltip target=".onHoverLeftIcon" position='bottom'>Move to previous capture element screen</Tooltip>
         <Tooltip target=".onHoverRightIcon" position='bottom'>Move to next capture element screen</Tooltip>
         <Tooltip target=".screen__name" position='bottom'>{parentData.name}</Tooltip>
-        <h4 className='dailog_header2'><span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /><span className='screen__name'>{parentData.name}</span><span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" />
+        <h4 className='dailog_header2'>
+          {/* <span className='pi pi-angle-left onHoverLeftIcon' style={idx === 0 ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === 0} onClick={onDecreaseScreen} tooltipOptions={{ position: 'bottom' }} tooltip="move to previous capture element screen" /><img className="screen_btn" src="static/imgs/ic-screen-icon.png" /> */}
+          <span className='screen__name'>{parentData.name}</span>
+          {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
+        
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
-          <button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more');}} >Add more</button>
+          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
-          <button className="btn-capture" onClick={() => setShowNote(true)} >Capture Elements</button>
+          <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
         </div> : null
         }
@@ -1156,7 +1207,7 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} >Capture Elements</Button>}
+        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1177,10 +1228,12 @@ const elementIdentifier=()=>{
 }  
 const footerSave = (
     <>
+    
     {(selectedCapturedElement.length>0 && (NameOfAppType.appType=="Web" || AppTypeElementIdentifier=="Web")) ?<Button label="Element Identifier Order"onClick={elementIdentifier} ></Button>:null}
     {selectedCapturedElement.length>0?<Button label='Delete' style={{position:'absolute',left:'1rem',background:'#D9342B',border:'none'}}onClick={onDelete} ></Button>:null}
     <Button label='Cancel' outlined onClick={()=>props.setVisibleCaptureElement(false)}></Button>
-    <Button label='Save' onClick={onSave} disabled={saveDisable}></Button>
+    <Button label='Save' onClick={onSave} disabled={saveDisable || blocked}></Button>
+    
     </>
   )
   
@@ -1420,8 +1473,8 @@ const footerSave = (
       objects.objectProperty = element.tag;
       objects.screenshots = '';
       objects.actions = '';
-      objects.objectDetails = {};
-      objects.isCustom=true
+      objects.objectDetails = {val:element.val};
+      objects.isCustom=element.isCustom;
       addElementData.push(objects)
     })
     setCaptureData([...captureData, ...addElementData])
@@ -1674,7 +1727,7 @@ const footerSave = (
   };
   // const typesOfAppType = NameOfAppType.map((item) => item.apptype);
      
-  
+  const AddElement = capturedDataToSave.every(item => item.isCustom === true);
 
 
      const isWebApp = NameOfAppType.appType === "Web";
@@ -1696,9 +1749,10 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj":"" )}`} title={rowdata.selectall}>{rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+        {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
       </div>
       </>
       )
@@ -1790,182 +1844,273 @@ const elementValuetitle=(rowdata)=>{
 }, [NameOfAppType.projectId]);
 
  const handleScreenChange = (e) => {
-  const selectedFolderValue = e.value;
-  setSelectedScreen(selectedFolderValue);
+  setSelectedFolderValue(e.value)
+  // const selectedFolderValue = e.value;
+  // setSelectedScreen(selectedFolderValue);
+  if(captureData.length >= 0){
+    setScreenChange(true);
+  }
+
   // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
-  setParentId(selectedFolderValue.id);
+  else{
+  setSelectedScreen(e.value);
+  
   // fetchScrapeData();
   setSaveDisable(false);
   setElementRepo(true);
-  addMore.current = true;
-  let newData = capturedDataToSave;
-  newData.push(...selectedFolderValue.related_dataobjects)
-  setCapturedDataToSave(newData);
-  // setCaptureData(newData);
-  setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+  }
+  // addMore.current = true;
+  // let newData = capturedDataToSave;
+  // newData.push(...selectedFolderValue.related_dataobjects)
+  // setCapturedDataToSave(newData);
+  // // setCaptureData(newData);
+  // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
 
 };
 
-console.log(props.screenData);
+const confirmScreenChange = () => {
+  (async () => {
+    try {
+        let params = {
+          param : "updateMindmapTestcaseScreen",
+          projectID :  NameOfAppType.projectId,
+          moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
+          parent:props.fetchingDetails["parent"]["_id"],
+          currentScreen:parentData.id,
+          updateScreen:selectedFolderValue.id
+        }
+
+        const res = await scrapeApi.updateScreen_ICE(params);
+        if(res === 'fail') {
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+        else {
+          
+          var req={
+            tab:"createdTab",
+            projectid:NameOfAppType.projectId,
+            version:0,
+            cycId: null,
+            modName:"",
+            moduleid:res
+          }
+          const dataScreen = await scrapeApi.getModules(req)
+          if(dataScreen.error)return;
+          else {
+            const screenData_1 = getReqScreen (dataScreen)
+            function getReqScreen (data){
+              let sd = []
+              data.children.forEach((child)=>{
+                if(child._id === props.fetchingDetails["parent"]["_id"]){
+                  child.children.forEach((subChild)=>{
+                    if(subChild._id === selectedFolderValue.id){
+                      if(subChild.children.length > 0){
+                         const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+                            return {
+                              ...item,
+                              parent:{...subChild,parent:{...child,parent:data}}
+                            }
+                         })}
+                         sd.push(newData);
+                      }
+                      else{
+                        sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+                          return{
+                            ...data,parent:{...child,parent:data}
+                          }
+
+                        })}})
+                      }
+                    }
+                  })
+                }
+              })
+              return sd;
+            }
+            
+            // console.log(screenData_1);
+            if(screenData_1.length>0){
+              props.setFetchingDetails(screenData_1[0])
+              props.setModuleData({id:res, key:uuid()})
+              setParentId(uuid());
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+            }else{
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+            }
+            // props.setFetchingDetails(screenData_1[0])
+            // props.setModuleData({id:res, key:uuid()})
+            // setParentId(uuid());
+          }
+        }
+        }
+     catch (error) {
+        console.error('Error fetching User list:', error);
+    }
+})();
+};
 
 const screenOption = screenData?.map((folder) => ({
-  label: folder.name,
+  label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
-  parent:folder.parent
+  parent:folder.parent,
+  title:folder.name
 }));
 
   return (
     <>
-     {overlay && <ScreenOverlay content={overlay} />}
+      {overlay && <ScreenOverlay content={overlay} />}
       {showPop && <PopupDialog />}
       {showConfirmPop && <ConfirmPopup />}
       <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}>
-      {typesOfAppType != "Webservice" && !props.testSuiteInUse?<div className="card_modal">
-          <Card className='panel_card'>
-            <div className="action_panelCard">
-            {!showPanel && <div className='utility__block'>
-                  <div className='panel_head1'>
-                  <p className='insprint__text'>Select from repository</p> </div>
-                  </div> }
-                {showPanel && <div className='utility__block'>
-                  <p className='insprint__text'>Select from repository</p>
-                  {/* <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                  <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/> */}
-                  <span className="insprint_auto">
-                    {/* <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
-                    <p className='text-600'>PDF Utility</p> */}
-                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption}
-                      placeholder={<h5 style={{color:'gray', fontSize:'19px'}}>{parentData.name}</h5>} className="w-full md:w-10rem repo__dropdown" />
-                      {/* <select value={selectedScreen} defaultValue={showCaptureScreen?parentData.name:""} onChange={handleScreenChange} placeholder="Select screen">
-                        {screenOption.map(option => (
-                          <option key={option._id} value={option._id}>{option.label}</option>
-                        ))}
-                    </select> */}
-                  </span>
+      {showCaptureScreen ?
+    
+      
+      
+      <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
+        <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
+        {
+          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          
+            <div className="capture_card_modal">
+              {/* Select From Repository */}
+              <div className="capture_card">
+                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Select Repository</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+                  </div>
                 </div>
-                }
-              {!showPanel && <div className='insprint__block1'>
-                <div>
-                <p className='insprint__text1'>In Sprint Automation</p></div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                    <div title={option.label}>{option.label}</div>
+                  )}/></div>
                 </div>}
-            {showPanel && <div className='insprint__block'>
-                <p className='insprint__text'>In Sprint Automation</p>
-                <img className='info__btn_insprint' ref={imageRef1} onMouseEnter={() => handleMouseEnter('insprint')} onMouseLeave={() => handleMouseLeave('insprint')} src="static/imgs/info.png" alt='info' ></img>
-                <Tooltip target=".info__btn_insprint" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('addObject')}>
-                  <img className='add_obj_insprint' src='static/imgs/Add_object_icon.svg' alt='add element' />
-                  {isWebApp &&  <Tooltip target=".add_obj_insprint" position="bottom" content="Add a placeholder element by specifying the element type." />}
-                  <p>Add Element</p>
-                </span>
-                <span className={`insprint_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleCaptureClickToast}>
-                  <img className='map_obj_insprint' src="static/imgs/Map_object_icon.svg" alt='map element' ></img>
-                  {isWebApp  && <Tooltip target=".map_obj_insprint" position="bottom" content=" Map placeholder elements to captured elements." />}
-
-                  <p>Map Element</p>
-                </span>
-                {/* <Tooltip target=".info__btn" position="left" content="View training videos and documents." /> */}
-                {/* {isInsprintHovered &&
-               
-                (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 100}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>InSprint Automation</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)
-                } */}
-              </div>}
-              {!showPanel && <div className='upgrade__block'>
-                <div className='panel_head'>
-                <p className='insprint__text'>Upgrade Analyzer</p>
+              </div>
+              {/* In Sprint Automation */}
+              <div className="capture_card">
+                <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
+                {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">In Sprint Automation</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
                 </div>
-                </div> }
-
-              {showPanel && <div className='upgrade__block'>
-                <p className='insprint__text'>Upgrade Analyzer</p>
-                <img className='info__btn_upgrade' ref={imageRef2} onMouseEnter={() => handleMouseEnter('upgrade')} onMouseLeave={() => handleMouseLeave('upgrade')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_upgrade" position="bottom" content="  Easily upgrade Test Automation as application changes" />
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`}  onClick={handleCompareClick}>
-                  <img className='add_obj_upgrade' src="static/imgs/compare_object_icon.svg" ></img>
-                  {isWebApp && <Tooltip target=".add_obj_upgrade" position="bottom" content="  Analyze screen to compare existing and newly captured element properties." />}
-                  <p>Compare Element</p>
-                </span>
-                <span className={`upgrade_auto ${!isWebApp ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                  <img className='map_obj_upgrade' src="static/imgs/replace_object_icon.svg" ></img>
-                  {isWebApp && <Tooltip target=".map_obj_upgrade" position="bottom" content=" Replace the existing elements with the newly captured elements." />}
-                  <p>Replace Element</p>
-                </span>
-                {/* {isUpgradeHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 650}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Upgrade Analyzer</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a href='docs.avoautomation.com'>Learn More</a>
-                </div>)} */}
-              </div>}
-              {/* {!showPanel && <div className='utility__block'>
-                <div className='panel_head1'>
-                <p className='insprint__text text-500'>Capture from PDF</p> </div>
-                </div> }
-               {showPanel && <div className='utility__block'>
-                <p className='insprint__text text-500'>Capture from PDF</p>
-                <img className='info__btn_utility' ref={imageRef3} onMouseEnter={() => handleMouseEnter('pdf')} onMouseLeave={() => handleMouseLeave('pdf')} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_utility" position="bottom" content="Capture the elements from a PDF."/>
-                <span className="insprint_auto">
-                  <img className='add_obj' src="static/imgs/pdf_icon.svg"></img>
-                  <p className='text-600'>PDF Utility</p>
-                </span>
-              </div>} */}
-
-              {!showPanel && <div className='createManual__block'>
-                <div className='panel_head2'>
-                <p className='insprint__text'>Create Manually</p> </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Add Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Map Element</p>
+                  </div>
                 </div>}
-
-              {showPanel && <div className='createManual__block'>
-                <p className='insprint__text'>Create Manually</p>
-                <img className='info__btn_create' ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" ></img>
-                <Tooltip target=".info__btn_create" position="bottom" content="  Create element manually by specifying properties." />
-                <span className={`insprint_auto create__block ${!isWebApp ? "disabled" : ""}`}   onClick={()=> isWebApp &&  handleDialog('createObject')}>
-                  <img className='map_obj' src="static/imgs/create_object_icon.svg"></img>
-                  <p>Create Element</p>
-                </span>
-                {/* {isCreateHovered && (<div className='card__insprint' style={{ position: 'absolute', right: `${cardPosition.right - 1000}px`, top: `${cardPosition.top - 10}px`, display: 'block' }}>
-                  <h3>Create Manually</h3>
-                  <p className='text__insprint__info'>Malesuada tellus tincidunt fringilla enim, id mauris. Id etiam nibh suscipit aliquam dolor.</p>
-                  <a>Learn More</a>
-                </div>)} */}
-              </div>}
-
-              {showPanel && <div className='imp_exp__block'>
-                <span className='insprint_auto'>
-                  <span className='import__block' onClick={() => setShowObjModal("importModal")}>
-                    <img className=' pi-file-import add_obj_import' src="static/imgs/Import_new_icon_grey.svg"  />
-                    {/* <i className="pi pi-file-import add_obj_import "  ></i> */}
-                    <Tooltip target=".add_obj_import" position="left" content=" Import elements from json or excel file exported from same/other screens." />
-                    <p className='imp__text'>Import Screen</p>
-                  </span>
-                  <span className="export__block"  onClick={handleExportClick}>
-                    <img  className="add_obj_export" src="static/imgs/Export_new_icon_grey.svg" />
-                    {/* <i className={`pi pi-file-export add_obj_export ${captureData.length === 0 ? "disabled-image" : ""}`} style={captureData.length === 0 ? { color: "#cccccc" }: {}}  ></i> */}
-                    <Tooltip target=".add_obj_export" position="left" content=" Export captured elements as json or excel file to be reused across screens/projects." />
-                    <p className='imp__text'>Export Screen</p>
-
-                  </span>
-                </span>
-              </div>}
-                <div style={{ display: 'flex'}}>
-                  <span onClick={togglePanel} style={{ cursor: 'pointer' }}>
+              </div>
+              {/* Upgrade Analyzer */}
+              <div className="capture_card">
+                <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
+                {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
+                {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Upgrade Analyzer</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Compare Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Replace Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Capture From Pdf */}
+              <div className="capture_card disabled">
+                <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
+                {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Capture from PDF</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn">
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">PDF <br/>Utility</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Create Manually */}
+              <div className="capture_card">
+                <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Create Manually</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Import Export Screen */}
+              <div className="capture_card import_export">
+                <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
+                {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
+                {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">File Handling</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Import Screen</p>
+                  </div>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Export Screen</p>
+                  </div>
+                </div>}
+                <div onClick={togglePanel} className="expandCollapseIconWrapper">
                   <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-                    <i className={showPanel ? 'pi pi-chevron-circle-up up_arrow icon-tooltip' : 'pi pi-chevron-circle-down down_arrow icon-tooltip'} style={{ fontSize: '1rem'}}></i>
-                  </span>
+                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
                 </div>
+              </div>
             </div>
-
-          </Card>
-        </div>
-        :null}
-
-
+          
+            : null
+        }
         <div className='card'>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
           <DataTable
@@ -1985,7 +2130,7 @@ const screenOption = screenData?.map((folder) => ({
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             columnResizeMode="expand"
             scrollable
-            scrollHeight="383px"
+            scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
           >
@@ -2020,7 +2165,230 @@ const screenOption = screenData?.map((folder) => ({
             </div>
           </Dialog>
         </div>
+        </BlockUI>
       </Dialog>
+      
+      
+            
+      :
+      <div>
+      {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
+      {typesOfAppType != "Webservice" && !props.testSuiteInUse? <div className="capture_card_modal">
+      <div className="capture_card">
+                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Select Repository</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                </div>}
+              </div>
+              {/* In Sprint Automation */}
+              <div className="capture_card">
+                <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
+                {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">In Sprint Automation</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img insprintToolTip" ref={imageRef1} onMouseEnter={() => handleMouseEnter("insprint")} onMouseLeave={() => handleMouseLeave("insprint")} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Add Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Map Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Upgrade Analyzer */}
+              <div className="capture_card">
+                <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
+                {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
+                {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Upgrade Analyzer</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className={`capture_bottom_btn ${(AddElement) ? "disabled" : ""}`} onClick={handleCompareClick}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Compare Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Replace Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Capture From Pdf */}
+              <div className="capture_card disabled">
+                <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
+                {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Capture from PDF</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn">
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">PDF <br/>Utility</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Create Manually */}
+              <div className="capture_card">
+                <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Create Manually</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Import Export Screen */}
+              <div className="capture_card import_export">
+                <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
+                {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
+                {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">File Handling</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Import Screen</p>
+                  </div>
+                  <div className="capture_bottom_btn"  onClick={handleExportClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Export Screen</p>
+                  </div>
+                </div>}
+                <div onClick={togglePanel} className="expandCollapseIconWrapper">
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+                </div>
+              </div>
+            </div>
+        :null}
+
+
+        <div className='card'>
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          <DataTable
+            size="small"
+            editMode="cell"
+            className='datatable__col'
+            value={captureData}
+            dragHandleIcon="pi pi-bars"
+            resizableColumns
+            reorderableRows
+            onRowReorder={handleRowReorder}
+            showGridlines
+            selectionMode={"single"}
+            selection={selectedCapturedElement}
+            onSelectionChange={onRowClick}
+            headerCheckboxToggleAllDisabled={false}
+            emptyMessage={showEmptyMessage ? emptyMessage : null} 
+            columnResizeMode="expand"
+            scrollable
+            scrollHeight="350px"
+            virtualScrollerOptions={{ itemSize: 46 }} 
+            tableStyle={{ minWidth: '50rem' }}
+          >
+            {/* editMode="cell"
+            onCellEdit={(e) => handleCellEdit(e)} */}
+            {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
+            {/* <Column rowReorder style={{ width: '3rem' }} /> */}
+            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
+              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
+              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
+              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+              bodyClassName={"ellipsis-column"}
+              body={renderElement}
+            >
+            </Column>
+            <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
+            <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
+            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+          </DataTable>
+              }
+          <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
+              <div data-test="popupSS" className="ref_pop screenshot_pop" style={{height: `${mirrorHeight}px`, width:typesOfAppType==="Web"?(screenshotData.isIris?'491px':'392px'):typesOfAppType==="Desktop"?'487px':typesOfAppType==="OEBS"?'462px':typesOfAppType==="SAP"?'492px':typesOfAppType==="MobileApp"?'490px':""}}>
+                <div className="screenshot_pop__content" >
+                 <div className="scrsht_outerContainer" id="ss_ssId">
+                  <div data-test="ssScroll" className="ss_scrsht_insideScroll">
+                    { highlight && <div style={{display: "flex", position: "absolute", ...highlight}}></div>}
+                    { (mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                  </div>
+                 </div>
+                </div>
+            </div>
+          </Dialog>
+        </div>
+        </div>}
+      {/* </Dialog> */}
+      <AvoConfirmDialog
+        visible={screenChange}
+        onHide={() => setScreenChange(false)}
+        showHeader={false}
+        message="Choosing the repository will overwrite the current data. Are you sure you want to proceed?"
+        icon="pi pi-exclamation-triangle"
+        accept={confirmScreenChange} />
+
+            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
+                {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
+                {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                    <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
+                    <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
+                    <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
+                    <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
+                </div> : null
+                }
+                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
+                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
+                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
+                <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
+            </div>
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
@@ -2319,7 +2687,8 @@ function generateScrapeItemList(lastIdx, viewString, type = "old") {
       left: scrapeObject.left,
       height: scrapeObject.height,
       width: scrapeObject.width,
-      identifier: scrapeObject.identifier
+      identifier: scrapeObject.identifier,
+      reused:scrapeObject.reused
     }
     if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop != undefined) {
       scrapeItem['viewTop'] = scrapeObject.viewTop;
@@ -2615,7 +2984,12 @@ const LaunchApplication = props => {
           }})
       }
     }
-
+    const handleCheckingMobileClient_ICE_MW = ()=>{
+        checkingMobileClient_ICE().then(data=>{
+          if(data === false){
+            setcheckingMobileClient_ICEResponse(true)
+          }})
+    }
     const MobileApps = {
         'content':<div className={os==="ios"?'inputIos':'inputContent'}>
            <div className="flex flex-wrap gap-3">
@@ -2734,9 +3108,14 @@ const LaunchApplication = props => {
     }
 
     const mobileWeb = {
-        'content': <div className="ss__mblweb_inputs">    
-            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum} onChange={slNumHandler} name="mobWebInput1" /> 
-            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" />
+        'content': <div className="ss__mblweb_inputs mbl_dialog">    
+            <input data-test="MWserdev" className={"ss__mblweb_input"+(error.slNum ? " la_invalid": "")} placeholder="AndroidDeviceSerialNumber/iOSDeviceName" value={slNum}  onChange={(e) => { slNumHandler(e); handleCheckingMobileClient_ICE_MW();}} name="mobWebInput1"  /> 
+            <input data-test="MWversion" className={"ss__mblweb_input"+(error.vernNum ? " la_invalid": "")} placeholder="Android/iOSVersion;UDID(for iOS device only)" value={vernNum} onChange={vernNumHandler} name="mobWebInput2" /> 
+            <div>
+                  {CheckingMobileClient_ICEResponse &&
+                    <span  className='lable_mw'>Required packages for mobile testing in Avo Assure client folder are missing.If it is android <a href="https://downloads.avoassure.ai/driver/avoAssureClient_Mobile.zip">click here</a> or if it is ios <a href="https://downloads.avoassure.ai/driver/AvoAssure_iOSMobileDependencies.zip">click here</a> to download the same, and move them to Avo Assure client folder in this path (\AvoAssureClient\AvoAssure)</span>
+                  }
+                </div>
         </div>,
 
         'footer': <input type="submit" data-test="MWLaunch" onClick={onMobileWebLaunch} style={{width: "100px"}} value="Launch" />,

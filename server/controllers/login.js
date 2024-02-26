@@ -74,7 +74,6 @@ exports.loadUserInfo = async (req, res) => {
 		}
 		license_dict={'trial':'1_','training':'2_','starter':'3_','enterprise':'4_'}
         userProfile['licenseID']='4_'
-		console.log(userProfile['licenseID'])
 		return res.send(userProfile);
 	} catch (exception) {
 		logger.error(exception.message);
@@ -164,7 +163,7 @@ exports.resetPassword = async (req, res) => {
       const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
       if (status == "fail" || status == "forbidden") return res.send("fail");
       else {
-        notifications.notify("userUpdate", {field: "password", user: userData.user});
+        notifications.notify("userUpdate", {field: "password", user: userData.user, hostName: req.headers.host});
         return res.send(status);
       }
     }
@@ -218,7 +217,7 @@ exports.resetPassword = async (req, res) => {
 		const status = await utils.fetchData(inputs, "admin/manageUserDetails", fnName);
 		if (status == "fail" || status == "forbidden") return res.send("fail");
 		else {
-			notifications.notify("userUpdate", {field: "password", user: userData.user});
+			notifications.notify("userUpdate", {field: "password", user: userData.user, hostName: req.headers.host});
 			res.send(status);
 		}
 	} catch (exception) {

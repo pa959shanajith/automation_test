@@ -10,6 +10,7 @@ import { Toast } from 'primereact/toast';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { uploadgeneratefile, getall_uploadfiles } from '../../admin/api';
 import { IntergrationLogin, AzureLogin, screenType } from './../../settings/settingSlice';
+import { Checkbox } from "primereact/checkbox";
 
 const ToastMessage = ({ message }) => (
    <Toast severity="success" life={3000}>
@@ -32,6 +33,8 @@ export default function Input({ items, callback, isReset }) {
    const [fileDetails, setFileDetails] = useState([]);
    const [badgeValue, setBadgeValue] = useState(0);
    const [toastMessage, setToastMessage] = useState('');
+   const [fileCB, setFileCB] = useState(false);
+   const [toolCB, setToolCB] = useState(false);
    const toast = useRef(null);
    const dispatchAction = useDispatch();
    //const selectedscreen = useSelector(state => state.setting.screenType);
@@ -126,7 +129,7 @@ export default function Input({ items, callback, isReset }) {
          <div className="row flex flex-row">
             <div class="col-8 ">
                <div className="form-check mb-3">
-                  <input className="form-check-input" type="checkbox" id="defaultCheck1" />
+                  <Checkbox checked={fileCB} className="form-check-input" id="defaultCheck1" onClick={(e) => setFileCB(e?.checked)}></Checkbox>
                   <label className="form-check-label text-muted pl-2 " htmlFor="defaultCheck1">
                      Upload any files relavent to the application being tested
                   </label>
@@ -134,7 +137,7 @@ export default function Input({ items, callback, isReset }) {
                <div className="card" style={{ 'margin-top': '0px' }}>
                   <FileUpload name="pdf file" multiple accept="application/pdf"
                      maxFileSize={10000000} customUpload={true}
-                     uploadHandler={myUploader}
+                     uploadHandler={myUploader} disabled={!fileCB} className='ai_file_upload'
                   />
                </div>
                {isLoading && <div className="spinner" style={{ position: 'absolute', top: '250px', left: '215px' }}>
@@ -143,31 +146,31 @@ export default function Input({ items, callback, isReset }) {
             </div>
             <div class="col-4 ">
                <div className="form-check mb-3">
-                  <input className="form-check-input" type="checkbox" value=" Upload" id="defaultCheck2" />
+                  <Checkbox checked={toolCB} className="form-check-input" id="defaultCheck2" onClick={(e)=>setToolCB(e?.checked)}></Checkbox>
                   <label className="form-check-label pl-2" htmlFor="defaultCheck2">
                      Choose a tool for user story extraction
                   </label>
                </div>
                <div className="tools-container">
-                  <div class="icon-wrapper selected" onClick={() => handleJiraIconClick({ name: 'Jira', code: 'JA' })} >
+                  <div class="ai_jira_icon_wrapper selected" onClick={() => handleJiraIconClick({ name: 'Jira', code: 'JA' })} style={!toolCB ? { pointerEvents: "none", opacity: "0.6" } : { cursor: "pointer" }} >
                      <div style={{ display: "flex",  alignItems: "center", gap: "10px", margin: "auto" }}>
                         <img src="static/imgs/jira_icon.svg" className="img__jira" />
                         <p className="text__jira">Jira</p>
                      </div>
                   </div>
-                  {/* <div class="icon-wrapper " onClick={() => handleJiraIconClick({ name: 'Azure DevOps', code: 'ADO' })} >
+                  {/* <div class="ai_jira_icon_wrapper " onClick={() => handleJiraIconClick({ name: 'Azure DevOps', code: 'ADO' })} >
                         <span>
                            <img src="static/imgs/azure_devops_icon.svg" className="img__azure mx-3" />
                         </span>
                         <span className="text__azure">Azure DevOps</span>
                      </div> */}
-                  {/*  <div class="icon-wrapper ">
+                  {/*  <div class="ai_jira_icon_wrapper ">
                         <span>
                            <img src="static/imgs/zephyr_icon.svg" class="img__zephyr" />
                         </span>
                         <span class="text__zephyr">Zephyr</span>
                      </div>
-                     <div class="icon-wrapper ">
+                     <div class="ai_jira_icon_wrapper ">
                         <span>
                            <img src="static/imgs/qTest_icon.svg" class="img__qtest" />
                         </span>
@@ -185,10 +188,10 @@ export default function Input({ items, callback, isReset }) {
          </div>
          <div className="row">
             <div className="Uploded_files">
-               <div className="files-heading mb-0 ">
+               {/* <div className="files-heading mb-0 ">
                   Already Uploaded files
                   <Badge value={badgeValue} size="large" className="ml-2 px-2 bg-secondary"></Badge>
-               </div>
+               </div> */}
                <UplodedFiles userData={fileDetails} />
             </div>
          </div>

@@ -212,12 +212,12 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , dele
     }
 };
 
-export const generateTree = (tree,sections,count,verticalLayout,screenData,isAssign,cycleID) =>{
+export const generateTree = (tree,sections,count,verticalLayout,screenData,geniusMindmap,isAssign,cycleID) =>{
     unfoldtree(tree)
     var translate;
     var nodeDisplay = {}
     var linkDisplay = {}
-    var s = d3.select('.mp__canvas_svg');
+    var s = geniusMindmap?d3.select(`.mp__canvas_svg_genius`):d3.select(`.mp__canvas_svg`)
     let  cSize= [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     var typeNum = {
         'modules': 0,
@@ -260,7 +260,7 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,isAss
                   parent: {
                     ...child.parent.data,
                     id: child.parent.id ? child.parent.id : parentId,
-                    parent: child.parent? child.parent.data:null // Use the parent's ID as the unique identifier
+                    parent: child.parent? child.parent.parent !== null? child.parent.parent.data:child.parent.data:null // Use the parent's ID as the unique identifier
                   }
                 };
           
@@ -944,7 +944,7 @@ export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
                 }
             }
         }
-    }    
+    }       
     if (p["_id"]== null && p["state"]=="created" && p["type"]=="endtoend") {deletedNodes=[]}
     return {dNodes,dLinks,linkDisplay,nodeDisplay,deletedNodes}
 }
@@ -1183,18 +1183,33 @@ export const ClickFullScreen = (setFullScreen) => {
     use:  parses input value to list of project props
 */
 
-export const parseProjList = (res) =>{
+export const parseProjList = (res) => {
     var proj = {};
-    res.projectId.forEach((e,i) => {
-        proj[res.projectId[i]]= {
-            'apptype': res.appType[i],
-            'name': res.projectName[i],
-            'apptypeName':res.appTypeName[i],
-            'id': res.projectId[i],
-            'releases':res.releases[i],
-            'domains':res.domains[i],
-            'projectLevelRole':res.projectlevelrole[0][i]["assignedrole"]
-        };
-    });
-    return proj
-}
+
+    if (
+        res.projectId &&
+        res.appType &&
+        res.projectName &&
+        res.appTypeName &&
+        res.releases &&
+        res.domains &&
+        res.projectlevelrole &&
+        Array.isArray(res.projectlevelrole[0])
+    ) {
+        res.projectId.forEach((e, i) => {
+            proj[res.projectId[i]] = {
+                'apptype': res.appType[i],
+                'name': res.projectName[i],
+                'apptypeName': res.appTypeName[i],
+                'id': res.projectId[i],
+                'releases': res.releases[i],
+                'domains': res.domains[i],
+                'projectLevelRole': res?.projectlevelrole[0][i]["assignedrole"]
+            };
+        });
+    } else {
+        proj = {}
+    }
+
+    return proj;
+};
