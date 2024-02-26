@@ -225,6 +225,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
 
     const callLogin_zephyr = async()=>{
+        setDomainDetails([]);
         var zephyrPayload = {};
         zephyrPayload.authtype = authType;
         zephyrPayload.zephyrURL = zephyrLoginDetails.url;
@@ -249,8 +250,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
         //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
-        else if (domainDetails) {
-            setToast("success", "Success", `${selectedscreen.name} login successful`);
+        else if (domainDetails?.length) {
+            setToast("success", "Success", `${selectedscreen?.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
             zephyrRef.current.callViewMappedFiles();
@@ -278,11 +279,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setIsSpin(false);
         }
         else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
-        // else if (testrailProjects === "noprojectfound") setLoginError("Invalid credentials or no project found");
-        // else if (testrailProjects === "invalidurl") setLoginError("Invalid URL");
         else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
         else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
-        // else if (testrailProjects === "Error:Failed in running testrail") setLoginError("Host not reachable");
         else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
         else if (testrailProjects) {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
