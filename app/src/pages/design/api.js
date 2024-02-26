@@ -1183,7 +1183,7 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
   api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
                 or {status:"", "":xpath}
 */ 
-export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false,advanceDebug=false,debuggerPoints=[],actionForAdvanceDebug="") => {
+export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false,debuggerPoints=[],advanceDebug=false,actionForAdvanceDebug="") => {
     return new Promise((resolve, reject)=>{
         let data={}
         if(advanceDebug){
@@ -1193,7 +1193,7 @@ export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, ge
                 debuggerPoints:debuggerPoints
             }
         }
-        else if (actionForAdvanceDebug=='moveToNextStep'){
+        else if (actionForAdvanceDebug=='nextStep'){
             data={
                 param:'moveToNextStep',
                 debuggerPoints:debuggerPoints

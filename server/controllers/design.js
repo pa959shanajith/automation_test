@@ -237,8 +237,8 @@ exports.debugTestCase_ICE = function (req, res) {
 											};
 										}
 										var responsedata = requestedtestcaseids.map(i=> tcDict[i])
-										
-										responsedata.push(browsertypeobject,debuggerPointsObject);										logger.info("Sending socket request for debugTestCase to cachedb");
+										responsedata.push(browsertypeobject,debuggerPointsObject);
+										logger.info("Sending socket request for debugTestCase to cachedb");
 										dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
 										startDebugging(dataToIce);
 									}
@@ -453,7 +453,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						}
 					}
 					else if(action=='playDebug'){
-						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints}}
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
 						mySocket.emit("playDebug",dataToIce );
 										function result_playDebug_listener(message) {
 											data = message;
@@ -470,7 +470,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										mySocket.on("result_playDebug_listener", result_playDebug_listener);
 					}
 					else if(action=='moveToNextStep'){
-						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints}}
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
 						mySocket.emit("moveToNextStep",dataToIce );
 										function result_moveToNextStep_listener(message) {
 											data = message;

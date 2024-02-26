@@ -75,7 +75,8 @@ const DesignModal = (props) => {
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
     const [arrow, setArrow] = useState(false);
-    const[actionForAdvanceDebug,setActionForAdvanceDebug]=useState("")
+    const[actionForAdvanceDebug,setActionForAdvanceDebug]=useState("");
+    const[watchlist,setWatchList] = useState([]);
     let runClickAway = true;
     
 
@@ -633,6 +634,18 @@ const DesignModal = (props) => {
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
                 setOverlay("");
                 dispatch(SetEnablePlayButton(true))
+                console.log(data)
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
                 return
                 }
                 setOverlay("");
@@ -1413,16 +1426,7 @@ const DesignModal = (props) => {
         }
     setExpandedRows(_expandedRow)
     }
-    const watchlist=[
-        {
-            testStep:1,
-           
-            name: '@Genric',
-            variable: '{c1}',
-            value: '6',
-           
-        }
-    ]
+
     const handlePlay=()=>{
         // SetEnablePauseDebugger({status:false})
         let debuggerPointShift=[...debuggerPoints]
@@ -1430,10 +1434,21 @@ const DesignModal = (props) => {
         debuggerPointShift.shift()
         let newDebuggerPoints=debuggerPointShift
         dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"play")
         .then(data => {
-            if(data==="success"){
-
+            if(data){
+                dispatch(SetEnablePlayButton(true))
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
             }
             console.log(data)
         }
@@ -1447,8 +1462,19 @@ const DesignModal = (props) => {
         let newDebuggerPoints=[nextVal,...debuggerPointShift]
         dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
 
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,advanceDebug,newDebuggerPoints,actionForAdvanceDebug)
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"nextStep")
         .then(data => {
+            let dataforstep=data.map(steps=>{
+                return {teststep:steps.index,
+                name:steps.custname,
+                status:steps.result[0],
+                value:steps.result[2].includes("901a")?"":steps.result[2]
+                }
+            }
+            )
+            setWatchList((watchlist)=>{
+            return [...watchlist,...dataforstep]
+            })
             console.log(data)
         }
         )
@@ -1463,7 +1489,7 @@ const DesignModal = (props) => {
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position={visibleRight?'left':'right'} visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false});dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',points:[]});setVisibleRight(false)}}>
+            <Dialog className='design_dialog_box' header={headerTemplate} position={visibleRight?'left':'right'} visible={props.visibleDesignStep} style={{ width: '70vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false});dispatch(SetAdvanceDebug(false));SetDebuggerPoints({push:'reset',points:[]});setVisibleRight(false)}}>
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
@@ -1516,26 +1542,25 @@ const DesignModal = (props) => {
                 </div>
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'26rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]})}}>
-                    <h2 style={{marginBottom:'1rem'}}>Advance Debug</h2>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]})}}>
+                    <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <div style={{display:'flex',width:'15rem',justifyContent:'space-between'}}>
-                        {(enablePlayButton)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<span style={{cursor:'pointer'}}><i className="pi pi-pause" style={{ height:'30px' }}></i>
-</span>}
+                    <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
+                        {(enablePlayButton)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
                         <img src='static/imgs/stepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
-                        <span title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{cursor:'pointer'}}><i className="pi pi-ban" style={{ height:'30px' }}></i></span>
+                        <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
                                             </div>
                     <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
 
                     </div>
                     <div className="card">
             <DataTable value={watchlist}>
-                <Column field="testStep" header="Step no."></Column>
-                <Column field="name" header="Element Name"></Column>
-                <Column field="variable" header="status/value"></Column>
-                
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '10%', flex:"0 0", fontFamily:'LatoWebLight'}} field="teststep" header="Step"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '43%', minWidth: '30%', flex:"0 0", fontFamily:'LatoWebLight'}} field="name" header="Element Name"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="status" header="Status"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="value" header="Value"></Column>
             </DataTable>
         </div>
                 </Sidebar>
