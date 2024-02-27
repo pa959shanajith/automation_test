@@ -1820,7 +1820,7 @@ const DesignModal = (props) => {
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
                         {(enablePlayButton)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
-                        <img src='static/imgs/stepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
                         <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
                                             </div>
