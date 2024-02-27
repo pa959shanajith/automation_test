@@ -972,7 +972,7 @@ else{
 
         if (viewString.view.length !== 0) {
 
-          let lastIdx = viewString.view ? viewString.view.length : 0;
+          let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
 
