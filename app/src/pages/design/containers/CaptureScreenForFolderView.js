@@ -246,9 +246,11 @@ const CaptureModal = (props) => {
     const handleAddMore = (id) => {
         if (id === 'add more') {
             setVisible(id);
+            setParentId(null)
         }
         else if (id === 'capture') {
             setVisible(id);
+            setParentId(null)
         }
     }
 
@@ -367,7 +369,7 @@ const CaptureModal = (props) => {
     }
 
     const onSave = (e, confirmed) => {
-
+        setOverlay("Saving in Progress...")
         let continueSave = true;
 
         // if (mainScrapedData.reuse && !confirmed) {
@@ -530,7 +532,7 @@ const CaptureModal = (props) => {
                                 viewString = newScrapeList;
                             }
                         }
-                        if(parentId !== null){
+                        if(parentId === Id){
                             setCapturedDataToSave(newScrapeList);
                             viewString = newScrapeList;
                         }
@@ -686,9 +688,11 @@ const CaptureModal = (props) => {
         // setNewScrapedCapturedData(newCapturedDataToSave)
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
         setSaveDisable(false);
+        setMasterCapture(true);
     }
 
     const saveScrapedObjects = () => {
+        setOverlay("Saving in progress")
         let scrapeItemsL = [...capturedDataToSave];
         let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
         let views = [];
@@ -761,13 +765,15 @@ const CaptureModal = (props) => {
                     footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
                   })
                   : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+                  setMasterCapture(false);
                 let numOfObj = scrapeItemsL.length;
                 // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
               } else { console.error(resp); addMore.current = true; }
             }).catch(error => console.error(error));
           })
           .catch(error => console.error(error))
-          setSaveDisable(true);
+          setSaveDisable(true); 
+          setOverlay("")
       }
     
       const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -1896,7 +1902,7 @@ const CaptureModal = (props) => {
                   if(screenData_1.length>0){
                     props.setFetchingDetails(screenData_1[0])
                     props.setModuleData({id:res, key:uuid()})
-                    setParentId(uuid());
+                    setParentId(screenData_1[0].parent._id);
                     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
                   }else{
                     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });

@@ -131,7 +131,8 @@ const ElementRepository = (props) => {
         if (response === "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to paste the Data.', life: 5000 });
         else if(response === "invalid session") return RedirectPage(history);
         else {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Copied Data saved successfully.', life: 5000 });
+          setCopiedRow(null);
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements copied.', life: 5000 });
           setUpdatPastedData(true);
         }
         
@@ -237,7 +238,7 @@ const ElementRepository = (props) => {
         setScreenData([...screenData, newScreen]);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added and saved.', life: 5000 });
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
       }
 
     
@@ -278,7 +279,7 @@ const handleAccordionNameEdit = (index,e) => {
     else{
       setScreenRename("")
       setEditingIndex(null)
-      screenRename && toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository renamed', life: 5000 });
+      screenRename && toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository renamed.', life: 5000 });
     }
   })
   .catch(error => console.log(error))
@@ -310,7 +311,7 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Paste',
           icon: <img
-                 src="static/imgs/paste_icon.svg"
+                 src="static/imgs/paste_icon.svg" className='paste-icon'
                 />,
           command: () => pasteRow(accordionId),
           disabled: (copiedRow === null)
@@ -327,7 +328,7 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Paste',
           icon: <img
-                  src="static/imgs/paste_icon.svg"
+                  src="static/imgs/paste_icon.svg" className='paste-icon'
                 />,
           command: () => pasteRow(accordionId),
           disabled: (copiedRow === null)
@@ -552,20 +553,22 @@ const handleChangeScreenName=(index,e)=>{
         <div className='flex flex-row justify-content-evenly'>
           {defaultselectedProject.appType === "Web" ? (
             <div>
-              <i className="pi pi-pencil"
+              <Tooltip target=".pencil-edit" position='bottom' content='Edit'/>
+              <i className="pi pi-pencil pencil-edit"
                 onClick={() => {
                   setSelectedCapturedElement(selectedElement);
                   openElementProperties(rowData);
                 }}></i>
           </div>) : null}
           <div>
+          <Tooltip target=".trash-icon" position='bottom' content='Delete'/>
           <i
-            className='pi pi-trash'
+            className='pi pi-trash trash-icon'
             onClick={() => {
               if (result.length>0) {
                 setResusedDeleteElement(true);
                 setReuseDelMessage(
-                  "Selected element is re-used. By deleting this, it will impact other Element Repository.\n \n Are you sure you want to delete permanently?"
+                  "Selected element is re-used.Are you sure you want to delete it?"
                 );
               } else {
                 setDeleteElements(true);
@@ -871,6 +874,10 @@ const deleteScreen = (index, screenDetails)=>{
     const updatedScreenData = screenData.filter(screen => screen._id !== screenDetails._id);
       setScreenData(updatedScreenData);
       saveScreens(screenDetails);
+      if (activeAccordionIndex === index) {
+        setActiveAccordionIndex(null); // Close the deleted accordion
+    }
+
 }
 
 
@@ -916,7 +923,7 @@ const deleteScreen = (index, screenDetails)=>{
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
-                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>10?screenDetails.name.trim().substring(0,10)+'...':screenDetails.name }</span>
+                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>30?screenDetails.name.trim().substring(0,30)+'...':screenDetails.name }</span>
                   )}
                 </span>
               {activeAccordionIndex === index && (
@@ -976,10 +983,10 @@ const deleteScreen = (index, screenDetails)=>{
               message="Are you sure you want to delete the element?"
               icon="pi pi-exclamation-triangle"
               accept={()=>handleDeleteRow(selectedCapturedElement,screenDetails)} />
-              {reusedDeleteElement && <Dialog visible={reusedDeleteElement} header='Confirmation' onHide={()=>setResusedDeleteElement(false)} footer={<>
+              {reusedDeleteElement && <Dialog className='delete_reuse_dailog' visible={reusedDeleteElement} onHide={()=>setResusedDeleteElement(false)} icon="pi pi-exclamation-triangle" footer={<>
+                        <Button label='Delete current' onClick={()=>{setResusedDeleteElement(false);deleteCurrentElement(selectedCapturedElement,screenDetails)}} text/>
                         <Button label='Delete everywhere' onClick={()=>{setResusedDeleteElement(false);deleteElement(selectedCapturedElement,screenDetails)}}/>
-                        <Button label='Delete current' onClick={()=>{setResusedDeleteElement(false);deleteCurrentElement(selectedCapturedElement,screenDetails)}}/>
-                        <Button onClick={()=>setResusedDeleteElement(false)} label='Cancel'/>        
+                        {/* <Button onClick={()=>setResusedDeleteElement(false)} label='Cancel'/>         */}
                     </>}
                     >
                       <DelReuseMsgContainer message={reuseDelMessage}/>
