@@ -193,7 +193,7 @@ const GeniusSap = (props) => {
   const [showMindmap, setShowMindmap] = useState(false);
   const [dataSaved, setDataSaved] = useState(false);
   const [activeIndex, setActiveIndex] = useState(3);
-  const dialogFuncMap = {
+    const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
 
@@ -1160,7 +1160,7 @@ const onScreenNameChange = (e, name) => {
     return <div><div className='keyworddata'>{rowData?.keywordVal}</div></div>
   }
   const sapPasswordMask = (rowData) => {
-    const result = rowData.id.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
+    const result = rowData?.id?.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
     return result
   }
   const inputValTemplate = (rowData) =>{
