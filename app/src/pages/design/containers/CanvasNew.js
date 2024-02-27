@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -32,7 +32,7 @@ import { Column } from 'primereact/column';
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from 'primereact/dropdown';
-import { highlightScrapElement_ICE,saveTag } from '../../design/api'
+import { highlightScrapElement_ICE,saveTag,getModules } from '../../design/api'
 import MapElement from '../components/MapElement';
 import { ContextMenu } from 'primereact/contextmenu'
 import { AnalyzeScenario, deletedNodes } from '../designSlice';
@@ -193,7 +193,7 @@ const CanvasNew = (props) => {
     const [tagAdded, setTagAdded] = useState(false);
     const [saveDisabled, setSaveDisabled] = useState(true);
     const [unsavedChanges, setUnsavedChanges] = useState(false);
-
+    const currentModId=useSelector(state=>state.design.currentModuleId)
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
   const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
@@ -448,6 +448,19 @@ const CanvasNew = (props) => {
             setTags('')
             toast.current.show({severity:'error', summary: 'error', detail:"Failed to save tag(s). Please try again.", life: 1000});
           }
+          const req = {
+            tab: "createTab",
+            projectid: proj,
+            version: 0,
+            cycId: null,
+            modName: "",
+            moduleid: currentModId
+          }
+      
+          var res = await getModules(req)
+          if (res.error) { displayError(res.error); return }
+          dispatch(selectedModuleReducer(res))
+          setBlockui({ show: false })
           setUnsavedChanges(false); 
           setVisibleTag(false); 
           setTagAdded(false);
