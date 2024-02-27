@@ -1818,7 +1818,7 @@ const DesignModal = (props) => {
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
-                        {(enablePlayButton)?<img src='static/imgs/start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
                         <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
