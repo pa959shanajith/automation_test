@@ -212,8 +212,8 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                     checked={selectedTestRailNodeFirstTree.id === node.id}
                     onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
-                <Tooltip target={`#${node.name}`} position='right'>{node.name}</Tooltip>
-                <span className="scenario_label" id={`${node.name}`}>{node.name}</span>
+                <Tooltip target={`.scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
+                <span className={`scenario-label scenario_label-${node.id}`} id={node.name}>{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
