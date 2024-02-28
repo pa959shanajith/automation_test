@@ -329,7 +329,7 @@ const GeniusSap = (props) => {
       let abc = screenData.testcases.map((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
+          let originalVal = testcase.inputVal
           // testcase.inputVal[0]=`|${testcase.custname}|`
           obj[variables] = originalVal
           i++
@@ -1033,7 +1033,7 @@ const onScreenNameChange = (e, name) => {
                 appType: 'SAP',
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
@@ -1049,7 +1049,7 @@ const onScreenNameChange = (e, name) => {
                 appType: testStep.custname.replace(new RegExp('@', 'g'), ''),
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
