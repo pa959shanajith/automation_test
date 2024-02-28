@@ -245,12 +245,12 @@ exports.getTestcases_Testrail = async (req, res) => {
       //ICE responds to the event and sends the above requested data
       function testrail_testcase_listener(data) {
         // remove the added listener once the task is done
-        mySocket.removeListener(`qcresponse${data[0]['section_id']}`, testrail_testcase_listener);
+        mySocket.removeListener(`qcresponse${data[0]['suite_id']}`, testrail_testcase_listener);
         res.send(data[0].message);
       }
  
       // Invoke the above function on qcresponse event
-      mySocket.on(`qcresponse${sectionId}`, testrail_testcase_listener);
+      mySocket.on(`qcresponse${suiteId}`, testrail_testcase_listener);
     } else {
       logger.info(
         "Error occurred in getTestcases_Testrail: Invalid Testrail Credentials"
