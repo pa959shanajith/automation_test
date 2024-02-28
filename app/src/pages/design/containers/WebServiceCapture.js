@@ -4,7 +4,7 @@ import XMLParser from 'react-xml-parser';
 import { useNavigate } from 'react-router-dom';
 import ScreenWrapper from './ScreenWrapper';
 // import ScrapeObject from '../components/ScrapeObject';
-import { RedirectPage, ResetSession, Messages as MSG, setMsg } from '../../global';
+import { RedirectPage, ResetSession, Messages as MSG, setMsg, ModalContainer } from '../../global';
 import { disableAction, actionError, WsData, wsdlError, disableAppend } from '../designSlice';
 // import SubmitTask from '../components/SubmitTask';
 import * as api from '../api';
@@ -20,6 +20,8 @@ import MonacoEditor from 'react-monaco-editor';
 import { RadioButton } from "primereact/radiobutton";
 import { InputTextarea } from 'primereact/inputtextarea';
 import xmlFormatter from 'xml-formatter';
+import { Tooltip } from 'primereact/tooltip';
+
 
 
 import CertificateModal from './CertificateModal';
@@ -55,7 +57,9 @@ const WebserviceScrape = (props) => {
     const [oAuthUrlError, setOAuthUrlError] = useState(false);
     const [oAuthClientIdError, setOAuthClientIdError] = useState(false);
     const [oAuthGrantTypeError, setOAuthGrantTypeError] = useState(false);
-
+    const [generateToken, setGenerateToken] = useState('');
+    const [readableTokenDialog, setReadableTokenDialog] = useState(false);
+    const [copyToolTip, setCopyToolTip] = useState("Click To Copy")
 
     const responseNavItem = [
         { label: 'Body' },
@@ -427,7 +431,14 @@ const WebserviceScrape = (props) => {
                     'grant_type': oAuthGrantTypechange
                 }
                 const apiGenerator = await api.generateToken(arg);
-                console.log(apiGenerator);
+                if(apiGenerator[0] === "Pass"){
+                    setReadableTokenDialog(true);
+                    setGenerateToken(apiGenerator[2]);
+                }
+                if(apiGenerator[0] === "Fail"){
+                    if(apiGenerator[3] != null) props.toastError(apiGenerator[3])
+                    else props.toastError("Error while creating the token");
+                }
             }
         } catch (error) {
             console.log(error)
@@ -442,9 +453,65 @@ const WebserviceScrape = (props) => {
         } else dispatch(disableAppend(false));
     }
 
+    const copyTokenFunc = () => {
+		const data = generateToken;
+		if (!data) {
+			setCopyToolTip("Nothing to Copy!");
+			setTimeout(() => {
+				setCopyToolTip("Click to Copy");
+			}, 1500);
+			return;
+		}
+		const x = document.getElementById('token');
+		x.select();
+		document.execCommand('copy');
+		setCopyToolTip("Copied");
+		setTimeout(() => {
+			setCopyToolTip("Click to Copy");
+		}, 1500);
+	}
+
+    const GenerateTokenContent = () => {
+       return( <div className='flex'>
+            <InputTextarea
+                autoResize
+                id="token"
+                name="token"
+                value={generateToken}
+                rows={5} cols={70}
+                // placeholder="Click on Provision/ Register to generate token"
+                readOnly
+            />
+            <Tooltip target=".token_copy" content={copyToolTip} position="right" />
+            <span
+                className="pi pi-copy token_copy"
+                style={{ fontSize: '1.5rem', cursor: 'pointer' }}
+                data-for="copy"
+                onClick={() => copyTokenFunc()}>
+            </span>
+        </div> )
+    }
+
+    const deleteModalButtons = () => {
+        return (
+          <div>
+            <Button label="Cancel" size="small" onClick={() => { setReadableTokenDialog(false) }} text></Button>
+          </div>
+        )
+      }
     return (
 
         <div className='webservice_container'>
+            {readableTokenDialog ?
+                <ModalContainer 
+                title="Token" 
+                show={readableTokenDialog}
+                footer={deleteModalButtons()} 
+                close={() => setReadableTokenDialog(false)} 
+                // width={}
+                content = {<GenerateTokenContent/>}
+                />
+                : null}
             <TabMenu model={webServiceNavItem} activeIndex={webServiceNavItem.findIndex((item) => item.key === selectedTab)} onTabChange={(e) => setSelectedTab(webServiceNavItem[e.index].key)} />
             {selectedTab === "request" &&
                 <div className='webservice_left_container'>

@@ -49,7 +49,7 @@ const initialState = {
     basicAuthPassword: "",
     oAuthClientSecret:'',
     oAuthScope: '',
-    oAuthGrantTypechange: '',
+    oAuthGrantTypechange: 'client_credentials',
     oAuthClientId: '',
     oAuthUrl: '',
     bearerTokenValue: ''
