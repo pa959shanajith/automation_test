@@ -133,6 +133,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -248,9 +249,11 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const handleAddMore = (id) => {
     if (id === 'add more') {
       setVisible(id);
+      setParentId(null)
     }
     else if (id === 'capture') {
       setVisible(id);
+      setParentId(null)
     }
   }
 
@@ -540,7 +543,7 @@ const elementTypeProp =(elementProperty) =>{
                 viewString = newScrapeList;
               }
             }
-            if(parentId !== null){
+            if(parentId === Id){
               setCapturedDataToSave(newScrapeList);
               viewString = newScrapeList;
             }
@@ -704,6 +707,7 @@ const elementTypeProp =(elementProperty) =>{
   // {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
+    setOverlay("Saving in progress...")
     let scrapeItemsL = [...capturedDataToSave];
     let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
     let views = [];
@@ -786,6 +790,7 @@ const elementTypeProp =(elementProperty) =>{
       })
       .catch(error => console.error(error))
       setSaveDisable(true);
+      setOverlay("");
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -1142,8 +1147,8 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(selectedElement)} />
-
+          className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+          
 
         
 
@@ -1191,7 +1196,7 @@ else{
         </h4>
         
         {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
-          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable && blocked} outlined>Add more</Button>
+          <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
           <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
@@ -1873,7 +1878,7 @@ const confirmScreenChange = () => {
         let params = {
           param : "updateMindmapTestcaseScreen",
           projectID :  NameOfAppType.projectId,
-          moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+          moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
           parent:props.fetchingDetails["parent"]["_id"],
           currentScreen:parentData.id,
           updateScreen:selectedFolderValue.id
@@ -1883,7 +1888,7 @@ const confirmScreenChange = () => {
         if(res === 'fail') {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
-          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 5000 });
+          
           var req={
             tab:"createdTab",
             projectid:NameOfAppType.projectId,
@@ -1901,7 +1906,7 @@ const confirmScreenChange = () => {
               data.children.forEach((child)=>{
                 if(child._id === props.fetchingDetails["parent"]["_id"]){
                   child.children.forEach((subChild)=>{
-                    if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                    if(subChild._id === selectedFolderValue.id){
                       if(subChild.children.length > 0){
                          const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
                             return {
@@ -1926,10 +1931,18 @@ const confirmScreenChange = () => {
               return sd;
             }
             
-            console.log(screenData_1);
-            props.setFetchingDetails(screenData_1[0])
-            props.setModuleData({id:res, key:uuid()})
-            setParentId(uuid());
+            // console.log(screenData_1);
+            if(screenData_1.length>0){
+              props.setFetchingDetails(screenData_1[0])
+              props.setModuleData({id:res, key:uuid()})
+              setParentId(screenData_1[0]._id);
+              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+            }else{
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+            }
+            // props.setFetchingDetails(screenData_1[0])
+            // props.setModuleData({id:res, key:uuid()})
+            // setParentId(uuid());
           }
         }
         }
@@ -2174,7 +2187,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" tooltipOptions="title" /></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}

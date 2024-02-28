@@ -8,12 +8,14 @@
     /* right: -11rem; */
     left: 60rem;
     bottom: 1rem;
+    font: $f6_semibold !important;
 }
 
 .scenario-accordion{
     display: flex;
     flex-direction: row;
     gap: 42rem;
+    font: $f6_semibold !important;
 }
 
 .button-class{
@@ -24,6 +26,7 @@
 
 .scenario-text{
     top: 1rem;
+    font: $f6_semibold !important;
 }
 
 .accordion-class{
@@ -47,10 +50,10 @@
 }
 
 .edit-text{
-    font: $f7_semibold !important;
+    font: $f6_semibold !important;
 }
 .delete-text{
-    font: $f7_semibold !important;
+    font: $f6_semibold !important;
 }
 
 .element-repository{
@@ -87,6 +90,7 @@
     justify-content: center;
     position: relative;
     right: 1rem;
+    font: $f6_semibold !important;
   }
 
 .input__field{
@@ -107,6 +111,7 @@
     border-radius: 1rem !important;
     width: 4rem;
     padding: 0.1rem 0.1rem;
+    font: $f6_semibold !important;
     .p-tag-value{
         position: relative;
         right: 1.2rem;
@@ -133,4 +138,14 @@
 .screenname__display{
     position: relative;
     bottom: 0.1rem;
+}
+
+.delete_reuse_dailog{
+    .p-dailog .p-dailog-header{
+        background: none !important;
+    }
+}
+
+.paste-icon{
+    margin-right: 0.5rem;
 }

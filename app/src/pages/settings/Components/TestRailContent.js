@@ -8,14 +8,15 @@ import { Button } from 'primereact/button';
 import { Tree } from 'primereact/tree';
 import { Paginator } from 'primereact/paginator';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from "primereact/tooltip";
 import { useSelector, useDispatch } from 'react-redux';
 import * as api from '../api.js';
-import { selectedProject, selectedIssue } from '../settingSlice';
+import { selectedProject, mappedTree } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
-import { enableSaveButton, mappedPair } from "../settingSlice";
-import { Messages as MSG, setMsg } from '../../global';
+import { enableSaveButton, mappedPair, updateTestrailMapping } from "../settingSlice";
+import { Messages as MSG } from '../../global';
 
-const TestRailContent = ({ domainDetails, ref }) => {
+const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -37,19 +38,21 @@ const TestRailContent = ({ domainDetails, ref }) => {
     const dispatch = useDispatch();
     const currentProject = useSelector(state => state.setting.selectedProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const isTestrailMapped = useSelector(state => state.setting.updateTestrailMapping);
+    const mappedData = useSelector(state => state.setting.mappedPair);
+
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
     };
 
-    const setToast = (tag, summary, msg) => {
-        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 5000 });
-    };
-
     const onDropdownChange = async (e) => {
         e.preventDefault();
-        dispatch(selectedProject(e.value));
         setLoading(true);
+        dispatch(selectedProject(e.value));
+        setSelectedTestRailNodeFirstTree({});
+        setSelectedTestRailNodesSecondTree([]);
+        setSectionData([]);
 
         const testrailTestSuites = await api.getSuitesTestrail_ICE({
             TestRailAction: "getSuites",
@@ -60,7 +63,12 @@ const TestRailContent = ({ domainDetails, ref }) => {
             setToast("error", "Error", testrailTestSuites.error);
 
         if (testrailTestSuites.length > 0) {
-            setProjectSuites(testrailTestSuites);
+            const _testrailTestSuites = testrailTestSuites.map((suite, index) => ({
+                ...suite,
+                key: `${index}`
+            }));
+
+            setProjectSuites(_testrailTestSuites);
             setLoading(false);
         };
     };
@@ -79,7 +87,9 @@ const TestRailContent = ({ domainDetails, ref }) => {
                         ...rest
                     }
                 }))
-            ));
+            )).map((obj, index) => {
+                return { ...obj, key: index }
+            });
 
             setUpdatedTreeData(() => testCasesList);
         };
@@ -102,13 +112,20 @@ const TestRailContent = ({ domainDetails, ref }) => {
                         "testrailAction": "getSections"
                     });
 
+                    for (let index = 0; index < sections.length; index++) {
+                        sections[index] = {
+                            ...sections[index],
+                            key: `${projectSuites[i].key}-${index}`
+                        };
+                    }
+
                     testSection.push({
                         ...suite,
                         children: sections || []
                     });
                 }
 
-                const fetchTestCases = async (projectId, suiteId, sectionId) => {
+                const fetchTestCases = async (projectId, suiteId, sectionId, outerIndex) => {
                     try {
                         const response = await api.getTestcasesTestrail_ICE({
                             projectId,
@@ -125,7 +142,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                 const testCaseWithType = {
                                     ...testCase,
                                     type: "testcase",
-                                    name: testCase.title
+                                    name: testCase.title,
+                                    key: `${outerIndex}-${i}`
                                 };
                                 testCaseDetails.push(testCaseWithType);
                             }
@@ -150,8 +168,9 @@ const TestRailContent = ({ domainDetails, ref }) => {
 
                             if (children.length === 0) {
                                 newItem.type = "parent";
+                                newItem.key = `${section.key}-${i}`
                                 const { suite_id, id: sectionId } = newItem;
-                                newItem.children = await fetchTestCases(currentProject.id, suite_id, sectionId);
+                                newItem.children = await fetchTestCases(currentProject.id, suite_id, sectionId, `${section.key}-${i}`);
                             }
 
                             result.push(newItem);
@@ -190,10 +209,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
             return <>
                 <Checkbox
                     value={node?.id}
-                    checked={selectedTestRailNodeFirstTree.id == node.id}
+                    checked={selectedTestRailNodeFirstTree.id === node.id}
                     onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
-                <span className="scenario_label">{node.name}</span>
+                <Tooltip target={`.scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
+                <span className={`scenario-label scenario_label-${node.id}`} id={node.name}>{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -206,8 +226,10 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     value={node}
                     checked={selectedTestRailNodesSecondTree.includes(node._id)}
                     onChange={(e) => handleNodeToggleSecondTree(e, node)}
+                    disabled={!Object.keys(selectedTestRailNodeFirstTree)?.length}
                 />
-                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
+                <Tooltip target={`#${node.name}-${node.testSuite?.name}`} position='right'>{node.name} - {node.testSuite?.name}</Tooltip>
+                <span className={`scenario_label`} id={`${node.name}-${node.testSuite?.name}`}>{node.name} - {node.testSuite?.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -215,7 +237,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
 
 
     const handleNodeToggleFirstTree = (node) => {
-        setSelectedTestRailNodeFirstTree({ id: node.id, name: node.name, suite_id: node.suite_id });
+        if (selectedTestRailNodeFirstTree.id === node.id) {
+            setSelectedTestRailNodeFirstTree({});
+        } else {
+            setSelectedTestRailNodeFirstTree({ id: node.id, name: node.name, suite_id: node.suite_id });
+        }
     };
 
     const handleNodeToggleSecondTree = (e, node) => {
@@ -234,12 +260,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
     };
 
     const handleSync = () => {
-        let popupMsg = false;
         let scenarioIdsList = [];
         const { id, name, suite_id } = selectedTestRailNodeFirstTree;
-        if (selectedTestRailNodesSecondTree.length === 0) {
-            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
-        }
 
         const data = updatedTreeData?.map((item) => {
             if (selectedTestRailNodesSecondTree.includes(item._id)) {
@@ -263,34 +285,43 @@ const TestRailContent = ({ domainDetails, ref }) => {
         };
 
         setUpdatedTreeData((updatedTreeData) => data);
-        if (popupMsg) setMsg(popupMsg);
-        dispatch(enableSaveButton(true));
+        if (selectedTestRailNodesSecondTree.length === 0 || Object.keys(selectedTestRailNodeFirstTree)?.length === 0) {
+            dispatch(enableSaveButton(false));
+        } else {
+            dispatch(enableSaveButton(true));
+        }
         dispatch(mappedPair(mappedData));
         setSelectedTestRailNodeFirstTree({});
         setSelectedTestRailNodesSecondTree([]);
-        fetchMappedTestcases();
     }
 
     const fetchMappedTestcases = async () => {
         const data = await api.viewTestrailMappedList();
         setRows(data);
+        dispatch(updateTestrailMapping(false));
     };
 
-    const handleUnSyncmappedData = async (items, scenario = null) => {
+    const handleUnSyncmappedData = async (items, scenario = null, testCaseNames = null) => {
         if (Object.keys(items).length) {
             let findMappedId = rows.filter((row) => row._id === items._id);
             if (findMappedId && findMappedId.length) {
                 const unSyncObj = [];
-                unSyncObj.push({
-                    'mapid': items._id,
-                    'testscenarioid': items.testscenarioid.filter((scenarioid) => scenarioid == scenario)
-                });
+                if (scenario != null) {
+                    unSyncObj.push({
+                        'mapid': items._id,
+                        'testscenarioid': items?.testscenarioid?.filter((scenarioid) => scenarioid == scenario)
+                    });
+                } else if (testCaseNames != null) {
+                    unSyncObj.push({
+                        'mapid': items._id,
+                        'testscenarioid': [testCaseNames]
+                    });
+                }
 
                 let args = Object.values(unSyncObj);
                 args['screenType'] = "Testrail";
 
                 const saveUnsync = await api.saveUnsyncDetails(args);
-                console.log("saveUnsync", saveUnsync);
 
                 if (saveUnsync.error)
                     setToast("error", "Error", 'Failed to Unsync');
@@ -305,6 +336,24 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     setToast("success", "Success", 'Mapped data unsynced successfully');
                 }
             }
+
+            const removeTestCase = updatedTreeData.map((data) => {
+                if (data._id == scenario || data._id == testCaseNames) {
+                    if (data.children && data.children.length > 0) {
+                        const filteredChildren = data.children.filter((child) => child._id != items.testid[0]);
+
+                        return {
+                            ...data,
+                            children: filteredChildren
+                        };
+                    }
+                    return data;
+                } else
+                    return data;
+            });
+
+            dispatch(mappedTree(removeTestCase));
+            setUpdatedTreeData((prevTreeData) => removeTestCase);
         }
     }
 
@@ -313,8 +362,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
     }, [domainDetails?.projects]);
 
     useEffect(() => {
-        fetchMappedTestcases();
-    }, [])
+        if (isTestrailMapped) fetchMappedTestcases();
+    }, [isTestrailMapped]);
 
     return (
         <div className="tab__cls">
@@ -410,16 +459,16 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                 <div className="accordion_testcase">
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
-                                            <AccordionTab key={item._id} header={<span>{item.testname}</span>}>
-                                                {
-                                                    item.testscenarioname.map((scenario, index) => (
+                                            item.testname?.map((name) => (
+                                                <AccordionTab key={item._id} header={<span>{name}</span>}>
+                                                    {item.testscenarioname.map((scenario, index) => (
                                                         <div className='unsync-icon' key={index}>
                                                             <span>{scenario}</span>
-                                                            <i className="pi pi-times" onClick={() => handleUnSyncmappedData(item, item.testscenarioid[index])} />
+                                                            <i className="pi pi-times" onClick={() => handleUnSyncmappedData(item, item.testscenarioid[index], null)} />
                                                         </div>
-                                                    ))
-                                                }
-                                            </AccordionTab>
+                                                    ))}
+                                                </AccordionTab>
+                                            ))
                                         ))}
                                     </Accordion>
                                 </div>
@@ -427,17 +476,19 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                 <div className="accordion_testcase">
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
-                                            <AccordionTab header={<span>{item.testscenarioname[0]}</span>}>
-                                                {
-                                                    item.testname?.map((test) => (
-                                                        <div className='unsync-icon'>
+                                            item.testscenarioname?.map((testname, index) => (
+                                                <AccordionTab key={item._id} header={<span>{testname}</span>}>
+                                                    {item.testname?.map((test, i) => (
+                                                        <div className='unsync-icon' key={i}>
                                                             <p>{test}</p>
-                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item)} />
+                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, null, item.testscenarioid[index])} />
                                                         </div>
-                                                    ))
-                                                }
-                                            </AccordionTab>
-                                        ))}
+                                                    ))}
+                                                </AccordionTab>
+                                            )
+                                            )
+                                        )
+                                        )}
                                     </Accordion>
                                 </div>
                             )}

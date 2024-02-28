@@ -13,7 +13,7 @@
 
 .design__tc_row{
     display: flex;
-    flex: 0 0 81.8%;
+    flex: 0 0 76%;
     align-items: center;
 
     .objname_col{
@@ -21,15 +21,15 @@
     }
     
     .keyword_col{
-        flex: 0 0 29%;
+        flex: 0 0 28%;
     }
     
     .input_col{
-        flex: 0 0 27%;
+        flex: 0 0 25%;
     }
     
     .output_col{
-        flex: 0 0 26%;
+        flex: 0 0 21%;
     }
 }
 
@@ -101,7 +101,7 @@
 }
 .d__row_text{
     min-height: 20px;
-    width: 12rem;
+    width: 11rem;
     overflow: hidden;
     // overflow-wrap: anywhere;
     text-overflow: ellipsis;
@@ -169,4 +169,12 @@
 // }
 .p-tag-value{
     width:4rem ;
+}
+.eyeIconImg{
+    position: sticky;
+    left: 3rem;
+}
+.eyeIcon3{
+    position: sticky;
+    left: 5rem;
 }

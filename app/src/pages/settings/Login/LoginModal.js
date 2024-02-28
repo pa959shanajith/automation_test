@@ -3,7 +3,9 @@ import { InputText } from "primereact/inputtext";
 import { Password } from 'primereact/password';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { useDispatch, useSelector } from 'react-redux';
-import { IntergrationLogin, zephyrLogin, AzureLogin, screenType, resetZephyrLogin, resetIntergrationLogin, resetAzureLogin, testRailLogin, resetTestRailLogin } from '../settingSlice';
+import { IntergrationLogin, zephyrLogin, AzureLogin, screenType, resetZephyrLogin,
+         resetIntergrationLogin, resetAzureLogin, testRailLogin, resetTestRailLogin,
+         updateTestrailMapping } from '../settingSlice';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { RadioButton } from 'primereact/radiobutton';
@@ -17,13 +19,13 @@ import { Toast } from "primereact/toast";
 import { Checkbox } from 'primereact/checkbox';
 import { Messages as MSG } from '../../global/components/Messages';
 import { RedirectPage, ScreenOverlay,ResetSession,setMsg, VARIANT} from '../../global';
-import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails, getDetails_Testrail, loginToTestRail_ICE} from "../api"
+import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails, getDetails_Testrail } from "../api"
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 
 
 
 
-const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
+const LoginModal = ({ isSpin = false, showCard2, handleIntegration, setShowLoginCard, setAuthType, authType }) => {
     const toast = useRef();
     // list of selectors
     const loginDetails = useSelector(state => state.setting.intergrationLogin);
@@ -223,17 +225,18 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
 
     const getTestRailDetails = async () => {
         try {
-            setLoading("Loading...")
+            setLoading("Loading...");
+            dispatchAction(updateTestrailMapping(true));
             const testRailData = await getDetails_Testrail();
             
             setLoading(false);
 
             if (testRailData === "empty") setMsg(testRailData);
             if (testRailData == {} || testRailData === "empty" || testRailData.error == "fail" ) {
-                setIsEmpty(true);
                 dispatchAction(testRailLogin({ fieldName: "url", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "username", value: "" }));
                 dispatchAction(testRailLogin({ fieldName: "apiKey", value: "" }));
+                setIsEmpty(true);
             }
             else {
                 dispatchAction(testRailLogin({ fieldName: "url", value: testRailData.url }));
@@ -391,7 +394,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                         toastSuccess("Successfully deleted the credentials")
                     break;
                 case 'TestRail':
-                    const testRailData = await manageTestRailDetails("delete", {});
+                    const testRailData = await manageTestRailDetails({action:"delete"});
                     if (testRailData.error) {
                         toastError(testRailData.error);
                         return;
@@ -414,7 +417,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.username,
         Zephyr: zephyrLoginDetails.username,
         TestRail: testRailLoginDetails.username,
-        default: testRailLoginDetails.username
+        default: ""
     };
 
     const passwordDetailsMap = {
@@ -422,7 +425,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.password,
         Zephyr: zephyrLoginDetails.password,
         TestRail: testRailLoginDetails.apiKey,
-        default: testRailLoginDetails.apiKey
+        default: ""
     };
 
     const urlDetailsMap = {
@@ -430,7 +433,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
         'Azure DevOps': AzureLoginDetails.url,
         Zephyr: zephyrLoginDetails.url,
         TestRail: testRailLoginDetails.url,
-        default: testRailLoginDetails.url
+        default: ""
     };
 
     return (
@@ -537,17 +540,14 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                 </div>
                                 <div className="passwrd-cls">
                                     {selectedscreen?.name === 'Zephyr' ? (
-                                        <span> Password <span style={{ color: 'red' }}>*</span></span>)
-                                        :
-                                        selectedscreen?.name === 'TestRail' ?
-                                            <span> API Keys <span style={{ color: 'red' }}>*</span></span>
-                                            : <span>API Token <span style={{ color: 'red' }}>*</span></span>
+                                        <span>Password <span style={{ color: 'red' }}>*</span></span>)
+                                        : <span>API Token <span style={{ color: 'red' }}>*</span></span>
                                     }
 
                                     <Tooltip target='.eyeIcon' content={showPassword ? 'Hide Password' : 'Show Password'} position='bottom' />
                                     {/* <Password disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem' }} className="input-txt1" value={selectedscreen.name === 'Jira' ? loginDetails.password : selectedscreen.name === 'Azure DevOps' ? AzureLoginDetails.password : zephyrLoginDetails.password} onChange={(e) => handleLogin('password', e.target.value)} type={showPassword ? "type" : "password"} feedback={false} /> */}
                                     <InputText disabled={selectedscreen && selectedscreen.name && !disableFields ? false : true} style={{ width: '20rem', height: '2.5rem', marginLeft: '2rem', paddingRight:'2rem' }} className="input-txt1" value={passwordDetailsMap[selectedscreen.name] || passwordDetailsMap.default} onChange={(e) => handleLogin(selectedscreen.name==="TestRail" ? 'apiKey' : 'password', e.target.value)} type={showPassword ? "type" : "password"} autoComplete="new-password"/>
-                                    {(loginDetails.password || zephyrLoginDetails.password || AzureLoginDetails.password) && <div className='p-input-icon-right cursor-pointer'>
+                                    {(loginDetails.password || zephyrLoginDetails.password || AzureLoginDetails.password || testRailLoginDetails.apiKey) && <div className='p-input-icon-right cursor-pointer'>
                                         <i className={`eyeIcon ${showPassword ? "pi pi-eye-slash" : "pi pi-eye"}`}
                                             onClick={() => { setShowPassword(!showPassword) }} />
                                     </div>}
@@ -561,7 +561,7 @@ const LoginModal = ({ isSpin, showCard2, handleIntegration, setShowLoginCard, se
                                     </span>
                                 </div>
                                 <div className="login__div">
-                                      {!isEmpty ? <Button label="Delete" onClick={()=>setShowModal(true)} severity="danger" /> :""}
+                                      {!isEmpty ? <Button label="Reset" onClick={()=>setShowModal(true)} severity="danger" /> :""}
                                       <Checkbox className="checkbox_cred" style={{left:!isEmpty?"1.5rem":"7.5rem"}} onChange={e => setChecked(e.checked)} checked={checked}></Checkbox>
                                       <span className="credentials__txt" style={{left:!isEmpty?"2rem":"8rem"}}>{isEmpty?"Save":"Update"} the credentials</span>
                                     <Button disabled={disableLoginBtn} size="small" label={isSpin ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Login'}
