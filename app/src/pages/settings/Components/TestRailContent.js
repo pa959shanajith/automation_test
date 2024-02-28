@@ -8,14 +8,15 @@ import { Button } from 'primereact/button';
 import { Tree } from 'primereact/tree';
 import { Paginator } from 'primereact/paginator';
 import { Checkbox } from 'primereact/checkbox';
+import { Tooltip } from "primereact/tooltip";
 import { useSelector, useDispatch } from 'react-redux';
 import * as api from '../api.js';
-import { selectedProject, selectedIssue } from '../settingSlice';
+import { selectedProject, mappedTree } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
 import { enableSaveButton, mappedPair, updateTestrailMapping } from "../settingSlice";
-import { Messages as MSG, setMsg } from '../../global';
+import { Messages as MSG } from '../../global';
 
-const TestRailContent = ({ domainDetails, ref }) => {
+const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -38,13 +39,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
     const currentProject = useSelector(state => state.setting.selectedProject);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
     const isTestrailMapped = useSelector(state => state.setting.updateTestrailMapping);
+    const mappedData = useSelector(state => state.setting.mappedPair);
+
 
     const handleTabChange = (index) => {
         setActiveIndex(index);
-    };
-
-    const setToast = (tag, summary, msg) => {
-        toast.current.show({ severity: tag, summary: summary, detail: JSON.stringify(msg), life: 5000 });
     };
 
     const onDropdownChange = async (e) => {
@@ -88,7 +87,9 @@ const TestRailContent = ({ domainDetails, ref }) => {
                         ...rest
                     }
                 }))
-            ));
+            )).map((obj, index) => {
+                return { ...obj, key: index }
+            });
 
             setUpdatedTreeData(() => testCasesList);
         };
@@ -211,7 +212,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     checked={selectedTestRailNodeFirstTree.id === node.id}
                     onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
-                <span className="scenario_label">{node.name}</span>
+                <Tooltip target={`#scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
+                <span className='scenario_label' id={`scenario_label-${node.id}`}>{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -226,7 +228,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     onChange={(e) => handleNodeToggleSecondTree(e, node)}
                     disabled={!Object.keys(selectedTestRailNodeFirstTree)?.length}
                 />
-                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
+                <Tooltip target={`#${node.name}-${node.testSuite?.name}`} position='right'>{node.name} - {node.testSuite?.name}</Tooltip>
+                <span className={`scenario_label`} id={`${node.name}-${node.testSuite?.name}`}>{node.name} - {node.testSuite?.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -257,12 +260,8 @@ const TestRailContent = ({ domainDetails, ref }) => {
     };
 
     const handleSync = () => {
-        let popupMsg = false;
         let scenarioIdsList = [];
         const { id, name, suite_id } = selectedTestRailNodeFirstTree;
-        if (selectedTestRailNodesSecondTree.length === 0) {
-            popupMsg = MSG.INTEGRATION.WARN_SELECT_SCENARIO;
-        }
 
         const data = updatedTreeData?.map((item) => {
             if (selectedTestRailNodesSecondTree.includes(item._id)) {
@@ -286,8 +285,11 @@ const TestRailContent = ({ domainDetails, ref }) => {
         };
 
         setUpdatedTreeData((updatedTreeData) => data);
-        if (popupMsg) setMsg(popupMsg);
-        dispatch(enableSaveButton(true));
+        if (selectedTestRailNodesSecondTree.length === 0 || Object.keys(selectedTestRailNodeFirstTree)?.length === 0) {
+            dispatch(enableSaveButton(false));
+        } else {
+            dispatch(enableSaveButton(true));
+        }
         dispatch(mappedPair(mappedData));
         setSelectedTestRailNodeFirstTree({});
         setSelectedTestRailNodesSecondTree([]);
@@ -312,7 +314,7 @@ const TestRailContent = ({ domainDetails, ref }) => {
                 } else if (testCaseNames != null) {
                     unSyncObj.push({
                         'mapid': items._id,
-                        'testCaseNames': items?.testname?.filter((name) => name == testCaseNames)
+                        'testscenarioid': [testCaseNames]
                     });
                 }
 
@@ -334,6 +336,24 @@ const TestRailContent = ({ domainDetails, ref }) => {
                     setToast("success", "Success", 'Mapped data unsynced successfully');
                 }
             }
+
+            const removeTestCase = updatedTreeData.map((data) => {
+                if (data._id == scenario || data._id == testCaseNames) {
+                    if (data.children && data.children.length > 0) {
+                        const filteredChildren = data.children.filter((child) => child._id != items.testid[0]);
+
+                        return {
+                            ...data,
+                            children: filteredChildren
+                        };
+                    }
+                    return data;
+                } else
+                    return data;
+            });
+
+            dispatch(mappedTree(removeTestCase));
+            setUpdatedTreeData((prevTreeData) => removeTestCase);
         }
     }
 
@@ -456,16 +476,17 @@ const TestRailContent = ({ domainDetails, ref }) => {
                                 <div className="accordion_testcase">
                                     <Accordion multiple activeIndex={0}>
                                         {rows?.map((item) => (
-                                            item.testscenarioname?.map((testname) => (
+                                            item.testscenarioname?.map((testname, index) => (
                                                 <AccordionTab key={item._id} header={<span>{testname}</span>}>
-                                                    {item.testname?.map((test, index) => (
-                                                        <div className='unsync-icon' key={index}>
+                                                    {item.testname?.map((test, i) => (
+                                                        <div className='unsync-icon' key={i}>
                                                             <p>{test}</p>
-                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, null, item.testname[index])} />
+                                                            <i className="pi pi-times cross_icon_zephyr" onClick={() => handleUnSyncmappedData(item, null, item.testscenarioid[index])} />
                                                         </div>
                                                     ))}
                                                 </AccordionTab>
-                                            ))
+                                            )
+                                            )
                                         )
                                         )}
                                     </Accordion>
