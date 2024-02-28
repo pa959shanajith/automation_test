@@ -54,8 +54,8 @@ const CertificateModal = props => {
                 authDetails: `${authName};${authPass}`
             }
             dispatch(Cert(certObj));
-            setMsg(MSG.SCRAPE.SUCC_CERT_SAVE);
-            props.setVisible(false);
+            props.toastSuccess(MSG.SCRAPE.SUCC_CERT_SAVE);
+            // props.setVisible(false);
         }
     }
 

@@ -41,13 +41,22 @@ const initialState = {
     reqHeader: "",
     reqBody: "",
     reqAuthKeyword: "",
-    reqAuthInput:"",
+    reqAuthInput: "",
     respHeader: "",
     respBody: "",
     paramHeader: "",
     basicAuthUsername: "",
-    basicAuthPassword: ""
+    basicAuthPassword: "",
+    oAuthClientSecret:'',
+    oAuthScope: '',
+    oAuthGrantTypechange: '',
+    oAuthClientId: '',
+    oAuthUrl: '',
+    bearerTokenValue: ''
   },
+
+
+  
   wsdlError: [],
   actionError: [],
   copiedTestCases: {},

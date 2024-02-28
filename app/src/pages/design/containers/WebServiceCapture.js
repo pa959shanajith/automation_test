@@ -31,47 +31,31 @@ let xpath = "";
 const WebserviceScrape = (props) => {
 
     const dispatch = useDispatch();
-    // const appType = useSelector((state)=>state.mindmap.appType)
     const DisableAction = useSelector(state => state.design.disableAction);
-    // const DisableAppend = useSelector(state => state.design.disableAppend);
-    const [appendCheck, setAppendCheck] = useState(false);
-    // const compareFlag = useSelector(state => state.design.compareFlag);
-    // const current_task = useSelector(state=>state.plugin.CT);
-    // const { user_id, role } = useSelector(state=>state.login.userinfo);
     const userInfo = useSelector((state) => state.landing.userinfo);
-    // const certificateInfo = useSelector(state => state.design.cert);
-    const { endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader, reqAuthKeyword, basicAuthPassword, basicAuthUsername} = useSelector(state => state.design.WsData);
-    // if (respBody !== "") { console.log(JSON.parse(JSON.stringify(respHeader))) }
-    // console.log("prettifyReqBody", prettifyReqBody);
-    // const ActionError = useSelector(state => state.design.actionError);
-    // const wsdlError = useSelector(state=>state.design.wsdlError);
-    const [wsdlURL, setwsdlURL] = useState("");
-    // const [opDropdown, setOpDropdown] = useState("0");
-    // const [opList, setOpList] = useState([]);
-    // const [activeView, setActiveView] = useState("req");
-    // const [certificatePopUp, setCertificatePopUp] = useState(false);
-    // const [visible, setVisible] = useState(true);
+    const { endPointURL, method, opInput, reqHeader, reqBody, respHeader, respBody, paramHeader, reqAuthKeyword, basicAuthPassword, oAuthClientSecret, oAuthScope, basicAuthUsername, oAuthUrl, oAuthClientId, oAuthGrantTypechange, bearerTokenValue } = useSelector(state => state.design.WsData);
+    const appendCheck = useSelector(state=> state.design.disableAppend);
     const history = useNavigate();
     const projectAppType = useSelector((state) => state.landing.defaultSelectProject);
     const [prettifiedRequestBody, setPrettifiedRequestBody] = useState('');
     const [requestActiveIndex, setRequestActiveIndex] = useState(0);
     const [responseActiveIndex, setResponseActiveIndex] = useState(0);
     const [codeLanguage, setCodeLanguage] = useState('json');
-    // const wsdlURLHandler = event => setwsdlURL(event.target.value);
-    // const opDropdownHandler = event => setOpDropdown(event.target.value);
-    const endpointURLHandler = event => {
-        dispatch(WsData({ endPointURL: event.target.value }))
-        //setEndpoinURL(event.target.value);
-    }
     const [authKeyword, setAuthKeyword] = useState('');
-    const [authUsername, setAuthUsername] = useState('');
-    const [authPassword, setAuthPassword] = useState('');
+    // const [authUsername, setAuthUsername] = useState('');
+    // const [authPassword, setAuthPassword] = useState('');
     const [selectedTab, setSelectedTab] = useState("request");
-    const [oAuthScope, setOAuthScope] = useState("");
-    const [oAuthClientSecret, setOAuthClientSecret] = useState("");
-    const [oAuthUrl, setOAuthUrl] = useState("");
-    const [oAuthClientId, setOAuthClientId] = useState("");
-    const [oAuthGrantTypechange, setOAuthGrantTypechange] = useState("");
+    // const [oAuthScope, setOAuthScope] = useState("");
+    // const [oAuthClientSecret, setOAuthClientSecret] = useState("");
+    // const [oAuthUrl, setOAuthUrl] = useState("");
+    // const [oAuthClientId, setOAuthClientId] = useState("");
+    // const [oAuthGrantTypechange, setOAuthGrantTypechange] = useState("");
+    const [oAuthScopeError, setOAuthScopeError] = useState(false);
+    const [oAuthClientSecretError, setOAuthClientSecretError] = useState(false);
+    const [oAuthUrlError, setOAuthUrlError] = useState(false);
+    const [oAuthClientIdError, setOAuthClientIdError] = useState(false);
+    const [oAuthGrantTypeError, setOAuthGrantTypeError] = useState(false);
+
 
     const responseNavItem = [
         { label: 'Body' },
@@ -93,9 +77,10 @@ const WebserviceScrape = (props) => {
 
 
     const autheniticateList = [
+        { value: "noAuth", name: "No Auth" },
         { value: "setBasicAuth", name: "Basic Auth" },
-        { value: "OAuth2.0", name: "OAuth2.0" },
-        { value: "bearertoken", name: "Bearer Token"}
+        { value: "setOAuth2.0", name: "OAuth2.0" },
+        { value: "setBearerToken", name: "Bearer Token" }
     ];
 
     const methodType = [{ value: "GET", name: "GET" },
@@ -122,6 +107,9 @@ const WebserviceScrape = (props) => {
     //     setAuthKeyword("setBasicAuth");
     // }, [requestActiveIndex === 3])
 
+    const endpointURLHandler = event => {
+        dispatch(WsData({ endPointURL: event.target.value }))
+    }
     const prettyRequestHandler = () => {
         let prettifyReqBody = "";
         if (reqBody !== "") prettifyReqBody = xmlFormatter(reqBody);
@@ -150,20 +138,20 @@ const WebserviceScrape = (props) => {
         //setOpInput(event.target.value);
     }
     const onRequestHeaderChange = event => {
-        dispatch(WsData({ reqHeader: event })) // setReqHeader(event.target.value);
+        dispatch(WsData({ reqHeader: event }))
     }
 
     const onParamChange = event => {
-        dispatch(WsData({ paramHeader: event.target.value })); //setParamHeader(event.target.value);
+        dispatch(WsData({ paramHeader: event.target.value }));
     }
 
     const onRequestBodyChange = event => {
-        dispatch(WsData({ reqBody: event })); //setReqBody(event.target.value);
+        dispatch(WsData({ reqBody: event }));
         // prettyRequestHandler();
     }
 
     const onResponseBodyChange = event => {
-        dispatch(WsData({ respBody: event })); //setRespBody(event.target.value);
+        dispatch(WsData({ respBody: event }));
     }
 
     const onResponseHeaderChange = event => {
@@ -171,40 +159,52 @@ const WebserviceScrape = (props) => {
     }
 
     const onAuthorisationUsernameChange = event => {
-        setAuthUsername(event.target.value);
-        // if (authKeyword == 'setBasicAuth') {
-        //     setAuthInput(`${event.target.value};${authPassword};`)
-        // }
-        dispatch(WsData({ basicAuthUsername: event.target.value }));
+        dispatch(WsData({ basicAuthUsername: event.target.value.trim() }));
     }
 
     const onAuthorisationPasswordChange = event => {
-        setAuthPassword(event.target.value);
-        // if (authKeyword == 'setBasicAuth') {
-        //     setAuthInput(`${authUsername};${event.target.value};`)
-        // }
         dispatch(WsData({ basicAuthPassword: event.target.value }));
     }
 
+    const resetFields = () => {
+        dispatch(
+            WsData
+                ({
+                    reqAuthInput: '',
+                    basicAuthUsername: "",
+                    basicAuthPassword: "",
+                    oAuthClientSecret: '',
+                    oAuthScope: '',
+                    oAuthGrantTypechange: '',
+                    oAuthClientId: '',
+                    oAuthUrl: '',
+                    bearerTokenValue:''
+                })
+        );
+    }
     const setAuthorizationKeyWord = event => {
         setAuthKeyword(event.value)
         dispatch(WsData({ reqAuthKeyword: event.value }));
+        resetFields();
     }
 
     const onOAuthUrlChange = (value) => {
-        setOAuthUrl(value.trim());
+        dispatch(WsData({ oAuthUrl: value.trim() }));
     }
     const onOAuthClientIdChange = (value) => {
-        setOAuthClientId(value.trim());
+        dispatch(WsData({ oAuthClientId: value.trim() }));
     }
     const onOAuthClientSecretChange = (value) => {
-        setOAuthClientSecret(value.trim());
+        dispatch(WsData({ oAuthClientSecret: value.trim() }));
     }
     const onOAuthScopeChange = (value) => {
-        setOAuthScope(value.trim());
+        dispatch(WsData({ oAuthScope: value.trim() }));
     }
     const onOAuthGrantTypeChange = (value) => {
-        setOAuthGrantTypechange(value.trim());
+        dispatch(WsData({ oAuthGrantTypechange: value.trim() }));
+    }
+    const setBearerToken = (value) => {
+        dispatch(WsData({ bearerTokenValue: value.trim() }));
     }
     // const clearFields = () => {
     //     setwsdlURL("");
@@ -247,9 +247,28 @@ const WebserviceScrape = (props) => {
         //eslint-disable-next-line
         let rRespBody = respBody;
         // let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-        if (!endPointURL ||  method === "0") props.toastError("Please fill the mandatory fields"); // error
-        // else if () props.toastError("Please fill the mandatory fields"); // error
-        else {
+
+        let newAuthInputData = '';
+
+        if ((!endPointURL || method === "" ) || reqAuthKeyword !== 'noAuth') {
+            if((!endPointURL || method === "" )) {props.toastError("Please fill all the mandatory fields"); return} // error
+            else{
+                if(reqAuthKeyword === 'setBearerToken'){
+                    if (bearerTokenValue) {newAuthInputData = `${bearerTokenValue}`}
+                    else {props.toastError("Please fill all the mandatory fields in Authorization"); return}
+                }
+                else if(reqAuthKeyword === 'setOAuth2.0'){
+                    if (oAuthUrl && oAuthClientId && oAuthClientSecret && oAuthScope && oAuthGrantTypechange) {newAuthInputData = `${oAuthUrl};${oAuthClientId};${oAuthClientSecret};${oAuthScope};${oAuthGrantTypechange}`}
+                    else {props.toastError("Please fill all the mandatory fields in Authorization"); return}
+                }
+                else if(reqAuthKeyword === 'setBasicAuth'){
+                    if(basicAuthUsername && basicAuthPassword) {newAuthInputData = `${basicAuthUsername + ';'}${basicAuthPassword}`}
+                    else {props.toastError("Please fill all the mandatory fields in Authorization"); return}
+                }
+            }
+        }
+           
+        if(((endPointURL && method !== "" && reqAuthKeyword !== 'noAuth') || newAuthInputData)) {
             dispatch(actionError([]));
             let temp_flag = true; // someflag
             try {
@@ -337,8 +356,8 @@ const WebserviceScrape = (props) => {
                     "endPointURL": endPointURL,
                     "header": rReqHeader,
                     "param": rParamHeader,
-                    "authKeyword": authKeyword,
-                    "authInput": basicAuthPassword && basicAuthPassword ? `${basicAuthUsername+';'}${basicAuthPassword}` : ''
+                    "authKeyword": reqAuthKeyword,
+                    "authInput": newAuthInputData,
                 };
 
                 if (viewArray.length > 0) scrapeData.view = viewArray;
@@ -385,20 +404,44 @@ const WebserviceScrape = (props) => {
                 })
         }
     }
-    const onGenerateToken = async() => {
-        // if( !(oAuthGrantTypechange && oAuthClientId && oAuthUrl && oAuthClientSecret && oAuthScope)){
-        //     if(oAuthGrantTypechange === ''){
-        //         setOAuthGrantTypeError(true)
-        //     }else if{oAuthClientId === }
-        // }
-        // const apiGenerator = await api.generateToken({'type':'OAuth2.0','token_url':'', 'client_id': '', 'client_secret':'', 'scope': '', 'grant_type': ''});
+    const onGenerateToken = async () => {
+        try {
+            if (!(oAuthGrantTypechange && oAuthClientId && oAuthUrl && oAuthClientSecret && oAuthScope)) {
+                if (oAuthGrantTypechange === '') setOAuthGrantTypeError(true)
+                if (oAuthClientId === '') setOAuthClientIdError(true)
+                if (oAuthUrl === '') setOAuthUrlError(true)
+                if (oAuthClientSecret === '') setOAuthClientSecretError(true)
+                if (oAuthScope === '') setOAuthScopeError(true)
+            } else {
+                setOAuthGrantTypeError(false);
+                setOAuthClientIdError(false);
+                setOAuthUrlError(false);
+                setOAuthClientSecretError(false);
+                setOAuthScopeError(false);
+                const arg = {
+                    'type': reqAuthKeyword === 'setOAuth2.0' ? reqAuthKeyword : '',
+                    'token_url': oAuthUrl,
+                    'client_id': oAuthClientId,
+                    'client_secret': oAuthClientSecret,
+                    'scope': oAuthScope,
+                    'grant_type': oAuthGrantTypechange
+                }
+                const apiGenerator = await api.generateToken(arg);
+                console.log(apiGenerator);
+            }
+        } catch (error) {
+            console.log(error)
+            props.toastError("Error while creating the token");
+        }
+
     }
 
-    const onAppendchange = (e) => {
+    const onAppendchange = (e) => { 
         if (e.checked) {
-            setAppendCheck(true);
-        } else setAppendCheck(false);
+            dispatch(disableAppend(true));
+        } else dispatch(disableAppend(false));
     }
+
     return (
 
         <div className='webservice_container'>
@@ -417,16 +460,16 @@ const WebserviceScrape = (props) => {
                             placeholder='Select'
                             style={{ width: "10%" }}
                             onChange={methodHandler}
-                            disabled={!appendCheck && !method }
+                            disabled={!appendCheck}
                         />
                         <InputText
                             className='p-inputtext-sm'
                             placeholder="Enter URL"
                             type='text'
                             onChange={endpointURLHandler}
-                            value={endPointURL} 
+                            value={endPointURL}
                             style={{ width: "50%" }}
-                            disabled={!appendCheck && !endPointURL}
+                            disabled={!appendCheck}
                         />
                         <InputText className='p-inputtext-sm '
                             placeholder="operation"
@@ -434,18 +477,18 @@ const WebserviceScrape = (props) => {
                             onChange={opInputHandler}
                             value={opInput}
                             style={{ width: "20%" }}
-                            disabled={!appendCheck && !opInput}
+                            disabled={!appendCheck}
                         />
                         <div className='flex' style={{ gap: "1rem", width: "fitContent" }}>
                             <Button label="send" size="small"
                                 onClick={() => props.startScrape()}
                             ></Button>
                             <Button label="save" size="small"
-                                disabled={!appendCheck && !method && !endPointURL}
+                                disabled={!appendCheck}
                                 onClick={onSave}
                             ></Button>
                             <div className='flex' style={{ alignItems: "center" }}>
-                                <Checkbox label="Append" inputId={"appendChecker"} name="append_checker" value={appendCheck} onChange={onAppendchange} checked={appendCheck} />
+                                <Checkbox label="Append" inputId={"appendChecker"} name="append_checker" value={appendCheck} onChange={onAppendchange} checked={appendCheck} ></Checkbox>
                                 <span className='pl-1'> Append</span>
                             </div>
                         </div>
@@ -496,8 +539,8 @@ const WebserviceScrape = (props) => {
                     {/* -----------Authenticate----------------- */}
                     {requestActiveIndex === 3 && <div style={{ overflow: "auto" }}>
                         <div className='flex flex-column' style={{ width: '70%' }}>
-                            <div className={`${reqAuthKeyword === 'OAuth2.0' ? "type_selection_dropdown" : "inputs_container" }`}>
-                                <label htmlFor={"typeSelect"} className={`${reqAuthKeyword === 'OAuth2.0' ? "type_selection_dropdown_label" : 'inputs_container_label'}` }>TYPE</label>
+                            <div className={`${reqAuthKeyword === 'setOAuth2.0' ? "type_selection_dropdown" : "inputs_container"}`}>
+                                <label htmlFor={"typeSelect"} className={`${reqAuthKeyword === 'setOAuth2.0' ? "type_selection_dropdown_label" : 'inputs_container_label'}`}>TYPE</label>
                                 <Dropdown
                                     data-test="typeSelect"
                                     id="typeSelect"
@@ -506,11 +549,10 @@ const WebserviceScrape = (props) => {
                                     optionLabel="name"
                                     className={`p-inputtext-sm`}
                                     style={{ width: '70%' }}
-                                    placeholder=''
+                                    placeholder='Select the type here'
                                     onChange={setAuthorizationKeyWord}
-                                    defaultValue={autheniticateList[0]}
                                 />
-                               { reqAuthKeyword === "OAuth2.0" &&  <div style={{width:'20%'}}>
+                                {reqAuthKeyword === "setOAuth2.0" && <div style={{ width: '20%' }}>
                                     <Button size="small" label="Generate Token" onClick={onGenerateToken}></Button>
                                 </div>}
                             </div>
@@ -538,11 +580,11 @@ const WebserviceScrape = (props) => {
                                     />
                                 </div>
                             </>}
-                            { reqAuthKeyword === "OAuth2.0" && <>
+                            {reqAuthKeyword === "setOAuth2.0" && <>
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_url"} className="inputs_container_label" > URL </label>
                                     <InputText
-                                        className=' p-inputtext-sm'
+                                        className={`p-inputtext-sm ${oAuthUrlError ? 'p-invalid' : ''}`}
                                         inputId="oauth_url"
                                         style={{ width: '70%' }}
                                         value={oAuthUrl}
@@ -553,7 +595,7 @@ const WebserviceScrape = (props) => {
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_client_id"} className="inputs_container_label" > Client Id </label>
                                     <InputText
-                                        className=' p-inputtext-sm'
+                                        className={`p-inputtext-sm ${oAuthClientIdError ? 'p-invalid' : ''}`}
                                         inputId="oauth_client_id"
                                         style={{ width: '70%' }}
                                         value={oAuthClientId}
@@ -564,7 +606,7 @@ const WebserviceScrape = (props) => {
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_client_secret"} className="inputs_container_label" > Client Secret </label>
                                     <InputText
-                                        className=' p-inputtext-sm'
+                                        className={`p-inputtext-sm ${oAuthClientSecretError ? 'p-invalid' : ''}`}
                                         inputId="oauth_client_secret"
                                         style={{ width: '70%' }}
                                         value={oAuthClientSecret}
@@ -575,7 +617,7 @@ const WebserviceScrape = (props) => {
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_scope"} className="inputs_container_label" > Scope </label>
                                     <InputText
-                                        className=' p-inputtext-sm'
+                                        className={`p-inputtext-sm ${oAuthScopeError ? 'p-invalid' : ''}`}
                                         inputId="oauth_scope"
                                         style={{ width: '70%' }}
                                         value={oAuthScope}
@@ -586,24 +628,28 @@ const WebserviceScrape = (props) => {
                                 <div className='inputs_container'>
                                     <label htmlFor={"oauth_grant_type"} className="inputs_container_label" >Grant Type</label>
                                     <InputText
-                                        className=' p-inputtext-sm'
+                                        className={`p-inputtext-sm ${oAuthGrantTypeError ? 'p-invalid' : ''}`}
                                         inputId="oauth_grant_type"
                                         style={{ width: '70%' }}
                                         value={oAuthGrantTypechange}
                                         onChange={(e) => onOAuthGrantTypeChange(e.target.value)}
                                     />
                                 </div>
-                                
+
                             </>}
-                            { reqAuthKeyword === 'bearertoken' && <>
-                                <InputText
-                                    className=' p-inputtext-sm'
-                                    inputId="beare_tken_input"
-                                    style={{ width: '70%' }}
-                                    value={basicAuthPassword}
-                                    // onChange={}
-                                    placeholder="Enter the bearer token"
-                                />
+                            {reqAuthKeyword === 'setBearerToken' && <>
+                                <div className='inputs_container'>
+                                    <label htmlFor={"bearer_token"} className="inputs_container_label" >Bearer</label>
+                                    <InputText
+                                        className=' p-inputtext-sm'
+                                        inputId="bearer_token"
+                                        style={{ width: '70%' }}
+                                        value={bearerTokenValue}
+                                        onChange={(e) => setBearerToken(e.target.value)}
+                                        placeholder="Enter the bearer token"
+                                    />
+                                </div>
+
                             </>}
                         </div>
 
@@ -611,7 +657,7 @@ const WebserviceScrape = (props) => {
 
                     {/* -----------Certificate----------------- */}
                     {requestActiveIndex === 4 && <div className='certificate_container'>
-                        <CertificateModal />
+                        <CertificateModal toastSuccess = {props.toastSuccess}/>
                     </div>
                     }
 

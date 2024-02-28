@@ -556,7 +556,7 @@ const elementTypeProp =(elementProperty) =>{
             setOverlay("");
             setBlocked(false)
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(false));
             const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
            
 
@@ -571,10 +571,20 @@ const elementTypeProp =(elementProperty) =>{
 
               let localRespBody = "";
               if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
-              let basicAuthUsername ='', basicAuthPassword =''
-              if(data?.authInput){
-                [basicAuthUsername, basicAuthPassword] = data?.authInput.split(';') 
+              let basicAuthUsername ='', basicAuthPassword ='', oAuthUrl='', oAuthClientId='', oAuthClientSecret='', oAuthScope='', oAuthGrantTypechange='', bearerTokenValue ='';
+              if (data.authKeyword === "setBearerToken") {
+                bearerTokenValue = data.authInput.split(';');
               }
+              else if (data.authKeyword === "setOAuth2.0") {
+                [oAuthUrl, oAuthClientId, oAuthClientSecret, oAuthScope, oAuthGrantTypechange] = data.authInput.split(';');
+              }
+              else if (data.authKeyword === 'setBasicAuth'){
+                [basicAuthUsername, basicAuthPassword] = data.authInput.split(';');
+              }
+
+              // if(data?.authKeyword){
+              //   [basicAuthUsername='', basicAuthPassword] = data?.authInput.split(';') 
+              // }
               dispatch(WsData({
                 endPointURL: data.endPointURL,
                 method: data.method,
@@ -586,8 +596,15 @@ const elementTypeProp =(elementProperty) =>{
                 respBody: localRespBody,
                 reqAuthKeyword: data.authKeyword,
                 basicAuthUsername: basicAuthUsername,
-                basicAuthPassword: basicAuthPassword
+                basicAuthPassword: basicAuthPassword,
+                oAuthClientSecret: oAuthClientSecret,
+                oAuthScope: oAuthScope,
+                oAuthGrantTypechange: oAuthGrantTypechange,
+                oAuthClientId: oAuthClientId,
+                oAuthUrl: oAuthUrl,
+                bearerTokenValue: bearerTokenValue
               }));
+              dispatch(disableAppend(false));
               setSaved({ flag: true });
               // setHideSubmit(false);
             } else {
@@ -597,17 +614,18 @@ const elementTypeProp =(elementProperty) =>{
                 endPointURL: "", method: "", opInput: "", reqHeader: "", reqAuthKeyword:'',
                 reqBody: "", respHeader: "", respBody: "", paramHeader: "", basicAuthUsername:'', basicAuthPassword: '',
               }));
+              dispatch(disableAppend(true));
             }
             setOverlay("");
             setBlocked(false)
-            dispatch(disableAppend(!haveItems));
+            // dispatch(disableAppend(!haveItems));
             dispatch(disableAction(haveItems));
             dispatch(actionError([]));
             dispatch(wsdlError([]));
           }
           else {
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(true));
             setOverlay("");
             setBlocked(false)
             // screenshot
