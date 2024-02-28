@@ -54,6 +54,8 @@ const GridBrowser = ({
       return 'Zephyr';
     } else if (integrationData?.azure?.url) {
       return 'Azure';
+    } else if (integrationData?.testrail?.url) {
+      return 'TestRail';
     }
      else {
       return 'None';
@@ -68,7 +70,8 @@ const GridBrowser = ({
     { name: 'ALM' },
     { name: 'qTest' },
     { name: 'Zephyr' },
-    { name: 'Azure'}
+    { name: 'Azure'},
+    { name: 'TestRail'},
   ];
 
   const selectedToolTemplate = (option, props) => {

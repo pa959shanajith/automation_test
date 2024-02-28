@@ -188,10 +188,10 @@ export default function Input({ items, callback, isReset }) {
          </div>
          <div className="row">
             <div className="Uploded_files">
-               <div className="files-heading mb-0 ">
+               {/* <div className="files-heading mb-0 ">
                   Already Uploaded files
                   <Badge value={badgeValue} size="large" className="ml-2 px-2 bg-secondary"></Badge>
-               </div>
+               </div> */}
                <UplodedFiles userData={fileDetails} />
             </div>
          </div>

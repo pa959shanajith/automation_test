@@ -2105,7 +2105,7 @@ const showToast = (severity, detail) => {
             value={configList}
             loading={loader}
             virtualScrollerOptions={{ itemSize: 20 }}
-            // globalFilter={searchProfile}
+            globalFilter={searchProfile}
             style={{
               width: "100%",
               height: "calc(100vh - 250px)",

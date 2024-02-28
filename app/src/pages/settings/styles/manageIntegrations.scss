@@ -91,6 +91,10 @@ height: 2.5rem !important;
 
 .scenario_label{
     font: $f6_regular !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
 }
 
 .cancel__btn{
@@ -268,12 +272,33 @@ height: 2.5rem !important;
 
 }
 
+.integration_login_icons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+    overflow: scroll;
+    height: 75vh;
+}
+
 .manage_integrations{
     .p-dialog-content{
         overflow: hidden;
     }
 }
 
+.cloud_integration_logos {
+    height: 2rem;
+    width: 35px;
+}
+
+.integration-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px 10px;
+}
 
 .side-panel_login {
     .icon-wrapper {
@@ -285,14 +310,15 @@ height: 2.5rem !important;
     align-items: center;
     display: flex;
     flex-direction: column;
-    height: 100%;
-    justify-content: center;
-    left: 0;
-    top: 12rem;
-    /* bottom: -1rem; */
-    width: 5rem;
+    align-content: center;
+    width: 7rem;
     gap: 1.2rem;
+    overflow: scroll;
+    height: 78%;
+    overflow-x: hidden;
     position: absolute;
+    text-align: center;
+    justify-content: flex-start;
 
     .img__saucelabs{
         height: 2rem;
@@ -322,6 +348,11 @@ height: 2.5rem !important;
         cursor: pointer;
     }
 
+    .img__testrail {
+        height: 2rem;
+        width: 40px;
+        cursor: pointer;
+    }
 
     .img__qtest {
         height: 2rem;
@@ -392,6 +423,13 @@ height: 2.5rem !important;
     padding: 1rem 4rem 2rem 2rem;
     background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
     cursor: pointer;
+  }
+  
+  .side-panel_login .integration-card.selected {
+      border: 1px solid #6837e6;
+      border-radius: 7px;
+      background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+      cursor: pointer;
   }
 
   .leafId{
@@ -466,6 +504,11 @@ height: 2.5rem !important;
         .avoProject_tree{
             .p-treenode-content{
                 padding: 0 !important;
+            }
+            
+            .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+                background: #eef2ff0a !important;
+                color: #333 !important;
             }
         }
         .p-treenode{
@@ -611,4 +654,10 @@ height: 2.5rem !important;
     position: absolute;
     right: 19rem;
     bottom: 3rem;
+}
+
+.unsync-icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

@@ -49,106 +49,108 @@ const recurseTogChild = (nodeDisplay, linkDisplay, d, v, dLinks) => {
     });
 };
 
-const getNewPosition = (dNodes, node, pi, arr_co, layout_vertical, sections) => {
+const getNewPosition = (dNodes,node, pi, arr_co ,layout_vertical,sections) => {
     //dNodes[pi].children are arranged in increasing
     // order of x/y disance depending on layout
     var index;
     var new_one;
-    if (dNodes[pi].children.length > 0) { // new node has siblings
+    if (dNodes[pi].children.length > 0) { 
         if (dNodes[pi].type === "scenarios") {
             if (dNodes[pi].children[0].id !== node.id) {
-                index = node.parentID
-                new_one = {
-                    x: sections[node.type] + 200,
-                    y: parseInt(dNodes[index].y)
-                };
-            } else {
+                index = node.parentID !== undefined?node.parentID:pi
+                if(dNodes[pi].children[0]._id !== undefined){
+                    new_one = {
+                        x: parseInt(dNodes[index].x) + 200,
+                        y: parseInt(dNodes[index].y)
+                    }
+                }else{
+                    new_one = {
+                        x: sections[node.type] + 200,
+                        y: parseInt(dNodes[index].y)
+                    };
+                }
+            }else{
                 index = dNodes[pi].children.length - 1
                 new_one = {
                     x: sections[node.type],
                     y: parseInt(dNodes[pi].y)
                 };
             }
-
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
-        } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
-            var index1 = dNodes[pi].id
-            var new_one1 = {
-                x: sections[node.type],
-                y: parseInt(dNodes[index1].y)
-            };
-            // node = getNonOverlappingPosition_1(node, arr_co, new_one1,layout_vertical);
-            if (node.children.length > 0) {
-                var index2 = node.children[0].id - 1
-                var new_one2 = {
-                    x: sections[node.type],
-                    y: parseInt(dNodes[index2].y)
-                };
-                // node = getNonOverlappingPosition_2(node.children[0], arr_co, new_one2,layout_vertical);
-            } else {
-                index2 = node.id - 1
-                new_one2 = {
-                    x: parseInt(dNodes[index2].x) + 200,
-                    y: parseInt(dNodes[index2].y)
-                };
-                node = getNonOverlappingPosition_2(node, arr_co, new_one2, layout_vertical);
+        }// new node has siblings
+        else{
+            index = dNodes[pi].children.length - 1;
+            if(dNodes[pi].state !== "created"){
+                if(dNodes[pi].type === "modules"){
+                    new_one = {
+                        x: sections[node.type],
+                        y: parseInt(dNodes[pi].children[index].y + 80)
+                    };
+                }
+                else{
+                    new_one = {
+                        x:  parseInt(dNodes[pi].children[index].x),
+                        y: parseInt(dNodes[pi].children[index].y + 180)
+                    };
+                }
+            }else{
+                    new_one = {
+                        x: sections[node.type],
+                        y: parseInt(dNodes[pi].children[index].y + 80)
+                    }
             }
         }
-        else {
-            index = dNodes[pi].children.length - 1
-            new_one = {
-                x: sections[node.type],
-                y: parseInt(dNodes[pi].children[index].y)
-            };
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
-        }
-        if (layout_vertical) {
-            if ((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 100
-                };// Go beside last sibling node
-            } else if ((dNodes[pi].type === "teststepgroups") && (dNodes[pi]?.parent?.parent?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 90
-                };// Go beside last sibling node
-            } else if ((dNodes[pi].type === "modules") && (dNodes[pi]?._id !== null)) {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type] - 120
-                };// Go beside last sibling node
-            } else {
-                new_one = {
-                    x: parseInt(dNodes[pi].children[index].x) + 100,
-                    y: sections[node.type]
-                }; // Go beside last sibling node
-            }
-        }
-        else {
-            // new_one = {
-            //     x: sections[node.type],
-            //     y: parseInt(dNodes[pi].children[index].y)
-            // };
-        }
-        // node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
+        node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
     } else { //first kid of any node
         if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
             // var arr = dNodes[pi].parent.children;
             index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
             if (layout_vertical) {
-                new_one = {
-                    x: parseInt(dNodes[pi].x),
-                    y: parseInt(sections[node.type])
-                }; // go directly below parent
-            } else {
+                if((dNodes[pi].type === "scenarios") && (dNodes[pi]?.parent?._id !== null)){
+                    if(dNodes[pi].childIndex === 1){
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])
+                        };
+                    }else{
+                        new_one = {
+                            x: parseInt(dNodes[pi].x),
+                            y: parseInt(sections[node.type])-100
+                        };
+                    }
+                }
+                else if((dNodes[pi].type === "screens") && (dNodes[pi]?.parent?._id !== null)){
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                }
+                else{
+                    new_one = {
+                        x: parseInt(dNodes[pi].x),
+                        y: parseInt(sections[node.type])
+                    };
+                } // go directly below parent
+            } else if(dNodes[pi].type === "teststepsgroups"){
+                if(dNodes[pi]._id === undefined){
+                    new_one = {
+                        x: parseInt(sections[node.type]) + 150,
+                        y: parseInt(dNodes[pi].y)
+                    };
+                }
+                else {
+                    new_one = {
+                        x: parseInt(dNodes[pi].x) + 150,
+                        y: parseInt(dNodes[pi].y)
+                    };
+                }
+            }else {
                 new_one = {
                     x: parseInt(sections[node.type]),
                     y: parseInt(dNodes[pi].y)
                 }; // go directly below parent
             }
-            node = getNonOverlappingPosition(node, arr_co, new_one, layout_vertical);
+            node = getNonOverlappingPosition(node, arr_co, new_one,layout_vertical);
         } else {
             //Module's kid
             //layout_change
@@ -165,44 +167,18 @@ const getNewPosition = (dNodes, node, pi, arr_co, layout_vertical, sections) => 
     return node;
 }
 
-const getNonOverlappingPosition = (node, arr_co, new_one, verticalLayout) => {
+const getNonOverlappingPosition = (node, arr_co, new_one,verticalLayout) => {
     var dist = 0;
     dist = closestCord(arr_co, new_one);
     while (dist < 60) {
         if (verticalLayout) {
             new_one.x = new_one.x + 80;
         } else {
-            new_one.y = new_one.y + 80;
-        }
-        dist = closestCord(arr_co, new_one);
-    }
-    node.x = new_one.x;
-    node.y = new_one.y;
-    return node;
-}
-const getNonOverlappingPosition_1 = (node, arr_co, new_one, verticalLayout) => {
-    var dist = 0;
-    dist = closestCord(arr_co, new_one);
-    while (dist < 60) {
-        if (verticalLayout) {
-            new_one.x = new_one.x + 80;
-        } else {
-            new_one.y = new_one.y + 80;
-        }
-        dist = closestCord(arr_co, new_one);
-    }
-    node.x = new_one.x;
-    node.y = new_one.y;
-    return node;
-}
-const getNonOverlappingPosition_2 = (node, arr_co, new_one, verticalLayout) => {
-    var dist = 0;
-    dist = closestCord(arr_co, new_one);
-    while (dist < 60) {
-        if (verticalLayout) {
-            new_one.x = new_one.x + 80;
-        } else {
-            new_one.y = new_one.y + 80;
+            if(node.type === "scenarios"){
+                new_one.y = new_one.y + 80;
+            }else{
+                new_one.x = new_one.x + 200;
+            }
         }
         dist = closestCord(arr_co, new_one);
     }
@@ -337,7 +313,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
                         parent: {
                             ...child.parent.data,
                             id: child.parent.id ? child.parent.id : parentId,
-                            parent: child.parent ? child.data.parent : null,
+                            parent: child.parent ? child.data.parent : null, // Use the parent's ID as the unique identifier
                             children: [{ ...child.data, id: child.id ? child.id : generateId(parentId, childIdx + 1) }] // Use the parent's ID as the unique identifier
                         }
                     };
@@ -891,7 +867,7 @@ const generateScenarioData = (data, item) => {
         target = target.children[target.children.length - 1];
     }
     // Add the newData to the last empty 'children' array
-    target.children.push({ ...item, parentID: target.id, parent: { ...item.parent, children: [item] } });
+    target.children.push({ ...item, parentID: target.id,x:data._id?data.y:item.x, parent: { ...item.parent, children: [item] } });
 
     return data;
 }
@@ -905,7 +881,7 @@ const updateScenarioData = (dataUpdate, item) => {
             // Check if the current child's id matches the target ID (item.id)
             if (child.id === item.id) {
                 // Update the child's properties with the data from 'item'
-                nodeItem = { ...item, parentID: node.children[index].parentID, parent: { ...item.parent, children: [item] } };
+                nodeItem = { ...item, parentID: node.children[index].parentID,x:node._id !== undefined?node.y:item.x, parent: { ...item.parent, children: [item] } };
             } else {
                 // If the child has children, recursively update them
                 if (child.children && child.children.length > 0) {
@@ -1001,6 +977,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         childIndex: '',
         type: (nNext[pt][0]).toLowerCase() + 's'
     };
+    getNewPosition(dNodes, node, pi, arr_co, verticalLayout, sections);
     if (nodeID) {
         node._id = nodeID
     }
@@ -1015,8 +992,10 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                 // Update the id of the current node
                 node.id = node.id + level;
                 if (level === 1) {
-                    node.y = node.y + 150
+                    node.y = dNodes[pi].children[0]._id !== undefined?node.y + 150:node.y
+                    node.x = dNodes[pi].children[0]._id !== undefined?node.x:node.x + 150
                 }
+                dNodes[node.id] = node
                 if (node.children && node.children.length > 0) {
                     // Update IDs in the children array
                     node.children.forEach(child => {
@@ -1043,7 +1022,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
             // Assign the updated object back to dNodes[pi]
             dNodes[pi] = new_obj_data;
             const new_obj_data_for_uNix = { ...dNodes[pi].children[0], children: dNodes[pi].children[0].children }
-            dNodes[uNix] = new_obj_data_for_uNix
+            // dNodes[uNix] = new_obj_data_for_uNix
         } else {
             if (dNodes[pi].type === 'teststepsgroups') {
                 const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, { ...dNodes[uNix], parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] } }], parent: { ...dNodes[pi].parent, children: [{ ...dNodes[pi].parent.children[0], children: [dNodes[uNix]] }] } };
@@ -1066,7 +1045,6 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         dNodes[uNix].childIndex = dNodes[pi].children.length;
     }
     dNodes[uNix].cidxch = 'true'; // child index updated
-    getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
     if (dNodes[pi].type === 'modules') {
         for (let r = 0; r < dNodes[0].children.length; r++) {
             if (dNodes[0].children[r].id === dNodes[uNix].id) {
@@ -1075,10 +1053,10 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         }
     }
     dNodes[uNix].cidxch = 'true'; // child index updated
-    getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
     var currentNode;
     if (dNodes[pi].type === "scenarios") {
-        if (dNodes[pi].children[0] === dNodes[uNix].id) {
+        getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
+        if (dNodes[pi].children[0].id === dNodes[uNix].id) {
             var link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -1105,7 +1083,35 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         }
     } else if (dNodes[pi].type === 'teststepsgroups' && dNodes[pi].children.length > 0) {
         // Assuming dNodes is an array of nodes
-        if (dNodes[uNix].children.length > 0) {
+        if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined && dNodes[0].children[0].children.length>0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined) {
             getChildUpdate(dNodes, dNodes[pi])
             createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
             function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
@@ -1133,7 +1139,91 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     }
                 }
             }
-        } else {
+        } else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0 && dNodes[pi].children[0].children[0]._id !== undefined) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLink(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode_1(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else if (dNodes[pi].children.length > 0) {
+            getChildUpdate(dNodes, dNodes[pi])
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+                var link = {
+                    id: uuid(),
+                    source: node,
+                    target: parentLinkTarget
+                };
+                var linkId = 'link-' + link.source.id + '-' + link.target.id;
+                dLinks.push(link);
+                if (sel) {
+                    var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
+                } else {
+                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                }
+
+
+                var currentNode = addNode(parentLinkTarget);
+                nodeDisplay[parentLinkTarget.id] = currentNode;
+                linkDisplay[linkId] = currentLink;
+
+                if (node.children && node.children[0].children.length > 0) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                    }
+                }
+            }
+        }else {
             link = {
                 id: uuid(),
                 source: dNodes[pi],
@@ -1645,7 +1735,7 @@ export function transformDataFromTreetoJourney(data) {
                 for (let s1 = 0; s1 < newData.children[m].children[s].children.length; s1++) {
                     const newObject = {
                         ...newData.children[m].children[s].children[s1],
-                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m], id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
+                        parent: { ...newData.children[m].children[s], parent: { ...newData.children[m],parent:{...newData, id:m}, id: m + 1 }, id: newData.children.length + s + 1 }, type: "teststepsgroups"
                     };
 
                     // Make changes in the deep copy
@@ -1687,6 +1777,8 @@ export function transformDataFromTreetoJourney(data) {
                     const child = currentNode.children[i];
                     if (child.childIndex === parentIndex) {
                         return child;
+                    }else if(child.parent.childIndex === parentIndex){
+                        return child;
                     }
                     const foundInChild = findParent(parentIndex, child);
                     if (foundInChild) {
@@ -1711,11 +1803,41 @@ export function transformDataFromTreetoJourney(data) {
                     }
                     parent.push(childItem);
                 }
+            }else if (childItem.parent && childItem.childIndex === 1) {
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
+                }else{
+                    const parentIndex = childItem.parent.childIndex;
+                    const parentData = findParent(parentIndex, newItem);
+
+                    if (parentData) {
+                        if (!parentData.children) {
+                            parentData.children = [];
+                        }
+                        parent.push(childItem);
+                    }
+                }
             } else {
-                if (parent[0].children.length === 0) {
-                    parent[parent.length - 1].children.push(childItem);
-                } else {
-                    newItem.children[i - 1].children.push(childItem);
+                if(parent.length>0){
+                    if (parent[0].children.length === 0) {
+                        parent[parent.length - 1].children.push(childItem);
+                    } else {
+                        newItem.children[i - 1].children.push(childItem);
+                    }
+                }else {
+                    const parentIndex = childItem.parent.childIndex;
+                    const parentData = findParent(parentIndex, newItem);
+
+                    if (parentData) {
+                        if (!parentData.children) {
+                            parentData.children = [];
+                        }
+                        parent.push(childItem);
+                    }
                 }
             }
         }
@@ -1965,6 +2087,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
             childIndex: dNodes[pi].type === 'scenarios' ? 1 : dNodes[pi].children.length > 0 ? dNodes[pi].children[0].parent.parent.childIndex : dNodes[pi].parent.childIndex
         }
     }
+    getNewPosition(dNodes, pasetNode, pi, arr_co, verticalLayout, sections);
     if (lt === true) {
         for (let p = 0; p < dNodes.length; p++) {
             if (dNodes[p]._id === pasetNode._id) {
@@ -2028,7 +2151,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 dNodes[uNix] = new_obj_data_for_uNix
             } else {
                 const pasteData = { ...dNodes[pi], children: [{ ...dNodes[uNix], children: dNodes[pi].children, parent: { ...dNodes[uNix].parent, children: [{ ...dNodes[uNix], children: dNodes[pi].children }] } }] }
-                dNodes[uNix] = { ...dNodes[uNix], children: [{ ...dNodes[pi].children[0], parent: { ...dNodes[uNix].parent, children: [{ ...dNodes[uNix], children: dNodes[pi].children }] } }] }
+                dNodes[uNix] = { ...dNodes[uNix], children: dNodes[pi].children, x:dNodes[uNix] + 100 }
                 dNodes[pi] = pasteData
                 getChildUpdate(dNodes, pasteData)
             }
@@ -2088,8 +2211,8 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
 
     }
     dNodes[uNix].cidxch = 'true'; // child index updated
-    getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
     if (dNodes[pi].type === "scenarios") {
+        getNewPosition(dNodes, dNodes[uNix], pi, arr_co, verticalLayout, sections);
         if (dNodes[uNix].children.length > 0) {
             getChildUpdate(dNodes, dNodes[pi])
             createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
@@ -2108,7 +2231,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 }
 
 
-                var currentNode = addNode_1(parentLinkTarget);
+                var currentNode = addNode(parentLinkTarget);
                 nodeDisplay[parentLinkTarget.id] = currentNode;
                 linkDisplay[linkId] = currentLink;
 
@@ -2119,6 +2242,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 }
             }
         } else {
+            dNodes[uNix] = {...dNodes[uNix], x:dNodes[uNix].x + 100}
             var link = {
                 id: uuid(),
                 source: dNodes[pi],

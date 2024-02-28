@@ -638,6 +638,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const handleProject= async(e)=>{
         const projectId = e.target.value;
         setSelectZephyrProject(projectId);
+        setSelectedRepoType("Select Type");
+        setSelectedRel("Select Repo/Release");
+        setProjectDetails([]);
         // const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
         // if (releaseData.error)
         //     setToast('error','Error',releaseData.error);
@@ -661,6 +664,8 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     }
 
     const handleType = async (e) => {
+        setSelectedRel("Select Repo/Release");
+        setProjectDetails([]);
         const repoType = e.value;
         let releaseData = ""
         if (repoType.name == "Release") {
@@ -712,6 +717,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     }
 
     const onReleaseSelect = async(event) => {
+        setProjectDetails([]);
         const releaseId = event.target.value;
         let testAndScenarioData = ""
         if (selectedRepoType.name == "Release") {
@@ -1339,11 +1345,11 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                     <div className="zephyr__mapping">
                                         {/* <div className="card_zephyr1"> */}
                                             <Card className="mapping_zephyr_card1">
-                                                {/* {enableBounce && <div className="bouncing-loader">
+                                                {enableBounce && <div className="bouncing-loader">
                                                     <div></div>
                                                     <div></div>
                                                     <div></div>
-                                                </div>} */}
+                                                </div>}
                                                 
                                                 <div className="dropdown_div1">
                                                     <div className="dropdown-zephyr1">

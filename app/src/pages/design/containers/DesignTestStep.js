@@ -23,7 +23,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -34,6 +34,7 @@ import PasteStepDialog from "../components/PasteStepDialog";
 import SelectMultipleDialog from "../components/SelectMultipleDialog";
 import { Checkbox } from 'primereact/checkbox';
 import { RadioButton } from "primereact/radiobutton";
+import { Sidebar } from 'primereact/sidebar';
 //import AceEditor from 'react-ace';
 
 
@@ -54,6 +55,9 @@ const DesignModal = (props) => {
     const modified = useSelector(state => state.design.Modified);
     const saveEnable = useSelector(state => state.design.SaveEnable);
     const mainTestCases = useSelector(state => state.design.TestCases);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
@@ -91,6 +95,8 @@ const DesignModal = (props) => {
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
     const [arrow, setArrow] = useState(false);
+    const[actionForAdvanceDebug,setActionForAdvanceDebug]=useState("");
+    const[watchlist,setWatchList] = useState([]);
     const [customkeyword, setCustomKeyWord] = useState(false);
     const [stepOfCustomKeyword, setStepOfCustomKeyword] = useState(0);
     const [langSelect, setLangSelect] = useState('javascript');
@@ -106,7 +112,7 @@ const DesignModal = (props) => {
     const [customEdit , setCustomEdit] =useState(false);
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
-    console.log(customEdit,'customEdit');
+
     const handleAceEditor = (e) => {
         setInputEditor(e)
     }
@@ -626,6 +632,7 @@ const DesignModal = (props) => {
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
 
+    // console.log(getKeywords('@Browser'),'getKeywords');
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
@@ -663,8 +670,26 @@ const DesignModal = (props) => {
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,actionForAdvanceDebug)
             .then(data => {
+                if(advanceDebug && debuggerPoints){
+                //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
+                setOverlay("");
+                dispatch(SetEnablePlayButton(true))
+                console.log(data)
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
+                return
+                }
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return ;
@@ -690,6 +715,7 @@ const DesignModal = (props) => {
                     toast.current.show({severity: 'success',summary: 'Success', detail:data, life:2000})
                 }										
             })
+
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
@@ -892,7 +918,7 @@ const DesignModal = (props) => {
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(rowData && !props.testSuiteInUse)?<div>
+            {(rowData && !props.testSuiteInUse && !advanceDebug)?<div>
                 {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
@@ -958,10 +984,27 @@ const DesignModal = (props) => {
             debugTestCases()
         }
     }
+    const [ingredients, setIngredients] = useState([]);
+    const [visibleRight, setVisibleRight] = useState(false);
+    const onIngredientsChange = (e) => {
+        let _ingredients = [...ingredients];
+
+        if (e.checked)
+            _ingredients.push(e.value);
+        else
+            _ingredients.splice(_ingredients.indexOf(e.value), 1);
+
+        setIngredients(_ingredients);
+    }
+    console.log(ingredients)
     const footerContent = (
         <div>
+            <div className="flex align-items-right">
+                <Checkbox inputId="ingredient1" name="Debug" value="Advance Debug" onChange={onIngredientsChange} checked={ingredients.includes('Advance Debug')} />
+                <label htmlFor="ingredient1" className="ml-2">Advance Debug</label>
+            </div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
+            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={!ingredients.includes('Advance Debug')?() =>{ handleDebug(selectedSpan)}:()=>{dispatch(SetAdvanceDebug(true));DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)} } autoFocus />
         </div>
     );
     
@@ -1365,7 +1408,6 @@ const DesignModal = (props) => {
           setIsNameValid(false);
         }
     }, [inputKeywordName, AllOptions]);
-    console.log(isSpaceError,'space',isNameValid);
     const rowExpansionTemplate = (data) => {
         function handleArrow(){
             setArrow(!arrow)
@@ -1386,10 +1428,10 @@ const DesignModal = (props) => {
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
-                    <span className="step_col d__step_head" ></span>
+                    <span className="step_col d__step_head" >Break Point</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keyword ":"Switch to new keyword"} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keyword ":"Switch to new keyword"}/></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1419,6 +1461,8 @@ const DesignModal = (props) => {
                                     setInputEditor={setInputEditor}
                                     setAlloptions={setAlloptions}
                                     setCustomEdit={setCustomEdit}
+                                    fetchData={props.fetchingDetails}
+                                    typesOfAppType={props.appType}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1444,6 +1488,62 @@ const DesignModal = (props) => {
         }
     setExpandedRows(_expandedRow)
     }
+    const handlePlay=()=>{
+        // SetEnablePauseDebugger({status:false})
+        let debuggerPointShift=[...debuggerPoints]
+        dispatch(SetEnablePlayButton(false))
+        debuggerPointShift.shift()
+        let newDebuggerPoints=debuggerPointShift
+        dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"play")
+        .then(data => {
+            if(data){
+                dispatch(SetEnablePlayButton(true))
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
+            }
+            console.log(data)
+        }
+        )
+    }
+    const handleMoveToNext=()=>{
+        
+        let nextVal=debuggerPoints[0]+1
+        let debuggerPointShift=[...debuggerPoints]
+        debuggerPointShift.shift()
+        let newDebuggerPoints=[nextVal,...debuggerPointShift]
+        dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
+
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"nextStep")
+        .then(data => {
+            let dataforstep=data.map(steps=>{
+                return {teststep:steps.index,
+                name:steps.custname,
+                status:steps.result[0],
+                value:steps.result[2].includes("901a")?"":steps.result[2]
+                }
+            }
+            )
+            setWatchList((watchlist)=>{
+            return [...watchlist,...dataforstep]
+            })
+            console.log(data)
+        }
+        )
+        }
+    const handleRemoveDebuggerPoints=()=>{
+        dispatch(SetDebuggerPoints({push:'reset',points:[]}))
+        toast.current.show({severity:'success', summary:'Success', detail:"Debugger points removed successfully", life:2000})
+    }
     
     const approvalOnClick = async () => {
 
@@ -1452,6 +1552,9 @@ const DesignModal = (props) => {
         }
 
         else if (inputEditor === '') {
+            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+        }
+        else if (customTooltip === '') {
             toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
         }
         else {
@@ -1629,7 +1732,6 @@ const DesignModal = (props) => {
                                 nameInput='name'
                                 isSpaceError={isSpaceError}
                                 customEdit={customEdit}
-                                setCustomEdit={setCustomEdit}
                                 />
                                 </div>
                                 </div>
@@ -1652,6 +1754,7 @@ const DesignModal = (props) => {
                                 style={{ width: '160%' }}
                                 placeholder="Enter short description"
                                 inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
                             />
                         </div>
                     </div>
@@ -1662,11 +1765,11 @@ const DesignModal = (props) => {
                         <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
 
                             <div className="flex align-items-center" >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
                                 <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
                             </div>
                             <div className="flex align-items-center"  >
-                                <RadioButton onChange={onSelectLanguage} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
                                 <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
                             </div>
                         </div>
@@ -1710,6 +1813,30 @@ const DesignModal = (props) => {
                 </div>
 
             </Dialog>
+            <div className='AdvanceDebug'>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false))}}>
+                    <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
+                    <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        
+                        <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        
+                        <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
+                                            </div>
+                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
+
+                    </div>
+                    <div className="card">
+            <DataTable value={watchlist}>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '10%', flex:"0 0", fontFamily:'LatoWebLight'}} field="teststep" header="Step"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '43%', minWidth: '30%', flex:"0 0", fontFamily:'LatoWebLight'}} field="name" header="Element Name"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="status" header="Status"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="value" header="Value"></Column>
+            </DataTable>
+        </div>
+                </Sidebar>
+            </div>
         </>
     )
 }

@@ -40,7 +40,6 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
-// import ReactTooltip from 'react-tooltip';
 
 
 
@@ -194,7 +193,7 @@ const GeniusSap = (props) => {
   const [showMindmap, setShowMindmap] = useState(false);
   const [dataSaved, setDataSaved] = useState(false);
   const [activeIndex, setActiveIndex] = useState(3);
-  const dialogFuncMap = {
+    const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
 
@@ -213,14 +212,14 @@ const GeniusSap = (props) => {
             ...element, stepNo: index + 1
           }
         })
-
-        data.push({
+        
+                data.push({
           id: counter,
           name: sapGeniusScrapeData.window_name,
           step: `Step ${counter}`,
           elementName: sapGeniusScrapeData.custname,
           keywordVal: sapGeniusScrapeData.keywordVal,
-          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.inputVal}</div>,
+          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.id.split("/")[6] !=="pwdRSYST-BCODE"?sapGeniusScrapeData.inputVal:"*********"}</div>,
           tempOrderId: newUUID,
           testcases: sapGeniusScrapeDataModified
         });
@@ -258,7 +257,7 @@ const GeniusSap = (props) => {
           step: `Step ${counter}`,
           elementName: sapGeniusScrapeData.custname,
           keywordVal: sapGeniusScrapeData.keywordVal,
-          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.inputVal}</div>,
+          testData: <div style={{ width: '18rem',wordWrap:'break-word' }}>{sapGeniusScrapeData.id.split("/")[6] !=="pwdRSYST-BCODE"?sapGeniusScrapeData.inputVal:"*********"}</div>,
           testcases: sapGeniusScrapeData
         });
         setDataLength(data.length);
@@ -338,6 +337,7 @@ const GeniusSap = (props) => {
 
 
       })
+      setSelectedScreen({name:screenData.name})
       return abc
     })
 
@@ -353,7 +353,7 @@ const GeniusSap = (props) => {
     }
     else {
       showPopup(true)
-      setMessage('No fields for Data Parametrization...')
+      props.toastError(MSG.CUSTOM('No fields for Data Parametrization...', VARIANT.ERROR))
     }
   }
   const saveAsExcelFile = (buffer, fileName) => {
@@ -426,7 +426,7 @@ const GeniusSap = (props) => {
   const saveScreen = () => {
     setDataManipulated(true)
     console.log(selectedScreen)
-    const screenEditTable = [...tableAfterOperation]
+    const screenEditTable = [...tableDataNew]
     let objIndex = screenEditTable.findIndex(testCase => testCase.name === selectedScreen.name)
     screenEditTable[objIndex].name = singleData.name
     setTableAfterOperation(screenEditTable)
@@ -812,6 +812,7 @@ const onScreenNameChange = (e, name) => {
     screenViewObject.applicationPath = applicationPath;
     screenViewObject.scrapeType = "Genius";
     if (startGenius === "Activate Genius") {
+      props.toastSuccess(MSG.CUSTOM("Genius activated successfully", "success"));
       setStartGenius("Stop Genius");
       data.push({
         id: 1,
@@ -1099,8 +1100,8 @@ const onScreenNameChange = (e, name) => {
       <>
         <div style={{ display: "flex", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "90%", color: 'white', backgroundColor: '#5f338f', padding: '6px 15px', borderRadius: '5px', width: 'auto', paddingLeft: 36, position: "absolute", left: "0.7rem" }}>
           <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{rowData.name}</div>
-          <span style={ { marginRight: '0.5rem', cursor: 'pointer' , opacity: '0.4',  }} onClick={() => {  { editScreen(selectedRow); setSelectedScreen({ name: selectedRow.name }) } }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-file-edit' style={{ fontSize: '17px' }} ></i></span>
-          <span style={ { marginRight: '1rem', cursor: 'pointer' , opacity: '0.4', cursor: 'not-allowed' }} onClick={() => {  { deleteScreen(selectedRow);setSelectedScreen({ name: selectedRow.name }) } }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-trash' style={{ fontSize: '17px' }} ></i></span>
+          {/* <span style={ { marginRight: '0.5rem', cursor: 'pointer' , opacity: '0.4',  }} onClick={() => {  { editScreen(selectedRow); setSelectedScreen({ name: selectedRow.name }) } }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-file-edit' style={{ fontSize: '17px' }} ></i></span>
+          <span style={ { marginRight: '1rem', cursor: 'pointer' , opacity: '0.4', cursor: 'not-allowed' }} onClick={() => {  { deleteScreen(selectedRow);setSelectedScreen({ name: selectedRow.name }) } }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-trash' style={{ fontSize: '17px' }} ></i></span> */}
 
         </div>
       </>
@@ -1149,10 +1150,22 @@ const onScreenNameChange = (e, name) => {
       <React.Fragment>
         <Tooltip target=".pi-info-circle" />
         <span className="removeEllipsis" style={{}} onMouseEnter={() => { if (rowData.custname.trim().length > 30) setShowFull(true) }} onMouseLeave={() => setShowFull(false)}> {rowData.custname.trim().length > 30 && !showFull ? rowData.custname.trim().substring(0, 20) + "..." : rowData.custname.trim()}</span>
-        <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span>
+        {/* <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span> */}
       </React.Fragment>
     );
     {/* <span className="info-logo" style={{ cursor: 'pointer', marginTop: '6px', paddingLeft: '1rem', fontSize: '13px' }} onMouseEnter={(e) => { showObjectProp(e, rowData) }} onMouseLeave={() => setCard(false)}> <i className="pi pi-info-circle" style={{ 'fontSize': '1.2em' }} /></span> */ }
+  }
+
+  const keywordValTemplate = (rowData) =>{
+    return <div><div className='keyworddata'>{rowData?.keywordVal}</div></div>
+  }
+  const sapPasswordMask = (rowData) => {
+    const result = rowData?.id?.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
+    return result
+  }
+  const inputValTemplate = (rowData) =>{
+    
+    return <div><div className='Testdata'> {sapPasswordMask(rowData)}</div></div>
   }
 
   let tableDataNew = useMemo(() => {
@@ -1368,13 +1381,21 @@ const onScreenNameChange = (e, name) => {
     }
   }
   const saveDataParam = () => {
-    const table = tableAfterOperation
+    const table = tableDataNew
     const UiDataParam = table.map(screenData => {
       screenData.testcases.forEach((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
-          testcase.inputVal[0] = `|${testcase.custname}|`
+          // let originalVal = testcase.inputVal[0]
+          // testcase.inputVal[0] = `|${testcase.custname}|`;
+          if (Array.isArray(testcase.inputVal)) {
+            let originalVal = testcase.inputVal[0];
+            testcase.inputVal[0] = `|${testcase.custname}|`;
+          } else {
+            // Handle the case where inputVal is not an array (optional)
+            // For example, you might want to convert it to an array:
+            testcase.inputVal = [`|${testcase.custname}|`];
+          }
   
   
   
@@ -1387,22 +1408,28 @@ const onScreenNameChange = (e, name) => {
     console.log(UiDataParam)
     // setTableAfterOperation(table)
     console.log(singleData)
-    const originalData = tableAfterOperation
-    let objIndex = tableAfterOperation.findIndex(testCase => testCase.name === selectedScreen.name)
-    const firstSteps = tableAfterOperation[0].testcases
+    const originalData = tableDataNew
+    let objIndex = tableDataNew.findIndex(testCase => testCase.name === selectedScreen.name)
+    const firstSteps = tableDataNew[1].testcases
     const lastStep = originalData[originalData.length - 1].testcases
     const newDataParamTableStart = [singleData, startLoop, ...firstSteps]
     const newDataParamTableEnd = [...lastStep, endLoop]
-    originalData[0].testcases = newDataParamTableStart
-    if (originalData.length === 1) {
-      originalData[0].testcases = [...newDataParamTableStart, endLoop]
-      originalData[0].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
+    originalData[1].testcases = newDataParamTableStart
+    if (originalData.length > 0 && originalData.length <= 2) {
+      originalData[1].testcases = [...newDataParamTableStart, endLoop]
+      originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     } else {
+      originalData[1].testcases = [...newDataParamTableStart]
       originalData[originalData.length - 1].testcases = newDataParamTableEnd;
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
-    originalData[0].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
-    allScreenData[selectedScreen.name]["testcases"] = originalData[objIndex].testcases;
+    originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
+    allScreenData[selectedScreen.name]['testcases'] = originalData[objIndex].testcases;
+    Object.keys(allScreenData).forEach(item=>{
+      const matchingOriginalData = originalData.find(i => i?.name === item);
+      allScreenData[item]['testcases'] = matchingOriginalData ? matchingOriginalData.testcases : [];
+    })
+    setAllScreenData(allScreenData)
     setTableAfterOperation(originalData)
   
     setDataParamUrl(false)
@@ -1595,16 +1622,12 @@ const debugTestCases = selectedBrowserType => {
           footer={` Test Steps count : ${data.testcases.length > 0 ? data.testcases.length : 0}`} style={{ textAlign: 'center' }}
         >
 
-          <Column rowReorder headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem', borderTopLeftRadius: '8px' }} style={{  paddingLeft: '0.8rem', paddingRight: '0.8rem' }} />
-          {/* <Column headerStyle={{ backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem',flexGrow:'0.2'}}  editor={(options) => textEditor(options)} header="Step" bodyStyle={{ textAlign: 'center' ,flexGrow:'0.2'}} field="stepNo"  style={{ width: '20%',overflowWrap: 'anywhere',paddingLeft:'0.8rem',paddingRight:'0.8rem' }} onCellEditComplete={onCellEditComplete}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem' }} header="Step" bodyStyle={{ textAlign: 'center' }} field="stepNo" style={{ minWidth: '4rem', width: '28%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem' }} ></Column>
-          {/* <Column  headerStyle={{ backgroundColor: ' #74737f', color: '#fff'}} header="Object Property" body={actionIconTemplate}  exportable={false} style={{ minWidth: '8rem' }}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff' }} body={ActionIconTemplate} header="Element Name" style={{ width: '13%', overflowWrap: 'anywhere', justifyContent: 'space-between' }}></Column>
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '100px' }} field="keywordVal" header="Keyword" style={{ width: '30%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }}></Column>
-          <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff' }} field="inputVal" header="Test Data" style={{  }} className='Testdata'></Column>
-          {/* <Column headerStyle={{ backgroundColor: ' #74737f', color: '#fff' }} field="outputVal" header="Output Data" editor={(options) => textEditor(options)} style={{ width: '20%', overflowWrap: 'anywhere' }}></Column> */}
-          {/* <Column rowEditor headerStyle={{ width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f',flexGrow:'0.2' }} bodyStyle={{ textAlign: 'center' ,flexGrow:'0.2'}}></Column> */}
-          <Column headerStyle={{ justifyContent: "center", width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f', borderTopRightRadius: '8px' }} body={actionBodyTemplate} bodyStyle={{ textAlign: 'center', minWidth: '4rem' }} exportable={false} style={{ minWidth: '8rem' }}></Column>
+          <Column rowReorder style={{ justifyContent: "center", width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopLeftRadius: '8px', flex: "0 0" }} />
+          <Column style={{ justifyContent: "center", width: '10%', minWidth: "10%" }} field="stepNo"/>
+          <Column body={ActionIconTemplate} style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  ></Column>
+          <Column body={keywordValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '20%', flex:"0 0"}} field="keywordVal"></Column>
+          <Column body={inputValTemplate} className='step_sap' style={{ justifyContent: "center", width: '40%', minWidth: '30%', flex:"0 0"}}  field="inputVal" ></Column>
+          <Column body={actionBodyTemplate} exportable={false} style={{ justifyContent: "center", width: '10%', minWidth: '5%', flexGrow: '0.2', flex:"0 0" }}/>
 
         </DataTable>
         {/* </ScrollPanel> */}
@@ -1616,9 +1639,9 @@ const debugTestCases = selectedBrowserType => {
   }
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
+      <>
         <span style={ { fontSize: '14px', opacity: '0.4' } } onClick={(event) => {  menu.current.toggle(event) }} aria-controls="popup_menu" aria-haspopup><i className='pi pi-ellipsis-v' style={{ fontSize: '14px' }} ></i></span>
-      </React.Fragment>
+      </>
     );
   }
   const items = [
@@ -1640,19 +1663,19 @@ const debugTestCases = selectedBrowserType => {
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>Tag</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', marginLeft: '10px' }}>{popupData[0].custname}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', marginLeft: '10px' }}>{popupData[0]?.custname}</p>
     </div>
     <Divider style={{ margin: '0' }} />
     <div className="column2" >
       <p style={{ marginLeft: '-25px' }}>Id</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%' }}>{popupData[0].keywordVal}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%' }}>{popupData[0]?.keywordVal}</p>
     </div>
     <Divider style={{ margin: '0' }} />
     <div className="column2" >
       <p style={{ marginLeft: '-26px' }}>X-path</p>
       <Divider layout="vertical" style={{ position: 'inherit' }} />
-      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0].xpath.trim().length !== 0 ? (popupData[0].xpath.trim().length > 10 && !showFullXpath ? popupData[0].xpath.trim().substring(0, 20) + "..." : popupData[0].xpath.trim()) : 'Not Found'}</p>
+      <p style={{ overflowWrap: 'anywhere', width: '42%', height: 'auto' }} ref={textRef} onMouseEnter={() => setShowFullXpath(true)} onMouseLeave={() => setShowFullXpath(false)}>{popupData[0]?.xpath?.trim().length !== 0 ? (popupData[0]?.xpath?.trim().length > 10 && !showFullXpath ? popupData[0]?.xpath?.trim().substring(0, 20) + "..." : popupData[0]?.xpath?.trim()) : 'Not Found'}</p>
     </div>
     <Divider style={{ margin: '0' }} />
   </div>
@@ -1679,7 +1702,7 @@ const debugTestCases = selectedBrowserType => {
       accept={()=>{visibleScenario?setSelectedScenario(scenarioChosen): resetFields()}} 
       reject={()=>{}} 
       />
-      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={!showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
+      {moduleSelect !== undefined && Object.keys(moduleSelect).length !== 0 && showMindmap && <GeniusMindmap gen={showMindmap} displayError={displayError} setBlockui={setBlockui} moduleSelect={moduleSelect} verticalLayout={true} setDelSnrWarnPop={() => { }} hideMindmap={() => setShowMindmap(false)}/>}
       {loading ? <ScreenOverlay content={loading} /> : null}
       <div className='create_testsuite'>
       <Dialog className='create_testsuite' header={'Create Test Suite'} visible={displayCreateModule} style={{ fontFamily: 'LatoWeb', fontSize: '16px',height: '40vh',width: '25vw'}} 
@@ -1998,7 +2021,7 @@ const debugTestCases = selectedBrowserType => {
                 }>
                 Next
               </button>
-              <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="AVO Genius for SAP" >
+              <Dialog visible={visible} style={{ width: '50vw', height:'50vw', right: '0',position:'fixed',  overflowY: 'hidden !important'}} className='genius_sap' onHide={onHideSap} header="Avo Genius(SAP)" >
               <div className="App">
             <TabMenu model={items} activeIndex={activeIndex}style={{display:'flex', justifyContent:'center'}}></TabMenu>
             <Menu model={menuModel} popup ref={menu} id="popup_menu" onHide={() => setSelectedRow(null)}/>
@@ -2032,18 +2055,12 @@ const debugTestCases = selectedBrowserType => {
                 onSelectionChange={e => { setSelectedRow(e.value); setSingleData(e.value); setSelectedScreen({ name: e.value.name }) }}
               >
 
-              <Column expander headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '4rem', flexGrow: '0.2', borderTopLeftRadius: '8px' }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
-              {/* <Column expander  headerStyle={{backgroundColor: '#74737f', color: '#fff'}}/> */}
-              {/* <Column field="step" header="Step" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff', width: '13%', minWidth: '4rem', flexGrow: '0.2' }} bodyStyle={{ textAlign: 'center' }} style={{ minWidth: '4rem', width: '20%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: 'flex-start' }} /> */}
-              {/* <Column body={actionScreen} header="Step"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}}/> */}
-              <Column body={actionScreen} headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '4rem'}} header="Step" bodyStyle={{ textAlign: 'center' }} style={{ minWidth: '4rem', width: '20%', overflowWrap: 'anywhere', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: 'flex-start' }} ></Column>
-              <Column header="Element Name" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff' }} style={{ width: '20%', overflowWrap: 'anywhere', justifyContent: 'space-between' }} ></Column>
-              {/* <Column header="Element Name" headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column header="Keyword" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff', width: '100px' }} style={{ width: '40%', overflowWrap: 'anywhere', justifyContent: 'flex-start' }} ></Column>
-              {/* <Column header="Keyword"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column header="Test Data" headerStyle={{ justifyContent: "center", backgroundColor: '#74737f', color: '#fff' }} style={{ justifyContent: 'flex-start', width: '-40%', overflowWrap: 'anywhere' }} ></Column>
-              {/* <Column header="Test Data"  headerStyle={{backgroundColor: '#74737f', color: '#fff'}} /> */}
-              <Column headerStyle={{ width: '10%', minWidth: '4rem', backgroundColor: ' #74737f', backgroundColor: ' #74737f', flexGrow: '0.2', borderTopRightRadius: '8px' }} bodyStyle={{ textAlign: 'center', flexGrow: '0.2', minWidth: '4rem' }} exportable={false} style={{ minWidth: '8rem' }}></Column>
+              <Column expander headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopLeftRadius: '8px', flex:"0 0" }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
+              <Column body={actionScreen} className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '10%', flex:"0 0"}} header="Steps" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '30%', flex:"0 0"}} header="Element Name" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '20%', flex:"0 0"}} header="Keyword" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column className='step_sap' headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '40%', minWidth: '30%', flex:"0 0"}} header="Test Data" bodyStyle={{ textAlign: 'center' }}  ></Column>
+              <Column headerStyle={{ justifyContent: "center", backgroundColor: ' #74737f', color: '#fff', width: '10%', minWidth: '5%', flexGrow: '0.2', borderTopRightRadius: '8px', flex:"0 0" }} style={{ flexGrow: '0.2', paddingLeft: '0.8rem', paddingRight: '0.8rem', justifyContent: "flex-start" }} />
               </DataTable>
             </div>
                 </div>
@@ -2051,27 +2068,26 @@ const debugTestCases = selectedBrowserType => {
             </div>
             { startGenius && <Button label={startGenius} style={{right:'0',bottom:'13px',margin:'0 2rem 2rem 0', position:'fixed' }} onClick={handleSAPActivateGenius}/> }
             <div class="icon-bar">
-            {/* <ReactTooltip /> */}
           {/* <Button label="Save" icon="pi pi-times" className="p-button-text" onClick={() => {
             port.postMessage({ data: { "module": projectData.module, "project": projectData.project, "scenario": projectData.scenario, "appType": projectData.appType, "screens": tableDataNew } })
           }} /> */}
 
           <div disabled={tableDataNew.length <= 0} onClick={(e) => { if(tableDataNew.length <= 0) e.preventDefault() }}>
-            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
+            <span  className={`${tableDataNew.length <= 0  ? "expand-all-disabled": "expand-all"}`} data-tip={"Expand All "} title={"Expand All "} data-pr-position="top" onClick={expand ? () => { setExpandedRows(null); setExpand(false) } : () => { expandAll(); setExpand(true) }} style={{ marginRight: '1rem', position:'absolute', bottom:'1.1rem' }}>   <img src={`static/imgs/${tableDataNew.length <= 0 ? "expand_all_disable" : "expand_all_enable"}.svg`}></img></span>
             {/* <span className= "bottombartooltips" data-pr-tooltip="Collapse All " data-pr-position="top"onClick={() => setExpandedRows(null)}>p<i className='pi pi-chevron-circle-right' style={{ fontSize: '18px' }} ></i></span> */}
           </div> {/** undo the last step */}
-          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
+          <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "erase-all-disabled": "erase-all"}`} title={'Erase all data'} data-tip={"Erase all data "} Tooltip="eraseall" data-pr-position="top" onClick={(e) => { if(startGenius || dataSaved){ e.preventDefault()} else { seteraseData(true); }}} > {/** erase all data */}
             <span><img src={`static/imgs/${startGenius || dataSaved ? "erase_all_disable" : "erase_all_enable"}.svg`}></img></span> 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
+          <div disabled={dataSaved} className={`${dataSaved  ? "debug-testcase": "debug-testcase-disabled"}`} data-tip={"Run test steps "} title={'Preview'}  data-pr-position="top" onClick={(e) => { if(!dataSaved) { e.preventDefault() } else { debugTestCases('1') } }}><img src={`static/imgs/${dataSaved ? "preview_testcase_enable" : "preview_testcase_disable"}.svg`}></img></div>  {/** execute the steps */}
 
-            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "}  data-pr-position="top" >
+            <div disabled={startGenius || dataSaved} className={`${startGenius || dataSaved ? "save-data-disabled": "save-data"}`} data-tip={"Save Data "} title={'Save Data'} data-pr-position="top" >
               <span onClick={(e) => {if(startGenius || dataSaved) {e.preventDefault()} else {handleSaveMindmap()}}}><img src={`static/imgs/${startGenius || dataSaved ? "save_disable" : "save_enable"}.svg`}></img>
             </span>
 
           </div>
-          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
-          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
+          <div disabled={dataSaved} className={`${dataSaved ? "show-mindmap": "show-mindmap-disabled"}`} data-tip={"Show Mindmap "} title={'Show Mindmap'} data-pr-position="top" onClick={(e) => { if(!dataSaved) {e.preventDefault()} else { setShowMindmap(true); loadModule(selectedModule.key, selectedProject.key);}}} ><img src={`static/imgs/${dataSaved ? "view_mindmap_enable" : "view_mindmap_disable"}.svg`}></img></div> {/** view the mindmap */}
+          <div disabled={startGenius || dataSaved} className={`${(startGenius || dataSaved) ? "data-param-disabled": "data-param"}`} title={'Data Parameterization'} data-tip={"Data Parameterization "} data-pr-position="top" onClick={(e) => {if(startGenius || dataSaved){ e.preventDefault() } else { if (!dataParamUrl) { exportExcel() }; setDataParamPath("") }}}><img src={`static/imgs/${(startGenius || dataSaved) ? "data_param_disable" : "data_param_enable"}.svg`}></img></div>
           {/* <div className="bottombartooltips" data-pr-tooltip={"Minimize"} data-pr-position="top" style={{ border: 'none' }} ></div> * maximize genius window */}
           {/* <div className="bottombartooltips" data-pr-tooltip="Close Genius App " data-pr-position="top" style={{ 'fontSize': '1.7rem', position:'absolute', bottom:'1rem', left:'30rem',cursor:'pointer' }} ><img src='static\imgs\close_icon.svg'></img></div>* close genius window */}
             </div>

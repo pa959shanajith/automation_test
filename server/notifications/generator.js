@@ -79,7 +79,7 @@ generateEmailPayload.report = async data => {
 	data.testsuite.forEach((testSuiteDetails) => {
 		testSuiteDetails.reportData.forEach((reportDataItem) => {
 			if (reportDataItem.reportid.length > 0) {
-				reportDataItem.url = data.url + '/viewReports?reportID=' + reportDataItem.reportid;
+				reportDataItem.url = data.url + '/viewReports?reportID=' + reportDataItem.reportid + '&downloadLevel=testCase&viewReport=true';
 				reportDataItem.projectName = testSuiteDetails.projectname;
 				reportDataItem.testsuiteName = testSuiteDetails.testsuitename;
 			}
@@ -719,7 +719,7 @@ generateEmailPayload.reportOnCICDExecution = async data => {
 
 	data.reportExecutionData.reportData.forEach(reportDataItem => {
 		reportDataItem.suiteDetails.forEach(reportItem => {
-			if (reportItem.reportId.length > 0) reportItem.url = data.url + '/viewReports?reportID=' + reportItem.reportId;
+			if (reportItem.reportId.length > 0) reportItem.url = data.url + '/viewReports?reportID=' + reportItem.reportId + '&downloadLevel=testCase&viewReport=true';
 
 			if (reportItem.status.toLowerCase() == "pass") reportItem.pass = true;
 			else if (reportItem.status.toLowerCase() == "fail") reportItem.fail = true;

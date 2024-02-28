@@ -19,7 +19,7 @@ import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree,enableSaveButton
+    selectedAvoproject, mappedTree,enableSaveButton, updateTestrailMapping
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -28,6 +28,7 @@ import { Tree } from 'primereact/tree';
 // import { checkboxTemplate } from './path/to/checkboxTemplate';
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
+import TestRailContent from "./TestRailContent";
 import { Paginator } from 'primereact/paginator';
 import { getDetails_SAUCELABS } from "../../execute/api";
 import { useNavigate } from 'react-router-dom';
@@ -45,6 +46,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
     const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
+    const testrailLoginDetails = useSelector(state => state.setting.testRailLogin);
     const enabledSaveButton = useSelector(state => state.setting.enableSaveButton);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
@@ -87,6 +89,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [user, setUser] = useState([]);
     const azureRef = useRef(null);
     const zephyrRef = useRef(null);
+    const testrailRef = useRef(null);
     const [domainDetails , setDomainDetails] = useState(null);
     const [currentAvoPage, setCurrentAvoPage] = useState(1);
     const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
@@ -181,6 +184,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 break;
             case 'qTest':
                 break;
+            case 'TestRail':
+                callLoginTestRail();
+                break;
             default:
                 break;
         }
@@ -243,12 +249,43 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
         //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
-        else if (domainDetails) {
-            setToast("success", "Success", `${selectedscreen.name} login successful`);
+        else if (domainDetails?.length) {
+            setToast("success", "Success", `${selectedscreen?.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
             zephyrRef.current.callViewMappedFiles();
             // setLoginSuccess(true);
+        }
+        setIsSpin(false);
+    }
+    
+    const callLoginTestRail = async()=>{
+        const testrailPayload = {
+            TestRailUrl : testrailLoginDetails.url,
+            TestRailUsername : testrailLoginDetails.username,
+            TestRailToken : testrailLoginDetails.apiKey,
+            TestRailAction : "getProjects"
+        };
+
+        const testrailProjects = await api.getProjectsTestrail_ICE(testrailPayload);
+        setIsSpin(false);
+
+        if (testrailProjects.error) setToast('error','Error', testrailProjects.error.CONTENT);
+        else if (testrailProjects === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (testrailProjects === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (testrailProjects === "Invalid Session"){
+            setToast('error','Error','Invalid session');
+            setIsSpin(false);
+        }
+        else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
+        else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
+        else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
+        else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
+        else if (testrailProjects) {
+            setToast("success", "Success", `${selectedscreen.name} login successful`);
+            setShowLoginCard(false);
+            setDomainDetails(testrailProjects);
+            testrailRef.current.callViewMappedFiles();
         }
         setIsSpin(false);
     }
@@ -528,6 +565,23 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     }
 
+    const callTestrailSaveButton = async () => {
+        if (mappedData && Object.keys(mappedData).length) {
+            const response = await api.saveTestrailMapping(mappedData);
+            if (response.error) {
+                setToast("error", "Error", response.error);
+            } else if (response === "scheduleModeOn")
+                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (response.status == 201 || response.status == 200 || response == "success") {
+                setToast("success", "Success", 'Tests mapped successfully!');
+                dispatchAction(updateTestrailMapping(true));
+            }
+        }
+        else {
+            setToast("info", "Info", 'Please sync atleast one map');
+        }
+    }
+
     const callViewMappedFiles = async (saveFlag) => {
         try {
             const response = await api.viewJiraMappedList_ICE("6440e7b258c24227f829f2a4");
@@ -601,6 +655,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     
     const acceptFunc = () => {
         setIsShowConfirm(false);
+        setDomainDetails([]);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -620,6 +675,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTreeData([]);
         setCompleteTreeData([]);
         setSelectedNodes([]);
+        dispatchAction(updateTestrailMapping(false));
     };
 
     const rejectFunc = () => {
@@ -630,8 +686,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         e.preventDefault();
         dispatchAction(selectedProject(e.target.value));
         setDisableIssue(false);
-        console.log(e.target.value, ' project e');
-        // const releaseId = e.target.value;
         const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
         if (projectScenario.error)
             setToast("error", "Error", projectScenario.error);
@@ -825,7 +879,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : callZephyrSaveButton} />
+                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name=="TestRail" ? callTestrailSaveButton : callZephyrSaveButton} />
                     <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" />
                 </div>)}
 
@@ -850,7 +904,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
          
 
     const CloudBasedIntegrationContent = useMemo(() => <CloudSettings  />, [])
-   
+    
 
 
     return (
@@ -1001,10 +1055,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                     </div>
                                 </div>
                             )
-
-                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
-                }
-
+                        : selectedscreen.name === "Zephyr" && Index === 0 ? 
+                            <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name === "Azure DevOps" && Index === 0 ?
+                            <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name == "TestRail" && Index === 0 ? 
+                            <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
+                        : null
+                    }
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>
