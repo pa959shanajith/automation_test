@@ -1088,7 +1088,7 @@ const CanvasNew = (props) => {
                             }
                             scenarioComparisionData.push(screenComparisonKeys)
                             setMarqueItem({...screenComparisonKeys,newlyfound:data['view'][3]['newElements'].new_obj_in_screen.length,screenHealth:screenHealth,screenName:screenAnalysisData['screenName']})           
-                            setOverlay(`Comparision of ${i+1}/${dataObjects.length} screen(s) in progress..`)
+                            setOverlay(`Comparison of ${i+1}/${dataObjects.length} screen(s) in progress..`)
                            
                             let compareObj = generateCompareObject(screenAnalysisData, screenAnalysisData.currentScrapedObjects.filter(object => object.xpath.substring(0, 4)==="iris"));
                             screenAnalysisData.view=compareObj
