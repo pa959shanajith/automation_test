@@ -1777,6 +1777,8 @@ export function transformDataFromTreetoJourney(data) {
                     const child = currentNode.children[i];
                     if (child.childIndex === parentIndex) {
                         return child;
+                    }else if(child.parent.childIndex === parentIndex){
+                        return child;
                     }
                     const foundInChild = findParent(parentIndex, child);
                     if (foundInChild) {
@@ -1825,6 +1827,16 @@ export function transformDataFromTreetoJourney(data) {
                         parent[parent.length - 1].children.push(childItem);
                     } else {
                         newItem.children[i - 1].children.push(childItem);
+                    }
+                }else {
+                    const parentIndex = childItem.parent.childIndex;
+                    const parentData = findParent(parentIndex, newItem);
+
+                    if (parentData) {
+                        if (!parentData.children) {
+                            parentData.children = [];
+                        }
+                        parent.push(childItem);
                     }
                 }
             }

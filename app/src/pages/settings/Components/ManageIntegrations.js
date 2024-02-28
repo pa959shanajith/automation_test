@@ -249,8 +249,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
         //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
-        else if (domainDetails) {
-            setToast("success", "Success", `${selectedscreen.name} login successful`);
+        else if (domainDetails?.length) {
+            setToast("success", "Success", `${selectedscreen?.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
             zephyrRef.current.callViewMappedFiles();
@@ -278,11 +278,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setIsSpin(false);
         }
         else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
-        // else if (testrailProjects === "noprojectfound") setLoginError("Invalid credentials or no project found");
-        // else if (testrailProjects === "invalidurl") setLoginError("Invalid URL");
         else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
         else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
-        // else if (testrailProjects === "Error:Failed in running testrail") setLoginError("Host not reachable");
         else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
         else if (testrailProjects) {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
@@ -658,6 +655,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     
     const acceptFunc = () => {
         setIsShowConfirm(false);
+        setDomainDetails([]);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -1057,13 +1055,14 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                     </div>
                                 </div>
                             )
-
-                        : selectedscreen.name === "Zephyr" && Index===0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton}  activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> : selectedscreen.name === "Azure DevOps" && Index===0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex}/> :null
-                }
-                {
-                    selectedscreen && selectedscreen.name == "TestRail" && Index === 0 && <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
-                }
-
+                        : selectedscreen.name === "Zephyr" && Index === 0 ? 
+                            <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name === "Azure DevOps" && Index === 0 ?
+                            <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name == "TestRail" && Index === 0 ? 
+                            <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
+                        : null
+                    }
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>

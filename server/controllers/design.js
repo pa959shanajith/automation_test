@@ -180,6 +180,9 @@ exports.debugTestCase_ICE = function (req, res) {
 							var browsertypeobject = {
 								browsertype: requestedbrowsertypes
 							};
+							var debuggerPointsObject = {
+                                debuggerPoints:req.body.debuggerPoints
+                            };
 							var flag = "";
 							var inputs = {
 								"query": "testcaseids",
@@ -235,7 +238,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											};
 										}
 										var responsedata = requestedtestcaseids.map(i=> tcDict[i])
-										responsedata.push(browsertypeobject);
+										responsedata.push(browsertypeobject,debuggerPointsObject);
 										logger.info("Sending socket request for debugTestCase to cachedb");
 										dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
 										startDebugging(dataToIce);
@@ -247,6 +250,7 @@ exports.debugTestCase_ICE = function (req, res) {
             }else {
               let responsedata = [{apptype, template:"",datatables:[], testcase:requestedtestcaseids, testcasename:"geniusExecution"}];
               responsedata.push(browsertypeobject);
+			  responsedata.push(debuggerPointsObject)
               dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
               startDebugging(dataToIce);
             }
@@ -449,6 +453,45 @@ exports.debugTestCase_ICE = function (req, res) {
 							logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 						}
 					}
+					else if(action=='playDebug'){
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
+						mySocket.emit("playDebug",dataToIce );
+										function result_playDebug_listener(message) {
+											data = message;
+											mySocket.removeListener('result_playDebug_listener', result_playDebug_listener);
+
+											//LB: make sure to send recieved data to corresponding user
+											
+
+											try {
+												res.send(data);
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											}
+												
+										}
+										mySocket.on("result_playDebug_listener", result_playDebug_listener);
+					}
+					else if(action=='moveToNextStep'){
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
+						mySocket.emit("moveToNextStep",dataToIce );
+										function result_moveToNextStep_listener(message) {
+											data = message;
+											//LB: make sure to send recieved data to corresponding user
+											mySocket.removeListener('result_moveToNextStep_listener', result_moveToNextStep_listener);
+
+											
+											
+											try {
+												res.send(data);
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											}
+												
+										}
+										mySocket.on("result_moveToNextStep_listener", result_moveToNextStep_listener);
+					}
+					
 				} catch (exception) {
 					logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 				}

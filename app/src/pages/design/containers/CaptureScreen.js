@@ -249,9 +249,11 @@ const CaptureModal = (props) => {
   const handleAddMore = (id) => {
     if (id === 'add more') {
       setVisible(id);
+      setParentId(null)
     }
     else if (id === 'capture') {
       setVisible(id);
+      setParentId(null)
     }
   }
 
@@ -541,7 +543,7 @@ const elementTypeProp =(elementProperty) =>{
                 viewString = newScrapeList;
               }
             }
-            if(parentId !== null){
+            if(parentId === Id){
               setCapturedDataToSave(newScrapeList);
               viewString = newScrapeList;
             }
@@ -729,6 +731,7 @@ const elementTypeProp =(elementProperty) =>{
   // {console.log(captureData[0].selectall)}
 
   const saveScrapedObjects = () => {
+    setOverlay("Saving in progress...")
     let scrapeItemsL = [...capturedDataToSave];
     let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
     let views = [];
@@ -811,6 +814,7 @@ const elementTypeProp =(elementProperty) =>{
       })
       .catch(error => console.error(error))
       setSaveDisable(true);
+      setOverlay("");
   }
 
   const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -997,7 +1001,7 @@ else{
 
         if (viewString.view.length !== 0) {
 
-          let lastIdx = viewString.view ? viewString.view.length : 0;
+          let lastIdx = newScrapedData.view ? newScrapedData.view.length : 0;
 
           let [scrapeItemList, newOrderList] = generateScrapeItemList(lastIdx, viewString, "new");
 
@@ -1960,7 +1964,7 @@ const confirmScreenChange = () => {
             if(screenData_1.length>0){
               props.setFetchingDetails(screenData_1[0])
               props.setModuleData({id:res, key:uuid()})
-              setParentId(uuid());
+              setParentId(screenData_1[0]._id);
               toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
             }else{
               toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
@@ -2213,7 +2217,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" tooltipOptions="title" /></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
