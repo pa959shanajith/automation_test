@@ -1751,7 +1751,7 @@ exports.generateToken = async (req, res) => {
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
 		if(icename!=undefined){
 			let action = req.body.data.type
-			if(action == 'OAuth2.0') {
+			if(action == 'setOAuth2.0') {
 				try {
 					let inputs = {...req.body.data};
 					dataToIce = {"emitAction" : "generateToken","username" : icename,'details':inputs};
