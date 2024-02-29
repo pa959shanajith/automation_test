@@ -193,7 +193,7 @@ const GeniusSap = (props) => {
   const [showMindmap, setShowMindmap] = useState(false);
   const [dataSaved, setDataSaved] = useState(false);
   const [activeIndex, setActiveIndex] = useState(3);
-  const dialogFuncMap = {
+    const dialogFuncMap = {
     'displayBasic2': setDisplayBasic2,
   }
 
@@ -329,7 +329,7 @@ const GeniusSap = (props) => {
       let abc = screenData.testcases.map((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
+          let originalVal = testcase.inputVal
           // testcase.inputVal[0]=`|${testcase.custname}|`
           obj[variables] = originalVal
           i++
@@ -1033,7 +1033,7 @@ const onScreenNameChange = (e, name) => {
                 appType: 'SAP',
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
@@ -1049,7 +1049,7 @@ const onScreenNameChange = (e, name) => {
                 appType: testStep.custname.replace(new RegExp('@', 'g'), ''),
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
@@ -1160,7 +1160,7 @@ const onScreenNameChange = (e, name) => {
     return <div><div className='keyworddata'>{rowData?.keywordVal}</div></div>
   }
   const sapPasswordMask = (rowData) => {
-    const result = rowData.id.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
+    const result = rowData?.id?.split("/")[6] !=="pwdRSYST-BCODE"?rowData.inputVal : "*********";
     return result
   }
   const inputValTemplate = (rowData) =>{
@@ -1415,15 +1415,21 @@ const onScreenNameChange = (e, name) => {
     const newDataParamTableStart = [singleData, startLoop, ...firstSteps]
     const newDataParamTableEnd = [...lastStep, endLoop]
     originalData[1].testcases = newDataParamTableStart
-    if (originalData.length === 1) {
+    if (originalData.length > 0 && originalData.length <= 2) {
       originalData[1].testcases = [...newDataParamTableStart, endLoop]
       originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     } else {
+      originalData[1].testcases = [...newDataParamTableStart]
       originalData[originalData.length - 1].testcases = newDataParamTableEnd;
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
     originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
     allScreenData[selectedScreen.name]['testcases'] = originalData[objIndex].testcases;
+    Object.keys(allScreenData).forEach(item=>{
+      const matchingOriginalData = originalData.find(i => i?.name === item);
+      allScreenData[item]['testcases'] = matchingOriginalData ? matchingOriginalData.testcases : [];
+    })
+    setAllScreenData(allScreenData)
     setTableAfterOperation(originalData)
   
     setDataParamUrl(false)

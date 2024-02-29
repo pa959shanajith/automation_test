@@ -212,7 +212,8 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                     checked={selectedTestRailNodeFirstTree.id === node.id}
                     onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
-                <span className="scenario_label">{node.name}</span>
+                <Tooltip target={`.scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
+                <span className={`scenario-label scenario_label-${node.id}`} id={node.name}>{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -227,8 +228,8 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                     onChange={(e) => handleNodeToggleSecondTree(e, node)}
                     disabled={!Object.keys(selectedTestRailNodeFirstTree)?.length}
                 />
-                <Tooltip target=".scenario_label" position='bottom'>{node.name} - {node.testSuite?.name}</Tooltip>
-                <span className="scenario_label">{node.name} - {node.testSuite?.name}</span>
+                <Tooltip target={`#${node.name}-${node.testSuite?.name}`} position='right'>{node.name} - {node.testSuite?.name}</Tooltip>
+                <span className={`scenario_label`} id={`${node.name}-${node.testSuite?.name}`}>{node.name} - {node.testSuite?.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -337,10 +338,9 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
             }
 
             const removeTestCase = updatedTreeData.map((data) => {
-                if (data._id == scenario) {
+                if (data._id == scenario || data._id == testCaseNames) {
                     if (data.children && data.children.length > 0) {
                         const filteredChildren = data.children.filter((child) => child._id != items.testid[0]);
-                        console.log("filteredChildren", filteredChildren);
 
                         return {
                             ...data,
