@@ -353,8 +353,9 @@ const CanvasNew = (props) => {
               tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
+              let number = tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3?2:3
               journey = transformDataFromTreetoJourney(tree)
-              tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData)
+              tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData,number)
               count= {...count,...tree.count}
             }
            
@@ -385,6 +386,7 @@ const CanvasNew = (props) => {
         else if(createnew !== false){
             var p = d3.select('#node_' + createnew);
             setCreateNew(false)
+            if(p['_groups'][0][0] === null){p = d3.select('#node_' + (createnew - 1))}
             setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -725,8 +727,16 @@ const CanvasNew = (props) => {
     }
     const clickDeleteNode=(id)=>{
       var sid = parseFloat(id.split('node_')[1]);
-      var reu=[...dNodes][sid]['reuse'];
       var type =[...dNodes][sid]['type'];
+      if(type==='teststepsgroups'){
+        var reu=[...dNodes][sid]['reuse']
+        if(reu === false){
+          reu=[...dNodes][sid]['parent']['reuse'];
+        }
+      }else{
+        reu=[...dNodes][sid]['reuse'];
+      }
+      
       if (type=='scenarios'){
           if (reu){
               if([...dNodes][sid]['children']){
