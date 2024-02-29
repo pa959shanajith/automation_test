@@ -474,7 +474,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         }
         var job_inputs = {"executionListIds":jobIds};
         const fetchJOB = await utils.fetchData(job_inputs, "/getExecutionJob", "getExecutionJob", true);
-        if(fetchJOB && !(fetchJOB[1].statusCode >= 200 && fetchJOB[1].statusCode <= 299)){
+        if(fetchJOB && fetchJOB.length && !(fetchJOB[1].statusCode >= 200 && fetchJOB[1].statusCode <= 299)){
           send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
           send_res['data'][0]['error']["errorCode"] = fetchJOB[1].statusCode;
           send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
@@ -497,7 +497,7 @@ exports.fetchALM_Testcases = async function (req,res) {
             percentage = fetch_jobStatus["status"] === "Completed"  ? 100 : percentage;
             percentage = fetch_jobStatus['Completed'] ? calculatePercentage(fetch_jobStatus['Completed']) : percentage;
             send_res["jobstatuses"].push({"id":each_exec.executionListId,
-            "status":fetch_jobStatus['status'] === "Inprogress" ? "running":fetch_jobStatus['status'],
+            "status":fetch_jobStatus['status'] === "Inprogress" ? "running": setStatus(fetch_jobStatus["status"]),
             "percentage":percentage
           })
             }))
@@ -512,7 +512,22 @@ exports.fetchALM_Testcases = async function (req,res) {
         res.status(500).json({ code:'500', error: 'error while processing' });
     }
   };
-
+  function setStatus(jobStatus){
+    var resStatus = "unknown"
+    if(jobStatus){
+      switch (jobStatus) {
+        case "Completed":
+          resStatus = "finished"
+          break;
+        case "Queued":
+          resStatus = "planned"
+          break;
+        default:
+          break;
+      }
+    }
+    return resStatus;
+  }
   function calculatePercentage(input) {
     // Extract numerator and denominator from the input
     const [numerator, denominator] = input.split('/').map(Number);
