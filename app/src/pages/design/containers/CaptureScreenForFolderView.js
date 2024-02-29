@@ -1722,9 +1722,10 @@ const CaptureModal = (props) => {
                     <div
                         className={`tooltip__target-${rowdata.objectDetails.objId}
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : (rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
                     {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
                     {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+                    {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
                 </div>
             </>
         )
@@ -2452,7 +2453,8 @@ function generateScrapeItemList(lastIdx, viewString, type = "old") {
             left: scrapeObject.left,
             height: scrapeObject.height,
             width: scrapeObject.width,
-            identifier: scrapeObject.identifier
+            identifier: scrapeObject.identifier,
+            reused:scrapeObject.reused
         }
         if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop != undefined) {
             scrapeItem['viewTop'] = scrapeObject.viewTop;

@@ -266,7 +266,7 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab, delet
     }
 };
 
-export const generateTreeOfView = (tree, sections, count, verticalLayout, screenData, isAssign, cycleID) => {
+export const generateTreeOfView = (tree, sections, count, verticalLayout, screenData,number, isAssign, cycleID) => {
     unfoldtree(tree)
     var translate;
     var nodeDisplay = {}
@@ -292,7 +292,11 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
     childCounter(1, tree);
     if (tree.type !== "endtoend") {
         var newHeight = d3.max(levelCount) * 90;
-        const d3Tree = d3.tree().size([newHeight * 2, cSize[0]]);
+        let d3Tree;
+        if(number === 1 ){d3Tree = d3.tree().size([newHeight * 2, cSize[0]/3])}
+        else if(number === 2){d3Tree = d3.tree().size([newHeight * 2, cSize[0]/2])}
+        // else if(number === 3 ) {d3Tree = d3.tree().size([newHeight * 2, cSize[0]/4]);}
+        else{d3Tree = d3.tree().size([newHeight * 2, cSize[0]]);}
         const hierarchyLayout = d3.hierarchy(tree);
         const data = d3Tree(hierarchyLayout);
         data.each((node, idx) => {
@@ -375,7 +379,7 @@ export const generateTreeOfView = (tree, sections, count, verticalLayout, screen
         if (verticalLayout) {
             translate = [(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y - 100]
         } else {
-            translate = [(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]
+            translate = [(cSize[0] / 3) - dNodes[0].x - 200, (cSize[1] / 2) - dNodes[0].y]
         }
         foldtree(tree)
         return { nodes: nodeDisplay, links: linkDisplay, translate: translate, dNodes, dLinks, sections, count }
@@ -995,7 +999,10 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     node.y = dNodes[pi].children[0]._id !== undefined?node.y + 150:node.y
                     node.x = dNodes[pi].children[0]._id !== undefined?node.x:node.x + 150
                 }
-                dNodes[node.id] = node
+                if(level === 0){
+                    dNodes[node.id] = node
+                }else
+                {dNodes[uNix] = {...node, id:uNix}}
                 if (node.children && node.children.length > 0) {
                     // Update IDs in the children array
                     node.children.forEach(child => {
@@ -1085,40 +1092,43 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
         // Assuming dNodes is an array of nodes
         if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined && dNodes[0].children[0].children.length>0) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel, nod) {
                 var link = {
                     id: uuid(),
                     source: node,
-                    target: parentLinkTarget
+                    target: nod?parentLinkTarget:dNodes[uNix]
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
                 if (sel) {
                     var currentLink = addLinkNew_1(link.source, link.target, verticalLayout);
                 } else {
-                    currentLink = addLinkNew(link.source, link.target, verticalLayout);
+                    currentLink = addLink(link.source, link.target, verticalLayout);
                 }
 
 
-                var currentNode = addNode(parentLinkTarget);
-                nodeDisplay[parentLinkTarget.id] = currentNode;
+                var currentNode = addNode_1(parentLinkTarget);
+                if(nod){
+                    nodeDisplay[parentLinkTarget.id] = currentNode;
+                }
+                else{nodeDisplay[uNix] = currentNode;}
                 linkDisplay[linkId] = currentLink;
 
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false, false);
                     }
                 }
             }
         }else if (dNodes[pi].children.length > 0 && dNodes[pi]._id !== undefined) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, true, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel, nod) {
                 var link = {
                     id: uuid(),
                     source: node,
-                    target: parentLinkTarget
+                    target: nod?parentLinkTarget:dNodes[uNix]
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
@@ -1130,23 +1140,26 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
 
 
                 var currentNode = addNode_1(parentLinkTarget);
-                nodeDisplay[parentLinkTarget.id] = currentNode;
+                if(nod){
+                    nodeDisplay[parentLinkTarget.id] = currentNode;
+                }
+                else{nodeDisplay[uNix] = currentNode;}
                 linkDisplay[linkId] = currentLink;
 
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false, false);
                     }
                 }
             }
         } else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0 && dNodes[pi].children[0].children[0]._id !== undefined) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel, nod) {
                 var link = {
                     id: uuid(),
                     source: node,
-                    target: parentLinkTarget
+                    target:nod?parentLinkTarget:dNodes[uNix]
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
@@ -1158,23 +1171,26 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
 
 
                 var currentNode = addNode_1(parentLinkTarget);
-                nodeDisplay[parentLinkTarget.id] = currentNode;
+                if(nod){
+                    nodeDisplay[parentLinkTarget.id] = currentNode;
+                }
+                else{nodeDisplay[uNix] = currentNode;}
                 linkDisplay[linkId] = currentLink;
 
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false, false);
                     }
                 }
             }
         }else if (dNodes[pi].children.length > 0  && dNodes[pi].children[0].children.length>0) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false, true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel, nod) {
                 var link = {
                     id: uuid(),
                     source: node,
-                    target: parentLinkTarget
+                    target: nod?parentLinkTarget:dNodes[uNix]
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
@@ -1186,23 +1202,26 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
 
 
                 var currentNode = addNode(parentLinkTarget);
-                nodeDisplay[parentLinkTarget.id] = currentNode;
+                if(nod){
+                    nodeDisplay[parentLinkTarget.id] = currentNode;
+                }
+                else{nodeDisplay[uNix] = currentNode;}
                 linkDisplay[linkId] = currentLink;
 
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false,false);
                     }
                 }
             }
         }else if (dNodes[pi].children.length > 0) {
             getChildUpdate(dNodes, dNodes[pi])
-            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false);
-            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel) {
+            createNodesAndLinks(dNodes[pi], dNodes[pi].children[0], verticalLayout, false,true);
+            function createNodesAndLinks(node, parentLinkTarget, verticalLayout, sel,nod) {
                 var link = {
                     id: uuid(),
                     source: node,
-                    target: parentLinkTarget
+                    target: nod?parentLinkTarget:dNodes[uNix]
                 };
                 var linkId = 'link-' + link.source.id + '-' + link.target.id;
                 dLinks.push(link);
@@ -1214,12 +1233,15 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
 
 
                 var currentNode = addNode(parentLinkTarget);
-                nodeDisplay[parentLinkTarget.id] = currentNode;
+                if(nod){
+                    nodeDisplay[parentLinkTarget.id] = currentNode;
+                }
+                else{nodeDisplay[uNix] = currentNode;}
                 linkDisplay[linkId] = currentLink;
 
                 if (node.children && node.children[0].children.length > 0) {
                     for (var i = 0; i < node.children.length; i++) {
-                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false);
+                        createNodesAndLinks(node.children[i], node.children[i].children[i], verticalLayout, false, false);
                     }
                 }
             }
@@ -1746,7 +1768,6 @@ export function transformDataFromTreetoJourney(data) {
         fullData = newData
         return data; // Return the updated object
     }
-
     function updateData(document) {
         if (document.children) {
             const updatedChildren = [];
@@ -1829,7 +1850,7 @@ export function transformDataFromTreetoJourney(data) {
                         newItem.children[i - 1].children.push(childItem);
                     }
                 }else {
-                    const parentIndex = childItem.parent.childIndex;
+                    const parentIndex = childItem.parent?.childIndex;
                     const parentData = findParent(parentIndex, newItem);
 
                     if (parentData) {
