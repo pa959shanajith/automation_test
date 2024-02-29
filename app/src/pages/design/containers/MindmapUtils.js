@@ -888,6 +888,9 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         var currentLink = addLink(dNodes[pi], dNodes[uNix],verticalLayout);
         nodeDisplay[uNix] = currentNode;
         linkDisplay[lid] = currentLink;
+        if(dNodes[uNix].type === 'screens'){
+            createNode(uNix, nodeDisplay, linkDisplay,dNodes, dLinks, sections, count, obj, verticalLayout, nodeID)
+        }
         return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
 }
 
