@@ -40,6 +40,7 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
+import {loadUserInfoActions} from '../LandingSlice';
 
 
 
@@ -409,6 +410,7 @@ const GeniusSap = (props) => {
     setStartGenius("Activate Genius");
     setDataSaved(false);
     seteraseData(false);
+    dispatch(loadUserInfoActions.setSAPGeniusScrapeData({}));
   };
   
   const displayError = (error) => {
