@@ -1,11 +1,11 @@
-name: Test-WebServerPipeline
+name: WebServerPipeline
 
 trigger: none
 
 resources:
   pipelines:
-  - pipeline: Test-WebServerPipeline
-    source: Test-Parent-Pipeline
+  - pipeline: WebServerPipeline
+    source: Build-AvoAssure
     trigger: true
 
 steps:
