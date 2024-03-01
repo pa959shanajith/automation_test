@@ -19,6 +19,7 @@ import { Messages as MSG } from '../../global';
 const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
     const [testRailProjectsName, setTestRailProjectsName] = useState([]);
+    const [testrailData, setTestrailData] = useState([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [updatedTreeData, setUpdatedTreeData] = useState([]);
     const [rows, setRows] = useState([]);
@@ -69,6 +70,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
             }));
 
             setProjectSuites(_testrailTestSuites);
+            setTestrailData((prev) => _testrailTestSuites);
             setLoading(false);
         };
     };
@@ -112,88 +114,115 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                         "testrailAction": "getSections"
                     });
 
-                    for (let index = 0; index < sections.length; index++) {
-                        sections[index] = {
-                            ...sections[index],
-                            key: `${projectSuites[i].key}-${index}`
-                        };
-                    }
+                    // Fetching test cases of each section
+                    const fetchTestCases = async (projectId, suiteId, sectionId, outerIndex) => {
+                        try {
+                            const response = await api.getTestcasesTestrail_ICE({
+                                projectId,
+                                suiteId,
+                                sectionId,
+                                TestRailAction: "getTestCases"
+                            });
 
-                    testSection.push({
-                        ...suite,
-                        children: sections || []
-                    });
-                }
+                            const testCaseDetails = [];
 
-                const fetchTestCases = async (projectId, suiteId, sectionId, outerIndex) => {
-                    try {
-                        const response = await api.getTestcasesTestrail_ICE({
-                            projectId,
-                            suiteId,
-                            sectionId,
-                            testrailAction: "getTestCases"
+                            if (response.length > 0) {
+                                for (let i = 0; i < response.length; i++) {
+                                    const testCase = response[i];
+                                    const testCaseWithType = {
+                                        ...testCase,
+                                        type: "testcase",
+                                        name: testCase.title,
+                                        key: `${outerIndex}-${i}`
+                                    };
+                                    testCaseDetails.push(testCaseWithType);
+                                }
+                            }
+                            setLoading(false);
+                            return testCaseDetails;
+                        } catch (error) {
+                            console.error("Error fetching test cases:", error);
+                            return [];
+                        }
+                    };
+
+                    if (sections.length > 0) {
+                        const sectionsWithTestcases = await Promise.all(sections.map(async (section, index) => {
+                            const testcaseData = await fetchTestCases(currentProject.id, section.suite_id, section.id, index) || [];
+                            return {
+                                ...section,
+                                key: `${i}-${index + 1}`,
+                                children: testcaseData.map((data, i) => {
+                                    return {
+                                        ...data,
+                                        key: `${i}-${i + 1}-${i + 2}`
+                                    }
+                                })
+                            };
+                        }));
+
+                        if (sectionsWithTestcases.length > 0) {
+                            let testData = []
+                            let childrens = [];
+                            sectionsWithTestcases.map((element) => {
+                                if (element.parent_id === null) {
+                                    testData.push(element);
+                                }
+                                else {
+                                    childrens.push(element)
+                                }
+                            });
+
+                            let newArr = [];
+                            for (let i = 0; i < childrens.length; i = i + 1) {
+                                for (let j = i + 1; j < childrens.length; j = j + 1) {
+                                    if (childrens[i].id === childrens[j].parent_id) {
+                                        let indexValue = -1;
+                                        newArr.find((element, index) => { if (element.id === childrens[i].id) indexValue = index })
+                                        if (indexValue >= 0) newArr[indexValue] = { ...newArr[indexValue], "children": [...newArr[indexValue].children, childrens[j]] }
+                                        else newArr.push({ ...childrens[i], "children": [...childrens[i].children, childrens[j]] })
+                                    }
+                                }
+                            }
+
+                            const newData = [];
+                            newArr.map(e_child => {
+                                testData.find(e_parent => {
+                                    if (e_parent.id === e_child.parent_id) {
+                                        if (e_parent.children.length > 0) {
+                                            var childrenData = [...e_parent.children, e_child]
+                                        }
+                                        else childrenData = [e_child]
+                                        let indexValue = -1;
+
+                                        newData.map((r, index) => {
+                                            if (r.id === e_child.parent_id)
+                                                indexValue = index
+                                        })
+
+                                        if (indexValue >= 0) {
+                                            let existedObjectData = newData[indexValue];
+                                            newData[indexValue] = { ...newData[indexValue], "children": [...existedObjectData.children, e_child] }
+                                        }
+                                        else newData.push({ ...e_parent, "children": [...childrenData] })
+                                    }
+                                })
+                            });
+
+                            testSection.push({
+                                ...suite,
+                                children: childrens.length ? newData : testData
+                            });
+                        }
+                    } else {
+                        testSection.push({
+                            ...suite
                         });
-
-                        const testCaseDetails = [];
-
-                        if (response.length > 0) {
-                            for (let i = 0; i < response.length; i++) {
-                                const testCase = response[i];
-                                const testCaseWithType = {
-                                    ...testCase,
-                                    type: "testcase",
-                                    name: testCase.title,
-                                    key: `${outerIndex}-${i}`
-                                };
-                                testCaseDetails.push(testCaseWithType);
-                            }
-                        }
-                        setLoading(false);
-                        return testCaseDetails;
-                    } catch (error) {
-                        console.error("Error fetching test cases:", error);
-                        return [];
-                    }
-                };
-
-
-                const organizeSectionsIntoHierarchy = async (sections, parentId = null) => {
-                    const result = [];
-
-                    for (let i = 0; i < sections.length; i++) {
-                        const section = sections[i];
-                        if (section.parent_id === parentId) {
-                            const children = await organizeSectionsIntoHierarchy(sections, section.id);
-                            const newItem = { ...section, children };
-
-                            if (children.length === 0) {
-                                newItem.type = "parent";
-                                newItem.key = `${section.key}-${i}`
-                                const { suite_id, id: sectionId } = newItem;
-                                newItem.children = await fetchTestCases(currentProject.id, suite_id, sectionId, `${section.key}-${i}`);
-                            }
-
-                            result.push(newItem);
-                        }
                     }
 
-                    return result;
-                }
-
-                const testCaseData = [];
-
-                for (let i = 0; i < testSection.length; i++) {
-                    const section = testSection[i];
-                    const organizedHierarchy = await organizeSectionsIntoHierarchy(section.children) || [];
-
-                    testCaseData.push({
-                        ...section,
-                        children: organizedHierarchy
-                    });
                     setLoading(false);
                 }
-
-                setSectionData((sectionData) => testCaseData);
+                setTestrailData([...testSection]);
                 setLoading(false);
             }
             catch (error) {
@@ -212,8 +241,8 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                     checked={selectedTestRailNodeFirstTree.id === node.id}
                     onChange={(e) => handleNodeToggleFirstTree(node)}
                 />
-                <Tooltip target={`.scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
-                <span className={`scenario-label scenario_label-${node.id}`} id={node.name}>{node.name}</span>
+                <Tooltip target={`#scenario_label-${node.id}`} position='bottom'>{node.name}</Tooltip>
+                <span className='scenario_label' id={`scenario_label-${node.id}`}>{node.name}</span>
             </>
         }
         else return <span className="scenario_label">{node.name}</span>
@@ -234,7 +263,6 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
         }
         else return <span className="scenario_label">{node.name}</span>
     };
-
 
     const handleNodeToggleFirstTree = (node) => {
         if (selectedTestRailNodeFirstTree.id === node.id) {
@@ -384,9 +412,9 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                                     <div className='zephyrdata-card1'>
 
                                         {
-                                            sectionData.length > 0 ?
+                                            testrailData.length > 0 ?
                                                 <Tree
-                                                    value={sectionData}
+                                                    value={testrailData}
                                                     selectionMode="single"
                                                     selectionKeys={selectedTestRailNodeFirstTree}
                                                     nodeTemplate={treeCheckboxTemplateFirstTree}
