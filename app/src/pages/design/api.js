@@ -945,7 +945,7 @@ export const getUserDetails = async(action, args) => {
 /*Component DesignContent
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
 */
-export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
+export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId,params="") =>	{
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {
             method: 'POST',
@@ -953,7 +953,8 @@ export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCase
                 'Content-type' : 'application/json'
             },
             data : {
-                param: 'getScrapeDataScreenLevel_ICE',
+                // param: 'getScrapeDataScreenLevel_ICE',
+                param:params,
                 screenId: screenId,
                 projectId: projectId,
                 type: type,
@@ -1743,6 +1744,25 @@ export const importDefinition = async(sourceUrl) => {
 export const insertScreen = arg => {
     return new Promise((resolve, reject)=>{
         axios(url+"/insertScreen", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const insertRepository = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/insertRepository", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'

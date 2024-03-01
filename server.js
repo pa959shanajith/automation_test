@@ -616,6 +616,7 @@ if (cluster.isMaster) {
 		app.post('/getScrapeDataScreenLevel_ICE', auth.protect, designscreen.getScrapeDataScreenLevel_ICE);
 		app.post('/updateScreen_ICE', auth.protect, designscreen.updateScreen_ICE);
 		app.post('/insertScreen', auth.protect, designscreen.insertScreen);
+		app.post('/insertRepository', auth.protect, designscreen.insertRepository);
 		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);

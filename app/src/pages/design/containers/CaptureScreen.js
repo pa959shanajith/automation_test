@@ -524,9 +524,11 @@ const elementTypeProp =(elementProperty) =>{
       let newlyScrapeList = [];
       let Id = parentData.id
 
+      let param = showCaptureScreen ? "elementRepo" : "getScrapeDataScreenLevel_ICE"
+
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "",param)
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);

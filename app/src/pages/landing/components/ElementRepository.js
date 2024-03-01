@@ -14,6 +14,7 @@ import { Toast } from 'primereact/toast';
 import * as scrapeApi from '../../design/api';
 import { v4 as uuid } from 'uuid';
 import { insertScreen } from '../../design/api';
+import { insertRepository } from '../../design/api';
 import { Tag } from 'primereact/tag';
 import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
@@ -231,6 +232,7 @@ const ElementRepository = (props) => {
       param : 'create'
     }
     insertScreen(params)
+    // insertRepository(params)
     .then(response =>  {
       if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
       else if(response === "invalid session") return RedirectPage(history);
@@ -273,6 +275,7 @@ const handleAccordionNameEdit = (index,e) => {
   }
  
   insertScreen(params)
+  // insertRepository(params)
   .then(response =>  {
     if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
     else if(response === "invalid session") return RedirectPage(history);
