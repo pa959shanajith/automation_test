@@ -488,16 +488,27 @@ exports.fetchALM_Testcases = async function (req,res) {
               req.query.configurekey = each_exec.configkey;
               req.query.eventType = eventType;
               var percentage = 0;
+              var jobStatus = "unknown"
               var fetch_jobStatus = await runningStatus(req,res);
-              console.log(fetch_jobStatus,' its fetch_jobStatus ');
+              logger.info(fetch_jobStatus,' its fetch_jobStatus ');
               if(!fetch_jobStatus){
                 logger.error('Job_Status Error: ', error);
                 res.status(500).json({ code:'500', error: 'error while processing' });
               }
-            percentage = fetch_jobStatus["status"] === "Completed"  ? 100 : percentage;
+              if(fetch_jobStatus["Modules"] && fetch_jobStatus["Modules"].length){
+                fetch_jobStatus["Modules"].forEach((_module) => {
+                  if(_module && _module["Scenarios"] && _module["Scenarios"].length){
+                    _module["Scenarios"].forEach((scn_report) => {
+                      if(scn_report && scn_report.Report && scn_report.Report.overallstatus && Object.keys(scn_report.Report.overallstatus).length)
+                      jobStatus = setStatus(scn_report.Report.overallstatus.overallstatus);
+                    })
+                  }
+                })
+              }
+            percentage = jobStatus === "finished"  ? 100 : percentage;
             percentage = fetch_jobStatus['Completed'] ? calculatePercentage(fetch_jobStatus['Completed']) : percentage;
             send_res["jobstatuses"].push({"id":each_exec.executionListId,
-            "status":fetch_jobStatus['status'] === "Inprogress" ? "running": setStatus(fetch_jobStatus["status"]),
+            "status":fetch_jobStatus['status'] === "Inprogress" ? "running": jobStatus,
             "percentage":percentage
           })
             }))
@@ -514,14 +525,17 @@ exports.fetchALM_Testcases = async function (req,res) {
   };
   function setStatus(jobStatus){
     var resStatus = "unknown"
-    if(jobStatus){
+    if(jobStatus && typeof jobStatus === "string"){
       switch (jobStatus) {
-        case "Completed":
+        case "Pass":
           resStatus = "finished"
           break;
-        case "Queued":
-          resStatus = "planned"
+        case "Fail":
+          resStatus = "aborted"
           break;
+        case "Terminate":
+          resStatus = "aborted"
+          break;  
         default:
           break;
       }
