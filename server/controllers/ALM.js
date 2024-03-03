@@ -6,6 +6,7 @@ var utils = require('../lib/utils');
 const socket_io = require("../lib/socket")
 const http = require('http');
 const {execAutomation,runningStatus} = require('./suite');
+const {fetchModSceDetails,viewReport} = require("./report");
 const uuid = require('uuid-random');
 const url = require('url');
 
@@ -472,7 +473,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         if(jobIds){
           jobIds = jobIds.split(',');
         }
-        var job_inputs = {"executionListIds":jobIds};
+        var job_inputs = {"executionListIds":jobIds,"type":"jobId"};
         const fetchJOB = await utils.fetchData(job_inputs, "/getExecutionJob", "getExecutionJob", true);
         if(fetchJOB && fetchJOB.length && !(fetchJOB[1].statusCode >= 200 && fetchJOB[1].statusCode <= 299)){
           send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
@@ -492,7 +493,7 @@ exports.fetchALM_Testcases = async function (req,res) {
               var fetch_jobStatus = await runningStatus(req,res);
               logger.info(fetch_jobStatus,' its fetch_jobStatus ');
               if(!fetch_jobStatus){
-                logger.error('Job_Status Error: ', error);
+                logger.error('Job_Status Error ...... ');
                 res.status(500).json({ code:'500', error: 'error while processing' });
               }
               if(fetch_jobStatus["Modules"] && fetch_jobStatus["Modules"].length){
@@ -570,56 +571,188 @@ exports.fetchALM_Testcases = async function (req,res) {
       + req.query.lastExecutionCount
       );
         var send_res = {
-          "project": "11111111-1111-1111-1111-111111111111",
-          "scope": "f787dc00-0e96-4457-82b5-911e2861f6bf",
-          "testcaseshistory": [
-            {
-              "testCaseId": "GUIDTC1",
-              "testDataVariantId": "VAR01",
-              "jobId": "JOB123",
-              "jobName": "string",
-              "jobUrl": "string",
-              "logUrl": "string",
-              "startedAt": "2023-12-06T11:28:41.259Z",
-              "startedBy": "John Doe",
-              "endedAt": "2023-12-06T11:28:41.259Z",
-              "resultStatus": "failed",
-              "message": "Save button not found - Sales order could not be created",
-              "language": "string",
-              "error": {
-                "errorType": "string",
-                "errorCode": 0,
-                "errorShortMessage": "string",
-                "errorLongMessage": "string",
-                "errorUrl": "string"
-              }
-            }
-          ]
+          "project": req.query.project,
+          "scope": req.query.scope,
+          "testcaseshistory": []
         }
-        // var inputs = {
-        //     "query": "alm_get_testcases"
-        // }
-        // inputs['query'] = "alm_create_testcase";
-        // logger.info("making an call to DAS to save the request details to db");
-        // const result = await utils.fetchData(inputs, "/ALM_createtestcase", "alm_create_testcase", true);
-        // if (result &&  result[1].statusCode !== 200) {
-        //     logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
-        //     return res.status(result[1].statusCode).json({
-        //         error: result[1].statusMessage || 'Unknown error',
-        //     });
-        // }
-        // emit_data['testcaseId'] = result[0].rows || ''
-        // socket_io.emit('messageFromServer',req.body);
-        logger.info("info : Execution_History api called , "+req.params.testcaseId);
+        // fetch job details
+        var testCases = req.query.testCases;
+        let all_jobstatus = [];
+        let testcaseshistory = [];
+        if(testCases){
+          testCases = testCases.split(',');
+        }
+        var job_inputs = {"testcaseIds":testCases,"type":"testcaseId"};
+        const fetchJOB = await utils.fetchData(job_inputs, "/getExecutionJob", "getExecutionJob", true);
+        if(fetchJOB && fetchJOB.length && !(fetchJOB[1].statusCode >= 200 && fetchJOB[1].statusCode <= 299)){
+          // send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
+          // send_res['data'][0]['error']["errorCode"] = fetchJOB[1].statusCode;
+          // send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
+          return res.status(500).json({ code:'500', error: 'error while processing' });
+        }
+        
+        if(fetchJOB[0].rows && fetchJOB[0].rows.length){
+          const _sortArr = fetchJOB[0].rows.reverse();
+          const scnDetailsfnName = "fetchModSceDetails";
+          const reportfnName = "viewReport";
+          
+          await Promise.all(_sortArr.map(async each_exec => {
+            try {
+            var inputs = {    
+              "query":"fetchModSceDetails",            
+              "param": "modulestatus",
+              "executionListId":each_exec.executionListId          
+      }
+            const fetch_jobStatus = await utils.fetchData(inputs, "reports/fetchModSceDetails", scnDetailsfnName,true);
+            // var fetch_jobStatus = await fetchModSceDetails(req,res);
+
+            // var fetch_jobStatus = await runningStatus(req,res);
+            logger.info(fetch_jobStatus,' its fetch_jobStatus ');
+            if(!fetch_jobStatus){
+              logger.error('Job_Status Error...... ');
+              res.status(500).json({ code:'500', error: 'error while processing' });
+            }
+            if(fetch_jobStatus[0].rows && fetch_jobStatus[0].rows.length){
+              all_jobstatus.push({"job_status":fetch_jobStatus[0].rows,"exec":each_exec});
+              // const generateReport = await prepareALM_Report(fetch_jobStatus[0].rows,each_exec);
+              // console.log(generateReport , ' its result from generateReport');
+              // return new Promise(async (resolve,reject) => {
+              //   const report_inputs = { reportid: fetch_jobStatus[0].rows[0]["_id"],"report_type":"CALM" };
+              //   const getReport = await utils.fetchData(report_inputs, "reports/getReport", reportfnName,true);
+              //   if(getReport[0].rows && getReport[0].rows.length){
+              //     return resolve(getReport[0].rows);
+              //   }
+              //   else{
+              //     reject([]);
+              //   }
+              // })
+              // const report_inputs = { reportid: fetch_jobStatus[0].rows[0]["_id"],"report_type":"CALM" };
+              // const getReport = await utils.fetchData(report_inputs, "reports/getReport", reportfnName,true);
+              // console.log(getReport,' its executed report');
+              // if(getReport[0].rows && getReport[0].rows.length){
+              //   let execHistory = getReport[0].rows;
+              //   let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${each_exec.executionData.configurekey}&executionListId=${each_exec.executionListId}`
+              //   send_res["testcaseshistory"].push({
+              //       "testCaseId": each_exec.executionData.testcaseRefId || "",
+              //       "testDataVariantId": "VAR01",
+              //       "jobId": each_exec.executionListId || "",
+              //       "jobName": each_exec.executionData.configurename || "",
+              //       "jobUrl": jobURL || "",
+              //       "logUrl": jobURL || "",
+              //       "startedAt": execHistory.report.overallstatus.StartTime || "" ,
+              //       "startedBy": "Automated",
+              //       "endedAt": execHistory.report.overallstatus.EndTime || "",
+              //       "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
+              //       "message": "Automated Execution",
+              //       "language": "en"
+              //   })
+              // } 
+            }
+            } catch (error) {
+              logger.error('Error:', error);
+              console.log(error,' its errror from promise');
+            }
+            
+          }))
+
+
+          // let jobSuccessCount = 0;
+          // await Promise.allSettled(jobPromises).then(results => {
+          //   results.forEach(result => {
+          //     if (result.status === "fulfilled") {
+          //         successCount++;
+          //     }
+          // });
+          // }).catch((promiseErr) => {
+          //   console.error("Error:", promiseErr);
+          //   res.status(500).json({ code:'500', error: 'error while processing' });
+          // });
+          // console.log(jobSuccessCount,' its jobSuccessCount');
+
+          if(all_jobstatus && all_jobstatus.length){
+            // const reportPromises = all_jobstatus.map(async job => {
+              for(const job of all_jobstatus){
+              try{
+              const report_inputs = { reportid: job.job_status[0]["_id"],"report_type":"CALM" };
+              // req.query.reportID = job.job_status[0]["_id"];
+              // req.query.type = "json";
+              // req.query.integration = "CALM"
+              // const getReport = await viewReport(req,res);  
+              const getReport = await utils.fetchData(report_inputs, "reports/getReport", "viewReport",true);
+              console.log("API Response for job:", job, "Response:", getReport,' getting from DAS'); 
+              if( getReport[0].rows && Object.keys(getReport[0].rows).length){
+                let execHistory = getReport[0].rows;
+                let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
+              //   let testCaseObj = {
+              //     "testCaseId": job.exec.executionData.testcaseRefId || "",
+              //     "testDataVariantId": "VAR01",
+              //     "jobId": job.exec.executionListId || "",
+              //     "jobName": job.exec.executionData.configurename || "",
+              //     "jobUrl": jobURL || "",
+              //     "logUrl": jobURL || "",
+              //     "startedAt": execHistory.report.overallstatus.StartTime || "" ,
+              //     "startedBy": "Automation",
+              //     "endedAt": execHistory.report.overallstatus.EndTime || "",
+              //     "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
+              //     "message": "Automated Execution",
+              //     "language": "en"
+              // }
+                testcaseshistory.push({
+                    "testCaseId": job.exec.executionData.testcaseRefId || "",
+                    "testDataVariantId": "VAR01",
+                    "jobId": job.exec.executionListId || "",
+                    "jobName": job.exec.executionData.configurename || "",
+                    "jobUrl": jobURL || "",
+                    "logUrl": jobURL || "",
+                    "startedAt": execHistory.report.overallstatus.StartTime || "" ,
+                    "startedBy": "Automation",
+                    "endedAt": execHistory.report.overallstatus.EndTime || "",
+                    "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
+                    "message": "Automated Execution",
+                    "language": "en"
+                })
+                // return testCaseObj; // Resolve the promise
+              }
+            //   else {
+            //     return false; // Resolve the promise with false if there is no data
+            // }
+            }
+            catch (error) {
+              console.error("Error fetching data:", error);
+              throw error;
+          } 
+            };
+            console.log(testcaseshistory,' its testcaseshistory');
+            // let successCount = 0;
+            // await Promise.allSettled(reportPromises).then(results => {
+            //   results.forEach(result => {
+            //     if (result.status === "fulfilled") {
+            //         successCount++;
+            //     }
+            // });
+            // }).catch((promiseErr) => {
+            //   console.error("Error:", promiseErr);
+            //   res.status(500).json({ code:'500', error: 'error while processing' });
+            // })
+            //   console.log("Number of successful API calls:", successCount);
+                
+          }
+          
+        
+        }
+        if(testcaseshistory && testcaseshistory.length){
+          send_res.testcaseshistory = testcaseshistory;
+        }
+        console.log(send_res,' its res');
         logger.info("send response : "+send_res)
-        res.status(200).send(send_res);
+        return res.status(200).send(send_res);
  
     } catch (error) {
         logger.error('Execution_History Error: ', error);
-        res.status(500).json({ code:'500', error: 'error while processing' });
+        return res.status(500).json({ code:'500', error: 'error while processing' });
     }
   };
-  
+
   exports.Scope_Changed = async function (req, res) {
  
     logger.info("ALM Scope Change service called");
