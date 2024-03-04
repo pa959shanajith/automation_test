@@ -683,7 +683,8 @@ exports.fetchALM_Testcases = async function (req,res) {
               if( getReport[0].rows && Object.keys(getReport[0].rows).length){
                 let execHistory = getReport[0].rows;
                 let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
-              //   let testCaseObj = {
+                let logURL = `${req.protocol}://${req.get('host')}/devOpsReport?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
+                //   let testCaseObj = {
               //     "testCaseId": job.exec.executionData.testcaseRefId || "",
               //     "testDataVariantId": "VAR01",
               //     "jobId": job.exec.executionListId || "",
@@ -703,7 +704,7 @@ exports.fetchALM_Testcases = async function (req,res) {
                     "jobId": job.exec.executionListId || "",
                     "jobName": job.exec.executionData.configurename || "",
                     "jobUrl": jobURL || "",
-                    "logUrl": jobURL || "",
+                    "logUrl": logURL || "",
                     "startedAt": execHistory.report.overallstatus.StartTime || "" ,
                     "startedBy": "Automation",
                     "endedAt": execHistory.report.overallstatus.EndTime || "",
