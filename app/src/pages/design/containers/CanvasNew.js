@@ -353,7 +353,7 @@ const CanvasNew = (props) => {
               tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
-              let number = tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3?2:3
+              let number = tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
               journey = transformDataFromTreetoJourney(tree)
               tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData,number)
               count= {...count,...tree.count}
@@ -937,6 +937,8 @@ const CanvasNew = (props) => {
           setLinks(res.linkDisplay)
           setdLinks(res.dLinks)
           setdNodes(res.dNodes)
+          toast.current.show({severity:"success", summary:"Success", detail:MSG.MINDMAP.SUCC_DELETE_NODE.CONTENT, life:2000})
+          setCreateNew('autosave')
       }
       setReuseDelConfirm(false);
       setDelConfirm(false);
@@ -2832,7 +2834,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             </svg>:
             <svg id="mp__canvas_svg" className='mp__canvas_svg' ref={CanvasRef}>
               {typeOfView !== 'mindMapView' && <defs>
-                <marker id="arrow" viewBox="0 0 10 10" refX="13" refY="5" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
+                <marker id="arrow" viewBox="0 0 10 10" refX="15" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
                   <path d="M 0 0 L 10 5 L 0 10 z"></path>
                 </marker>
               </defs>}
