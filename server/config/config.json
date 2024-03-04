@@ -47,6 +47,7 @@
     "videoTrialUrl":"/static/media/welcomevideo.mp4",
     "enableNotification": {
         "assignTabMindmap" : false
-    }
+    },
+    "version":"24.2.0"
     
 }
