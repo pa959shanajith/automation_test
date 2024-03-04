@@ -749,7 +749,7 @@ const elementTypeProp =(elementProperty) =>{
     setParentId(null);
     // const newdeleted=deleted.filter(element=>element!==undefined)
 
-    let params = {
+    let params = showCaptureScreen?{
       'deletedObj': deleted,
       'modifiedObj': modifiedObjects,
       'addedObj': { ...added, view: views },
@@ -757,8 +757,21 @@ const elementTypeProp =(elementProperty) =>{
       'userId': userInfo.user_id,
       'roleId': userInfo.role,
       'param': 'saveScrapeData',
-      'orderList': orderList
+      'orderList': orderList,
+      'elementrepo':showCaptureScreen?"elementrepo":""
+
+    }:{
+      'deletedObj': deleted,
+      'modifiedObj': modifiedObjects,
+      'addedObj': { ...added, view: views },
+      'screenId': parentData.id,
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'saveScrapeData',
+      'orderList': orderList,
+      
     }
+
 
     scrapeApi.updateScreen_ICE(params)
       .then(response => {
@@ -1878,77 +1891,115 @@ const elementValuetitle=(rowdata)=>{
 const confirmScreenChange = () => {
   (async () => {
     try {
+        // let params = {
+        //   param : "updateMindmapTestcaseScreen",
+        //   projectID :  NameOfAppType.projectId,
+        //   moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
+        //   parent:props.fetchingDetails["parent"]["_id"],
+        //   currentScreen:parentData.id,
+        //   updateScreen:selectedFolderValue.id
+        // }
+        if(!captureData.length){
         let params = {
-          param : "updateMindmapTestcaseScreen",
-          projectID :  NameOfAppType.projectId,
-          moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
-          parent:props.fetchingDetails["parent"]["_id"],
-          currentScreen:parentData.id,
-          updateScreen:selectedFolderValue.id
+          'screenId': parentData.id,
+          'userId': userInfo.user_id,
+          'roleId': userInfo.role,
+          'param': 'updateOrderList',
+          'orderList': selectedFolderValue.orderlist,
+          
+    
         }
+    
+        // scrapeApi.updateScreen_ICE(params)
 
         const res = await scrapeApi.updateScreen_ICE(params);
+      
         if(res === 'fail') {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
-          
-          var req={
-            tab:"createdTab",
-            projectid:NameOfAppType.projectId,
-            version:0,
-            cycId: null,
-            modName:"",
-            moduleid:res
-          }
-          const dataScreen = await scrapeApi.getModules(req)
-          if(dataScreen.error)return;
-          else {
-            const screenData_1 = getReqScreen (dataScreen)
-            function getReqScreen (data){
-              let sd = []
-              data.children.forEach((child)=>{
-                if(child._id === props.fetchingDetails["parent"]["_id"]){
-                  child.children.forEach((subChild)=>{
-                    if(subChild._id === selectedFolderValue.id){
-                      if(subChild.children.length > 0){
-                         const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
-                            return {
-                              ...item,
-                              parent:{...subChild,parent:{...child,parent:data}}
-                            }
-                         })}
-                         sd.push(newData);
-                      }
-                      else{
-                        sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
-                          return{
-                            ...data,parent:{...child,parent:data}
-                          }
+          fetchScrapeData()
+          // var req={
+          //   tab:"createdTab",
+          //   projectid:NameOfAppType.projectId,
+          //   version:0,
+          //   cycId: null,
+          //   modName:"",
+          //   moduleid:res
+          // }
+          // const dataScreen = await scrapeApi.getModules(req)
+          // if(dataScreen.error)return;
+          // else {
+          //   const screenData_1 = getReqScreen (dataScreen)
+          //   function getReqScreen (data){
+          //     let sd = []
+          //     data.children.forEach((child)=>{
+          //       if(child._id === props.fetchingDetails["parent"]["_id"]){
+          //         child.children.forEach((subChild)=>{
+          //           if(subChild._id === selectedFolderValue.id){
+          //             if(subChild.children.length > 0){
+          //                const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+          //                   return {
+          //                     ...item,
+          //                     parent:{...subChild,parent:{...child,parent:data}}
+          //                   }
+          //                })}
+          //                sd.push(newData);
+          //             }
+          //             else{
+          //               sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+          //                 return{
+          //                   ...data,parent:{...child,parent:data}
+          //                 }
 
-                        })}})
-                      }
-                    }
-                  })
-                }
-              })
-              return sd;
-            }
+          //               })}})
+          //             }
+          //           }
+          //         })
+          //       }
+          //     })
+          //     return sd;
+          //   }
             
-            // console.log(screenData_1);
-            if(screenData_1.length>0){
-              props.setFetchingDetails(screenData_1[0])
-              props.setModuleData({id:res, key:uuid()})
-              setParentId(screenData_1[0]._id);
-              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
-            }else{
-              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
-            }
-            // props.setFetchingDetails(screenData_1[0])
-            // props.setModuleData({id:res, key:uuid()})
-            // setParentId(uuid());
+          //   // console.log(screenData_1);
+          //   if(screenData_1.length>0){
+          //     props.setFetchingDetails(screenData_1[0])
+          //     props.setModuleData({id:res, key:uuid()})
+          //     setParentId(screenData_1[0]._id);
+          //     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+          //   }else{
+          //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+          //   }
+          //   // props.setFetchingDetails(screenData_1[0])
+          //   // props.setModuleData({id:res, key:uuid()})
+          //   // setParentId(uuid());
+          // }
+        }
+      }
+      else{
+        let orderlist=selectedFolderValue.orderlist.some(
+          value => { return typeof value == "object" });
+          if(orderlist){
+            orderlist=selectedFolderValue.orderlist.map(dataobject=>dataobject._id)
           }
+          else{
+            orderlist=selectedFolderValue.orderlist
+          }
+        let params={
+          'param':"updateOrderListAndRemoveParentId",
+          'screenId': parentData.id,
+          'userId': userInfo.user_id,
+          'roleId': userInfo.role,
+          'orderList': orderlist,
+          'oldOrderList':captureData.map(element=>element.objectDetails.objId)
+      }
+      let res=scrapeApi.updateScreen_ICE(params)
+      if(res === 'fail') {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+      else {
+        fetchScrapeData()
         }
-        }
+      }
+    }
      catch (error) {
         console.error('Error fetching User list:', error);
     }
