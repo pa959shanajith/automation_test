@@ -1,7 +1,7 @@
 @import "../../global/styles/ColorVariables.scss";
 .mp__canvas{
     position: absolute;
-    top: 50px;
+    top: 30px;
     height: calc(100% - 30px);
     overflow: hidden;
     border: 1px solid transparent;
@@ -34,7 +34,7 @@
     display: flex;
     flex: 0 1 100%;
     flex-direction: row;
-    float: left;
+    // float: left;
     margin: 2px;
     min-width: 0;
     position: relative;

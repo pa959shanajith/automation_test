@@ -938,10 +938,13 @@ const getChildUpdate = (data, item) => {
             const child = children[i];
 
             if (child.id === item.id) {
-                // Update logic goes here
-                // For example, you can update child properties
-                child.children = [item.children[0]];
-                return;
+                // Handle the case when the IDs match
+                // You can update properties or handle it differently
+                if (child.id === item.id) {
+                    // Example: Merge the children of both the item and the child
+                    child.children = item.children;
+                    return;
+                }
             }
 
             if (child.children && child.children.length > 0) {
@@ -950,7 +953,15 @@ const getChildUpdate = (data, item) => {
         }
     };
 
-    updateChild(data[0].children);
+    for (let index = 0; index < data.length; index++) {
+        let element = data[index];
+        if(data[index].id === item.children[0].id){
+            data[index] = item.children[0]
+            return;
+        }else{
+            updateChild(element.children); // Corrected line
+        }
+    }
 };
 
 export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, dNodes, dLinks, sections, count, obj, verticalLayout, nodeID) => {
@@ -1334,7 +1345,7 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
     //     setMsg(MSG.MINDMAP.WARN_CHILD_TASK_ASSIGNED)
     //     return;
     // }
-    if (dNodes[sid].type === 'teststepsgroups') {
+    if (dNodes[sid].type === 'teststepsgroups' && dNodes[sid].state !== "created") {
         if (dNodes[sid].children.length > 0) {
             dNodes[sid].children = []
         }
@@ -1349,7 +1360,7 @@ export const deleteNodeForJourneyView = (activeNode, dNodes, dLinks, linkDisplay
         } else {
             recurseDelParent(dNodes[sid].parent, dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
         }
-    } else {
+    } else  if(dNodes[sid].state !== "created"){
         recurseDelChild(dNodes[sid], linkDisplay, nodeDisplay, dNodes, dLinks, undefined, deletedNodes);
     }
     for (var j = dLinks.length - 1; j >= 0; j--) {
