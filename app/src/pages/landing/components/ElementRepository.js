@@ -568,7 +568,10 @@ const handleChangeScreenName=(index,e)=>{
               if (result.length>0) {
                 setResusedDeleteElement(true);
                 setReuseDelMessage(
-                  "Selected element is re-used.Are you sure you want to delete it?"
+                  <>
+                  <div className="pi pi-exclamation-triangle triangle-color"></div>
+                  <span className='resued-msg'>Selected element is re-used.Are you sure you want to delete it?</span>
+                  </>
                 );
               } else {
                 setDeleteElements(true);
@@ -594,7 +597,7 @@ const handleChangeScreenName=(index,e)=>{
 
 
    const DelReuseMsgContainer = ({message}) => (
-    <p style={{color:'red'}}>
+    <p style={{color:'black'}}>
         {message}
     </p>
 )
@@ -905,7 +908,7 @@ const deleteScreen = (index, screenDetails)=>{
             <div className='scenario-accordion'>
               <span
                   className="relative"
-                  style={{ top: activeAccordionIndex === index ? '1rem' : '0rem', cursor: 'pointer' }}
+                  style={{ top:'0rem', cursor: 'pointer' }}
                   onClick={() => {setEditingIndex(index); setScreenBasedElements(screenDetails.related_dataobjects)}}
                   title={screenDetails.name}
                 >
@@ -923,7 +926,7 @@ const deleteScreen = (index, screenDetails)=>{
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
-                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>30?screenDetails.name.trim().substring(0,30)+'...':screenDetails.name }</span>
+                    <span className='screenname__display'>{screenDetails.name && screenDetails.name.length>30?screenDetails.name.slice(0,30)+'...':screenDetails.name }</span>
                   )}
                 </span>
               {activeAccordionIndex === index && (

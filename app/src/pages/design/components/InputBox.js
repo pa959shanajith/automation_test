@@ -82,6 +82,12 @@ const InputBox = (props) => {
             filterSuggest()
             return;
         }
+        if(nodetype === 'teststepsgroups'){
+            setSuggestList(res.testCaseList);
+            initdata = res.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
+            filterSuggest()
+            return;
+        }
     })();
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[screenData])
@@ -126,7 +132,7 @@ const InputBox = (props) => {
 
     const onEnter = (val) =>{
         var reuseDict = getReuseDetails(dNodes);
-        if (val === 'Screen_0' || val === 'Scenario_0' || val === 'Testcase_0') {
+        if (val === 'Screen_0' || val === 'Scenario_0' || val === 'Testcase_0' || val === "Teststepsgroup1") {
             d3.select('#ct-inpAct').classed('errorClass',!0);
             return;
         }

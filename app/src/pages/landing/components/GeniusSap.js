@@ -40,6 +40,7 @@ import { getKeywordList } from '../../design/components/UtilFunctions';
 import { InputNumber } from 'primereact/inputnumber';
 import {getObjNameList} from '../../design/components/UtilFunctions'
 import { classNames } from 'primereact/utils';
+import {loadUserInfoActions} from '../LandingSlice';
 
 
 
@@ -329,7 +330,7 @@ const GeniusSap = (props) => {
       let abc = screenData.testcases.map((testcase, idx) => {
         if (testcase.keywordVal === 'setText') {
           let variables = `${testcase.custname}`
-          let originalVal = testcase.inputVal[0]
+          let originalVal = testcase.inputVal
           // testcase.inputVal[0]=`|${testcase.custname}|`
           obj[variables] = originalVal
           i++
@@ -409,6 +410,7 @@ const GeniusSap = (props) => {
     setStartGenius("Activate Genius");
     setDataSaved(false);
     seteraseData(false);
+    dispatch(loadUserInfoActions.setSAPGeniusScrapeData({}));
   };
   
   const displayError = (error) => {
@@ -1033,7 +1035,7 @@ const onScreenNameChange = (e, name) => {
                 appType: 'SAP',
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
@@ -1049,7 +1051,7 @@ const onScreenNameChange = (e, name) => {
                 appType: testStep.custname.replace(new RegExp('@', 'g'), ''),
                 cord: '',
                 custname: testStep.custname,
-                inputVal: [testStep.inputVal],
+                inputVal: Array.isArray(testStep.inputVal)? testStep.inputVal : [testStep.inputVal],
                 keywordVal: testStep.keywordVal,
                 objectname: testStep.xpath,
                 outputVal: '',
@@ -1415,15 +1417,21 @@ const onScreenNameChange = (e, name) => {
     const newDataParamTableStart = [singleData, startLoop, ...firstSteps]
     const newDataParamTableEnd = [...lastStep, endLoop]
     originalData[1].testcases = newDataParamTableStart
-    if (originalData.length === 1) {
+    if (originalData.length > 0 && originalData.length <= 2) {
       originalData[1].testcases = [...newDataParamTableStart, endLoop]
       originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     } else {
+      originalData[1].testcases = [...newDataParamTableStart]
       originalData[originalData.length - 1].testcases = newDataParamTableEnd;
       originalData[originalData.length - 1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1)
     }
     originalData[1].testcases.forEach((testcase, idx) => testcase.stepNo = idx + 1) 
     allScreenData[selectedScreen.name]['testcases'] = originalData[objIndex].testcases;
+    Object.keys(allScreenData).forEach(item=>{
+      const matchingOriginalData = originalData.find(i => i?.name === item);
+      allScreenData[item]['testcases'] = matchingOriginalData ? matchingOriginalData.testcases : [];
+    })
+    setAllScreenData(allScreenData)
     setTableAfterOperation(originalData)
   
     setDataParamUrl(false)
