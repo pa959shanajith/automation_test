@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Tree } from 'primereact/tree';
 import { getProjectsMMTS, readTestSuite_ICE } from '../../design/api';
 import { viewALM_MappedList_ICE } from '../../settings/api';
+import { getProjectList } from "../../design/api";
 import { Messages as MSG, setMsg } from '../../global';
 import { enableSaveButton, mappedPair, almavomapped } from "../settingSlice";
 import { InputText } from 'primereact/inputtext';
@@ -24,6 +25,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
     const [treeData, setTreeData] = useState([]);
     const [updatedTreeData, setUpdatedTreeData] = useState([]);
     const [almTestcases, setAlmTestcases] = useState([]);
+    const [populateProject,setPopulateProject] = useState([]);
 
     // selectors/redux
     const dispatch = useDispatch();
@@ -65,7 +67,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
         });
 
         const scenarioIdsGroup = Object.groupBy(scenarioIdDetails, (arr) => arr?.testSuite?.name);
-
+        const findCycleId = populateProject["releases"][populateProject.projectId.indexOf(projectDetails.projectId)][0]["cycles"][0]['_id'];
         for (let key in scenarioIdsGroup) {
             const testSuiteId = scenarioIdsGroup[key]?.map((data) => data.testSuite?._id);
             const avoTestCaseDetails = {
@@ -75,7 +77,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
 
             const reqObject = [{
                 "releaseid": "r1",
-                "cycleid": "643f8b543f8ee3f7fe70823a",
+                "cycleid": findCycleId,
                 "testsuiteid": testSuiteId[0],
                 "testsuitename": key,
             }]
@@ -90,6 +92,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                 "testscenarioids": avoTestCaseDetails._id, // avo test case id of mentioned above
                 "scenarioname": avoTestCaseDetails.name, // avo test case name of mentioned above
                 "mindmapid": testSuiteId[0],
+                "cycleId":findCycleId,
                 "getparampaths": [
                     ""
                 ],
@@ -196,6 +199,15 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
 
         fetchAvoModules();
     }, []);
+
+    useEffect(() => {
+        const fetchProjectDetails = async () => {
+            const getModulesData = await getProjectList();
+            setPopulateProject(getModulesData);
+        };
+
+        fetchProjectDetails();
+    },[])
 
     useEffect(() => {
         const { user_id } = JSON.parse(localStorage.getItem("userInfo")) || "";

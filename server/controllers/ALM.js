@@ -830,7 +830,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         const TestSuiteResult = await utils.fetchData(inputs, "suite/updateTestSuite_ICE", "updateTestSuite_ICE")
         if (TestSuiteResult == "fail") overallstatusflag = "fail";
       }
-
+      
       // Create Execution Profile
       const createProfileDoc = await generateExeProfile(req.body);
       createProfileDoc.executionData.testcaseRefId = flag && mappedDetails[0].testcaseId && mappedDetails[0].testcaseId.length ? mappedDetails[0].testcaseId[0] : '';
@@ -905,7 +905,7 @@ exports.fetchALM_Testcases = async function (req,res) {
                 "projectId": obj.projectId,
                 "releaseId": "R1",
                 "cycleName": "C1",
-                "cycleId": "6540a954e846cc361ebc125d",
+                "cycleId": obj.cycleId,
                 "scenarionIndex": [
                     1
                 ],
