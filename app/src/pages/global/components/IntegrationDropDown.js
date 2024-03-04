@@ -2,21 +2,29 @@ import React , { useState, useEffect} from 'react';
 import {ModalContainer, ScreenOverlay, Messages as MSG, setMsg} from '../../global' 
 import '../styles/IntegrationDropDown.scss'
 import { loginQCServer_ICE, loginQTestServer_ICE, loginZephyrServer_ICE, getDetails_ZEPHYR,getDetails_Azure,connectAzure_ICE } from '../../execute/api';
-import { getDetails_Testrail } from '../../settings/api';
+import { getDetails_Testrail, getTestPlanDetails, getTestPlansAndRuns } from '../../settings/api';
+import { testrailPlanRunIds } from '../../execute/configureSetupSlice';
 import { InputText } from "primereact/inputtext";
 import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
+import { useSelector } from "react-redux";
 
 /*Component IntegrationDropDown
   use: renders integration popup for ALM/ qTest/ Zypher
 */
 
-const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setCredentialsExecution, displayError}) => {
-    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:"basic"});
+const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integrationCred, setCredentialsExecution, displayError, integrationType}) => {
+    const [credentials,setCredentials] = useState({url: "", userName: "", password: "", apitoken:"", authtype:"basic", testrailUserName: "", testrailApiKey: ""});
     const [urlErrBor,setUrlErrBor] = useState(false)
     const [usernameErrBor,setUserNameErrBor] = useState(false)
     const [passErrBor,setPassErrBor] = useState(false)
     const [authErrBor,setAuthErrBor] = useState(false)
     const [qtestSteps,setqtestSteps] = useState(false)
+    const [testrailLoginData, settestrailLoginData] = useState(false);
+    const [selectedTestrailRunsPlans, setSelectedTestrailRunsPlans] = useState({
+        plan: "",
+        run: ""
+    });
     const [errorMsg,setErrorMsg] = useState("")
     const [zephAuthType, setZephAuthType] = useState("basic");
     const [isEmpty, setIsEmpty] = useState(true);
@@ -44,13 +52,13 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 		} else if (type==="Zephyr" && latestCredentialsData.authtype==="token" && !latestCredentialsData.apitoken) {
             setAuthErrBor(true);
             setErrorMsg("Please "+placeholder[type].apitoken);
-        } else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.url) {
+        } else if (type!=="Zephyr" && integrationType !=="TestRail" && !latestCredentialsData.url) {
             setUrlErrBor(true);
             setErrorMsg("Please "+placeholder[type].url);
-		} else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.userName) {
+		} else if (type!=="Zephyr" && integrationType !=="TestRail" && !latestCredentialsData.userName) {
             setUserNameErrBor(true);
             setErrorMsg("Please "+placeholder[type].username);
-		} else if (type!=="Zephyr" && type !=="TestRail" && !latestCredentialsData.password) {
+		} else if (type!=="Zephyr" && integrationType !=="TestRail" && !latestCredentialsData.password) {
             setPassErrBor(true);
             setErrorMsg("Please "+placeholder[type].password);
 		} else if (appType !== "SAP" && browserTypeExe.length === 0) {
@@ -65,8 +73,8 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
             if(type === "Zephyr") data = await loginZephyrServer_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, latestCredentialsData.apitoken, latestCredentialsData.authtype, type);
             if(type === "Azure") data = await connectAzure_ICE(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password);
             if(type === "qTest") data = await apiIntegration(latestCredentialsData.url, latestCredentialsData.userName, latestCredentialsData.password, type);
-            if(type === "TestRail") {
-                data = await getDetails_Testrail(latestCredentialsData.url, latestCredentialsData.username, latestCredentialsData.apiKey);
+            if(integrationType === "TestRail") {
+                data = await getDetails_Testrail(latestCredentialsData.url, latestCredentialsData.testrailUserName, latestCredentialsData.testrailApiKey);
             };
             if(data.error){displayError(data.error);return;}    
             else if (data === "unavailableLocalServer") setErrorMsg("Unavailable LocalServer");
@@ -83,6 +91,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 						username: latestCredentialsData.userName,
 						password: latestCredentialsData.password
 					}
+                    setshowModal(false);
                 }
                 else if(type === "qTest"){
                     integration.qtest = {
@@ -91,6 +100,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                         password: latestCredentialsData.password,
                         qteststeps:qtestSteps
 					}
+                    setshowModal(false);
                 }
                 else if(type === "Zephyr"){
                     integration.zephyr = {
@@ -100,6 +110,7 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
                         apitoken: latestCredentialsData.apitoken,
                         authtype: latestCredentialsData.authtype
 					}
+                    setshowModal(false);
                 }
                 else if(type === "Azure"){
                     integration.azure = {
@@ -107,16 +118,24 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
 						username: latestCredentialsData.userName,
                         password: latestCredentialsData.password
 					}
+                    setshowModal(false);
                 }
-                else if(type === "TestRail"){
+                else if(integrationType === "TestRail"){
                     integration.testrail = {
 						url:latestCredentialsData.url,
-						username: latestCredentialsData.username,
-                        apitoken: latestCredentialsData.apiKey,
+						username: latestCredentialsData.testrailUserName,
+                        apitoken: latestCredentialsData.testrailApiKey,
+                        runId: selectedTestrailRunsPlans.run.id,
+                        planId: selectedTestrailRunsPlans.plan.id,
+                        runAndPlanDetails: selectedTestrailRunsPlans
 					}
+                    if (Object.keys(selectedTestrailRunsPlans.run).length > 0) {
+                        setshowModal(false);
+                    } else {
+                        setshowModal(true);
+                    }
                 }
                 setCredentialsExecution(integration)
-                setshowModal(false);
             }
 		}
     }
@@ -124,11 +143,11 @@ const IntegrationDropDown = ({setshowModal, type, browserTypeExe, appType, integ
     return(
         <ModalContainer 
         className="modal_integration"
-            title={type}
+            title={integrationType || type}
             show={true}
             footer={submitModal(errorMsg, saveAction, type, isEmpty)}
             close={()=>{setshowModal(false)}} 
-            content={MiddleContent(credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty)} 
+            content={MiddleContent(credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty, selectedTestrailRunsPlans, setSelectedTestrailRunsPlans, testrailLoginData, settestrailLoginData, integrationType)} 
             modalClass=" i__modal"
         />
     )
@@ -159,9 +178,13 @@ const submitModal = (errorMsg, saveAction,type,  isEmpty) => {
     )
 }
 
-const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty) => {
+const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, passErrBor, authErrBor, type, qtestSteps, setqtestSteps, zephAuthType, setZephAuthType, setErrorMsg, saveAction, setIsEmpty, selectedTestrailRunsPlans, setSelectedTestrailRunsPlans, testrailLoginData, settestrailLoginData, integrationType) => {
     const [loading, setLoading] = useState(false);
+    const [testrailDetails, setTestrailDetails] = useState([]);
+    const [testrailRuns, setTestrailRuns] = useState([]);
     const [defaultValues, setDefaultValues] = useState(false);
+    const testrailPlanRunDetails = useSelector((state)=> state.configsetup.testrailPlanRunIds);
+
     const populateFields=async(authtype)=>{
         setErrorMsg("");
         let tempCredentialsData = {};
@@ -208,20 +231,20 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                     setCredentials(credentialsData);
                     saveAction(true, credentialsData);
                 }
-            } else if(type == 'TestRail') {
+            } else if(integrationType == 'TestRail') {
                 const data = await getDetails_Testrail();
                 if (data.error) { setMsg(data.error); return; }
                 if(data !=="empty" || data!= {}){
                     setIsEmpty(false);
                     let credentialsData = {
                         url: '',
-                        username: '',
-                        apiKey: ''
+                        testrailUserName: '',
+                        testrailApiKey: ''
                     };
                     
                     if(data.url) credentialsData['url'] = data.url;
-                    if(data.username) credentialsData['username'] = data.username;
-                    if(data.apiKey) credentialsData['apiKey'] = data.apiKey;
+                    if(data.username) credentialsData['testrailUserName'] = data.username;
+                    if(data.apiKey) credentialsData['testrailApiKey'] = data.apiKey;
 
                     setDefaultValues(credentialsData);
                     // setZephAuthType(credentialsData.authtype);
@@ -265,6 +288,40 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
         (type==="Zephyr" || type === "Azure" || type =="TestRail") && getDetails(type);
     }, [])
     
+    useEffect(() => {
+        const fetchTestPlans = async () => {
+            try{
+                const data = await getTestPlansAndRuns();
+                setTestrailDetails(data);
+                setTestrailRuns(() => data.testRuns);
+            } catch(err) {
+                console.log("err", err);
+            }
+        }
+
+        if (type === "TestRail") {
+            fetchTestPlans();
+        }
+    }, [type]);
+
+    const onDropdownChange = async (e, type) => {
+        if (type == "plan") {
+            setSelectedTestrailRunsPlans({
+                ...selectedTestrailRunsPlans,
+                plan: e || 0
+            });
+
+            const { runs } = await getTestPlanDetails(e.id);
+            if (runs?.length) {
+                setTestrailRuns(() => runs);
+            }
+        } else if (type == "runs") {
+            setSelectedTestrailRunsPlans({
+                ...selectedTestrailRunsPlans,
+                run: e
+            });
+        }
+    };
 
     return(
         <div className="popupWrapRow">
@@ -285,7 +342,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 </div>
                 </>
                 :null}
-                {type !== "TestRail" && <p><input value={credentials.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{marginBottom:"1rem"}} /></p>}
+                {integrationType!== "TestRail" && <p><input value={credentials?.url} onChange={(event)=>{setCredentials({url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={(urlErrBor ? " i__inputErrBor " : "")+"i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{marginBottom:"1rem"}} /></p>}
                 {(type==="Zephyr" && zephAuthType==="basic")?
                 <>
                 <p className="halfWrap halfWrap-margin" ><input value={credentials.userName} onChange={(event)=>{setCredentials({url: credentials.url, userName: event.target.value, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype})}} type="text" className={"i__input-cust i__input e__modal-alm-input"+ (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{marginBottom:"1rem"}} /></p>
@@ -300,15 +357,19 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                 {type==="qTest"?
                     <p className="qtestSteps"  ><input value={qtestSteps} onChange={()=>{setqtestSteps(!qtestSteps)}} type="checkbox" title="Update steps status" style={{marginTop:"1rem"}}/><span className="i__step">Update step status</span></p>
                 :null}
-                {type === "TestRail" ?
+                {integrationType === "TestRail" ?
                     <>
                         <p className="halfWrap">
-                            <input value={credentials.username} onChange={(event) => { setCredentials({ url: credentials.url, username: event.target.value, apiKey: credentials.apiKey }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].username} style={{ marginBottom: "1rem" }} />
+                            <input value={credentials.testrailUserName} onChange={(event) => { setCredentials({ url: credentials.url, testrailUserName:event.target.value, testrailApiKey: credentials.testrailApiKey, userName: credentials.userName, }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (usernameErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[integrationType].username} style={{ marginBottom: "1rem" }} />
                         </p>
                         <p className="halfWrap">
-                            <input value={credentials.apiKey} onChange={(event) => { setCredentials({ url: credentials.url, username: credentials.username, apiKey: event.target.value }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (passErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[type].password} />
+                            <input value={credentials.testrailApiKey} onChange={(event) => { setCredentials({ url: credentials.url, testrailUserName: credentials.testrailUserName, testrailApiKey: event.target.value, userName: credentials.userName, }) }} type="text" className={"i__input-cust i__input e__modal-alm-input" + (passErrBor ? " i__inputErrBor" : "")} placeholder={placeholder[integrationType].password} />
                         </p>
-                        <p><input value={credentials.url} onChange={(event) => { setCredentials({ url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype }) }} type="text" className={(urlErrBor ? " i__inputErrBor " : "") + "i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[type].url} style={{ marginBottom: "1rem" }} /></p>
+                        <p><input value={credentials.url} onChange={(event) => { setCredentials({ url: event.target.value, userName: credentials.userName, password: credentials.password, apitoken: credentials.apitoken, authtype: credentials.authtype }) }} type="text" className={(urlErrBor ? " i__inputErrBor " : "") + "i__input-cust i__input e__modal-alm-input "} placeholder={placeholder[integrationType].url} style={{ marginBottom: "1rem" }} /></p>
+                        <div style={{ width: "100%", display: "flex", justifyContent: "space-between", borderTop: "2px solid #c4c4c4", paddingTop: "15px" }}>
+                            <Dropdown style={{ width:"45%" }} placeholder="Select Test Plan" optionLabel="name" options={testrailDetails?.testPlans} value= {testrailPlanRunDetails?.plan || selectedTestrailRunsPlans.plan || { name: "Default", id: 0}} onChange={(e) => onDropdownChange(e.value, "plan")} />
+                            <Dropdown style={{ width:"45%" }} placeholder="Default" optionLabel="name" options={testrailRuns} value= {testrailPlanRunDetails?.run || selectedTestrailRunsPlans.run || "Default"} onChange={(e) => onDropdownChange(e.value, "runs")} />
+                        </div>
                     </>
                     : null
                 }

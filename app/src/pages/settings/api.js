@@ -396,6 +396,61 @@ export const manageTestRailDetails = async (payload) => {
     }
 }
 
+export const getTestPlansAndRuns = async () => {
+    try {
+        const { data, status } = await axios(url + '/getTestPlansAndRuns', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                "TestRailAction": "getTestPlansAndRuns"
+            },
+            credentials: 'include'
+        });
+
+
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(navigate)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        else if (data == "success" || status == 200) {
+            return data;
+        }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.INTEGRATION.ERR_LOGIN_AGAIN }
+    }
+}
+
+export const getTestPlanDetails = async (planId) => {
+    try {
+        const { data, status } = await axios(url + '/getTestPlanDetails', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            data: {
+                "TestRailAction":"getTestPlanDetails",
+                "testPlanId": planId
+            },
+            credentials: 'include'
+        });
+
+
+        if (status === 401 || data === "Invalid Session") {
+            RedirectPage(navigate)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        else if (data.length || status == 200) {
+            return data;
+        }
+    } catch (err) {
+        console.error(err)
+        return { error: MSG.INTEGRATION.ERR_LOGIN_AGAIN }
+    }
+}
+
 export const getAvoDetails = async(user_id) => {
     try{
         const res = await axios(url+'/getAvoDetails', {
