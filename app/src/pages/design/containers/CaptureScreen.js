@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful, SetSelectedRepository} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -133,7 +133,8 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
-  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
+  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID);
+  const selectedRepositoryInCapture = useSelector(state => state.design.selectedRepository);
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -1873,7 +1874,7 @@ const elementValuetitle=(rowdata)=>{
 
   // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
   else{
-  setSelectedScreen(e.value);
+  // setSelectedScreen(e.value);
   
   // fetchScrapeData();
   setSaveDisable(false);
@@ -1906,6 +1907,7 @@ const confirmScreenChange = () => {
           'roleId': userInfo.role,
           'param': 'updateOrderList',
           'orderList': selectedFolderValue.orderlist,
+          'elementrepoid':selectedFolderValue.id
           
     
         }
@@ -1917,6 +1919,8 @@ const confirmScreenChange = () => {
         if(res === 'fail') {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
+          dispatch(SetSelectedRepository(selectedFolderValue))
+          setSelectedScreen(selectedFolderValue);
           fetchScrapeData()
           // var req={
           //   tab:"createdTab",
@@ -1976,21 +1980,25 @@ const confirmScreenChange = () => {
         }
       }
       else{
-        let orderlist=selectedFolderValue.orderlist.some(
-          value => { return typeof value == "object" });
-          if(orderlist){
-            orderlist=selectedFolderValue.orderlist.map(dataobject=>dataobject._id)
-          }
-          else{
-            orderlist=selectedFolderValue.orderlist
-          }
+        dispatch(SetSelectedRepository(selectedFolderValue))
+        setSelectedScreen(selectedFolderValue);
+
+        // let orderlist=selectedFolderValue.orderlist.some(
+        //   value => { return typeof value == "object" });
+        //   if(orderlist){
+           let orderlist=selectedFolderValue.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
+          // }
+          // else{
+          //   orderlist=selectedFolderValue.orderlist
+          // }
         let params={
           'param':"updateOrderListAndRemoveParentId",
           'screenId': parentData.id,
           'userId': userInfo.user_id,
           'roleId': userInfo.role,
           'orderList': orderlist,
-          'oldOrderList':captureData.map(element=>element.objectDetails.objId)
+          'oldOrderList':captureData.map(element=>element.objectDetails.objId),
+          'elementrepoid':selectedFolderValue.id
       }
       let res=scrapeApi.updateScreen_ICE(params)
       if(res === 'fail') {
@@ -2041,7 +2049,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
                     <div title={option.label}>{option.label}</div>
                   )}/></div>
                 </div>}
@@ -2241,7 +2249,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" tooltipOptions="title" /></div>
+                  <div className="dropdown_container"><Dropdown value={selectedRepositoryInCapture?selectedRepositoryInCapture:selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" tooltipOptions="title" optionLabel='title'/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
