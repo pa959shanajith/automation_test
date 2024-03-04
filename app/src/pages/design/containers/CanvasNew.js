@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -32,7 +32,7 @@ import { Column } from 'primereact/column';
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from 'primereact/dropdown';
-import { highlightScrapElement_ICE,saveTag } from '../../design/api'
+import { highlightScrapElement_ICE,saveTag,getModules } from '../../design/api'
 import MapElement from '../components/MapElement';
 import { ContextMenu } from 'primereact/contextmenu'
 import { AnalyzeScenario, deletedNodes } from '../designSlice';
@@ -192,7 +192,8 @@ const CanvasNew = (props) => {
     const [enteredTags, setEnteredTags] = useState([]);
     const [tagAdded, setTagAdded] = useState(false);
     const [saveDisabled, setSaveDisabled] = useState(true);
-
+    const [unsavedChanges, setUnsavedChanges] = useState(false);
+    const currentModId=useSelector(state=>state.design.currentModuleId)
 
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
   const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
@@ -444,24 +445,39 @@ const CanvasNew = (props) => {
           // setTags(tagdata);
           if(response==="pass"){
             setTags(tags)
-            showToast('success', 'Tag(s) saved successfully.',3000);
+            toast.current.show({severity:'success', summary: 'Success', detail:"Tag(s) saved.", life: 1000});
           }else{
             setTags('')
-            showToast('error', 'Failed to save tag(s). Please try again.',6000);
+            toast.current.show({severity:'error', summary: 'error', detail:"Failed to save tag(s). Please try again.", life: 1000});
           }
-           
-          setVisibleTag(false) 
+          const req = {
+            tab: "createTab",
+            projectid: proj,
+            version: 0,
+            cycId: null,
+            modName: "",
+            moduleid: currentModId
+          }
+      
+          var res = await getModules(req)
+          if (res.error) { displayError(res.error); return }
+          dispatch(selectedModuleReducer(res))
+          setBlockui({ show: false })
+          setUnsavedChanges(false); 
+          setVisibleTag(false); 
           setTagAdded(false);
           setInputValue('');
           dispatch(dontShowFirstModule(true))
           dispatch(SetTagTestCases(false))
       };
       const handleDialogHide = () => {
-        setVisibleTag(false)
-        setInputValue('');
-        setTagAdded(true);
-        dispatch(dontShowFirstModule(true))
-        dispatch(SetTagTestCases(false))
+        if (unsavedChanges) {
+          toast.current.show({severity:'error', summary: 'error', detail:"Please save your changes before closing the dialog.", life: 1000});
+        } else {
+          setVisibleTag(false);
+          setInputValue('');
+          setTagAdded(false); 
+        }
       };
 
     const menuItemsModule = [
@@ -491,7 +507,7 @@ const CanvasNew = (props) => {
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value || typeOfView !== "mindMapView"),command:()=>{confirm1()},title:(agsLicense.msg)},
       { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
       { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
-      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
+      {label:'Tag a test Case',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -586,6 +602,7 @@ const CanvasNew = (props) => {
       setInputValue(e.target.value);
       setSuggestions(alltag.filter(tag => tag.toLowerCase().includes(e.target.value.toLowerCase())));
       setShowSuggestions(true);
+      setUnsavedChanges(true);
     };
     const handleSuggestionSelect = (e) => {
       setInputValue(e.value);
@@ -625,13 +642,14 @@ const CanvasNew = (props) => {
     const updatedTags = tags[fetchingDetails._id].filter((_, index) => index !== indexToRemove);
   setTags({ ...tags, [fetchingDetails._id]: updatedTags });
   setTagAdded(true);
+  setUnsavedChanges(true);
     for (let i = 0; i < dNodes[0].children.length; i++) {
           if (dNodes[0].children[i]._id === fetchingDetails._id) {
             const data = { ...dNodes[0].children[i], tag: updatedTags };
             dNodes[0].children[i] = data; 
           }
         }
-        showToast('success', 'Tag(s) removed successfully.',3000);
+        toast.current.show({severity:'success', summary: 'Success', detail:"tag removed.", life: 1000});
   };  
 
   const renderTags = () => {
@@ -2715,10 +2733,9 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
         <div className='tagtestcase'>
           <Dialog
             className='Tag_dialog'
-            // header={<span className="tagheader">tag a testcase</span>}
-            header="Tag a Testcase"
+            header="Tag a Test Case"
             visible={visibleTag}
-            style={{ width: '35vw', maxHeight: '20vw', overflow: "auto", contentStyle: { background: 'blue' } }}
+            style={{ width: '35vw', maxHeight: '20vw', overflow: "auto", contentStyle: { background: 'blue' } ,backgroundColor:"blue"}}
             footer={footerContentTag}
             onHide={handleDialogHide}
           >
@@ -2749,6 +2766,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                       </div>
                     </div>
                     <img src="static/imgs/Add_icon.svg" onClick={handleAddTag} className='plus'></img>
+                    <Tooltip target=".plus" position="right" content="Add tag(s)."></Tooltip>
                   </div>
                 </div>
                 <Card className='tagcards'>
