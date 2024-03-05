@@ -82,11 +82,12 @@
     // top: 0.2rem;
     width: 12vw;
     position: sticky;
-    left: 60vw;
+    // left: 60vw;
     height: 3rem;
     top: 0.3rem;
     min-height: 3rem;
     min-width: 12vw;
+    right: 1rem;
 }
 
 .not_captured_ele {
@@ -173,4 +174,15 @@
 
 .reused-msg{
     color: black;
+}
+
+.search__button{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.search__class{
+    padding-right: 1.5rem;
+    margin-top: 0.35rem;
 }
