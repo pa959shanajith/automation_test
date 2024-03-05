@@ -946,20 +946,34 @@ export const getUserDetails = async(action, args) => {
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
 */
 export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId,params="") =>	{
+    let data={}    
+            if(!params){
+data={
+    param: 'getScrapeDataScreenLevel_ICE',
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+            }
+else{
+data={
+    param:params,
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+}
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
             },
-            data : {
-                // param: 'getScrapeDataScreenLevel_ICE',
-                param:params,
-                screenId: screenId,
-                projectId: projectId,
-                type: type,
-                testCaseId: testCaseId
-            },
+        
+            
+            data : data,
             credentials : 'include',
         }).then(res=>{
             if (res.status === 200){
