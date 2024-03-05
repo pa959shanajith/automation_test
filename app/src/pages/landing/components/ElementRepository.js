@@ -110,10 +110,11 @@ const ElementRepository = (props) => {
 
 
   useEffect(() => {
+    if(copiedRow!==null){
     // Assuming copiedScreenData is a state variable
     if(accordionIndex !== null){const updatedScreen = screenData[accordionIndex];
     setCopiedScreenData(updatedScreen);
-  
+      let orderlist=copiedRow.map(element=>element._id)
     // Now, construct the params object using the updatedScreen
     let params = {
       deletedObj: [],
@@ -123,7 +124,7 @@ const ElementRepository = (props) => {
       userId: userInfo.user_id,
       roleId: userInfo.role,
       param: 'screenPaste',
-      orderList: [...copiedRow.map(element=>element._id)],
+      orderList: orderlist
     };
 
     scrapeApi.updateScreen_ICE(params)
@@ -135,12 +136,14 @@ const ElementRepository = (props) => {
           setCopiedRow(null);
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements copied.', life: 5000 });
           setUpdatPastedData(true);
+          setPastedData(false)
         }
         
         
   }})
    .catch(error => console.log(error))
     }
+  }
     // Use params as needed
   }, [accordionIndex,copiedRow != null]);
 
@@ -164,6 +167,7 @@ const ElementRepository = (props) => {
         );
         console.log(updatedScreens)
         return updatedScreens;
+        setPastedData(true)
       });
     }
     else toast.current.show({ severity: 'error', summary: 'Error', detail: 'Copy any row before pasting.', life: 5000 });
