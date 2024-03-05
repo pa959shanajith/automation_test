@@ -404,7 +404,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setSelectedNodes([]);
         dispatchAction(enableSaveButton(false))
         onHide();
-
+        setDomainDetails([]);
     }
 
     const handleTabChange = (index) => {

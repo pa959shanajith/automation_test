@@ -290,111 +290,131 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
 
     // Fetching Testrail test suites, test  sections & test cases
     const fetchSectionTestcases = async (node) => {
-        node?.order === "top" && setLoading(true);
+        if (node?.order === "top") {
+            setLoading(true);
 
-        const sections = await api.getSectionsTestrail_ICE({
-            "projectId": currentProject.id,
-            "suiteId": node.id,
-            "testrailAction": "getSections"
-        });
+            try {
+                const sections = await api.getSectionsTestrail_ICE({
+                    "projectId": currentProject.id,
+                    "suiteId": node.id,
+                    "testrailAction": "getSections"
+                });
 
-        const testSection = [];
+                const updateSections = async (sections, nodeKey) => {
+                    const updatedSections = await Promise.all(sections.map(async (section, index) => {
+                        if (section.suite_id && section.id) {
+                            const testcasesData = await api.getTestcasesTestrail_ICE({
+                                projectId: currentProject.id,
+                                suiteId: section.suite_id,
+                                sectionId: section.id,
+                                TestRailAction: "getTestCases",
+                            });
 
-        // Fetching test cases of each section
-        if (sections.length > 0) {
-            const sectionsWithTestcases = await Promise.all(sections.map(async (section, index) => {
-                const testcaseData = await fetchTestCases(currentProject.id, section.suite_id, section.id, index) || [];
+                            const typedTestcase = testcasesData?.map((testcase, i) => {
+                                const { id, title, section_id, suite_id, ...rest } = testcase;
+                                return {
+                                    id,
+                                    section_id,
+                                    suite_id,
+                                    type: "testcase",
+                                    name: title,
+                                    key: `${section.id}`,
+                                    // key: `${section.key}-${i}`,
+                                };
+                            }) || [{}];
 
-                let testdata = [{}];
-                if (testcaseData.length > 0) {
-                    testdata = (testcaseData?.map((data, i) => {
+                            const updatedSection = {
+                                ...section,
+                                key: section.id,
+                                // key: `${nodeKey}-${index}`,
+                                children: section.children.length === 0 ? typedTestcase : [...typedTestcase, ...await updateSections(section.children, nodeKey)],
+                            };
+
+                            return updatedSection;
+                        }
+                    }));
+
+                    setLoading(false);
+                    return updatedSections;
+                };
+
+                const _sections = sections?.map((section, i) => {
+                    return {
+                        ...section,
+                        order: "top",
+                        key: section.id
+                        // key: `${node.key}-${i}`
+                    }
+                });
+
+                const updatedSections = await updateSections(_sections, node.key);
+
+                const sectionsData = testrailData?.map((data) => {
+                    if (data.id == node.id) {
                         return {
                             ...data,
-                            key: `${i}-${i + 1}-${i + 2}`
-                        }
-                    }))
-                }
-                
-                return {
-                    ...section,
-                    key: `${section.id}-${index}-${index + 1}`,
-                    children: testdata
-                };
-            }));
-
-            if (sectionsWithTestcases.length > 0) {
-                let testData = []
-                let childrens = [];
-                sectionsWithTestcases.map((element) => {
-                    if (element.parent_id === null) {
-                        testData.push(element);
-                    }
-                    else {
-                        childrens.push(element)
-                    }
+                            children: [...updatedSections],
+                        };
+                    } else return data;
                 });
 
-                let newArr = [];
-                for (let i = 0; i < childrens.length; i = i + 1) {
-                    for (let j = i + 1; j < childrens.length; j = j + 1) {
-                        if (childrens[i].id === childrens[j].parent_id) {
-                            let indexValue = -1;
-                            newArr.find((element, index) => { if (element.id === childrens[i].id) indexValue = index })
-                            if (indexValue >= 0) newArr[indexValue] = { ...newArr[indexValue], "children": [...newArr[indexValue].children, childrens[j]] }
-                            else newArr.push({ ...childrens[i], "children": [...childrens[i].children, childrens[j]] })
-                        }
-                    }
-                }
-
-                const newData = [];
-                newArr.map(e_child => {
-                    testData.find(e_parent => {
-                        if (e_parent.id === e_child.parent_id) {
-                            if (e_parent.children.length > 0) {
-                                var childrenData = [...e_parent.children, e_child]
-                            }
-                            else childrenData = [e_child]
-                            let indexValue = -1;
-
-                            newData.map((r, index) => {
-                                if (r.id === e_child.parent_id)
-                                    indexValue = index
-                            })
-
-                            if (indexValue >= 0) {
-                                let existedObjectData = newData[indexValue];
-                                newData[indexValue] = { ...newData[indexValue], "children": [...existedObjectData.children, e_child] }
-                            }
-                            else newData.push({ ...e_parent, "children": [...childrenData] })
-                        }
-                    })
-                });
-
-                testSection.push(childrens.length ? newData[0] : testData[0]);
+                setTestrailData(() => sectionsData);
                 setLoading(false);
+            } catch (err) {
+                console.log("err", err);
             }
-        } else {
-            testSection.push({
-                ...sections
-            });
-            setLoading(false);
         }
 
-        setTestrailData((testrailData) => {
-            return testrailData.map((data) => {
-                if (data.id == node.id && data.order === "top") {
-                    return {
-                        ...data,
-                        children: testSection
-                    }
-                } else {
-                    return {
-                        ...data
-                    }
-                }
-            })
-        });
+        // might be useful. If not, Delete after sometime.
+        // else {
+        //     try {
+        //         const testCaseDetails = [];
+
+        //         const response = await api.getTestcasesTestrail_ICE({
+        //             projectId: currentProject.id,
+        //             suiteId: node.suite_id,
+        //             sectionId: node.id,
+        //             TestRailAction: "getTestCases",
+        //         });
+
+        //         if (response.length > 0) {
+        //             for (let i = 0; i < response.length; i++) {
+        //                 const { id, title, section_id, suite_id, ...rest } = response[i];
+        //                 testCaseDetails.push({
+        //                     id,
+        //                     section_id,
+        //                     suite_id,
+        //                     type: "testcase",
+        //                     name: title,
+        //                     key: `${i}-${i + 1}`,
+        //                 });
+        //             }
+        //         }
+
+        //         const sectionsData = testrailData?.map((data) => {
+        //             if (data.id == node.suite_id) {
+        //                 data.children?.map((child) => {
+        //                     if (child.id == node.id) {
+        //                         return {
+        //                             ...child,
+        //                             children: [...child.children, ...testCaseDetails],
+        //                         };
+        //                     } else return child;
+        //                 });
+        //             } else return data;
+        //         });
+
+        //         console.log("sectionsData", sectionsData);
+
+        //         setLoading(false);
+        //         return testCaseDetails;
+        //     } catch (error) {
+        //         console.error("Error fetching test cases:", error);
+        //         return [];
+        //     }
+        // }
     };
+
 
     useEffect(() => {
         setTestRailProjectsName(domainDetails?.projects);
