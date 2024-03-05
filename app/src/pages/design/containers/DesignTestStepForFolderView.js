@@ -337,17 +337,30 @@ const DesignModal = (props) => {
                                 for(let object in keywordData) {
                                     let firstList = [];
                                     let secondList = [];
-                                    for(let keyword in keywordData[object]){
-                                        if(keywordData[object][keyword]['ranking']){
-                                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
-                                                [keyword] : keywordData[object][keyword]
-                                            });
+                                    for (let keyword in keywordData[object]) {
+                                        if (keywordData[object][keyword]['ranking']) {
+                                            const index = keywordData[object][keyword]['ranking'] - 1;
+                                            let key = keyword;
+                                    
+                                            // Check if the index already exists in firstList
+                                            let newIndex = index;
+                                            while (firstList[newIndex]) {
+                                                newIndex++;
+                                            }
+                                    
+                                            // Create a new object at the new index if necessary
+                                            if (!firstList[newIndex]) {
+                                                firstList[newIndex] = {};
+                                            }
+                                    
+                                            // Assign the keyword to the new index
+                                            firstList[newIndex][key] = keywordData[object][keyword];
                                         } else {
-                                            secondList.push(({
-                                                [keyword] :keywordData[object][keyword]
-                                            }));
+                                            secondList.push({
+                                                [keyword]: keywordData[object][keyword]
+                                            });
                                         }
-                                    };
+                                    }
                                     secondList = [...firstList, ...secondList];
                                     let keyWordObject = {};
                                     for(let keyword of secondList){
