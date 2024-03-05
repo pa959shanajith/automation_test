@@ -65,7 +65,10 @@ const ElementRepository = (props) => {
   const [deleteScreens, setDeleteScreens] = useState(false);
   const [overlay, setOverlay] = useState(null);
   const [screenRename,setScreenRename] =  useState("");
-  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false);
+  const [pastedData, setPastedData] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchText, setSearchText] =  useState("");
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -94,6 +97,7 @@ const ElementRepository = (props) => {
             else {
               setOverlay("")
               setScreenData(screens.screenList);
+              setFilteredData(screens.screenList)
               setScreenId(false);
             }
         } catch (error) {
@@ -112,7 +116,7 @@ const ElementRepository = (props) => {
   useEffect(() => {
     if(copiedRow!==null){
     // Assuming copiedScreenData is a state variable
-    if(accordionIndex !== null){const updatedScreen = screenData[accordionIndex];
+    if(accordionIndex !== null && pastedData){const updatedScreen = screenData[accordionIndex];
     setCopiedScreenData(updatedScreen);
       let orderlist=copiedRow.map(element=>element._id)
     // Now, construct the params object using the updatedScreen
@@ -136,7 +140,7 @@ const ElementRepository = (props) => {
           setCopiedRow(null);
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements copied.', life: 5000 });
           setUpdatPastedData(true);
-          setPastedData(false)
+          
         }
         
         
@@ -145,7 +149,7 @@ const ElementRepository = (props) => {
     }
   }
     // Use params as needed
-  }, [accordionIndex,copiedRow != null]);
+  }, [accordionIndex,pastedData]);
 
   const pasteRow = (targetAccordionIndex) => {
     let orderlistarr=
@@ -169,6 +173,7 @@ const ElementRepository = (props) => {
         return updatedScreens;
         setPastedData(true)
       });
+      setPastedData(true);
     }
     else toast.current.show({ severity: 'error', summary: 'Error', detail: 'Copy any row before pasting.', life: 5000 });
   };
@@ -545,9 +550,18 @@ const handleChangeScreenName=(index,e)=>{
   
           const result=[];
 
+        // const matchingOrderItem = screenDetails.orderlist?.find((orderItem) => {
+        //   return orderItem._id === rowData._id && orderItem.flag === true;
+        // });
+
         const matchingOrderItem = screenDetails.orderlist?.find((orderItem) => {
-          return orderItem._id === rowData._id && orderItem.flag === true;
-        });
+          // Check if orderItem is not null and if it has _id and flag properties
+          if (orderItem && orderItem._id && orderItem.flag) {
+              return orderItem._id === rowData._id && orderItem.flag === true;
+          } else {
+              return false; // Skip null or incomplete orderItem
+          }
+      });
 
         if (matchingOrderItem) {
           result.push(matchingOrderItem);
@@ -892,6 +906,20 @@ const deleteScreen = (index, screenDetails)=>{
 
 }
 
+const handleSearchChange=(event) => {
+  const inputValue= event.toLowerCase();
+  setSearchText(inputValue);
+  if (inputValue !== "") {
+    const filterScreenName = filteredData.filter((item) =>
+      item.name.toLowerCase().includes(inputValue)
+    );
+    setScreenData(filterScreenName);
+  } 
+  else {
+    setScreenData(filteredData);
+  }
+}
+
 
 
   
@@ -909,8 +937,19 @@ const deleteScreen = (index, screenDetails)=>{
         <p className="not_captured_message">No Element Repository yet</p>
         <Button label='Create Repository' onClick={handleAddAccordion} />
         </div>)
-      :<><Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
-      <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip></>}
+      :<>
+      <div className='search__button'>
+          <span className="p-input-icon-left search__class">
+            <i className="pi pi-search" />
+            <InputText placeholder="Search" value={searchText} onChange={(event) =>
+                      event &&
+                      event.target &&
+                      handleSearchChange(event.target.value)} />
+          </span>
+          <Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
+          <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
+       </div>
+      </>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
         {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={
