@@ -307,12 +307,17 @@ const CanvasNew = (props) => {
                             }
                         }
                         var res = createNode(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
-                        tree.links = res.linkDisplay
-                        tree.dLinks = res.dLinks
-                        tree.nodes = res.nodeDisplay
-                        tree.dNodes = res.dNodes
-                        count= {...count,...res.count}
-                        typeo = typen;
+                        if(res !== undefined){
+                          tree.links = res.linkDisplay
+                          tree.dLinks = res.dLinks
+                          tree.nodes = res.nodeDisplay
+                          tree.dNodes = res.dNodes
+                          count= {...count,...res.count}
+                          typeo = typen;
+                        }else{
+                          toast.current.show({severity:'error', summary:"Error", detail:"Try to import multi test suite structure", life:5000})
+                        }
+                       
                     }
                 })
                 if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
