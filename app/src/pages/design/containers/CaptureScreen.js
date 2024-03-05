@@ -1890,6 +1890,7 @@ const elementValuetitle=(rowdata)=>{
 };
 
 const confirmScreenChange = () => {
+  
   (async () => {
     try {
         // let params = {
@@ -1906,7 +1907,8 @@ const confirmScreenChange = () => {
           'userId': userInfo.user_id,
           'roleId': userInfo.role,
           'param': 'updateOrderList',
-          'orderList': selectedFolderValue.orderlist,
+          'orderList':selectedFolderValue.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
+
           'elementrepoid':selectedFolderValue.id
           
     
@@ -2004,6 +2006,7 @@ const confirmScreenChange = () => {
       if(res === 'fail') {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
       else {
+        setCaptureData([])
         fetchScrapeData()
         }
       }

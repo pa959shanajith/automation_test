@@ -118,12 +118,12 @@ const ElementRepository = (props) => {
     let params = {
       deletedObj: [],
       modifiedObj: [],
-      addedObj: { view: [{...copiedRow, tempOrderId: copiedRow?.tempOrderId ? copiedRow?.tempOrderId :uuid()}]},
+      addedObj: { },
       screenId: updatedScreen["_id"],
       userId: userInfo.user_id,
       roleId: userInfo.role,
       param: 'screenPaste',
-      orderList: [copiedRow?._id],
+      orderList: [...copiedRow.map(element=>element._id)],
     };
 
     scrapeApi.updateScreen_ICE(params)
@@ -145,6 +145,7 @@ const ElementRepository = (props) => {
   }, [accordionIndex,copiedRow != null]);
 
   const pasteRow = (targetAccordionIndex) => {
+    let orderlistarr=
     setAccordionIndex(targetAccordionIndex);
     if (copiedRow !== null) {
       setScreenData((prevScreens) => {
@@ -155,12 +156,13 @@ const ElementRepository = (props) => {
                 // related_dataobjects: [...screen.related_dataobjects, copiedRow],
                 // orderlist: [...screen.orderlist, copiedRow["_id"]],
                 related_dataobjects: screen.related_dataobjects.length === 0
-                ? [copiedRow]
-                : [...screen.related_dataobjects, copiedRow],
-              orderlist: screen.orderlist ? [...screen.orderlist, copiedRow["_id"]] : [copiedRow["_id"]]
+                ? [...copiedRow]
+                : [...screen.related_dataobjects, ...copiedRow],
+              orderlist: screen.orderlist ? [...screen.orderlist, ...copiedRow.map(element=>element._id)] : [...copiedRow.map(element=>element._id)]
               }
             : screen
         );
+        console.log(updatedScreens)
         return updatedScreens;
       });
     }
@@ -326,7 +328,7 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Copy',
           icon: 'pi pi-copy',
-          command: () => copyRow(selectedRowData),
+          command: () => copyRow(selectedCapturedElement),
         },
         {
           label: 'Paste',
@@ -953,10 +955,15 @@ const deleteScreen = (index, screenDetails)=>{
               onContextMenu={(e) => handleContextMenu(e, index)}
               size='small'
               emptyMessage="No data found"
-              selectionMode={"single"}
+              // selectionMode={"single"}
               selection={selectedCapturedElement}
-              onSelectionChange={onRowClick}
+              // onSelectionChange={onRowClick}
+              selectionMode={'checkbox'} 
+              
+              onSelectionChange={(e)=>onRowClick(e)} 
+              // dataKey="id"
             >
+              <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
               editor={(options) => {
                 if (!options.rowData || Object.keys(options.rowData).length === 0) {
