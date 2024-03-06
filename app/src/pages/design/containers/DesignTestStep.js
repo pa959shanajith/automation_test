@@ -1515,7 +1515,7 @@ const DesignModal = (props) => {
                     return
                 }
                 dispatch(SetEnablePlayButton(true))
-                dispatch(setCurrentDebugPlayButton(data.length+1))
+                dispatch(setCurrentDebugPlayButton(data.length+watchlist.length+1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1547,7 +1547,7 @@ const DesignModal = (props) => {
                 dispatch(SetEnablePlayButton(false))
                 return
             }
-            dispatch(setCurrentDebugPlayButton(data.length+1))
+            dispatch(setCurrentDebugPlayButton(data.length.watchlist.length+1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
