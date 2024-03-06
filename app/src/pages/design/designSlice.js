@@ -65,7 +65,8 @@ const initialState = {
   tagtestcase:false,
   debuggerPoints:[],
   advanceDebug:false,
-  enablePlayButton:false
+  enablePlayButton:false,
+  currentplaybutton
 }
 
 export const designSlice = createSlice({
@@ -270,6 +271,9 @@ export const designSlice = createSlice({
 
     SetEnablePlayButton:(state,action)=>{
       state.enablePlayButton=action.payload
+  },
+  setCurrentDebugPlayButton:(state,action)=>{
+    state.currentplaybutton=action.payload
   }
 }
 })
@@ -316,6 +320,7 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedScreenOfStepSlice,
   setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
   SetAdvanceDebug,
-  SetEnablePlayButton} = designSlice.actions
+  SetEnablePlayButton,
+  setCurrentDebugPlayButton} = designSlice.actions
 
 export default designSlice.reducer

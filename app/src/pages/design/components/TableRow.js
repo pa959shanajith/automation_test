@@ -62,6 +62,7 @@ const TableRow = (props) => {
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const advanceDebug=useSelector(state=>state.design.advanceDebug)
     const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
+    const currentplaybutton=useSelector(state=>state.design.currentplaybutton)
    
     const [elementData, setElementData] = useState([]);
     const [visible, setVisible] = useState(false);
@@ -616,10 +617,10 @@ const TableRow = (props) => {
 
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col" onMouseEnter={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null:null} onMouseLeave={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
-                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>

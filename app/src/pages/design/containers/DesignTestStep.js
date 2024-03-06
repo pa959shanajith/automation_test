@@ -23,7 +23,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton, setCurrentDebugPlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -681,7 +681,7 @@ const DesignModal = (props) => {
                     return
                 }
                 else{
-               
+               dispatch(setCurrentDebugPlayButton(data.length+1))
                 dispatch(SetEnablePlayButton(true))
                 console.log(data)
                 let dataforstep=data.map(steps=>{
@@ -1502,11 +1502,12 @@ const DesignModal = (props) => {
         dispatch(SetEnablePlayButton(false))
         debuggerPointShift.shift()
         let newDebuggerPoints=debuggerPointShift
-        dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"play")
+        // dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
         .then(data => {
             if(data){
                 dispatch(SetEnablePlayButton(true))
+                dispatch(setCurrentDebugPlayButton(data.length+1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1519,7 +1520,7 @@ const DesignModal = (props) => {
                 return [...watchlist,...dataforstep]
                 })
             }
-            console.log(data)
+            
         }
         )
     }
@@ -1529,10 +1530,11 @@ const DesignModal = (props) => {
         let debuggerPointShift=[...debuggerPoints]
         debuggerPointShift.shift()
         let newDebuggerPoints=[nextVal,...debuggerPointShift]
-        dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
+        // dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
 
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"nextStep")
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
         .then(data => {
+            dispatch(setCurrentDebugPlayButton(data.length+1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
@@ -1544,7 +1546,7 @@ const DesignModal = (props) => {
             setWatchList((watchlist)=>{
             return [...watchlist,...dataforstep]
             })
-            console.log(data)
+           
         }
         )
         }
