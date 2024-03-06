@@ -33,6 +33,8 @@ const AdminHeader = (props) => {
         return <img src="static/imgs/users_icon.svg" alt="SVG Image" className='current_img_icon' />;
       case 'privileges':
         return <img src="static/imgs/privileges_icon.svg" alt="SVG Image" className='current_img_icon' style={{ width: '1.5rem' }} />;
+      case 'project':
+        return <i className='pi pi-briefcase current_img_icon' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem'}} />;
       default:
         return null;
     }

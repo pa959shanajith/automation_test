@@ -45,10 +45,10 @@ const Privileges = () => {
                         sortMode="single" 
                         sortField="area.name" 
                         sortOrder={1} 
-                        tableStyle={{ width: '69rem', paddingLeft:'1rem' }}
+                        tableStyle={{ width: '72vw', paddingLeft:'1rem' }}
                         showGridlines
                         scrollable
-                        scrollHeight="35rem"
+                        scrollHeight="77vh"
                         >
                 <Column field="area.name" header="Area"></Column>
                 <Column field="features" header="Features"></Column>

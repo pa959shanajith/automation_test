@@ -11,10 +11,12 @@ import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
+import Project from './ProjectAssign';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
     const [createUserDialog, setCreateUserDialog] = useState(false)
+    const [resetMiddleScreen,setResetMiddleScreen] =useState({assignProjectTab:true})
     // const [provisionDialog,setProvisionDialog] = useState(false)
     return (<>
         <div className="rightContainer">
@@ -31,6 +33,7 @@ const OriginContainer = (props) => {
             {currentTab === "license_details" && <LicenseManagement/>}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
+            {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}
         </div>
     </>)
 }

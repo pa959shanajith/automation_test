@@ -82,6 +82,10 @@ const AdminSidePanel = () => {
                         <img src="static/imgs/privileges.svg" alt="SVG Image" style={{ marginRight: '0.5rem', width: '1.5rem' }} />
                        <span className='privileges_label'>Privileges</span> 
                     </li>
+                    <li onClick={() => { setHeader('Project'); setScreen('project'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
+                        <i className='pi pi-briefcase' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem' }} />
+                       <span className='privileges_label'>Manage Project</span> 
+                    </li>
                 </ul>
             </div>
         </div>
