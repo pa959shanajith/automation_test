@@ -680,12 +680,14 @@ const DesignModal = (props) => {
                     }
                     setOverlay("");
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
-                if(data=="success"){
-                    toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
-                    dispatch(SetEnablePlayButton(false))
-                    setAdvDebugDisable(false)
-                    return
-                }
+                if (data === "Invalid Session") return ;
+                else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+                else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+                else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+                else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+                else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+                else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+                else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
                 else{
                dispatch(setCurrentDebugPlayButton(data.length+1))
                 dispatch(SetEnablePlayButton(true))
@@ -1511,13 +1513,16 @@ const DesignModal = (props) => {
         // dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
         DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
         .then(data => {
-            if(data){
-                if(data=="success"){
-                    toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
-                    dispatch(SetEnablePlayButton(false))
-                    setAdvDebugDisable(false)
-                    return
-                }
+            
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+        else{
                 dispatch(SetEnablePlayButton(true))
                 dispatch(setCurrentDebugPlayButton(data.length+watchlist.length+1))
                 let dataforstep=data.map(steps=>{
@@ -1532,8 +1537,8 @@ const DesignModal = (props) => {
                 return [...watchlist,...dataforstep]
                 })
             }
-            
         }
+        
         )
     }
     const handleMoveToNext=()=>{
@@ -1552,7 +1557,7 @@ const DesignModal = (props) => {
                 setAdvDebugDisable(false)
                 return
             }
-            dispatch(setCurrentDebugPlayButton(data.length.watchlist.length+1))
+            dispatch(setCurrentDebugPlayButton(data.length+watchlist.length+1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
