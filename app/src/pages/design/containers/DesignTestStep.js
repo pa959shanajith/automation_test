@@ -673,6 +673,9 @@ const DesignModal = (props) => {
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,"")
             .then(data => {
                 if(advanceDebug && debuggerPoints){
+                    if(watchlist.length){
+                        setWatchList([])
+                    }
                     setOverlay("");
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
                 if(data=="success"){
@@ -1506,6 +1509,11 @@ const DesignModal = (props) => {
         DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
         .then(data => {
             if(data){
+                if(data=="success"){
+                    toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
+                    dispatch(SetEnablePlayButton(false))
+                    return
+                }
                 dispatch(SetEnablePlayButton(true))
                 dispatch(setCurrentDebugPlayButton(data.length+1))
                 let dataforstep=data.map(steps=>{
@@ -1534,6 +1542,11 @@ const DesignModal = (props) => {
 
         DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
         .then(data => {
+            if(data=="success"){
+                toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
+                dispatch(SetEnablePlayButton(false))
+                return
+            }
             dispatch(setCurrentDebugPlayButton(data.length+1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
