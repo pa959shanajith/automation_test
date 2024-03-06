@@ -131,6 +131,7 @@ const CaptureModal = (props) => {
     const [parentId, setParentId] = useState(null);
     const [screenChange, setScreenChange] = useState(false);
     const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+    const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
   
@@ -245,9 +246,11 @@ const CaptureModal = (props) => {
     const handleAddMore = (id) => {
         if (id === 'add more') {
             setVisible(id);
+            setParentId(null)
         }
         else if (id === 'capture') {
             setVisible(id);
+            setParentId(null)
         }
     }
 
@@ -366,7 +369,7 @@ const CaptureModal = (props) => {
     }
 
     const onSave = (e, confirmed) => {
-
+        setOverlay("Saving in Progress...")
         let continueSave = true;
 
         // if (mainScrapedData.reuse && !confirmed) {
@@ -529,6 +532,10 @@ const CaptureModal = (props) => {
                                 viewString = newScrapeList;
                             }
                         }
+                        if(parentId === Id){
+                            setCapturedDataToSave(newScrapeList);
+                            viewString = newScrapeList;
+                        }
 
                         setMainScrapedData(data);
                         setMirror({ scrape: data.mirror, compare: null });
@@ -594,17 +601,17 @@ const CaptureModal = (props) => {
 
                                 selectall: item.custname,
                                 objectProperty: item.tag.includes("iris") ? elementTypeProp(item.tag.split(";")[1]) : elementTypeProp(item.tag),
-                                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId ? (event) => {
+                                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
                                     setScreenshotY(event.clientY);
                                     setScreenshotData({
                                         header: item.custname,
-                                        imageUrl: data.mirror || "",
+                                        imageUrl: data.mirror ?data.mirror: mirror.scrape || "",
                                         enable: true,
                                         isIris: item.xpath.split(';')[0] == "iris" ? true : false
                                     });
                                     onHighlight();
                                     // setHighlight(true);
-                                } : () => toastError('Please save element')}>View Screenshot</span> : <span>No Screenshot Available</span>,
+                                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                                 actions: '',
                                 objectDetails: item,
 
@@ -631,6 +638,7 @@ const CaptureModal = (props) => {
                         )
                     })
                     setCaptureData(newData);
+                    setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
                     addMore.current = false;
                 })
                 .catch(error => {
@@ -681,9 +689,11 @@ const CaptureModal = (props) => {
         // setNewScrapedCapturedData(newCapturedDataToSave)
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
         setSaveDisable(false);
+        setMasterCapture(true);
     }
 
     const saveScrapedObjects = () => {
+        setOverlay("Saving in progress")
         let scrapeItemsL = [...capturedDataToSave];
         let added = Object.keys(newScrapedCapturedData).length ? { ...newScrapedCapturedData } : { ...mainScrapedData };
         let views = [];
@@ -756,13 +766,15 @@ const CaptureModal = (props) => {
                     footer: <Button onClick={() => { setShowPop("") }} >OK</Button>
                   })
                   : toastSuccess(MSG.SCRAPE.SUCC_OBJ_SAVE);
+                  setMasterCapture(false);
                 let numOfObj = scrapeItemsL.length;
                 // setDisableBtns({save: true, delete: true, edit: true, search: false, selAll: numOfObj===0, dnd: numOfObj===0||numOfObj===1 });
               } else { console.error(resp); addMore.current = true; }
             }).catch(error => console.error(error));
           })
           .catch(error => console.error(error))
-          setSaveDisable(true);
+          setSaveDisable(true); 
+          setOverlay("")
       }
     
       const startScrape = (browserType, compareFlag, replaceFlag) => {
@@ -995,45 +1007,56 @@ const CaptureModal = (props) => {
       };
 
 
-    const handleDelete = (rowData, confirmed) => {
+      const handleDelete = (rowData,confirmed) => {
         // const updatedData = captureData.filter((item) => item.selectall !== rowData.selectall);
         if (mainScrapedData.reuse && !confirmed) {
-            setShowConfirmPop({ 'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': () => { setShowConfirmPop(false); onDelete(null, true); } })
-            return;
+          setShowConfirmPop({'title': "Delete Scraped data", 'content': 'Screen has been reused. Are you sure you want to delete scrape objects?', 'onClick': ()=>{setShowConfirmPop(false);setSelectedCapturedElement(rowData) ;handleDelete(rowData, true);}})
+          return;
         }
-        if (rowData.objectDetails.objId !== undefined && !rowData.objectDetails.duplicate) {
-            let deletedArr = [...deleted];
-            let scrapeItemsL = [...captureData];
-            let newOrderList = [];
-
-            const capturedDataAfterDelete = captureData.filter(item =>
-                item.objectDetails.objId !== rowData.objectDetails.objId
-            );
-
-            deletedArr.push(rowData.objectDetails.objId);
-
-            let notused = scrapeItemsL.filter(item => {
-                if (deletedArr.includes(item.objectDetails.objId)) {
-                    return false
-                }
-                else {
-                    newOrderList.push(item.objectDetails.objId)
-                }
-            })
-            let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
-            setCaptureData(capturedDataAfterDelete)
-            setDeleted(deletedArr)
-            setOrderList(newOrderList)
-            setCapturedDataToSave(newCapturedDataToSave)
-            setSelectedCapturedElement([])
-            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
-        }
-        else {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
-        }
+        if(rowData.objectDetails.objId!== undefined && !rowData.objectDetails.duplicate){
+        let deletedArr = [...deleted];
+        let scrapeItemsL = [...captureData];
+        let newOrderList = [];
+    
+        const capturedDataAfterDelete = captureData.filter(item =>
+          item.objectDetails.objId !== rowData.objectDetails.objId
+        );
+    
+        deletedArr.push(rowData.objectDetails.objId);
+    
+        // var capturedDataAfterDelete = scrapeItemsL.filter(function (item) {
+    
+        //   return !selectedElement.find(function (objFromB) {
+        //     if (item.objectDetails.val === objFromB.objectDetails.val) {
+        //       if(item.objectDetails.objId){
+        //         deletedArr.push(item.objectDetails.objId)}
+        //       return true
+        //     }
+        //   })
+        // })
+    
+        let notused = scrapeItemsL.filter(item => {
+          if (deletedArr.includes(item.objectDetails.objId)) {
+            return false
+          }
+          else {
+            newOrderList.push(item.objectDetails.objId)
+          }
+        })
+        let newCapturedDataToSave = capturedDataAfterDelete.map(item => item.objectDetails)
+        setCaptureData(capturedDataAfterDelete)
+        setDeleted(deletedArr)
+        setOrderList(newOrderList)
+        setCapturedDataToSave(newCapturedDataToSave)
+        setSelectedCapturedElement([])
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element deleted successfully', life: 5000 });
+      }
+      else {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Save the captured element before delete', life: 5000 });
+      }
         // setCaptureData(updatedData);
         setSaveDisable(false);
-    };
+      };
 
     const handleEdit = (rowData) => {
         const updatedData = captureData.map((item) => {
@@ -1070,45 +1093,45 @@ const CaptureModal = (props) => {
 
 
     const renderActionsCell = (rowData) => {
-        let selectedElement = []
+        let selectedElement=[]
         selectedElement.push(rowData)
         setScrapeDataForIris(rowData)
-        let scrapeType = rowData?.objectDetails?.xpath?.split(';') !== undefined ? rowData?.objectDetails?.xpath?.split(';') : " "
-        //  setIrisObject(scrapeType[0]);
+       let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
+      //  setIrisObject(scrapeType[0]);
         return (
-            <div >
-
-
-                {!saveDisable ?
-                    <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." /> : <Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
-                {(scrapeType[0] === "iris" || typesOfAppType === "Web") &&
-                    <button
-                        disabled={!saveDisable}
-                        onClick={() => { setSelectedCapturedElement(selectedElement); openElementProperties(rowData); }}
-                    >
-                        <img
-                            src="static/imgs/ic-edit.png"
-                            alt="Edit Icon"
-                            style={{ height: "20px", width: "20px", opacity: !saveDisable ? 0.6 : 1 }}
-                            className="edit__icon"
-                        />
-                    </button>
-
-                }
-                <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
-                <img
-
-                    src="static/imgs/ic-delete-bin.png"
-                    style={{ height: "20px", width: "20px", marginLeft: "0.5rem" }}
-                    className="delete__icon" onClick={() => handleDelete(rowData)} />
-
-
-
-
-            </div>
+          <div >
+            
+            
+            {!saveDisable?
+            <Tooltip target=".edit__icon" position="bottom" content="Please Save Before edit the properties of elements." />:<Tooltip target=".edit__icon" position="bottom" content=" Edit the properties of elements." />}
+            {  (scrapeType[0] === "iris" || typesOfAppType==="Web")  && 
+            <button
+            disabled={!saveDisable}
+            onClick={() => {setSelectedCapturedElement(selectedElement);openElementProperties(rowData);}}
+          >
+            <img
+              src="static/imgs/ic-edit.png"
+              alt="Edit Icon"
+              style={{ height: "20px", width: "20px", opacity: !saveDisable? 0.6 : 1}}
+              className="edit__icon"
+            />
+          </button>
+          
+            }
+            <Tooltip target=".delete__icon" position="bottom" content=" Delete the element." />
+            <img
+    
+              src="static/imgs/ic-delete-bin.png"
+              style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
+              className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+              
+    
+            
+    
+          </div>
         )
-
-    };
+    
+      };
 
 
     const handleMouseLeaveRow = () => {
@@ -1700,9 +1723,10 @@ const CaptureModal = (props) => {
                     <div
                         className={`tooltip__target-${rowdata.objectDetails.objId}
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : (rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
                     {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
                     {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+                    {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
                 </div>
             </>
         )
@@ -1795,7 +1819,7 @@ const CaptureModal = (props) => {
         // const selectedFolderValue = e.value;
         // setSelectedScreen(selectedFolderValue);
       
-        if(captureData.length > 0){
+        if(captureData.length >= 0){
           setScreenChange(true);
         }
       
@@ -1822,7 +1846,7 @@ const CaptureModal = (props) => {
               let params = {
                 param : "updateMindmapTestcaseScreen",
                 projectID :  NameOfAppType.projectId,
-                moduleID:props.fetchingDetails["parent"]["parent"]["_id"],
+                moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
                 parent:props.fetchingDetails["parent"]["_id"],
                 currentScreen:parentData.id,
                 updateScreen:selectedFolderValue.id
@@ -1830,9 +1854,9 @@ const CaptureModal = (props) => {
       
               const res = await scrapeApi.updateScreen_ICE(params);
               if(res === 'fail') {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the repository, try again!!.', life: 5000 });}
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
               else {
-                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repsotory updated and saved', life: 5000 });
+                
                 var req={
                   tab:"createdTab",
                   projectid:NameOfAppType.projectId,
@@ -1850,7 +1874,7 @@ const CaptureModal = (props) => {
                     data.children.forEach((child)=>{
                       if(child._id === props.fetchingDetails["parent"]["_id"]){
                         child.children.forEach((subChild)=>{
-                          if(subChild._id === selectedFolderValue.id && subChild.childIndex === props.fetchingDetails.childIndex){
+                          if(subChild._id === selectedFolderValue.id){
                             if(subChild.children.length > 0){
                                const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
                                   return {
@@ -1858,7 +1882,8 @@ const CaptureModal = (props) => {
                                     parent:{...subChild,parent:{...child,parent:data}}
                                   }
                                })}
-                               sd.push(newData);
+                               const childData = {...newData.children[0], type:'teststepsgroups', parent:newData}
+                               sd.push(childData);
                             }
                             else{
                               sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
@@ -1875,10 +1900,18 @@ const CaptureModal = (props) => {
                     return sd;
                   }
                   
-                  console.log(screenData_1);
-                  props.setFetchingDetails(screenData_1[0].children[0])
-                  props.setModuleData({id:res, key:uuid()})
-                  setParentId(uuid());
+                //   console.log(screenData_1);
+                  if(screenData_1.length>0){
+                    props.setFetchingDetails(screenData_1[0])
+                    props.setModuleData({id:res, key:uuid()})
+                    setParentId(screenData_1[0].parent._id);
+                    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+                  }else{
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+                  }
+                  // props.setFetchingDetails(screenData_1[0])
+                  // props.setModuleData({id:res, key:uuid()})
+                  // setParentId(uuid());
                 }
               }
               }
@@ -2090,7 +2123,7 @@ const CaptureModal = (props) => {
                             <div className="scrsht_outerContainer" id="ss_ssId">
                                 <div data-test="ssScroll" className="ss_scrsht_insideScroll">
                                     {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                                    {(mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                                    {(screenshotData.imageUrl || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : screenshotData.imageUrl}`} /> : "No Screenshot Available"}
                                 </div>
                             </div>
                         </div>
@@ -2421,7 +2454,8 @@ function generateScrapeItemList(lastIdx, viewString, type = "old") {
             left: scrapeObject.left,
             height: scrapeObject.height,
             width: scrapeObject.width,
-            identifier: scrapeObject.identifier
+            identifier: scrapeObject.identifier,
+            reused:scrapeObject.reused
         }
         if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop != undefined) {
             scrapeItem['viewTop'] = scrapeObject.viewTop;

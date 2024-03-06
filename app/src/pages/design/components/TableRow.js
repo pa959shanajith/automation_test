@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch ,useSelector} from 'react-redux';
 import { updateScrollBar } from '../../global';
 import "../styles/TableRow.scss";
 import { Tag } from 'primereact/tag'
 import Select, { components } from "react-select";
+import { SetDebuggerPoints } from '../designSlice';
 import { Icon } from '@mui/material';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
@@ -31,6 +33,7 @@ import { Column } from 'primereact/column';
 */
 
 const TableRow = (props) => {
+    const dispatch=useDispatch()
   const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
@@ -54,6 +57,12 @@ const TableRow = (props) => {
     const [showAllKeyword, setShowAllKeyword] = useState(false);
     const [selectedOptions, setSelectedOptions] = useState(null);
     const [objetListOption,setObjetListOption] = useState(null);
+    const [debuggerPoint,setDebuggerPoint]=useState(false);
+    const [debugeerInLightMode,setDebugeerInLightMode]=useState(false);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
+   
     const [elementData, setElementData] = useState([]);
     const [visible, setVisible] = useState(false);
     let objList = props.objList;
@@ -165,7 +174,13 @@ const TableRow = (props) => {
       setTCDetails(newTcDetails);
     }
   }, [props.rowChange, props.testCase]);
-
+  useEffect(()=>{
+    if(!debuggerPoints.length){
+      setDebuggerPoint(false)
+      setDebugeerInLightMode(false)
+     
+    }
+    },[debuggerPoints])
   useEffect(() => {
     setChecked(props.stepSelect.check.includes(props.idx));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -588,11 +603,25 @@ const TableRow = (props) => {
               <div className={`tooltip__target-${rowdata.value}`} title={rowdata.value}>{rowdata.value}</div>
             )
            }
+           const ActivateDebuggerPoint=()=>{
+            setDebuggerPoint(debuggerPoint=>!debuggerPoint)
+            if(!debuggerPoint){
+              dispatch(SetDebuggerPoints({push:'push',stepNo:props.idx+1}))
+            }
+              else{
+                dispatch(SetDebuggerPoints({push:'pop',stepNo:props.idx+1}))
+              }
+              
+          }
 
     return (
         <>
-        <div ref={rowRef} className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
-                <span className="step_col">{props.idx + 1}</span>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+                <span className="step_col" onMouseEnter={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null:null} onMouseLeave={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
+                onClick={ActivateDebuggerPoint}>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
+                  <span>{props.idx + 1}</span>
+                  </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
@@ -604,7 +633,7 @@ const TableRow = (props) => {
                     <Select  value={objetListOption} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} options={optionElement} getOptionLabel={getOptionElementLable} styles={customElementStyles} menuPortalTarget={document.body} menuPlacement="auto" menuPosition={'fixed'} placeholder='Select'/>
                      :
                     <div className="d__row_text" title={objName} >
-                        <div style={{display:'contents'}}><span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>{objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onMouseEnter={()=>showCard(objName)} className='pi pi-eye'></span>}</>}</div>
+                        <span style={(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep)?{overflow: 'hidden',display: 'inline-block',width: '6rem',textOverflow: 'ellipsis'}:null}>{objName}</span>
                         {(objName==="OBJECT_DELETED" && props.impactAnalysisDone?.addedElement)?<span style={{display:'inline-block',marginRight:'6px'}}><Tag severity="danger" value="deleted"></Tag></span>:null}
         {(props.testcaseDetailsAfterImpact && props.testcaseDetailsAfterImpact?.custNames?.includes(objName) && props.impactAnalysisDone?.addedTestStep) ? <span style={{display:'inline-block',marginRight:'5px'}}><Tag severity="success" value="Newly Added"></Tag></span>:null}
                         </div>
@@ -635,7 +664,9 @@ const TableRow = (props) => {
         </div>
         {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
         <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
-          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          <span>
+          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon3'></span>}</>}</span>
         </span>
       </div>
         <Dialog header={"Element Properties"} style={{width:'66vw'}} visible={visible} onHide={() => setVisible(false)}>

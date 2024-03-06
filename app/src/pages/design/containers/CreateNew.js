@@ -34,6 +34,7 @@ const CreateNew = ({ importRedirect }) => {
     const moduleSelect = useSelector(state => state.design.selectedModule)
     const selectProj = useSelector(state => state.design.selectedProj);
     const analyzeScenario = useSelector(state => state.design.analyzeScenario);
+    const tagtestcase = useSelector(state => state.design.tagtestcase);
     const prjList = useSelector(state => state.design.projectList)
     const initEnEProj = useSelector(state => state.design.initEnEProj)
     const [delSnrWarnPop, setDelSnrWarnPop] = useState(false)
@@ -89,9 +90,9 @@ const CreateNew = ({ importRedirect }) => {
     },[handleTypeOfViewMap])
 
     const views = [
+        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/folderViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Folder View</h5></div>, code: 'folderView', disabled: true },
-        { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', paddingLeft: '4px', height: "15px" }}><img style={{ width: '25px', height: '38px' }} src="static/imgs/tableViewIcon.svg" alt="modules" /><h5 style={{ paddingLeft: '3px' }}>Table View</h5></div>, code: 'tableView', disabled: true },
     ];
 
@@ -193,6 +194,37 @@ const CreateNew = ({ importRedirect }) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [analyzeScenario])
+    useEffect(() => {
+        if (!tagtestcase) {
+            (async () => {
+                setBlockui({ show: true, content: 'Loading modules ...' })
+                var res = await getProjectList()
+                if (res.error) { displayError(res.error); return; }
+                var data = parseProjList(res)
+                dispatch(projectList(data))
+                if (!importRedirect) {
+                    dispatch(selectedProj(selectProj ? selectProj : res.projectId[0]))
+                    var req = {
+                        tab: "endToend" || "tabCreate",
+                        projectid: Proj ? Proj.projectId : res.projectId[0],
+                        version: 0,
+                        cycId: null,
+                        modName: "",
+                        moduleid: null
+                    }
+                    var moduledata = await getModules(req);
+                    if (moduledata.error) { displayError(moduledata.error); return; }
+                    var screendata = await getScreens(Proj ? Proj.projectId : res.projectId[0])
+                    if (screendata.error) { displayError(screendata.error); return; }
+                    dispatch(screenData(screendata))
+                    dispatch(moduleList(moduledata))
+                }
+                setBlockui({ show: false, content: '' })
+                setLoading(false)
+            })()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tagtestcase])
     const displayError = (error) => {
         setBlockui({ show: false })
         setLoading(false)
@@ -203,8 +235,10 @@ const CreateNew = ({ importRedirect }) => {
         return (
             <div className={`${handleTypeOfViewMap ==='folderView' ? "canvas_topbar_in_folderview": "canvas_topbar"}`}>
                             <div className='mp__toolbar__container '>
-                                <div className="mr-3 ml-4">
+                                <div className="mr-3 ml-5">
+                                    <label style={{position:'relative', bottom:"1.3vh"}} htmlFor='views'>View: </label>
                                     <Dropdown 
+                                        id="views"
                                         className={'w-full md:w-12rem p-inputtext-sm'} 
                                         value={selectedView}
                                         onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
@@ -248,26 +282,26 @@ const CreateNew = ({ importRedirect }) => {
                             <FolderView setBlockui={setBlockui}/></div>}
                         {(handleTypeOfViewMap ==='tableView') && <h1>hello i am Table view</h1>}
                         
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
-                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
-                            
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <>
+                        <div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
+                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />  
                         </div>
-                        <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> </>}
-
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <div id='mp__canvas' className='mp__canvas'>
-                            {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
-                                <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
-                                : <Fragment>
-                                    <ExportMapButton />
-                                    <SaveMapButton disabled={true} />
-                                </Fragment>
-                            )
-                                : ((Object.keys(moduleSelect).length > 0) ?
-                                    <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                            <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/>
+                            <div id='mp__canvas' className='mp__canvas'>
+                                {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
+                                    <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
                                     : <Fragment>
+                                        <ExportMapButton />
                                         <SaveMapButton disabled={true} />
-                                    </Fragment>)}
-                        </div>}
+                                    </Fragment>
+                                )
+                                    : ((Object.keys(moduleSelect).length > 0) ?
+                                        <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                                        : <Fragment>
+                                            <SaveMapButton disabled={true} />
+                                        </Fragment>)}
+                            </div>
+                        </>}
             </div> : null
                 }
             </Fragment>
