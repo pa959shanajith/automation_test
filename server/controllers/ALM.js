@@ -614,39 +614,6 @@ exports.fetchALM_Testcases = async function (req,res) {
             }
             if(fetch_jobStatus[0].rows && fetch_jobStatus[0].rows.length){
               all_jobstatus.push({"job_status":fetch_jobStatus[0].rows,"exec":each_exec});
-              // const generateReport = await prepareALM_Report(fetch_jobStatus[0].rows,each_exec);
-              // console.log(generateReport , ' its result from generateReport');
-              // return new Promise(async (resolve,reject) => {
-              //   const report_inputs = { reportid: fetch_jobStatus[0].rows[0]["_id"],"report_type":"CALM" };
-              //   const getReport = await utils.fetchData(report_inputs, "reports/getReport", reportfnName,true);
-              //   if(getReport[0].rows && getReport[0].rows.length){
-              //     return resolve(getReport[0].rows);
-              //   }
-              //   else{
-              //     reject([]);
-              //   }
-              // })
-              // const report_inputs = { reportid: fetch_jobStatus[0].rows[0]["_id"],"report_type":"CALM" };
-              // const getReport = await utils.fetchData(report_inputs, "reports/getReport", reportfnName,true);
-              // console.log(getReport,' its executed report');
-              // if(getReport[0].rows && getReport[0].rows.length){
-              //   let execHistory = getReport[0].rows;
-              //   let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${each_exec.executionData.configurekey}&executionListId=${each_exec.executionListId}`
-              //   send_res["testcaseshistory"].push({
-              //       "testCaseId": each_exec.executionData.testcaseRefId || "",
-              //       "testDataVariantId": "VAR01",
-              //       "jobId": each_exec.executionListId || "",
-              //       "jobName": each_exec.executionData.configurename || "",
-              //       "jobUrl": jobURL || "",
-              //       "logUrl": jobURL || "",
-              //       "startedAt": execHistory.report.overallstatus.StartTime || "" ,
-              //       "startedBy": "Automated",
-              //       "endedAt": execHistory.report.overallstatus.EndTime || "",
-              //       "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
-              //       "message": "Automated Execution",
-              //       "language": "en"
-              //   })
-              // } 
             }
             } catch (error) {
               logger.error('Error:', error);
@@ -655,22 +622,7 @@ exports.fetchALM_Testcases = async function (req,res) {
             
           }))
 
-
-          // let jobSuccessCount = 0;
-          // await Promise.allSettled(jobPromises).then(results => {
-          //   results.forEach(result => {
-          //     if (result.status === "fulfilled") {
-          //         successCount++;
-          //     }
-          // });
-          // }).catch((promiseErr) => {
-          //   console.error("Error:", promiseErr);
-          //   res.status(500).json({ code:'500', error: 'error while processing' });
-          // });
-          // console.log(jobSuccessCount,' its jobSuccessCount');
-
           if(all_jobstatus && all_jobstatus.length){
-            // const reportPromises = all_jobstatus.map(async job => {
               for(const job of all_jobstatus){
               try{
               const report_inputs = { reportid: job.job_status[0]["_id"],"report_type":"CALM" };
@@ -684,20 +636,6 @@ exports.fetchALM_Testcases = async function (req,res) {
                 let execHistory = getReport[0].rows;
                 let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
                 let logURL = `${req.protocol}://${req.get('host')}/devOpsReport?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
-                //   let testCaseObj = {
-              //     "testCaseId": job.exec.executionData.testcaseRefId || "",
-              //     "testDataVariantId": "VAR01",
-              //     "jobId": job.exec.executionListId || "",
-              //     "jobName": job.exec.executionData.configurename || "",
-              //     "jobUrl": jobURL || "",
-              //     "logUrl": jobURL || "",
-              //     "startedAt": execHistory.report.overallstatus.StartTime || "" ,
-              //     "startedBy": "Automation",
-              //     "endedAt": execHistory.report.overallstatus.EndTime || "",
-              //     "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
-              //     "message": "Automated Execution",
-              //     "language": "en"
-              // }
                 testcaseshistory.push({
                     "testCaseId": job.exec.executionData.testcaseRefId || "",
                     "testDataVariantId": "VAR01",
@@ -705,12 +643,13 @@ exports.fetchALM_Testcases = async function (req,res) {
                     "jobName": job.exec.executionData.configurename || "",
                     "jobUrl": jobURL || "",
                     "logUrl": logURL || "",
-                    "startedAt": execHistory.report.overallstatus.StartTime || "" ,
+                    "startedAt": convertDateUTC(execHistory.report.overallstatus.StartTime) || "" ,
                     "startedBy": "Automation",
-                    "endedAt": execHistory.report.overallstatus.EndTime || "",
+                    "endedAt": convertDateUTC(execHistory.report.overallstatus.EndTime) || "",
                     "resultStatus": execHistory.report.overallstatus.overallstatus === "Pass" ? "successful": "failed",
-                    "message": "Automated Execution",
-                    "language": "en"
+                    "message": execHistory.report.overallstatus.overallstatus === "Pass" ? "Automated Execution" : "Execution failed due to some issues",
+                    "language": "en",
+                    "error":null
                 })
                 // return testCaseObj; // Resolve the promise
               }
@@ -724,18 +663,6 @@ exports.fetchALM_Testcases = async function (req,res) {
           } 
             };
             console.log(testcaseshistory,' its testcaseshistory');
-            // let successCount = 0;
-            // await Promise.allSettled(reportPromises).then(results => {
-            //   results.forEach(result => {
-            //     if (result.status === "fulfilled") {
-            //         successCount++;
-            //     }
-            // });
-            // }).catch((promiseErr) => {
-            //   console.error("Error:", promiseErr);
-            //   res.status(500).json({ code:'500', error: 'error while processing' });
-            // })
-            //   console.log("Number of successful API calls:", successCount);
                 
           }
           
@@ -753,6 +680,25 @@ exports.fetchALM_Testcases = async function (req,res) {
         return res.status(500).json({ code:'500', error: 'error while processing' });
     }
   };
+
+   function convertDateUTC(dateStr) {
+    let convertedDate = ""
+    if(dateStr){
+      const dateParts = dateStr.split(" ");
+      const date = dateParts[0];
+      const time = dateParts[1];
+
+      const [year, month, day] = date.split("-");
+      const [hour, minute, second] = time.split(":");
+      const datetime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+
+      // Format the datetime to ISO 8601 format
+      convertedDate = datetime.toISOString();
+      console.log(convertedDate);
+    }
+    return convertedDate;
+  }
+
 
   exports.Scope_Changed = async function (req, res) {
  
