@@ -1552,8 +1552,6 @@ const DesignModal = (props) => {
 
         DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
         .then(data => {
-            dispatch(SetEnablePlayButton(false))
-            setAdvDebugDisable(false)
             if (data === "Invalid Session") return ;
             else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
             else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
