@@ -730,8 +730,9 @@ if (cluster.isMaster) {
 		app.post('/saveTestrailMapping',auth.protect,testrail.saveMapping_Testrail)
 		app.post('/viewTestrailMappedList',auth.protect,testrail.viewMappedDetails_Testrail)
 		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
-		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
+		app.post('/getTestPlanDetails',auth.protect,testrail.getTestPlanDetails_Testrail)
 		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
+		app.post('/getTestPlansAndRuns',auth.protect,testrail.getTestPlansAndRuns)
 		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);

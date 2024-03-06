@@ -44,6 +44,7 @@ const GridBrowser = ({
     }
   });
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
+  const [integrationType, setIntegrationType] = useState("");
   
   const determineIntegration = (integrationData) => {
     if (integrationData?.alm?.url) {
@@ -137,6 +138,7 @@ const GridBrowser = ({
         <IntegrationDropDown
           setshowModal={setshowModal}
           type={showIntegrationModal}
+          integrationType={integrationType}
           showIntegrationModal={showIntegrationModal}
           appType=''
           setCredentialsExecution={setIntegration}
@@ -184,6 +186,7 @@ const GridBrowser = ({
               onChange={(selectedIntegration) => {
                 setSelectedTool(selectedIntegration.value)
                 syncScenarioChange(selectedIntegration.value.name)
+                setIntegrationType(selectedIntegration.value.name);
               }}
               options={integrationList}
               optionLabel="name"
