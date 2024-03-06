@@ -66,7 +66,7 @@ const initialState = {
   debuggerPoints:[],
   advanceDebug:false,
   enablePlayButton:false,
-  currentplaybutton
+  currentplaybutton:null
 }
 
 export const designSlice = createSlice({
