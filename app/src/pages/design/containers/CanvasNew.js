@@ -750,21 +750,28 @@ const CanvasNew = (props) => {
     }
 
     const checkTestStepGroup = (teststep, dNode, sids, types, ids) => {
-      let check = []
-      teststep.forEach((child) => {
-          if (child['reuse']) {
-             check.push(child['reuse'])
-             return;
-          } else if (child.children && child.children.length > 0) {
-            checkTestStepGroup(child.children, dNode, sids, types, ids); // Corrected line
-          }
-      });
-      if(check.includes(true)){
-        reusedNode(dNode, sids, types);
-        setReuseDelContent("Selected Test Scenario has reused Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permanently?");
-        setSelectedDelNode(ids);
-        setReuseDelConfirm(true);
-        return;
+      let check = [];
+  
+      const checkRecursively = (children) => {
+          children.forEach((child) => {
+              if (child['reuse']) {
+                  check.push(child['reuse']);
+              } else if (child.children && child.children.length > 0) {
+                  checkRecursively(child.children);
+              }
+          });
+      };
+  
+      checkRecursively(teststep);
+  
+      if (check.includes(true)) {
+          reusedNode(dNode, sids, types);
+          setReuseDelContent("Selected Test Scenario has reused Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permanently?");
+          setSelectedDelNode(ids);
+          setReuseDelConfirm(true);
+      } else {
+          setSelectedDelNode(ids);
+          setDelConfirm(true);
       }
   };
     const clickDeleteNode=(id)=>{
@@ -800,7 +807,7 @@ const CanvasNew = (props) => {
               return;
           }
           else if([...dNodes][sid]['children']){
-            if([...dNodes][sid]['children'][0].type !== 'teststepsgroups'){
+            if([...dNodes][sid]['children'].length>0 && [...dNodes][sid]['children'][0].type !== 'teststepsgroups'){
               for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
                 if ([...dNodes][sid]['children'][i]["reuse"]){
                     reusedNode(dNodes,sid,type);
@@ -813,8 +820,12 @@ const CanvasNew = (props) => {
                     continue;
                 }
               }
-            }else{
+            }else if([...dNodes][sid]['children'].length>0){
               checkTestStepGroup([...dNodes][sid]['children'], dNodes, sid, type, id)
+              return;
+            }else{
+              setSelectedDelNode(id);
+              setDelConfirm(true);
               return;
             }
           } 
