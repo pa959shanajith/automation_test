@@ -110,6 +110,7 @@ const DesignModal = (props) => {
     const [isNameValid, setIsNameValid] = useState(false);
     const [isSpaceError, setIsSpaceError] = useState(false);
     const [customEdit , setCustomEdit] =useState(false);
+    const[advDebugDisable,setAdvDebugDisable]=useState(false)
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
 
@@ -673,6 +674,7 @@ const DesignModal = (props) => {
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,"")
             .then(data => {
                 if(advanceDebug && debuggerPoints){
+                    setAdvDebugDisable(true)
                     if(watchlist.length){
                         setWatchList([])
                     }
@@ -681,6 +683,7 @@ const DesignModal = (props) => {
                 if(data=="success"){
                     toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
                     dispatch(SetEnablePlayButton(false))
+                    setAdvDebugDisable(false)
                     return
                 }
                 else{
@@ -1512,6 +1515,7 @@ const DesignModal = (props) => {
                 if(data=="success"){
                     toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
                     dispatch(SetEnablePlayButton(false))
+                    setAdvDebugDisable(false)
                     return
                 }
                 dispatch(SetEnablePlayButton(true))
@@ -1545,6 +1549,7 @@ const DesignModal = (props) => {
             if(data=="success"){
                 toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
                 dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)
                 return
             }
             dispatch(setCurrentDebugPlayButton(data.length.watchlist.length+1))
@@ -1841,13 +1846,13 @@ const DesignModal = (props) => {
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
-                        {(enablePlayButton)?<img src='static/imgs/Start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' title="Move to next debugger point" onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
-                        <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        <img src='static/imgs/StepInto.svg' title ="Move to next step" onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
                         <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
                                             </div>
-                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
+                    <div><Button label="DEBUG" title ={advDebugDisable?"Already in progress":"Start debugging" } disabled={advDebugDisable} style={advDebugDisable?{height:'30px',cursor:'not-allowed'}:{height:'30px',cursor:'pointer'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan);setAdvDebugDisable(true)}}/></div>
 
                     </div>
                     <div className="card">
