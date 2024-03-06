@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful, SetSelectedRepository} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful, SetSelectedRepository,SetEmptyDatatable} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -135,6 +135,8 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [selectedFolderValue,setSelectedFolderValue] = useState([]);
   const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID);
   const selectedRepositoryInCapture = useSelector(state => state.design.selectedRepository);
+  // const [emptyDatatable, setEmptyDatatable] =useState(false);
+  const emptyDatatbleRepository = useSelector(state => state.design.emptyDatatable);
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -251,10 +253,12 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     if (id === 'add more') {
       setVisible(id);
       setParentId(null)
+      dispatch(SetEmptyDatatable(false))
     }
     else if (id === 'capture') {
       setVisible(id);
       setParentId(null)
+      dispatch(SetEmptyDatatable(false))
     }
   }
 
@@ -520,7 +524,7 @@ const elementTypeProp =(elementProperty) =>{
     return new Promise((resolve, reject) => {
       setOverlay("Loading...");
       setBlocked(true)
-      let viewString = capturedDataToSave;
+      let viewString = emptyDatatbleRepository ?[]:capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
       let Id = parentData.id
@@ -2007,7 +2011,10 @@ const confirmScreenChange = () => {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
       else {
         setCaptureData([])
+        setCapturedDataToSave([])
+        dispatch(SetEmptyDatatable(true))
         fetchScrapeData()
+        // setParentId(uuid());
         }
       }
     }

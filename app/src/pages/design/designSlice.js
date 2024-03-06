@@ -66,7 +66,8 @@ const initialState = {
   debuggerPoints:[],
   advanceDebug:false,
   enablePlayButton:false,
-  selectedRepository:{}
+  selectedRepository:{},
+  emptyDatatable:false
 }
 
 export const designSlice = createSlice({
@@ -275,6 +276,10 @@ export const designSlice = createSlice({
     SetSelectedRepository:(state,action)=>{
       state.selectedRepository=action.payload
   },
+  SetEmptyDatatable:(state,action)=>{
+    state.emptyDatatable=action.payload
+},
+
 }
 })
 
@@ -320,6 +325,6 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedScreenOfStepSlice,
   setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
   SetAdvanceDebug,
-  SetEnablePlayButton,SetSelectedRepository} = designSlice.actions
+  SetEnablePlayButton,SetSelectedRepository,SetEmptyDatatable} = designSlice.actions
 
 export default designSlice.reducer

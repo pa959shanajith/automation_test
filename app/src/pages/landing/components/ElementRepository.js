@@ -140,7 +140,8 @@ const ElementRepository = (props) => {
           setCopiedRow(null);
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements copied.', life: 5000 });
           setUpdatPastedData(true);
-          
+          setPastedData(false);
+          setSelectedCapturedElement([]);
         }
         
         
@@ -152,7 +153,6 @@ const ElementRepository = (props) => {
   }, [accordionIndex,pastedData]);
 
   const pasteRow = (targetAccordionIndex) => {
-    let orderlistarr=
     setAccordionIndex(targetAccordionIndex);
     if (copiedRow !== null) {
       setScreenData((prevScreens) => {
@@ -184,7 +184,12 @@ const ElementRepository = (props) => {
       // Check if orderlist exists in screenItem
       if (screenItem.orderlist) {
         const matchingOrderItem = screenItem.orderlist?.find((orderItem) => {
-          return orderItem?._id === rowData?._id && orderItem?.flag === true;
+          if(typeof orderItem=="string"){
+           return orderItem === rowData?._id
+          }
+          else{
+            return orderItem?._id === rowData?._id && orderItem?.flag === true;
+          }
         });
     
         if (matchingOrderItem) {
@@ -209,14 +214,15 @@ const ElementRepository = (props) => {
     
 
     const uniqueArray = isUnique(matchingDataArray, '_id');
+    console.log(uniqueArray)
     // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
         <div className='flex justify-content-between'>
-          <div className={`flex flex-row ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          <div className={`flex flex-row ${Array.isArray(uniqueArray) && uniqueArray.length > 0 && uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
           {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
           </div>
-          <div>{uniqueArray.map((item)=>(
+          <div>{Array.isArray(uniqueArray) && uniqueArray.length > 0 && uniqueArray.map((item)=>(
               item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
             ))}
           </div>
@@ -606,8 +612,7 @@ const handleChangeScreenName=(index,e)=>{
         </div>
       );
     }
-  
-    // Return a default value or null outside the if condition
+
     return null;
   };
   
@@ -741,7 +746,14 @@ const saveDeletedElements = (screenDetails,deletedArr) => {
     'userId': userInfo.user_id,
     'roleId': userInfo.role,
     'param': 'delElement',
-    'orderList': screenDetails.orderlist
+    'orderList': screenDetails.orderlist.map(element=> {
+      if(typeof element == "string"){
+        return element
+    }
+    else{
+      return element._id
+    }
+  })
   }
 
   scrapeApi.updateScreen_ICE(params)
@@ -785,29 +797,30 @@ const handleDeleteRow = (selectedCapturedElement,screenDetails) => {
 
   screenData.forEach(screen => {
     // Update orderlist by removing the item
-    setOrderList(screen.orderlist?.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
-    }))
+    screen.orderlist = screen.orderlist?.filter(item => {
+      return item && (item !== selectedCapturedElement[0]["_id"]);
+    })
   
     // Update related_dataobjects by removing the item
     screen.related_dataobjects = screen.related_dataobjects.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
     });
   })
 
   screenDetails.orderlist?.filter(item=>{
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item !== selectedCapturedElement[0]["_id"]);
   })
 
   screenDetails.related_dataobjects.filter(item => {
-    return item && (item._id !== selectedCapturedElement["_id"]);
+    return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
 
-  deletedArr.push(selectedCapturedElement["_id"]);
+  deletedArr.push(selectedCapturedElement[0]["_id"]);
 
   setDeleted(deletedArr)
   saveElements(screenDetails,deletedArr);
+  setSelectedCapturedElement([])
 
 }
 
@@ -826,26 +839,27 @@ const deleteCurrentElement = (selectedCapturedElement,screenDetails) =>{
     // setOrderList(screen.orderlist?.filter(item => {
     //   return item && (item._id !== selectedCapturedElement["_id"]);
     // }))
-    screen.orderlist = screen.orderlist?.filter(item => item && (item._id !== selectedCapturedElement["_id"]));
+    screen.orderlist = screen.orderlist?.filter(item => item && (item._id !== selectedCapturedElement[0]["_id"]));
     // Update related_dataobjects by removing the item
     screen.related_dataobjects = screen.related_dataobjects.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
     });
   })
 
   screenDetails.orderlist?.filter(item=>{
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
   screenDetails.related_dataobjects.filter(item => {
-    return item && (item._id !== selectedCapturedElement["_id"]);
+    return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
 
-  deletedArr.push(selectedCapturedElement["_id"]);
+  deletedArr.push(selectedCapturedElement[0]["_id"]);
 
   setDeleted(deletedArr)
   saveDeletedElements(screenDetails,deletedArr)
+  setSelectedCapturedElement([])
 }
 
 const deleteElement = (selectedCapturedElement,screenDeatils) =>{
@@ -857,8 +871,8 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
   
   // Step 2: Update orderlist and related_dataobjects for each screen
   screenData.forEach(screen => {
-    screen.orderlist = screen.orderlist?.filter(item => item?._id !== selectedCapturedElement["_id"]);
-    screen.related_dataobjects = screen.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement["_id"]);
+    screen.orderlist = screen.orderlist?.filter(item => item?._id !== selectedCapturedElement[0]["_id"]);
+    screen.related_dataobjects = screen.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement[0]["_id"]);
   });
 
   
@@ -867,12 +881,13 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
   // screenDeatils.related_dataobjects = screenDeatils.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement["_id"]);
   
   // Step 4: Update deletedArr and saveDeletedElements
-  const updatedDeletedArr = [...deletedArr, selectedCapturedElement["_id"]];
+  const updatedDeletedArr = [...deletedArr, selectedCapturedElement[0]["_id"]];
   setDeleted(updatedDeletedArr);
 //  for(let i=0; i<screenData.length;i++){
 //   saveDeleteAllElements(screenData[i], updatedDeletedArr);
 // }
   saveDeleteAllElements(updatedDeletedArr);
+  setSelectedCapturedElement([]);
 }
 
 const saveScreens = (screenDetails) => {
@@ -880,6 +895,7 @@ const saveScreens = (screenDetails) => {
         screenIds: [screenDetails._id],
       scenarioIds:[],
       testcaseIds:[],
+      param:'elementRepository'
     }
   
     scrapeApi.deleteScenario(params)
@@ -1001,7 +1017,7 @@ const handleSearchChange=(event) => {
               // selectionMode={"single"}
               selection={selectedCapturedElement}
               // onSelectionChange={onRowClick}
-              selectionMode={'checkbox'} 
+              selectionMode='multiple' 
               
               onSelectionChange={(e)=>onRowClick(e)} 
               // dataKey="id"
