@@ -47,7 +47,8 @@ import {
   updateTestSuite,
   setScheduleStatus,
   clearErrorMSg,
-  testrailPlanRunIds
+  testrailPlanRunIds,
+  setEditConfig
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -1458,7 +1459,9 @@ const showToast = (severity, detail) => {
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
+        testrail: { url: "", username: "", apiKey: "", runId: "", planId: "", runAndPlanDetails: {} },
       });
+      dispatch(setEditConfig(true));
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
       setTypeOfExecution(getData.executionRequest.selectedModuleType)
@@ -1476,7 +1479,10 @@ const showToast = (severity, detail) => {
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
+        testrail: { url: "", username: "", apiKey: "", runId: "", planId: "", runAndPlanDetails: {} },
       });
+      dispatch(testrailPlanRunIds({ plan: "", run: "" }));
+      dispatch(setEditConfig(false));
       setConfigTxt("");
       setModules("normalExecution");
       setSelectedNodeKeys({});
