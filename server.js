@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-												var redisStore = require('connect-redis')(sessions);
+														var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -161,8 +161,8 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-									}  
-						return next();
+									}
+															return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -282,6 +282,7 @@ if (cluster.isMaster) {
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.get('/devopsReports/viewReport', report.viewReport);
+		// Gen AI API'S List
 		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
 		app.get('/getall_uploadfiles',report.getall_uploadfiles);
 		app.post('/getjira_json',report.getJiraJSON_ICE)
@@ -290,6 +291,15 @@ if (cluster.isMaster) {
 		app.post('/save_testcase',generateAI.save_GenTestcases);
 		app.post('/fetch_git_exp_details',auth.protect, mindmap.fetch_git_exp_details);
 		app.post('/saveTag', mindmap.saveTag);
+		app.post("/validateAI_token",generateAI.validateToken);
+		app.post("/genAI/create",generateAI.createModel);
+		app.get("/genAI/read",generateAI.readModel);
+		app.put("/genAI/edit/:id",generateAI.editModel);
+		app.delete("/genAI/delete/:id",generateAI.deleteModel);
+		app.post("/genAI/createTemp",generateAI.createTemp);
+		// app.get("/genAI/readTemp",generateAI.readTemp);
+		// app.put("/genAI/editTemp/:id",generateAI.editTemp);
+		// app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
 
 		app.use(csrf({
 		cookie: true
