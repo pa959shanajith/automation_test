@@ -1525,7 +1525,15 @@ const DesignModal = (props) => {
             else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
         else{
                 dispatch(SetEnablePlayButton(true))
-                dispatch(setCurrentDebugPlayButton(data.length+watchlist.length+1))
+                let uniquewatchlist=watchlist.reduce((acc, obj)=>{
+                var existObj = acc.find(item => item.inde === obj.index);
+                if(existObj){
+                      return acc;
+                    }
+                    acc.push(obj);
+                    return acc;
+                  },[]);
+                dispatch(setCurrentDebugPlayButton(data.length+uniquewatchlist.length+1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1563,7 +1571,15 @@ const DesignModal = (props) => {
             else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
             
             else{
-                dispatch(setCurrentDebugPlayButton(data.length+watchlist.length+1))
+                let uniquewatchlist=watchlist.reduce((acc, obj)=>{
+                    var existObj = acc.find(item => item.inde === obj.index);
+                    if(existObj){
+                          return acc;
+                        }
+                        acc.push(obj);
+                        return acc;
+                      },[]);
+                dispatch(setCurrentDebugPlayButton(data.length+uniquewatchlist.length+1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
