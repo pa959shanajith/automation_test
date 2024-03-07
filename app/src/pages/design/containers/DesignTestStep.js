@@ -1878,7 +1878,7 @@ const DesignModal = (props) => {
 
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false));setIngredients([]);setCurrentDebugPlayButton(null);SetEnablePlayButton(false);setAdvDebugDisable(false)}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetDebuggerPoints({push:'reset',points:[]}));dispatch(SetAdvanceDebug(false));setIngredients([]);dispatch(setCurrentDebugPlayButton(null));dispatch(SetEnablePlayButton(false));setAdvDebugDisable(false)}}>
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
                     <div style={{display:'flex',justifyContent:'space-between', marginBottom:'1.5rem'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
