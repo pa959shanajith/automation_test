@@ -5,7 +5,7 @@ import CaptureModal from '../containers/CaptureScreen';
 import DesignModal from '../containers/DesignTestStep';
 import { TabView, TabPanel } from 'primereact/tabview';
 import '../styles/NavigatetoCaptureDesign.scss'
-import { dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
+import { dontShowFirstModule, setUpdateScreenModuleId ,SetAdvanceDebug} from "../designSlice";
 
 
 
@@ -51,7 +51,7 @@ function NavigatetoCaptureDesign(params) {
     // }
     return(
         <div className="captureDesign_dialog_div">
-            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position={advanceDebug?'left':'right'} style={{ width: '73vw', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true))}else{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false)}}}>
+            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position={advanceDebug?'left':'right'} style={{ width: '73vw', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true));dispatch(SetAdvanceDebug(false))}else{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(SetAdvanceDebug(false))}}}>
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>

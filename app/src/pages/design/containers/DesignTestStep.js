@@ -1525,15 +1525,19 @@ const DesignModal = (props) => {
             else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
         else{
                 dispatch(SetEnablePlayButton(true))
-                let uniquewatchlist=watchlist.reduce((acc, obj)=>{
-                var existObj = acc.find(item => item.inde === obj.index);
-                if(existObj){
-                      return acc;
-                    }
-                    acc.push(obj);
-                    return acc;
-                  },[]);
-                dispatch(setCurrentDebugPlayButton(data.length+uniquewatchlist.length+1))
+                // let watchlistinindexformat=watchlist.map(step=>{
+                //     return {...step,index:step.teststep}
+                // })
+                // let applplaybuttononstep=[...watchlistinindexformat,...data]
+                // let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                //     var existObj = acc.find(item => item.index === obj.index);
+                //     if(existObj){
+                //           return acc;
+                //         }
+                //         acc.push(obj);
+                //         return acc;
+                //       },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index +1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1571,15 +1575,19 @@ const DesignModal = (props) => {
             else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
             
             else{
-                let uniquewatchlist=watchlist.reduce((acc, obj)=>{
-                    var existObj = acc.find(item => item.inde === obj.index);
+                let watchlistinindexformat=watchlist.map(step=>{
+                    return {...step,index:step.teststep}
+                })
+                let applplaybuttononstep=[...watchlistinindexformat,...data]
+                let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                    var existObj = acc.find(item => item.index === obj.index);
                     if(existObj){
                           return acc;
                         }
                         acc.push(obj);
                         return acc;
                       },[]);
-                dispatch(setCurrentDebugPlayButton(data.length+uniquewatchlist.length+1))
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index + 1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
@@ -1870,9 +1878,9 @@ const DesignModal = (props) => {
 
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false));setIngredients([])}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false));setIngredients([]);setCurrentDebugPlayButton(null);SetEnablePlayButton(false);setAdvDebugDisable(false)}}>
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
-                    <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <div style={{display:'flex',justifyContent:'space-between', marginBottom:'1.5rem'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
                         {(enablePlayButton)?<img src='static/imgs/Start.svg' title="Move to next debugger point" onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
