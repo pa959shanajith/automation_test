@@ -2024,14 +2024,31 @@ const confirmScreenChange = () => {
 })();
 };
 
-const screenOption = screenData?.map((folder) => ({
+const screenOption = screenData?.map((folder) => {
+  let tooltip;
+  if (!folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0) {
+    tooltip = "This option is disabled because of missing data";
+} else {
+    // Tooltip content for enabled options
+    tooltip = folder.name; // Set tooltip text to the full folder name
+}
+ return {
   label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
   parent:folder.parent,
-  title:folder.name
-}));
+  title:folder.name,
+  tooltip,
+  disabled: !folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0
+ }
+});
+
+const optionTemplate = (option) => {
+  return (
+    <div title={option.tooltip}>{option.title}</div>
+  );
+};
 
   return (
     <>
@@ -2046,146 +2063,146 @@ const screenOption = screenData?.map((folder) => ({
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
-          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          // typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
           
-            <div className="capture_card_modal">
-              {/* Select From Repository */}
-              <div className="capture_card">
-                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select Repository</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
-                    <div title={option.label}>{option.label}</div>
-                  )}/></div>
-                </div>}
-              </div>
-              {/* In Sprint Automation */}
-              <div className="capture_card">
-                <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
-                {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
-                {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">In Sprint Automation</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
-                    <div className='capture_bottom_btn_img_wrapper'>
-                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
-                    </div>
-                    <p className="capture_bottom_heading">Add Element</p>
-                  </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
-                    <div className="capture_bottom_btn_img_wrapper">
-                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
-                    </div>
-                    <p className="capture_bottom_heading">Map Element</p>
-                  </div>
-                </div>}
-              </div>
-              {/* Upgrade Analyzer */}
-              <div className="capture_card">
-                <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
-                {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
-                {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Upgrade Analyzer</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
-                    <div className='capture_bottom_btn_img_wrapper'>
-                      <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
-                    </div>
-                    <p className="capture_bottom_heading">Compare Element</p>
-                  </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
-                    <div className="capture_bottom_btn_img_wrapper">
-                      <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
-                    </div>
-                    <p className="capture_bottom_heading">Replace Element</p>
-                  </div>
-                </div>}
-              </div>
-              {/* Capture From Pdf */}
-              <div className="capture_card disabled">
-                <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
-                {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Capture from PDF</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn">
-                    <div className='capture_bottom_btn_img_wrapper'>
-                      <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
-                    </div>
-                    <p className="capture_bottom_heading">PDF <br/>Utility</p>
-                  </div>
-                </div>}
-              </div>
-              {/* Create Manually */}
-              <div className="capture_card">
-                <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Create Manually</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
-                    <div className='capture_bottom_btn_img_wrapper'>
-                      <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
-                    </div>
-                    <p className="capture_bottom_heading">Create <br/> Element</p>
-                  </div>
-                </div>}
-              </div>
-              {/* Import Export Screen */}
-              <div className="capture_card import_export">
-                <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
-                {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
-                {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
-                <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">File Handling</h4>
-                  <div className='capture_card_info_wrapper'>
-                    <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
-                  </div>
-                </div>
-                {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
-                    <div className='capture_bottom_btn_img_wrapper'>
-                      <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
-                    </div>
-                    <p className="capture_bottom_heading">Import Screen</p>
-                  </div>
-                  <div className="capture_bottom_btn" onClick={handleExportClick}>
-                    <div className="capture_bottom_btn_img_wrapper">
-                      <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
-                    </div>
-                    <p className="capture_bottom_heading">Export Screen</p>
-                  </div>
-                </div>}
-                <div onClick={togglePanel} className="expandCollapseIconWrapper">
-                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
-                </div>
-              </div>
-            </div>
+          //   <div className="capture_card_modal">
+          //     {/* Select From Repository */}
+          //     <div className="capture_card">
+          //       <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">Select Repository</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+          //           <div title={option.label}>{option.label}</div>
+          //         )}/></div>
+          //       </div>}
+          //     </div>
+          //     {/* In Sprint Automation */}
+          //     <div className="capture_card">
+          //       <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+          //       {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
+          //       {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">In Sprint Automation</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+          //           <div className='capture_bottom_btn_img_wrapper'>
+          //             <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Add Element</p>
+          //         </div>
+          //         <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+          //           <div className="capture_bottom_btn_img_wrapper">
+          //             <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Map Element</p>
+          //         </div>
+          //       </div>}
+          //     </div>
+          //     {/* Upgrade Analyzer */}
+          //     <div className="capture_card">
+          //       <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
+          //       {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
+          //       {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">Upgrade Analyzer</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className="capture_bottom_btn" onClick={handleCompareClick}>
+          //           <div className='capture_bottom_btn_img_wrapper'>
+          //             <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Compare Element</p>
+          //         </div>
+          //         <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+          //           <div className="capture_bottom_btn_img_wrapper">
+          //             <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Replace Element</p>
+          //         </div>
+          //       </div>}
+          //     </div>
+          //     {/* Capture From Pdf */}
+          //     <div className="capture_card disabled">
+          //       <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
+          //       {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">Capture from PDF</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className="capture_bottom_btn">
+          //           <div className='capture_bottom_btn_img_wrapper'>
+          //             <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">PDF <br/>Utility</p>
+          //         </div>
+          //       </div>}
+          //     </div>
+          //     {/* Create Manually */}
+          //     <div className="capture_card">
+          //       <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">Create Manually</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+          //           <div className='capture_bottom_btn_img_wrapper'>
+          //             <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Create <br/> Element</p>
+          //         </div>
+          //       </div>}
+          //     </div>
+          //     {/* Import Export Screen */}
+          //     <div className="capture_card import_export">
+          //       <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
+          //       {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
+          //       {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
+          //       <div className="capture_card_top_section">
+          //         <h4 className="capture_card_header">File Handling</h4>
+          //         <div className='capture_card_info_wrapper'>
+          //           <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+          //         </div>
+          //       </div>
+          //       {showPanel && <div className="capture_card_bottom_section">
+          //         <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+          //           <div className='capture_bottom_btn_img_wrapper'>
+          //             <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Import Screen</p>
+          //         </div>
+          //         <div className="capture_bottom_btn" onClick={handleExportClick}>
+          //           <div className="capture_bottom_btn_img_wrapper">
+          //             <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
+          //           </div>
+          //           <p className="capture_bottom_heading">Export Screen</p>
+          //         </div>
+          //       </div>}
+          //       <div onClick={togglePanel} className="expandCollapseIconWrapper">
+          //         <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+          //         <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+          //       </div>
+          //     </div>
+          //   </div>
           
-            : null
+          //   : null
         }
         <div className='card'>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
@@ -2259,7 +2276,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedRepositoryInCapture?selectedRepositoryInCapture:selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" tooltipOptions="title" optionLabel='title'/></div>
+                  <div className="dropdown_container"><Dropdown value={selectedRepositoryInCapture?selectedRepositoryInCapture:selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" tooltipOptions="title" optionLabel='title' itemTemplate={optionTemplate}/></div>
                 </div>}
               </div>
               {/* In Sprint Automation */}

@@ -21,6 +21,8 @@ import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'primereact/tooltip';
+import { Card } from 'primereact/card';
+import { OverlayPanel } from 'primereact/overlaypanel';
 
 const ElementRepository = (props) => {
   const history = useNavigate();
@@ -69,6 +71,14 @@ const ElementRepository = (props) => {
   const [pastedData, setPastedData] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [searchText, setSearchText] =  useState("");
+  // const [showTestCases, setShowTestCases] = useState(false);
+  const op = useRef(null);
+
+  const testcasename=[
+    {label:"testcase 1"},
+    {label:"testcase 2"},
+    {label:"testcase 3"}
+  ]
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -226,6 +236,17 @@ const ElementRepository = (props) => {
               item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
             ))}
           </div>
+          <div>
+            <img src='static/imgs/elements_used_in tescases_icon.svg' className='element_used_testcase' onMouseEnter={(e) => op.current.toggle(e)} onMouseLeave={()=> op.current.hide()}/>
+          </div>
+            <OverlayPanel ref={op} className='overlay_panel'>
+              <div className='flex flex-column'>
+                <span className='testcase__name'>TestCase Name</span>
+                {testcasename.map((testcase)=>{
+                  return <span className='flex flex-column testcase_name_list'>{testcase.label}</span>
+                })}
+              </div>
+            </OverlayPanel>
       </div>
       </>
     );
@@ -929,13 +950,17 @@ const handleSearchChange=(event) => {
     const filterScreenName = filteredData.filter((item) =>
       item.name.toLowerCase().includes(inputValue)
     );
-    setScreenData(filterScreenName);
+    setScreenData(filterScreenName  || [{}]);
   } 
   else {
     setScreenData(filteredData);
   }
 }
 
+
+// const toggleOverlay = () => {
+//   setShowTestCases(!showTestCases);
+// };
 
 
   
