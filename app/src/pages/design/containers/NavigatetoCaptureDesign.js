@@ -51,7 +51,7 @@ function NavigatetoCaptureDesign(params) {
     // }
     return(
         <div className="captureDesign_dialog_div">
-            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position={advanceDebug?'left':'right'} style={{ width: '73vw', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true));dispatch(SetAdvanceDebug(false))}else{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(SetAdvanceDebug(false))}}}>
+            <Dialog className='captureDesign_dialog_box' header={headerTemplate} visible={params.visibleCaptureAndDesign} position={advanceDebug?'left':'right'} style={{ width: '73vw', color: 'grey', height: '95%', margin: '0px' }} onHide={()=>{if(Object.keys(moduleData).length>0){params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(setUpdateScreenModuleId(moduleData));dispatch(dontShowFirstModule(true));dispatch(SetAdvanceDebug(false));dispatch(SetDebuggerPoints({push:'reset',points:[]}))}else{params.setVisibleCaptureAndDesign(false);params.setDesignClick(false);dispatch(SetAdvanceDebug(false));dispatch(SetDebuggerPoints({push:'reset',points:[]}))}}}>
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
