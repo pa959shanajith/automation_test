@@ -385,6 +385,7 @@ const ModuleListDrop = (props) =>{
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
         dispatch(selectedModuleReducer(res))
+        dispatch(SetCurrentModuleId(modID))
         setBlockui({show:false})
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');

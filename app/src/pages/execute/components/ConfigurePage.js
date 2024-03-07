@@ -46,8 +46,9 @@ import {
   testSuitesSchedulerRecurring_ICE,
   updateTestSuite,
   setScheduleStatus,
-  clearErrorMSg
-
+  clearErrorMSg,
+  testrailPlanRunIds,
+  setEditConfig
 } from "../configureSetupSlice";
 import { getPoolsexe } from "../configurePageSlice";
 import { getICE } from "../configurePageSlice";
@@ -110,6 +111,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     qtest: { url: "", username: "", password: "", qteststeps: "" },
     zephyr: { url: "", username: "", password: "" },
     azure: { url: "", username: "", password: "" },
+    testrail: { url: "", username: "", apiKey: "", runId: "", planId: "", runAndPlanDetails: {} },
   });
   const [proceedExecution, setProceedExecution] = useState(false);
   const [smartMode, setSmartMode] = useState("normal");
@@ -1260,11 +1262,19 @@ const handleSubmit1 = async (SauceLabPayload) => {
   const tableUpdate = async (getPageNo = 1, getSearch = "") => {
     const getState = [];
     setLoader(true);
+
+    if(configProjectId) {
     const configurationList = await fetchConfigureList({
       projectid: configProjectId,
       page: getPageNo,
       searchKey: getSearch
     });
+
+    const configDataLength = configurationList["data"].length;
+    if(configDataLength > 0){
+      dispatch(testrailPlanRunIds(configurationList["data"][configDataLength - 1]?.executionRequest?.integration?.testrail?.runAndPlanDetails) || {});
+    }
+
     setLoader(false);
     setFetechConfig(configurationList?.data);
     setConfigPages(configurationList?.pagination?.totalcount);
@@ -1390,6 +1400,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       });
     });
     setConfigList(getState);
+  }
   };
 
   useEffect(() => {
@@ -1448,7 +1459,9 @@ const showToast = (severity, detail) => {
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
+        testrail: { url: "", username: "", apiKey: "", runId: "", planId: "", runAndPlanDetails: {} },
       });
+      dispatch(setEditConfig(true));
       setConfigTxt(getData.configurename);
       setModules(getData.executionRequest.selectedModuleType);
       setTypeOfExecution(getData.executionRequest.selectedModuleType)
@@ -1466,7 +1479,10 @@ const showToast = (severity, detail) => {
         qtest: {url:"",username:"",password:"",qteststeps:""}, 
         zephyr: {url:"",username:"",password:""},
         azure: { url: "", username: "", password: "" },
+        testrail: { url: "", username: "", apiKey: "", runId: "", planId: "", runAndPlanDetails: {} },
       });
+      dispatch(testrailPlanRunIds({ plan: "", run: "" }));
+      dispatch(setEditConfig(false));
       setConfigTxt("");
       setModules("normalExecution");
       setSelectedNodeKeys({});
