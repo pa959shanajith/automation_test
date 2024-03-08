@@ -73,6 +73,8 @@ const ElementRepository = (props) => {
   const [searchText, setSearchText] =  useState("");
   // const [showTestCases, setShowTestCases] = useState(false);
   const op = useRef(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [repositoryName, setRepositoryName] = useState("");
 
   const testcasename=[
     {label:"testcase 1"},
@@ -256,7 +258,7 @@ const ElementRepository = (props) => {
 
   const handleAddAccordion = () => {
     const newScreen = {
-      name: `Repository_${screenData.length + 1}`,
+      name: repositoryName,
       related_dataobjects: [] // Add your initial data structure here
     };
     setNewScreenCount(newScreenCount + 1);
@@ -275,9 +277,11 @@ const ElementRepository = (props) => {
       if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
       else if(response === "invalid session") return RedirectPage(history);
       else {
-        setScreenData([...screenData, newScreen]);
+        const addingScreen = [newScreen,...screenData];
+        setScreenData(addingScreen);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
+        setRepositoryName("")
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
       }
 
@@ -950,17 +954,30 @@ const handleSearchChange=(event) => {
     const filterScreenName = filteredData.filter((item) =>
       item.name.toLowerCase().includes(inputValue)
     );
-    setScreenData(filterScreenName  || [{}]);
+    if (filterScreenName.length > 0) {
+      setScreenData(filterScreenName);
+    } else {
+      setScreenData([]);
+    }
   } 
   else {
     setScreenData(filteredData);
   }
 }
 
+const footer =()=>(
+  <Button label='Save' className='repository__save__btn' onClick={()=>{setShowDialog(false);handleAddAccordion()}} disabled={!repositoryName}/>
+)
 
-// const toggleOverlay = () => {
-//   setShowTestCases(!showTestCases);
-// };
+const handleRepositoryName =(e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
+  setRepositoryName(e.target.value)
+}
+
 
 
   
@@ -976,7 +993,7 @@ const handleSearchChange=(event) => {
       (<div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">No Element Repository yet</p>
-        <Button label='Create Repository' onClick={handleAddAccordion} />
+        <Button label='Create Repository' onClick={()=>setShowDialog(true)} />
         </div>)
       :<>
       <div className='search__button'>
@@ -987,12 +1004,15 @@ const handleSearchChange=(event) => {
                       event.target &&
                       handleSearchChange(event.target.value)} />
           </span>
-          <Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
+          <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>
           <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
+          <Dialog className='RepositoryDailog' header="Add repository" visible={showDialog} onHide={()=>{setRepositoryName("");setShowDialog(false)}} footer={footer}>
+            <InputText value={repositoryName} className='repository__input' onChange={handleRepositoryName} placeholder='Enter repository name'/>
+          </Dialog>
        </div>
       </>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
-        {screenData?.map((screenDetails,index) => (
+        {screenData?.slice().reverse().map((screenDetails,index) => (
           <AccordionTab key={index} header={
             <div className='scenario-accordion'>
               <span
