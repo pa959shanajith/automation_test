@@ -106,7 +106,7 @@ steps:
    echo "-------------------"
    ls
    mkdir webserver
-   cp -r assets .env logger.js logs nginx.conf node nodejs node_modules package.json package-lock.json public server server.js templates wkhtmltox artifact_name.txt webserver
+   cp -r assets .env logger.js logs nginx.conf node nodejs node_modules package.json package-lock.json public server server.js templates wkhtmltox version.txt artifact_name.txt webserver
    echo "files in webserver folder"
    ls webserver
    echo "inside wkhtmltox folder"
