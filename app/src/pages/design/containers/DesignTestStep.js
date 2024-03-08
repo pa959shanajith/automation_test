@@ -23,7 +23,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton, setCurrentDebugPlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -110,6 +110,7 @@ const DesignModal = (props) => {
     const [isNameValid, setIsNameValid] = useState(false);
     const [isSpaceError, setIsSpaceError] = useState(false);
     const [customEdit , setCustomEdit] =useState(false);
+    const[advDebugDisable,setAdvDebugDisable]=useState(false)
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
 
@@ -670,11 +671,25 @@ const DesignModal = (props) => {
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,actionForAdvanceDebug)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,"")
             .then(data => {
                 if(advanceDebug && debuggerPoints){
+                    setAdvDebugDisable(true)
+                    if(watchlist.length){
+                        setWatchList([])
+                    }
+                    setOverlay("");
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
-                setOverlay("");
+                if (data === "Invalid Session") return ;
+                else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+                else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+                else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+                else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+                else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+                else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+                else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+                else{
+               dispatch(setCurrentDebugPlayButton(data.length+1))
                 dispatch(SetEnablePlayButton(true))
                 console.log(data)
                 let dataforstep=data.map(steps=>{
@@ -688,6 +703,7 @@ const DesignModal = (props) => {
                 setWatchList((watchlist)=>{
                 return [...watchlist,...dataforstep]
                 })
+            }
                 return
                 }
                 setOverlay("");
@@ -1428,7 +1444,7 @@ const DesignModal = (props) => {
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
-                    <span className="step_col d__step_head" >Break Point</span>
+                    <span className="step_col d__step_head" >{advanceDebug?'Break Point':''}</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
                     <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
@@ -1494,11 +1510,34 @@ const DesignModal = (props) => {
         dispatch(SetEnablePlayButton(false))
         debuggerPointShift.shift()
         let newDebuggerPoints=debuggerPointShift
-        dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"play")
+        // dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
         .then(data => {
-            if(data){
+            
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+        else{
                 dispatch(SetEnablePlayButton(true))
+                // let watchlistinindexformat=watchlist.map(step=>{
+                //     return {...step,index:step.teststep}
+                // })
+                // let applplaybuttononstep=[...watchlistinindexformat,...data]
+                // let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                //     var existObj = acc.find(item => item.index === obj.index);
+                //     if(existObj){
+                //           return acc;
+                //         }
+                //         acc.push(obj);
+                //         return acc;
+                //       },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index +1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1511,8 +1550,8 @@ const DesignModal = (props) => {
                 return [...watchlist,...dataforstep]
                 })
             }
-            console.log(data)
         }
+        
         )
     }
     const handleMoveToNext=()=>{
@@ -1521,10 +1560,34 @@ const DesignModal = (props) => {
         let debuggerPointShift=[...debuggerPoints]
         debuggerPointShift.shift()
         let newDebuggerPoints=[nextVal,...debuggerPointShift]
-        dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
+        // dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
 
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"nextStep")
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
         .then(data => {
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+            
+            else{
+                let watchlistinindexformat=watchlist.map(step=>{
+                    return {...step,index:step.teststep}
+                })
+                let applplaybuttononstep=[...watchlistinindexformat,...data]
+                let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                    var existObj = acc.find(item => item.index === obj.index);
+                    if(existObj){
+                          return acc;
+                        }
+                        acc.push(obj);
+                        return acc;
+                      },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index + 1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
@@ -1536,8 +1599,9 @@ const DesignModal = (props) => {
             setWatchList((watchlist)=>{
             return [...watchlist,...dataforstep]
             })
-            console.log(data)
+           
         }
+    }
         )
         }
     const handleRemoveDebuggerPoints=()=>{
@@ -1814,17 +1878,17 @@ const DesignModal = (props) => {
 
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false))}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetDebuggerPoints({push:'reset',points:[]}));dispatch(SetAdvanceDebug(false));setIngredients([]);dispatch(setCurrentDebugPlayButton(null));dispatch(SetEnablePlayButton(false));setAdvDebugDisable(false)}}>
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
-                    <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <div style={{display:'flex',justifyContent:'space-between', marginBottom:'1.5rem'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
-                        {(enablePlayButton)?<img src='static/imgs/Start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' title="Move to next debugger point" onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
-                        <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        <img src='static/imgs/StepInto.svg' title ="Move to next step" onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
                         <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
                                             </div>
-                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
+                    <div><Button label="DEBUG" title ={advDebugDisable?"Already in progress":"Start debugging" } disabled={advDebugDisable} style={advDebugDisable?{height:'30px',cursor:'not-allowed'}:{height:'30px',cursor:'pointer'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan);setAdvDebugDisable(true)}}/></div>
 
                     </div>
                     <div className="card">
