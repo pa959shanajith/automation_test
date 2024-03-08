@@ -275,6 +275,7 @@ if (cluster.isMaster) {
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);
+		app.post('/downloadVideo', report.downloadVideo);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);

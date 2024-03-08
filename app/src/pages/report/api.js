@@ -797,3 +797,30 @@ export const getPublicFunctionalReportsDevOps = async(projId, relName, cycId) =>
         return {error:MSG.REPORT.ERR_FETCH_REPORT}
     }
 }
+
+export const getExecutionVideo = async(videoPath) => {
+    try{
+        const res = await axios(url+'/downloadVideo', {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            responseType: 'arraybuffer',
+            data: { videoPath: videoPath  },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return { error: MSG.GENERIC.INVALID_SESSION };
+        }
+        if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return { error: MSG.REPORT.ERR_FETCH_VIDEO }
+    }
+    catch(err){
+        console.error(err)
+        return { error: MSG.REPORT.ERR_FETCH_VIDEO }
+    }
+}

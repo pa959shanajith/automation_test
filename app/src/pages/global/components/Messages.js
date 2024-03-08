@@ -209,8 +209,10 @@ const Messages={
         ERR_FETCH_REPORT: {"CONTENT":"Failed to fetch report data.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_SUITE_DETAILS: {"CONTENT":"Failed to fetch suite details.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_REPORT_STATUS: {"CONTENT":"Failed to fetch report status.", "VARIANT": VARIANT.ERROR},
+        ERR_FETCH_VIDEO: { "CONTENT": "Error while exporting report Video", "VARIANT": VARIANT.ERROR },
         ERR_FETCH_REPORT_DETAILS: {"CONTENT":"Failed to fetch report details.", "VARIANT": VARIANT.ERROR},
         ERR_NO_ACC_SCREEN: {"CONTENT":"No accessibility screen is created yet.", "VARIANT": VARIANT.ERROR},
+        SUCC_EXPORT_REPORT: { "CONTENT": "Exported Report Video Successfully.", "VARIANT": VARIANT.SUCCESS },
     },
     PROFJ:{
         ERR_FETCH_RESULTS: {"CONTENT":"Failed to Fetch Results.", "VARIANT": VARIANT.ERROR},
