@@ -28,6 +28,17 @@
     flex-direction: column;
     width: 100%;
   }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 1px;
+    width: calc(100% - 0.1rem); 
+    background-color: #ccc; 
+}
+
 
   #Last_modifie {
     overflow: hidden;
@@ -35,18 +46,21 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     display: inline-block;
+    margin-left: -1.2rem;
   }
 
   .project-card {
     background: #fff;
     border: none;
-    border-radius: 0.5rem;
+    // border-radius: 0.5rem;
     cursor: pointer;
     display: flex;
     padding: 0.5rem;
     width: 100%;
     flex-wrap: wrap;
     overflow-x: hidden;
+    border-bottom: 1px solid #ccc;
+    padding: 0.5rem 0.5rem;
   }
 
   .default-project {
@@ -54,8 +68,8 @@
   }
 
   #projectInside {
-    font: $f6_regular;
-    color: rgba(3, 2, 41, .6);
+    font: $f6_semibold;
+    color: black;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -85,8 +99,9 @@
 
   .Search_name {
     width: 100% !important;
-    background: #FAFAFB !important;
-    border: none !important;
+    // background: #FAFAFB !important;
+    // border: none !important;
+    border:1px solid #ccc;
     font: $f6_regular;
   }
 
@@ -96,7 +111,7 @@
 
   .project {
     overflow-y: auto;
-    height: 70vh;
+    height: 73vh;
     overflow-x: hidden;
   }
 
@@ -111,8 +126,8 @@
     .sort-Menu {
       position: absolute;
       z-index: 1;
-      top: 6.1rem;
-      right: 70rem;
+      top: 5rem;
+      right: 75%;
       .p-menuitem-link:hover {
         background: rgba(96, 91, 255, 0.2) !important;
         border-radius: 3px !important;
@@ -135,11 +150,19 @@
         font: $f6_regular !important;
       }
     }
+    @media screen and (max-width: 768px) {
+      .sort-Menu {
+        right: 10%; 
+      }
+    }
 
     .All_Project_font {
-      color: rgba(3, 2, 41, 0.6);
-      width: 100%;
-      font: $f6_regular;
+      // color: rgba(3, 2, 41, 0.6);
+      color:black;
+      // width: 100%;
+      font: $f6_bold;
+      margin-right: 20px;
+      margin-left: 5px;
     }
 
     .sort_btn {
@@ -147,22 +170,24 @@
       background: transparent;
       cursor: pointer;
       color: #6c757d;
-      margin-right: 2rem;
+      margin-right: 5px;
     }
 
     .add_btn {
       border: none;
       background: transparent;
       cursor: pointer;
-      color: #6c757d;
+      color: rgb(25, 118, 210);
+      // margin-left:-7rem
     }
-
+   
     .CreateDisable_Title{
       cursor: not-allowed !important;
     }
 
     .All_Project {
-      padding: 0.5rem 1.5rem;
+      padding: 0.5rem 1.25rem;
+      border-bottom: 1px solid #ccc;
     }
 
     .add_sort_btn {
@@ -184,6 +209,14 @@
     .text__tooltip__info1 {
       padding: 0.2rem 0;
       line-height: 2.3; 
+    }
+    .folder_icon{
+      margin-left: -0.2rem;
+    }
+    .Project_header.collapsed {
+      height: 50px; /* Adjust the collapsed height as needed */
+      overflow: hidden;
+      transition: height 0.3s ease; /* Add smooth transition effect */
     }
   }
 }
