@@ -290,6 +290,12 @@ if (cluster.isMaster) {
 		app.post('/save_testcase',generateAI.save_GenTestcases);
 		app.post('/fetch_git_exp_details',auth.protect, mindmap.fetch_git_exp_details);
 		app.post('/saveTag', mindmap.saveTag);
+		// app.post("/validateAI_token",generateAI.validateToken);
+		app.post("/genAI/create",generateAI.createModel);
+		// app.get("/genAI/read",generateAI.readModel);
+		// app.put("/genAI/edit/:id",generateAI.editModel);
+		// app.delete("/genAI/delete/:id",generateAI.deleteModel);
+		// app.post("/genAI/createTemp",generateAI.createTemp);
 
 		app.use(csrf({
 		cookie: true
