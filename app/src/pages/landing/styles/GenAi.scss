@@ -1,0 +1,58 @@
+@import "../../global/styles/ColorVariables.scss";
+.genai_container{
+    width:100%;
+}
+.genai_left_container{
+    width:30%;
+    overflow-y: auto;
+    height: 95vh;
+    overflow-x: hidden;
+}
+.genai_right_container{
+    width: 70%;
+}
+.context_container{
+    border-color: #DEE2E6;
+}
+.context_heading{
+    font : $f5_semibold;
+}
+.context_doc{
+    font : $f6_semibold
+}
+.doc_fileupload > span{
+    background-color: white;
+    color: #605BFF;
+    border: 1px solid #605BFF;
+}
+.doc_container{
+    border: 1px solid #DEE2E6;
+}
+.doc_top{
+    background-color: #DEE2E6;
+}
+.doc_btm_para{
+    font: $f6_regular;
+    color: #DEE2E6;
+}
+.left_table_header{
+    font: $f6_semibold;
+}
+.left_table_view{
+    color: #605BFF;
+    font: $f7_semibold;
+}
+.leftandor{
+    color: #9E9E9E;
+    font: $f7_regular;
+}
+.left_btm_container{
+    border-bottom: 1px solid #DEE2E6;
+}
+.left_btm_header{
+    font: $f6_semibold;
+}
+.left_btm_placeholder{
+    color: #6C757D;
+    font: $f7_regular;
+}

@@ -89,4 +89,39 @@
             
         }
     }
+
+    .Gen_Ai{
+        display: flex;
+        // height: 16vh;
+        justify-content: center;
+        margin-bottom: 1rem;
+        margin-left: 0.7rem;
+        top: 1rem;
+        width: 98%;
+        // height: 16vh;
+        .p-card-body{
+            padding: 0.5rem !important;
+            width: 100%;
+            overflow: auto;
+            .p-card-title{
+                font-size: 1.2rem !important;
+                position: relative !important;
+                margin-bottom: 0rem !important;
+                text-align: center !important;
+                font: $f4_bold !important;
+             }
+            .p-card-content {
+                padding: 0.5rem;
+                justify-content: center;
+                display: flex;
+                .CreateProj_btn{
+                    font:$f7_semibold;
+                }
+            }
+        }
+        .CreateDisable_Title{
+            cursor: not-allowed !important;
+        }
+        
+    } 
     

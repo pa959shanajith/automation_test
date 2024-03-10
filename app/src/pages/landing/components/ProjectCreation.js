@@ -41,6 +41,10 @@ const ProjectCreation = (props) => {
     "Custom Keyword 3",
   ];
 
+  const CreateGenAi = () =>{
+    navigate("/GenAI");
+  }
+
   const keywordListElements = dummyData.map((item, index) => (
     <>
       <Card
@@ -209,6 +213,10 @@ const ProjectCreation = (props) => {
             <Button className="CreateProj_btn m-3" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
 }
+        <Card className='Gen_Ai' title="Create TestCase using AI">
+          <div><Button size='small' className='Genai_button' onClick={CreateGenAi}>Create</Button></div>
+        </Card>
+
       </div>
     </>
 

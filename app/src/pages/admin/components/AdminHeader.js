@@ -29,6 +29,8 @@ const AdminHeader = (props) => {
         return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
       case 'grid_configuration':
         return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
+        case 'LLM':
+        return <img src="static/imgs/agent_icon.svg" alt="SVG Image" className='current_img_icon' />;
       case 'session_management':
         return <img src="static/imgs/users_icon.svg" alt="SVG Image" className='current_img_icon' />;
       case 'privileges':
