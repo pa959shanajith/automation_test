@@ -1599,15 +1599,14 @@ export const fetch_git_exp_details = async(projectId) => {
     }
 }
 
-export const createModel = async(props) => { 
+export const createModel = async(payload) => { 
     try{
-        const res = await axios(url+'/createModel', {
+        const res = await axios(url+'/genAI/create', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {
-				data: props},
+            data: payload ,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){

@@ -149,7 +149,7 @@ async function validateOpenAIToken(token) {
 exports.createModel = async (req, res) => {
     logger.info("Inside Generate AI service: createModel");
     try {
-         if (!req.body.modeltype) {
+         if (!(req.body.modeltype)) {
             return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
         }
         const inputData = validatePayload(req.body);

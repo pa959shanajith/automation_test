@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Messages as MSG, VARIANT, setMsg } from '../../global';
-import '../styles/Grid.scss';
+import '../styles/LlmModal.scss';
 import { deleteAvoGrid, fetchAvoAgentAndAvoGridList } from '../api';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -28,14 +28,20 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const [filteredList, setFilteredList] = useState(gridList);
     const [tableData, setTableData] = useState([]);
     // const [showDataTable, setShowDataTable] = useState(false)
-    const [input1, setInput1] = useState('');
+    const [modalName, setModalName] = useState('');
+    const [modalType, setModalType] = useState({});
+    const [modalToken, setModalToken] = useState('');
+    const [openAiExtras, setOpenAiExtras] = useState({
+        name: "",
+        api_type: "",
+        api_version: "",
+        api_base: "",
+    });
     const [input2, setInput2] = useState('');
     const [selectedDropdownValue, setSelectedDropdownValue] = useState(null);
     const [dataTableValues, setDataTableValues] = useState([]);
     const [deleteRow, setDeleteRow] = useState(false);
     // const [llmModel, setLlmModel] = useState(false);
-    const [inputName, setInputName] = useState('');
-    const [inputToken, setInputToken] = useState('');
     const [inputDeploymentName, setInputDeploymentName] = useState('');
     const [inputApiType, setInputApiType] = useState('');
     const [inputApiVersion, setInputApiVersion] = useState('');
@@ -250,11 +256,13 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const saveModel = async () => {
         try {
           setLoading('Saving...');
-          const payload = {
-            name: inputName,
-            token: inputToken,
-            // ... other fields based on the selectedDropdownValue
-          };
+          let payload = {};
+          payload["name"]=modalName;
+          payload["modeltype"]=modalType;
+          payload["api_key"]=modalToken;
+          if(modalType=="openAi"){
+            payload = {...payload, ...openAiExtras}
+          }
       
           const response = await createModel(payload);
       
@@ -294,7 +302,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     }
 
     const dropdownOptions = [
-        { label: 'Azure', value: 'Azure' },
+        { label: 'OpenAi', value: 'openAi' },
         { label: 'Cohere', value: 'Cohere' },
         { label: 'Anthropic', value: 'Anthropic' },
         // Add more options as needed
@@ -307,12 +315,6 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         </div>)
         
     }
-
- 
-      
-
-
-
     return (
         <>
             {!tableData.length && <NoDataFound />}
@@ -327,131 +329,46 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
             </div>
             }
             {
-                llmModel && <Dialog visible={llmModel} onHide={() => setLlmModel(false)} header='Add LLM Modal' footer={footerContent} style={{ width: '60vh' }} >
+                llmModel && <Dialog className='llm_modal_container' visible={llmModel} onHide={() => setLlmModel(false)} header='Add LLM Modal' footer={footerContent} style={{ width: '60vh' }} >
 
-                <div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">Name <span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput1(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Name'
-                        />
-                    </div>
-                </div>
-
-                <div className="flex flex-row items-center">
                     <div className="flex flex-column">
-                        <label data-test="primaryRoleLabel" className='pb-2 font-medium' style={{ paddingLeft: '0.7rem' }}>Model<span style={{ color: "#d50000" }}>*</span></label>
-                        <Dropdown
-                            onChange={(e) => setInputName(e.target.value)}
-                            value={inputName}
-                            placeholder="Select an option"
-                        />
+                        <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">Name <span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
+                            <InputText placeholder='Enter Modal Name' onChange={(e) => setModalName(e.target.value)} />
+
+                        </div>
+                        <div className="flex flex-column pb-2">
+                            <label className='pb-2 font-medium'>Model<span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
+                            <Dropdown
+                                options={dropdownOptions}
+                                onChange={(e) => setModalType(e.value)}
+                                value={modalType}
+                                placeholder="Select an option"
+                            />
+                        </div>
+                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">Deployment Name <span style={{ color: "#d50000" }}>*</span></label>
+                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } })} placeholder='Enter Deployment Name' />
+                        </div>}
+                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">API Type <span style={{ color: "#d50000" }}>*</span></label>
+                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_type: e.target.value } })} placeholder='Enter Api Type' />
+                        </div>}
+                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">API Version <span style={{ color: "#d50000" }}>*</span></label>
+                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_version: e.target.value } })} placeholder='Enter Api Version'
+                            />
+                        </div>}
+                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">Base URL <span style={{ color: "#d50000" }}>*</span></label>
+                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_base: e.target.value } })} placeholder='Enter Base URL'
+                            />
+                        </div>}
+                        <div className="flex flex-column pb-2">
+                            <label className="pb-2 font-medium">Token<span style={{ color: "#d50000" }}>*</span></label>
+                            <InputText onChange={(e) => setModalToken(e.target.value)} placeholder='Enter Token' />
+                        </div>
                     </div>
-                </div>
-                <div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">Token<span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput2(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Token'
-                        />
-                    </div>
-                </div>
-
-                {selectedDropdownValue== 'Azure'&&<div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">Deployment Name <span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput1(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Name'
-                        />
-                    </div>
-                </div>}
-                
-                {selectedDropdownValue== 'Azure'&&<div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">API Type <span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput1(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Name'
-                        />
-                    </div>
-                </div>}
-
-                {selectedDropdownValue== 'Azure'&& <div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">API Version <span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput1(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Name'
-                        />
-                    </div>
-                </div>}
-
-                {selectedDropdownValue== 'Azure'&&<div className="flex flex-column">
-                    <label htmlFor="username" className="pb-2 font-medium">Base URL <span style={{ color: "#d50000" }}>*</span></label>
-                    <div className="p-input-icon-right">
-
-                        <InputText
-                            data-test="password"
-                            // value={passWord}
-                            // className={`w-full md:w-20rem p-inputtext-sm ${passwordAddClass ? 'inputErrorBorder' : ''}`}
-                            onChange={(e) => setInput1(e.target.value)}
-                            // type={showNewPassword ? "text" : "password"}
-                            autoComplete="new-password"
-                            name="passWord"
-                            id="password"
-                            maxLength="16"
-                            placeholder='Enter Name'
-                        />
-                    </div>
-                </div>}
 
                     {/* <AvoConfirmDialog 
                         visible={deleteRow}
@@ -462,7 +379,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                         accept={() =>setDeleteRow(false) } 
                         /> */}
 
-            </Dialog>
+                </Dialog>
             }
         </>
 
