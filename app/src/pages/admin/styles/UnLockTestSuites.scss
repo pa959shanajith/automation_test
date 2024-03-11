@@ -1,7 +1,11 @@
-searchInputUnlock{
-    width: 20vw;
+.searchInputUnlock{
+    .p-inputtext{
+        width: 20vw !important;
+    }
 }
 .dataTableUnlock{
-    width: 70vw;
-    padding-left: 1%;
+    .p-datatable {
+        width: 70vw !important;
+        padding-left: 1% !important;
+    }
 }
