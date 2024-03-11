@@ -748,6 +748,32 @@ const CanvasNew = (props) => {
         }
         // setCreateNew('autosave')
     }
+
+    const checkTestStepGroup = (teststep, dNode, sids, types, ids) => {
+      let check = [];
+  
+      const checkRecursively = (children) => {
+          children.forEach((child) => {
+              if (child['reuse']) {
+                  check.push(child['reuse']);
+              } else if (child.children && child.children.length > 0) {
+                  checkRecursively(child.children);
+              }
+          });
+      };
+  
+      checkRecursively(teststep);
+  
+      if (check.includes(true)) {
+          reusedNode(dNode, sids, types);
+          setReuseDelContent("Selected Test Scenario has reused Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permanently?");
+          setSelectedDelNode(ids);
+          setReuseDelConfirm(true);
+      } else {
+          setSelectedDelNode(ids);
+          setDelConfirm(true);
+      }
+  };
     const clickDeleteNode=(id)=>{
       var sid = parseFloat(id.split('node_')[1]);
       var type =[...dNodes][sid]['type'];
@@ -781,18 +807,28 @@ const CanvasNew = (props) => {
               return;
           }
           else if([...dNodes][sid]['children']){
+            if([...dNodes][sid]['children'].length>0 && [...dNodes][sid]['children'][0].type !== 'teststepsgroups'){
               for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
-                  if ([...dNodes][sid]['children'][i]["reuse"]){
-                      reusedNode(dNodes,sid,type);
-                      setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
-                      setSelectedDelNode(id);
-                      setReuseDelConfirm(true);
-                      return;
-                  }
-                  else {
-                      continue;
-                  }
-          }} 
+                if ([...dNodes][sid]['children'][i]["reuse"]){
+                    reusedNode(dNodes,sid,type);
+                    setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
+                    setSelectedDelNode(id);
+                    setReuseDelConfirm(true);
+                    return;
+                }
+                else {
+                    continue;
+                }
+              }
+            }else if([...dNodes][sid]['children'].length>0){
+              checkTestStepGroup([...dNodes][sid]['children'], dNodes, sid, type, id)
+              return;
+            }else{
+              setSelectedDelNode(id);
+              setDelConfirm(true);
+              return;
+            }
+          } 
           setSelectedDelNode(id);
           setDelConfirm(true);
           return;
