@@ -132,6 +132,9 @@ const GridBrowser = ({
       onClick={() => { handleSubmit(defaultValues) }} />
     </>
 
+const disableOption = (option) => (option.status === "inactive");
+const filteredGrids = avogrids.map(option => ({ ...option, disabled: disableOption(option) }));
+
   return (
     <>
       {showIntegrationModal ?
@@ -154,7 +157,7 @@ const GridBrowser = ({
             <AvoDropdown
               dropdownValue={avodropdown?.avogrid ? avodropdown?.avogrid : { name: 'Any Agent', _id: '1111' }}
               onDropdownChange={onAvoSelectChange}
-              dropdownOptions={avogrids}
+              dropdownOptions={filteredGrids}
               name="avogrid"
               placeholder="Select Avo Grid"
               labelTxt="Avo Agent / Avo Grid"
