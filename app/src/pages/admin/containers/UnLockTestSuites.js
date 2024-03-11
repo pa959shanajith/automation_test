@@ -75,7 +75,7 @@ const UnlockTestSuites = () => {
             <div className="flex justify-content-end">
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={(e)=>onGlobalFilterChange(e)} className ="searchInputUnlock" placeholder="TestSuites/Assign Users Search" />
+                    <InputText value={globalFilterValue} onChange={(e)=>onGlobalFilterChange(e)} className ="searchInputUnlock" style={{width:'20vw'}} placeholder="TestSuites/Assign Users Search" />
                 </span>
             </div>
         );
@@ -84,7 +84,7 @@ const UnlockTestSuites = () => {
     return(
         <> 
             <Toast position="bottom-center" baseZIndex={9999} ref={toast}/>       
-            <DataTable value={testSuite} header={header} size='small' className="dataTableUnlock" showGridlines scrollable scrollHeight="400px" loading={loading}>
+            <DataTable value={testSuite} header={header} size='small' className="dataTableUnlock" style={{width:'70vw', paddingLeft:'1%'}} showGridlines scrollable scrollHeight="400px" loading={loading}>
             <Column field="name" header="Name"></Column>
             <Column field="currentlyinuse" header="Currentlyinuse"></Column>
             <Column field="UnLock Test Suites" header="UnLock Test Suites" body={showUnLockIcon}/>
