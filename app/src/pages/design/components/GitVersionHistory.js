@@ -216,7 +216,7 @@ const bodyTemplate = (rowData) => {
           title="restore"
           onClick={() => handleRestore(rowData)}
           className='restore_cls'
-          disabled={restorebtnDisable}
+          disabled={rowData.selectedProject.name ? false : true}
         />
       </div>
     </React.Fragment>)
