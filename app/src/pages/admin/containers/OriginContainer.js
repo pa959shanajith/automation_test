@@ -12,6 +12,7 @@ import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
 import Project from './ProjectAssign';
+import UnlockTestSuites from './UnLockTestSuites';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
@@ -34,6 +35,7 @@ const OriginContainer = (props) => {
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
             {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}
+            {currentTab === "TestSuites_details" && <UnlockTestSuites/>}
         </div>
     </>)
 }

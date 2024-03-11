@@ -598,6 +598,7 @@ if (cluster.isMaster) {
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
+		app.post('/unLock_TestSuites', auth.protect, admin.unlockTestSuites);
 
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);

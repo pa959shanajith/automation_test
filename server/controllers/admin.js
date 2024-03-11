@@ -3192,3 +3192,21 @@ exports.getDetails_BROWSERSTACK= async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.unlockTestSuites = async (req, res) => {
+	const actionName = "unLock_TestSuites";
+	logger.info("Inside UI service: " + actionName)
+	try {
+		const userId = req.session.userid;
+		let input = req.body.inputs
+		const resuiltData = await utils.fetchData(input, 'admin/unLock_TestSuites', actionName);
+		if (resuiltData === "fail") res.status(500).send("fail");
+		else if (resuiltData === "empty") res.send("empty");
+		else {
+			return res.status('200').send(resuiltData);
+		}
+	} catch (error) {
+		logger.error("Test Suites Details in the service unlockTestSuites: %s", error);
+		return res.status(500).send("fail");
+	}
+}

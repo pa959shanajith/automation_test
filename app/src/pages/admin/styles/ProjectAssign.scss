@@ -118,7 +118,7 @@
     outline: none;
     margin-bottom: 15px;
     padding: 6px 12px;
-    background: $primaryColor;
+    background: #6366f1;
     border: none;
     color: $whiteColor;
     border-radius: 3px;
@@ -144,7 +144,7 @@
     user-select: none;
 }
 select[multiple]:focus option:checked {
-	background: $primaryColor linear-gradient(0deg, $primaryColor 0%, $primaryColor 100%);
+	background: #6366f1 linear-gradient(0deg, #6366f1 0%, #6366f1 100%);
 }
 select[multiple]:-internal-list-box option:checked {
 	background: none;
@@ -157,7 +157,7 @@ select[size] {
   }
 
 .selected-project{
-    background-color: $primaryColor !important;
+    background-color: #6366f1 !important;
     color:white !important;
 }  
 
@@ -198,7 +198,7 @@ select[size] {
     // border-top: 1px solid #e5e5e5;
 }
 .modal-footer-edit button {
-    background: $primaryColor;
+    background: #6366f1;
     color: $whiteColor;
     border: 0;
     border-radius: 20px;

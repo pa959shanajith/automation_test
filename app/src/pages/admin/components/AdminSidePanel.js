@@ -86,6 +86,10 @@ const AdminSidePanel = () => {
                         <i className='pi pi-briefcase' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem' }} />
                        <span className='privileges_label'>Manage Project</span> 
                     </li>
+                    <li onClick={() => { setHeader('TestSuites_details'); setScreen('TestSuites_details'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
+                        <i className='pi pi-unlock' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem' }} />
+                       <span className='privileges_label'>TestSuites_details</span> 
+                    </li>
                 </ul>
             </div>
         </div>

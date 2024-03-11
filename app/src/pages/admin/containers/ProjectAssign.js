@@ -5,7 +5,7 @@ import { useSelector} from 'react-redux';
 import '../styles/ProjectAssign.scss';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { Dialog } from 'primereact/dialog'
+import { Dialog } from 'primereact/dialog';
 
 /*Component ProjectAssign
   use: renders Project Assign Middle Screen
