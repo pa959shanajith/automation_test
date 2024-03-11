@@ -226,11 +226,11 @@ function isEmptyOrUndefinedOrNull(input) {
 exports.readModel = async (req, res) => {
     logger.info("Inside Generate AI service: readModel");
     try {
-         if ( !req.query.userid) {
+         if ( !req.session.userid) {
             return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
         }
         var inputs = {
-            "userid": req.query.userid
+            "userid": req.session.userid
         };
         const result = await utils.fetchData(inputs, "genAI/readModel", "readModel", true);
 
