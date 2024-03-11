@@ -184,7 +184,8 @@ function validatePayload(payload) {
                     !payload.hasOwnProperty('api_type') || isEmptyOrUndefinedOrNull(payload["api_type"]) ||
                     !payload.hasOwnProperty('api_version') || isEmptyOrUndefinedOrNull(payload["api_version"]) ||
                     !payload.hasOwnProperty('api_base') || isEmptyOrUndefinedOrNull(payload["api_base"]) ||
-                     !payload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(payload["name"])) {
+                     !payload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(payload["name"]) || 
+                     !payload.hasOwnProperty('deployment_name') || isEmptyOrUndefinedOrNull(payload["deployment_name"])) {
                     isValid = false;
                 }
                 else{
@@ -194,6 +195,7 @@ function validatePayload(payload) {
                     modelInput["openai_api_base"] = payload["api_base"];
                     modelInput["name"] = payload["name"];
                     modelInput["description"] = payload["description"] || "";
+                    modelInput["deployment_name"] = payload["deployment_name"];
                 }
                 break;
             case 'cohere':
