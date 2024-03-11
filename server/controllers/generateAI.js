@@ -165,7 +165,7 @@ exports.createModel = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
+        logger.info("LLM model saved");
         res.status(201).send({ status: true, message: 'doc created' });
 
     } catch (error) {
@@ -303,6 +303,38 @@ exports.deleteModel = async (req, res) => {
         const sendRes = result[0] && result[0].rows ? result[0].rows : []
         logger.info("model deleted successfully : ",sendRes);
         res.status(200).send({ status: true, data:sendRes, message:"model deleted" });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+// create template
+exports.createTemp = async (req, res) => {
+    logger.info("Inside Generate AI service: createTemp");
+    try {
+        let tempPayload = req.body;
+         if (!tempPayload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(tempPayload["name"]) || 
+         !tempPayload.hasOwnProperty('domain') || isEmptyOrUndefinedOrNull(tempPayload["domain"]) ||
+         !tempPayload.hasOwnProperty('model_id') || isEmptyOrUndefinedOrNull(tempPayload["model_id"]) ||
+         !tempPayload.hasOwnProperty('test_type') || isEmptyOrUndefinedOrNull(tempPayload["test_type"]) ||
+         !tempPayload.hasOwnProperty('temperature') || isEmptyOrUndefinedOrNull(tempPayload["temperature"])
+         ) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        let inputData = tempPayload;
+        inputData.userinfo = req.session;
+        const result = await utils.fetchData(inputData, "genAI/createTemp", "createTemp", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("Template created ");
+        res.status(201).send({ status: true, message: 'doc created' });
 
     } catch (error) {
         logger.error('Error:', error);
