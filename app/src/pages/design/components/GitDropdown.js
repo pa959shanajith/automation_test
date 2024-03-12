@@ -347,11 +347,12 @@ const GitDropdown = (props) => {
         <CreateProject setProjectName={setProjectNamehandler} visible={CreateProjectVisible} onHide={() => createProjectCloseDialogHandler()} projectsDetails={projectListForCreateProject} toastSuccess={props.toastSuccess} toastError={props.toastError} />
       </div>}
       <Dialog
-        header={'Git Configurations'}
+        header={'Git Configuration'}
         visible={visibleGitconfFormAfterCreatePrj}
         style={{ width: "58vw", height: '85vh' }}
         onHide={() => { setVisibleGitconfFormAfterCreatePrj(false); setCreatedProjectDetails({}); }}
         footer={dialogFooter}
+        className='git_config_after_create_project'
       >
         <div className='createProject_GitConfig'>
           <GitConfigurationForm
