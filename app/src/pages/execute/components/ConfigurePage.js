@@ -66,6 +66,7 @@ import { getNotificationChannels } from '../../admin/api'
 import { useNavigate } from 'react-router-dom';
 import { Paginator } from "primereact/paginator";
 import useDebounce from "../../../customHooks/useDebounce";
+import { Checkbox } from "primereact/checkbox";
 export var navigate
 
 
@@ -187,6 +188,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [runningStatusTimer, setRunningStatusTimer] = useState("");
+  const [dryRun, setDryRun] = useState(false);
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -1125,6 +1127,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     executionData["executionListId"] = uuid();
     executionData["profileName"] = currentName;
     executionData["recieverEmailAddress"] = emailNotificationReciever;
+    executionData["actualRun"] = !dryRun; 
     executionData["batchInfo"] =
       currentSelectedItem &&
         currentSelectedItem.executionRequest &&
@@ -2257,29 +2260,28 @@ Learn More '/>
 
                 </div>
                 {showIcePopup && (
-                  <div>
-                    <div className="legends-container">
-                      <div className="legend">
-                        <span id="status" className="status-available"></span>
-                        <span className="legend-text">Available</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-unavailable"></span>
-                        <span className="legend-text2">Unavailable</span>
-                      </div>
-                      <div className="legend">
-                        <span id="status" className="status-dnd"></span>
-                        <span className="legend-text1">Do Not Disturb</span>
-                      </div>
-                    </div>
-                    <div>
-                      <span
+                    <div className="flex justify-content-around">
+                      <div
                         className="execute_dropdown .p-dropdown-label "
                         title="Token Name"
                       >
                         Execute on
-                      </span>
-                      <div className="ice">
+                      </div>
+                      <div className="flex flex-column">
+                        <div className="legends-container">
+                          <div className="legend">
+                            <span id="status" className="status-available"></span>
+                            <span className="legend-text">Available</span>
+                          </div>
+                          <div className="legend">
+                            <span id="status" className="status-unavailable"></span>
+                            <span className="legend-text">Unavailable</span>
+                          </div>
+                          <div className="legend">
+                            <span id="status" className="status-dnd"></span>
+                            <span className="legend-text">Do Not Disturb</span>
+                          </div>
+                        </div>
                        <div className="search_icelist ">
                         <DropDownList
                           poolType={poolType}
@@ -2294,8 +2296,11 @@ Learn More '/>
                         />
                        </div>
                       </div>
+                      <div id="actual_run" className="dryRun_checkbox">
+                        <Checkbox htmlFor="actual_run" value={dryRun} disabled={!availableICE} onChange={() => setDryRun(!dryRun)} checked={dryRun}/>
+                        <span className="pl-1">Dry run</span>
+                      </div>
                     </div>
-                  </div>
                 )}
               </>
             }
