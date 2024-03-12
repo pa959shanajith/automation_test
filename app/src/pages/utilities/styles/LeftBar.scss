@@ -19,6 +19,10 @@
     font: $f5_regular;
     color: #212121;
 }
+.util_header_migration{
+    font: $f5_regular;
+    color: #212121;
+}
 
 .letfnav h4{
     text-align: center;
@@ -48,6 +52,9 @@
 }
 
 .util__execution_ic{
+    padding: 10px;
+}
+.util__execution_migration{
     padding: 10px;
 }
 .util__devOps {
@@ -104,4 +111,21 @@
     margin-left: 4rem;
     margin-top: -1.5rem;
    font:$f6_regular
+}
+.active_tab_migrate{
+    display: flex;
+    align-items: center;
+    width: 95%;
+    background: #e3cff0 !important;
+    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    position: relative;
+    top: 3rem;
+}
+.not_active_tab_migrate {
+    background-color: none !important;
+    font: $f7_regular;
+    display: flex;
+    align-items: center;
+    position: relative;
+    top: 3rem;
 }
