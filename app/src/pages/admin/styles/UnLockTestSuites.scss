@@ -1,4 +1,9 @@
 .searchInputUnlock{
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-content: flex-end;
     .p-inputtext{
         width: 20vw !important;
     }

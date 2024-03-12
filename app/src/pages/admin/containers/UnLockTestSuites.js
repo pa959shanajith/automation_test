@@ -4,7 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { unlockTestSuites } from "../api";
 import { Toast } from "primereact/toast";
 import { InputText } from 'primereact/inputtext';
-
+import '../styles/UnLockTestSuites.scss'
 
 
 
@@ -31,7 +31,15 @@ const UnlockTestSuites = () => {
     const showUnLockIcon = (rowData) =>{
         return(
             <>
-              <i className="pi pi-unlock" onClick={()=>un_lock(rowData)}/>
+              <i className="pi pi-unlock searchInputUnlock" onClick={()=>un_lock(rowData)}/>
+            </>
+        )
+
+    }
+    const showUnLockName = (rowData) =>{
+        return(
+            <>
+            <span title={rowData.name}>{rowData.name.length>30?rowData.name.trim().substring(0,30)+'...':rowData.name }</span>
             </>
         )
 
@@ -74,7 +82,7 @@ const UnlockTestSuites = () => {
         return (
             <div className="flex justify-content-end">
                 <span className="p-input-icon-left">
-                    <i className="pi pi-search" />
+                    <i className="pi pi-search searchInputUnlock" />
                     <InputText value={globalFilterValue} onChange={(e)=>onGlobalFilterChange(e)} className ="searchInputUnlock" style={{width:'20vw'}} placeholder="TestSuites/Assign Users Search" />
                 </span>
             </div>
@@ -85,9 +93,9 @@ const UnlockTestSuites = () => {
         <> 
             <Toast position="bottom-center" baseZIndex={9999} ref={toast}/>       
             <DataTable value={testSuite} header={header} size='small' className="dataTableUnlock" style={{width:'70vw', paddingLeft:'1%'}} showGridlines scrollable scrollHeight="400px" loading={loading}>
-            <Column field="name" header="Name"></Column>
-            <Column field="currentlyinuse" header="Currentlyinuse"></Column>
-            <Column field="UnLock Test Suites" header="UnLock Test Suites" body={showUnLockIcon}/>
+            <Column field="name" header="Name" style={{width:'40vw'}} body={showUnLockName}></Column>
+            <Column field="currentlyinuse" style={{width:'10vw'}} header="Currently In Used"></Column>
+            <Column field="UnLock Test Suites" style={{width:'10vw'}} header="UnLock Test Suites" body={showUnLockIcon}/>
             </DataTable>
         </>
     )
