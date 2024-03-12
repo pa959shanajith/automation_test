@@ -93,9 +93,9 @@ const UnlockTestSuites = () => {
         <> 
             <Toast position="bottom-center" baseZIndex={9999} ref={toast}/>       
             <DataTable value={testSuite} header={header} size='small' className="dataTableUnlock" style={{width:'70vw', paddingLeft:'1%'}} showGridlines scrollable scrollHeight="400px" loading={loading}>
-            <Column field="name" header="Name" style={{width:'40vw'}} body={showUnLockName}></Column>
+            <Column field="name" header="Test Suites Name" style={{width:'40vw'}} body={showUnLockName}></Column>
             <Column field="currentlyinuse" style={{width:'10vw'}} header="Currently In Used"></Column>
-            <Column field="UnLock Test Suites" style={{width:'10vw'}} header="UnLock Test Suites" body={showUnLockIcon}/>
+            <Column field="UnLock Test Suites" style={{width:'10vw'}} header="Locked Test Suites" body={showUnLockIcon}/>
             </DataTable>
         </>
     )

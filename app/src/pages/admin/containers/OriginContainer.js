@@ -35,7 +35,7 @@ const OriginContainer = (props) => {
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
             {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}
-            {currentTab === "TestSuites_details" && <UnlockTestSuites/>}
+            {currentTab === "Locked_TestSuites" && <UnlockTestSuites/>}
         </div>
     </>)
 }
