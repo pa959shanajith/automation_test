@@ -12,9 +12,9 @@
 }
 
 .scenario-accordion{
-    display: flex;
-    flex-direction: row;
-    gap: 42rem;
+    // display: flex;
+    // flex-direction: row;
+    // gap: 42rem;
     font: $f6_semibold !important;
 }
 
@@ -22,6 +22,9 @@
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
+    position: absolute;
+    right: 10px;
+    top: 12%;
 }
 
 .scenario-text{
@@ -33,7 +36,7 @@
     .p-accordion-tab{
         .p-accordion-header{
             .p-accordion-header-link{
-                padding: 0.8rem;
+                padding: 1.2rem;
             }
         }
     }  
@@ -50,13 +53,18 @@
 }
 
 .edit-text{
-    font: $f6_semibold !important;
+    font: $f7_semibold !important;
 }
 .delete-text{
-    font: $f6_semibold !important;
+    font: $f7_semibold !important;
 }
 
 .element-repository{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
     overflow: auto;
     .p-accordion-header{
         .p-accordion-header-link{
@@ -68,10 +76,17 @@
 }
 
 .button__elements{
-    position: relative;
-    left: 58.4rem;
-    bottom: rem;
-    top: 0.2rem;
+    // position: relative;
+    // left: 58.4rem;
+    // bottom: rem;
+    // top: 0.2rem;
+    width: 12vw;
+    position: sticky;
+    left: 60vw;
+    height: 3rem;
+    top: 0.3rem;
+    min-height: 3rem;
+    min-width: 12vw;
 }
 
 .not_captured_ele {
@@ -124,16 +139,17 @@
 
 .reused__icon{
     height: 1.5rem;
+    cursor: pointer;
 }
 
-.relative{
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 15rem;
-    width: 11rem;
-    display: flex;
-}
+// .relative{
+//     white-space: nowrap;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     max-width: 15rem;
+//     width: 11rem;
+//     display: flex;
+// }
 
 .screenname__display{
     position: relative;
@@ -148,4 +164,13 @@
 
 .paste-icon{
     margin-right: 0.5rem;
+}
+
+.triangle-color{
+    color: black;
+    margin-right: 0.5rem;
+}
+
+.reused-msg{
+    color: black;
 }

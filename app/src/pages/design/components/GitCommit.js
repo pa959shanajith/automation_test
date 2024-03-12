@@ -61,7 +61,7 @@ const GitCommit = (props) => {
         let rightSideModuleList = RhsModuleList.filter(arr1 => !rightSideCheckedModuleList.some(arr2 => arrayEquals(arr1._id, arr2)));
         let leftSideModuleList = RhsModuleList.filter(arr1 => rightSideCheckedModuleList.some(arr2 => arrayEquals(arr1._id, arr2)));
         let lhsList = [...LhsModuleList, ...leftSideModuleList];
-        let moduleIdList = lhsList.map(element =>  { return element._id })
+        let moduleIdList = rightSideModuleList.map(element =>  { return element._id })
         setLhsModuleList(lhsList);
         setRhsModuleList(rightSideModuleList);
         props.moduleListChange(moduleIdList);

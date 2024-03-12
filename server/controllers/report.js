@@ -15,7 +15,9 @@ const tokenAuth = require('../lib/tokenAuth');
 const constants = require('../lib/execution/executionConstants');
 const Handlebars = require('../lib/handlebar.js');
 var axios  =  require('axios');
-var https = require('https')
+var https = require('https');
+var os = require('os');
+
 // PDF EXPORT
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
@@ -2043,6 +2045,42 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
         res.send("fail");
     }
 };
+
+exports.downloadVideo = async (req, res) => {
+    const fnName = "downloadVideo";
+    const osPf = os.platform();
+    const videoPathLinux = "" //options.screenShotPath.linux;
+    logger.info("os platform is '%s'", osPf);
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var videoPath = req.body.videoPath;
+        if (osPf == 'linux') {
+            if (videoPathLinux != ""){
+                /*Below logic is to manipulate or change the Video Path from windows to linux specific*/
+                logger.info("Requested video file path is '%s'", videoPath);
+                var ss_path = videoPath.split("Screenshots")[1];
+                var temp_videoPath = videoPathLinux.concat(ss_path);
+                videoPath = temp_videoPath.replace(/\\/g,"/");
+                logger.info("Final video file path is '%s'", videoPath);
+            } else {
+                logger.error("Please enter the value of linux for screenShotPath in config");
+            }
+        }
+        if (fs.existsSync(videoPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4',
+            });
+            const filestream = fs.createReadStream(videoPath);
+            filestream.pipe(res);
+        } else {
+            logger.error("Requested video file '%s' is not available", videoPath);
+            return res.status(404).send("fail");
+        }
+    } catch (exception) {
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
+        res.send("fail");
+    }
+}
 
 exports.getAccessibilityTestingData_ICE = async function(req, res) {
     try {

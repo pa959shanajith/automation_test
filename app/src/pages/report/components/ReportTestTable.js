@@ -16,6 +16,7 @@ import {
   openScreenshot,
   getAccessibilityData,
   getDetails_AZURE,
+  getExecutionVideo
 } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -34,8 +35,11 @@ import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
 import NetworkOperation from "./NetworkOperation";
 import { Tooltip } from 'primereact/tooltip';
+import {Messages as MSG} from '../../global';
+
 
 export default function BasicDemo() {
+  const toast = useRef();
   const [reportData, setReportData] = useState([]);
   const [reportViewData, setReportViewData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState(null);
@@ -73,6 +77,9 @@ export default function BasicDemo() {
   const [networkData, setNetworkData] = useState([]);
   const [description, setDescription] = useState(null);
   const [downloadLevel, setDownloadLevel] = useState(null);
+  const [reportVideo, setReportVideo] = useState({ hasVideo: false });
+  const [reportInfo, setReportInfo] = useState({ reportId: "", executionId: "" });
+
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -109,7 +116,13 @@ export default function BasicDemo() {
   const getReportsTable = async () => {
     if (reportid) {
       const view = await viewReport(reportid, "json", false, downloadLevel, true);
-      setReportData(JSON.parse(view));
+      const parsedView = JSON.parse(view);
+      setReportData(parsedView);
+      setReportInfo({ reportid, executionId: parsedView.overallstatus.executionId, scenarioName: parsedView.overallstatus.scenarioName });
+      if (parsedView.overallstatus.video !== "-") {
+        setReportVideo({ hasVideo: true, videoPath: parsedView.overallstatus.video });
+    }
+    else setReportVideo({ hasVideo: false });
     }
   };
 
@@ -891,8 +904,50 @@ export default function BasicDemo() {
     return <span className="pi pi-arrow-right" onClick={() => onMoreDetails(getDetails)}></span>
   }
 
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+        toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+}
+
+const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+        toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+}
+  
+  const onVideoExportClick = async() => {
+    let scName = reportInfo.scenarioName;
+    
+    let data = await getExecutionVideo (reportVideo.videoPath);
+
+    if (data.error || !data.byteLength) {
+        console.error(data.error);
+        toastError(MSG.REPORT.ERR_FETCH_VIDEO);
+    }
+    else {
+        let filedata = new Blob([data], { type: "video/mp4" });
+
+        if (window.navigator.msSaveOrOpenBlob) window.navigator.msSaveOrOpenBlob(filedata, scName);
+        else {
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(filedata);
+            a.download = scName;
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(a.href);
+            document.body.removeChild(a);
+        }
+
+        toastSuccess(MSG.REPORT.SUCC_EXPORT_REPORT);
+    }
+}
+
   return (
     <>
+    <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
     <div className="reportsTable_container">
       <div className="reportSummary">
         <Accordion
@@ -901,7 +956,14 @@ export default function BasicDemo() {
           onTabOpen={() => setReportSummaryCollaps(false)}
           onTabClose={() => setReportSummaryCollaps(true)}
         >
-          <AccordionTab className="content" header="Result Summary">
+          <AccordionTab header={
+                        <div className="flex align-items-center">
+                            <span className="content" >Result Summary</span>
+                            {reportVideo.hasVideo && 
+                            <span style={{marginLeft : '81rem'}}>
+                            <img src='static/imgs/video-download.svg' alt='video-export' height="24" width="24" onClick={(e)=> {e.stopPropagation();e.preventDefault();onVideoExportClick()}}/></span>}
+                        </div>
+                    }>
             <CollapsibleCard
               collapsible={false}
               width="100%"

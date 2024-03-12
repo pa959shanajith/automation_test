@@ -1598,3 +1598,28 @@ export const fetch_git_exp_details = async(projectId) => {
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }
+
+// All Test suites Data
+export const unlockTestSuites = async(inputs) => {
+    try {
+        const res = await axios(url+'/unLock_TestSuites',{
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data:{inputs:inputs},
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"Enable to fetch test suites details"}
+    } catch (error) {
+        console.error(error)
+        return {error:"Enable to fetch test suites details"}
+    }
+}

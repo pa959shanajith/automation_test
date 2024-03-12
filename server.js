@@ -275,6 +275,7 @@ if (cluster.isMaster) {
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);
+		app.post('/downloadVideo', report.downloadVideo);
 		app.post('/getUserRoles', admin.getUserRoles);
 		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
@@ -598,6 +599,7 @@ if (cluster.isMaster) {
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
+		app.post('/unLock_TestSuites', auth.protect, admin.unlockTestSuites);
 
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
@@ -729,8 +731,9 @@ if (cluster.isMaster) {
 		app.post('/saveTestrailMapping',auth.protect,testrail.saveMapping_Testrail)
 		app.post('/viewTestrailMappedList',auth.protect,testrail.viewMappedDetails_Testrail)
 		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
-		app.post('/getSuitesandRuns',auth.protect,testrail.getSuiteAndRunInfo_Testrail)
+		app.post('/getTestPlanDetails',auth.protect,testrail.getTestPlanDetails_Testrail)
 		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
+		app.post('/getTestPlansAndRuns',auth.protect,testrail.getTestPlansAndRuns)
 		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);
