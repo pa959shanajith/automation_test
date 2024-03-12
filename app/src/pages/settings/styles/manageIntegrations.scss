@@ -113,6 +113,18 @@ height: 2.5rem !important;
 
 .tab__cls{
     margin-top: 0.5rem;
+    position: relative;
+    
+    .download_mapping {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 9999;
+        cursor: pointer;
+        border: 2px solid black;
+        margin: 2px;
+        padding: 2px;
+    }
     .p-tabview-nav-content {
          height: 3rem !important;
     }

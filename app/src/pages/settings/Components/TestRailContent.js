@@ -15,6 +15,7 @@ import { selectedProject, mappedTree } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
 import { enableSaveButton, mappedPair, updateTestrailMapping } from "../settingSlice";
 import { Messages as MSG } from '../../global';
+import Papa from 'papaparse';
 
 const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
@@ -29,7 +30,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     const [selectedTestRailNodeFirstTree, setSelectedTestRailNodeFirstTree] = useState({});
     const [selectedTestRailNodesSecondTree, setSelectedTestRailNodesSecondTree] = useState([]);
     const [checked, setChecked] = useState(false);
-    const toast = useRef();
+    const [jsonData, setJsonData] = useState([]);
 
     // constants, variables
     const projectDetails = JSON.parse(localStorage.getItem("DefaultProject"));
@@ -172,6 +173,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     const fetchMappedTestcases = async () => {
         const data = await api.viewTestrailMappedList();
         setRows(data);
+        setJsonData(data);
         dispatch(updateTestrailMapping(false));
     };
 
@@ -364,57 +366,56 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                 console.log("err", err);
             }
         }
-
-        // might be useful. If not, Delete after sometime.
-        // else {
-        //     try {
-        //         const testCaseDetails = [];
-
-        //         const response = await api.getTestcasesTestrail_ICE({
-        //             projectId: currentProject.id,
-        //             suiteId: node.suite_id,
-        //             sectionId: node.id,
-        //             TestRailAction: "getTestCases",
-        //         });
-
-        //         if (response.length > 0) {
-        //             for (let i = 0; i < response.length; i++) {
-        //                 const { id, title, section_id, suite_id, ...rest } = response[i];
-        //                 testCaseDetails.push({
-        //                     id,
-        //                     section_id,
-        //                     suite_id,
-        //                     type: "testcase",
-        //                     name: title,
-        //                     key: `${i}-${i + 1}`,
-        //                 });
-        //             }
-        //         }
-
-        //         const sectionsData = testrailData?.map((data) => {
-        //             if (data.id == node.suite_id) {
-        //                 data.children?.map((child) => {
-        //                     if (child.id == node.id) {
-        //                         return {
-        //                             ...child,
-        //                             children: [...child.children, ...testCaseDetails],
-        //                         };
-        //                     } else return child;
-        //                 });
-        //             } else return data;
-        //         });
-
-        //         console.log("sectionsData", sectionsData);
-
-        //         setLoading(false);
-        //         return testCaseDetails;
-        //     } catch (error) {
-        //         console.error("Error fetching test cases:", error);
-        //         return [];
-        //     }
-        // }
     };
 
+    const handleDownload = () => {
+        const getProjectName = (projectId) => {
+            const project = testRailProjectsName.find(proj => proj.id === projectId);
+            return project ? project.name : 'Unknown Project';
+        };
+
+        const modifiedData = jsonData.map(entry => {
+            const projectNames = entry["projectid"].map(projectId => getProjectName(projectId));
+
+            return {
+                "TestRail Project Name": projectNames[0],
+                "TestRail Test Case Name": entry["testname"][0],
+                "AVO Project Name": reduxDefaultselectedProject.projectName,
+                "AVO Test Scenario Name": entry["testscenarioname"].join(',  '),
+            }
+        });
+
+        const csv = Papa.unparse(modifiedData, { header: true });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+
+        const getCurrentDateTime = () => {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${day}${month}${year}${hours}${minutes}${seconds}`;
+        };
+
+        const formattedDateTime = getCurrentDateTime();
+
+        if (navigator.msSaveBlob) {
+            // For Internet Explorer
+            navigator.msSaveBlob(blob, `TestRail_AVO_MappingList_${formattedDateTime}.csv`);
+        } else {
+            // For other browsers
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `TestRail_AVO_MappingList_${formattedDateTime}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    };
 
     useEffect(() => {
         setTestRailProjectsName(domainDetails?.projects);
@@ -427,6 +428,12 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     return (
         <div className="tab__cls">
             <div className="tab__cls">
+                {activeIndex === 1 && (
+                    <>
+                        <Tooltip target=".download_mapping" position="left" content="Click here to download mapping details." />
+                        <img className='download_mapping' src="static/imgs/download_icon_blue.svg" alt="Download Mapping Icon" height="30" onClick={handleDownload} />
+                    </>
+                )}
                 <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                     <TabPanel header="Mapping">
                         <div className="data__mapping">

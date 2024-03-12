@@ -96,7 +96,6 @@ exports.getProjects_Testrail = function (req, res) {
       res.send("unavailableLocalServer");
     }
   } catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in getProjects_Testrail:", exception.message);
     res.send("fail");
   }
@@ -174,7 +173,6 @@ exports.getSuites_Testrail = async (req, res) => {
       res.send("unavailableLocalServer");
     }
   } catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in getSuites_Testrail:", exception.message);
     res.send("fail");
   }
@@ -331,16 +329,13 @@ exports.getTestPlans_Testrail = async (req, res) => {
       mySocket.on("qcresponse", testraillogin_listener);
 
     }
-
-
   } catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in getProjectPlans:", exception.message);
     res.send("fail");
   }
 }
-
-
+ 
+ 
 /** 
 * @function : getSuiteAndRunInfo_Testrail
 * @description : the function is responsible for getting all the suites and runs information for a specific test plan
@@ -376,7 +371,12 @@ exports.getTestPlanDetails_Testrail = async (req, res) => {
 
     // Getting the details of the socket
     mySocket = myserver.allSocketsMap[clientName][name];
-
+ 
+    const testrailDetails = await utils.fetchData({userId : req.session.userid}, "admin/getDetails_TestRail", 'getDetails_Testrail');
+    let testrailUsername = testrailDetails.username
+    let testrailApiToken = testrailDetails.API_Key
+    let baseUrl = testrailDetails.url
+ 
     if (mySocket != undefined && mySocket.connected) {
       logger.debug("ICE Socket requesting Address: %s", name);
 
@@ -386,7 +386,10 @@ exports.getTestPlanDetails_Testrail = async (req, res) => {
 
       let testrailDetails = {
         testrailAction,
-        testPlanId
+        testPlanId,
+        testrailUsername,
+        testrailApiToken,
+        baseUrl
       };
 
       // add into the info log
@@ -404,18 +407,14 @@ exports.getTestPlanDetails_Testrail = async (req, res) => {
 
       // Invoke the above function on qcresponse event
       mySocket.on(`qcresponse${testPlanId}`, testraillogin_runid_listener);
-
     }
-
-
   } catch (exception) {
-    console.log(exception);
-    logger.error("Error occurred in getSuiteAndRunInfo:", exception.message);
+    logger.error("Error occurred in getTestPlanDetails_Testrail:", exception.message);
     res.send("fail");
   }
 }
-
-
+ 
+ 
 /** 
 * @function : saveMapping_Testrail
 * @description : the function is responsible getting the mappedData and passing the request to DAS to save it in respective collection.
@@ -452,7 +451,6 @@ exports.getTestPlanDetails_Testrail = async (req, res) => {
        A String with fail or empty message with statusCode => 500
             Incase of success
        Success message with statusCode => 200
-            
 */
 exports.saveMapping_Testrail = async (req, res) => {
   try {
@@ -485,7 +483,6 @@ exports.saveMapping_Testrail = async (req, res) => {
       return res.send("fail");
     }
   } catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in saveMapping_Testrail:", exception.message);
     res.send("fail");
   }
@@ -543,61 +540,47 @@ exports.viewMappedDetails_Testrail = async (req, res) => {
     if (result == "fail") res.send('fail');
     else res.send(result);
   } catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in viewMappedDetails_Testrail:", exception.message);
     res.send("fail");
   }
 }
-
+ 
 exports.getSections_Testrail = async (req, res) => {
   try {
     // Add into the info log
     logger.info("Inside UI service: getSections_Testrail")
- 
     let mySocket;
- 
     // get the clients name
     let clientName = utils.getClientName(req.headers.host);
- 
     let username = req.session.username
- 
     let name;
- 
     // check if the socket connection is established with ice.
     if (
       myserver.allSocketsICEUser[clientName][username] &&
       myserver.allSocketsICEUser[clientName][username].length > 0
     )
       name = myserver.allSocketsICEUser[clientName][username][0];
- 
     // Getting the details of the socket
     mySocket = myserver.allSocketsMap[clientName][name];
- 
     if (mySocket != undefined && mySocket.connected) {
       logger.debug("ICE Socket requesting Address: %s", name);
- 
       // get the details from request body
       let projectId = req.body.projectId;
       let suiteId = req.body.suiteId;
       let testrailAction = req.body.testrailAction
- 
       let testrailDetails = {
         projectId,
         suiteId,
         testrailAction
       };
- 
       // add into the info log
       logger.info("Sending socket request for testrailLogin to redis");
- 
       // emit the information to ICE, to request the Project details data.
       mySocket.emit("testraillogin", testrailDetails);
-     
       //ICE responds to the event and sends the above requested data
       function testrail_section_listener(data) {
         // remove the added listener once the task is done
         mySocket.removeListener(`qcresponse${data[0]['suite_id']}`, testrail_section_listener);
-       
         if (!Array.isArray(data[0].message || data[0].message.length == 0)) {
           res.send(data[0].message);
         } else {
@@ -623,7 +606,6 @@ exports.getSections_Testrail = async (req, res) => {
           res.send(formattedData);
         }
       }
- 
       // Invoke the above function on qcresponse event
       mySocket.on(`qcresponse${suiteId}`, testrail_section_listener);
     } else {
@@ -637,8 +619,8 @@ exports.getSections_Testrail = async (req, res) => {
     res.send("fail");
   }
 }
-
-
+ 
+ 
 exports.getTestPlansAndRuns = async(req,res) => {
   try{
     const userid = req.session.userid
@@ -646,9 +628,12 @@ exports.getTestPlansAndRuns = async(req,res) => {
       "userid": userid,
       "query": "TestrailDetails"
     };
-   
+ 
+		const testrailDetails = await utils.fetchData({userId : userid}, "admin/getDetails_TestRail", 'getDetails_Testrail');
     let projectId
-   
+    let testrailUsername = testrailDetails.username
+    let testrailApiToken = testrailDetails.API_Key
+    let baseUrl = testrailDetails.url
     const mappedDetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", 'viewMappedDetails_Testrail');
     if (mappedDetails.length > 0) {
       projectId =  mappedDetails[mappedDetails.length - 1].projectid[mappedDetails[mappedDetails.length - 1].projectid.length - 1]
@@ -669,25 +654,22 @@ exports.getTestPlansAndRuns = async(req,res) => {
         myserver.allSocketsICEUser[clientName][username].length > 0
       )
         name = myserver.allSocketsICEUser[clientName][username][0];
- 
       // Getting the details of the socket
       mySocket = myserver.allSocketsMap[clientName][name];
- 
       if(mySocket != undefined && mySocket.connected) {
           logger.debug("ICE Socket requesting Address: %s", name);
- 
-       
+    
         let testrailDetails = {
           testrailAction : req.body.TestRailAction,
-          projectId
+          projectId,
+          testrailUsername,
+          testrailApiToken,
+          baseUrl
         };
- 
         // add into the info log
         logger.info("Sending socket request for testrailLogin to redis");
- 
         // emit the information to ICE, to request the Project details data.
         mySocket.emit("testraillogin", testrailDetails);
- 
         //ICE responds to the event and sends the above requested data
         function testrail_PlansandRuns_Listener(data) {
           // remove the added listener once the task is done
@@ -695,16 +677,12 @@ exports.getTestPlansAndRuns = async(req,res) => {
           res.send(data);
         }
       }
- 
       mySocket.on(`qcresponse`, testrail_PlansandRuns_Listener);
- 
     } else {
       res.send("No Mapped Test Cases");
     }
- 
     // res.send(mappedDetails)
   }catch (exception) {
-    console.log(exception);
     logger.error("Error occurred in getTestPlansAndRuns:", exception.message);
     res.send("fail");
   }
