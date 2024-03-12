@@ -2297,7 +2297,7 @@ Learn More '/>
                        </div>
                       </div>
                       <div id="actual_run" className="dryRun_checkbox">
-                        <Checkbox htmlFor="actual_run" value={dryRun} disabled={!availableICE} onChange={() => setDryRun(!dryRun)} checked={dryRun}/>
+                        <Checkbox htmlFor="actual_run" value={dryRun} disabled={!selectedICE} onChange={() => setDryRun(!dryRun)} checked={dryRun}/>
                         <span className="pl-1">Dry run</span>
                       </div>
                     </div>
