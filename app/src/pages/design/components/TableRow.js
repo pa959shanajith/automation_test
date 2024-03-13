@@ -12,6 +12,8 @@ import { Dialog } from 'primereact/dialog';
 import { getScreens } from '../api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Tooltip } from 'primereact/tooltip';
+
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -79,7 +81,8 @@ const TableRow = (props) => {
   }
   const CustomMenu = (value) => {
     return (
-      <MenuList {...value} style={{ width: '100%' }}>
+    <div style={{ width: '100%', position: 'relative', paddingBottom: "3rem"  }}>
+      <MenuList {...value} style={{ width: '100%'}}>
         {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
           <div key={index}>
             {child.props && child.props.data && child.props.data.isCode !== "" ? (
@@ -92,13 +95,16 @@ const TableRow = (props) => {
               ) : (
                 child
               )} */}
-                <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
+                  {/* <Tooltip target=".testTooltip" position="right" content="Edit" className="custom-tooltip"/> */}
+                <img src='static/imgs/pencil-edit_old.svg' alt='editImg' className='optionstyle_img testTooltip'
                   onClick={() => {
                     props.setStepOfCustomKeyword(props.stepSelect.check[0]);
                     props.setCustomKeyWord(objType);
                     hanldlecustomClick(child, objType);
                     setCustomEdit(true);
-                  }}
+                  }
+                }
+                title={'Edit'}
                 />
               </div>
             ) : (
@@ -112,9 +118,12 @@ const TableRow = (props) => {
           </div>
         ))}
 
-        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
-        </Button>
+        {/* <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+        </Button> */}
       </MenuList >
+        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%", position: 'absolute', bottom: 0, left: 0,backgroundColor:'#FFFF',zIndex:'2'}} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+        </Button>
+      </div>
 
       // <MenuList {...value}>
       //   {value.children && Array.isArray(value.children) && value.children.map((child, index) => (

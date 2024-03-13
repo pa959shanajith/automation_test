@@ -161,7 +161,7 @@ const Messages={
         SUCC_TASK_REASSIGN: {"CONTENT":"Task Reassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_APPROVED: {"CONTENT":"Task Approved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SUBMIT: {"CONTENT":"Task Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"custom keyword saved successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"custom keyword saved", "VARIANT": VARIANT.SUCCESS},
 
         WARN_DELETED_TC_FOUND: {"CONTENT":"Deleted objects found in some teststeps, Please delete or modify those steps.", "VARIANT": VARIANT.WARNING},
         WARN_DELETE: {"CONTENT":"No steps to Delete.", "VARIANT": VARIANT.WARNING},

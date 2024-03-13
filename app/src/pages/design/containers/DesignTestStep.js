@@ -1625,14 +1625,16 @@ const DesignModal = (props) => {
     const approvalOnClick = async () => {
 
         if (inputKeywordName === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 ,style: { zIndex:999999999 }  })
         }
 
         else if (inputEditor === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+            setCustomKeyWord(false)
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
         }
         else if (customTooltip === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+            setCustomKeyWord(false)
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
         }
         else {
             try {
@@ -1715,18 +1717,24 @@ const DesignModal = (props) => {
         setInputEditor('');
         setCustomEdit(false);
     }
-
-    const createCustomeKeywordFooter = () => <>
+console.log(customEdit,'customEditcustomEdit');
+const createCustomeKeywordFooter = () => (
+    <>
+      <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>
+        <p>*mandatory field</p>
+      </div>
+      <div style={{ paddingTop: '10px', float: 'right' }}>
         <Button
-            data-test="createButton"
-            label={"save keyword"}
-            onClick={approvalOnClick}
-            style={{padding: '0.5rem 1rem' }}
-            disabled={isNameValid && !customEdit} 
-        >
-
-        </Button>
+          data-test="createButton"
+          label={customEdit ? "Save Keyword" : "Create Keyword"}
+          onClick={approvalOnClick}
+          style={{ padding: '0.5rem 1rem' }}
+          disabled={isNameValid && !customEdit}
+        />
+      </div>
     </>
+  );
+  
 
     return (
         <>
@@ -1786,7 +1794,9 @@ const DesignModal = (props) => {
             </Dialog>
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
-            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false);setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+            <Dialog  draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false);setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/>
+                <Tooltip target=".p-dialog-header-maximize" position="bottom" content="Maximize/Minimize" />
                 <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
                     <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
                         {/* <div className="flex flex-row gap-2 align-items-center">
@@ -1795,7 +1805,7 @@ const DesignModal = (props) => {
                         </div> */}
                         <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
-                            <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
+                            <label htmlFor='firstName' className="pb-2 font-semibold ">Name<span style={{color:'red'}}>*</span>:</label>
                             <div className="flex" style={{flexDirection:"column"}}>
                             <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
@@ -1824,7 +1834,7 @@ const DesignModal = (props) => {
                         
                         </div>
                         <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
-                            <label htmlFor='TooltipNamme' className="pb-2 font-medium ">Tooltip: </label>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-semibold ">Tooltip<span style={{color:'red'}}>*</span>: </label>
                             <AvoInput htmlFor="keywordtooltip" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
