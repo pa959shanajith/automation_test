@@ -1463,7 +1463,9 @@ const DesignModal = (props) => {
         if (inputKeywordName === '') {
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000,style: { zIndex:999999999 } })
         }
-
+        else if (customTooltip === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+        }
         else if (inputEditor === '') {
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000,style: { zIndex:999999999 } })
         }
