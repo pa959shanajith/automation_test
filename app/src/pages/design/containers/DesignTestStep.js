@@ -1629,11 +1629,9 @@ const DesignModal = (props) => {
         }
 
         else if (inputEditor === '') {
-            setCustomKeyWord(false)
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
         }
         else if (customTooltip === '') {
-            setCustomKeyWord(false)
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
         }
         else {
@@ -1717,7 +1715,6 @@ const DesignModal = (props) => {
         setInputEditor('');
         setCustomEdit(false);
     }
-console.log(customEdit,'customEditcustomEdit');
 const createCustomeKeywordFooter = () => (
     <>
       <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>

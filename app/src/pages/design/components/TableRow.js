@@ -95,7 +95,6 @@ const TableRow = (props) => {
               ) : (
                 child
               )} */}
-                  {/* <Tooltip target=".testTooltip" position="right" content="Edit" className="custom-tooltip"/> */}
                 <img src='static/imgs/pencil-edit_old.svg' alt='editImg' className='optionstyle_img testTooltip'
                   onClick={() => {
                     props.setStepOfCustomKeyword(props.stepSelect.check[0]);
@@ -117,9 +116,6 @@ const TableRow = (props) => {
             )}
           </div>
         ))}
-
-        {/* <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
-        </Button> */}
       </MenuList >
         <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%", position: 'absolute', bottom: 0, left: 0,backgroundColor:'#FFFF',zIndex:'2'}} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
         </Button>
