@@ -56,3 +56,26 @@
     color: #6C757D;
     font: $f7_regular;
 }
+.genai_right_container {
+    display: flex;
+    .p-card {
+        height: 45rem;
+    }
+  }
+  
+  .genai_main_content {
+    flex: 1;
+    /* Adjust other styles as needed */
+  }
+  .lable-div-temp{
+    gap:10rem;
+  }
+  .gen-btn{
+    .p-button{
+        width: 7rem;
+        margin-top: 1rem;
+    }
+  }
+  .label-genai{
+    font: $f6_semibold;
+  }

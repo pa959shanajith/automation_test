@@ -7,6 +7,8 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Fieldset } from 'primereact/fieldset';
 import { Dropdown } from 'primereact/dropdown';
+import RightPanelGenAi from "./RightPanelGenAi";
+import MiddleContainerGenAi from "./MiddleContainerGenAi";
 
 
 const GenAi = () => {
@@ -70,7 +72,9 @@ const GenAi = () => {
             <Button className="w-full" label="Submit" />
             </div>
         </div>
-        <div className="genai_right_container">Mid and Right</div>
+        <div className="genai_right_container"><MiddleContainerGenAi/></div>
+        <div className="genai_right_content"><RightPanelGenAi /></div>
+
     </div>)
 }
 
