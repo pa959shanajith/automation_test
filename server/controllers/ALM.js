@@ -691,10 +691,12 @@ exports.fetchALM_Testcases = async function (req,res) {
       const [year, month, day] = date.split("-");
       const [hour, minute, second] = time.split(":");
       const datetime = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-
+      // console.log(datetime.toISOString(),' IST date');
+      // converting the time from IST to UTC
+      const IST_to_UTC = new Date(datetime.getTime() - (5 * 60 * 60 * 1000) - (30 * 60 * 1000));
       // Format the datetime to ISO 8601 format
-      convertedDate = datetime.toISOString();
-      console.log(convertedDate);
+      convertedDate = IST_to_UTC.toISOString();
+      // console.log(convertedDate,' UTC date');
     }
     return convertedDate;
   }
