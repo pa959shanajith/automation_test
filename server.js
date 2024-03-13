@@ -440,7 +440,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl,"version":uiConfig.version})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {
