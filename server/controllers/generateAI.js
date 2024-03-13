@@ -149,7 +149,7 @@ async function validateOpenAIToken(token) {
 exports.createModel = async (req, res) => {
     logger.info("Inside Generate AI service: createModel");
     try {
-         if (!(req.body.modeltype)) {
+         if (!req.body.modeltype) {
             return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
         }
         const inputData = validatePayload(req.body);
@@ -165,7 +165,7 @@ exports.createModel = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
+        logger.info("LLM model saved");
         res.status(201).send({ status: true, message: 'doc created' });
 
     } catch (error) {
@@ -184,7 +184,8 @@ function validatePayload(payload) {
                     !payload.hasOwnProperty('api_type') || isEmptyOrUndefinedOrNull(payload["api_type"]) ||
                     !payload.hasOwnProperty('api_version') || isEmptyOrUndefinedOrNull(payload["api_version"]) ||
                     !payload.hasOwnProperty('api_base') || isEmptyOrUndefinedOrNull(payload["api_base"]) ||
-                     !payload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(payload["name"])) {
+                     !payload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(payload["name"]) || 
+                     !payload.hasOwnProperty('deployment_name') || isEmptyOrUndefinedOrNull(payload["deployment_name"])) {
                     isValid = false;
                 }
                 else{
@@ -193,7 +194,7 @@ function validatePayload(payload) {
                     modelInput["openai_api_version"] = payload["api_version"];
                     modelInput["openai_api_base"] = payload["api_base"];
                     modelInput["name"] = payload["name"];
-                    modelInput["description"] = payload["description"] || "";
+                    modelInput["deployment_name"] = payload["deployment_name"];
                 }
                 break;
             case 'cohere':
@@ -208,7 +209,6 @@ function validatePayload(payload) {
                     modelInput[`model`] = payload["model"];
                     modelInput[`modeltype`] = payload["modeltype"];
                     modelInput["name"] = payload["name"];
-                    modelInput["description"] = payload["description"] || "";
                 }
                 break;
             default:
@@ -226,11 +226,11 @@ function isEmptyOrUndefinedOrNull(input) {
 exports.readModel = async (req, res) => {
     logger.info("Inside Generate AI service: readModel");
     try {
-         if ( !req.query.userid) {
+         if ( !req.session.userid) {
             return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
         }
         var inputs = {
-            "userid": req.query.userid
+            "userid": req.session.userid
         };
         const result = await utils.fetchData(inputs, "genAI/readModel", "readModel", true);
 
@@ -283,7 +283,7 @@ exports.editModel = async (req, res) => {
 
 // delete model
 exports.deleteModel = async (req, res) => {
-    logger.info("Inside Generate AI service: editModel");
+    logger.info("Inside Generate AI service: deleteModel");
     try {
          if (!req.params.id) {
             return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
@@ -303,6 +303,127 @@ exports.deleteModel = async (req, res) => {
         const sendRes = result[0] && result[0].rows ? result[0].rows : []
         logger.info("model deleted successfully : ",sendRes);
         res.status(200).send({ status: true, data:sendRes, message:"model deleted" });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+// create template
+exports.createTemp = async (req, res) => {
+    logger.info("Inside Generate AI service: createTemp");
+    try {
+        let tempPayload = req.body;
+         if (!tempPayload.hasOwnProperty('name') || isEmptyOrUndefinedOrNull(tempPayload["name"]) || 
+         !tempPayload.hasOwnProperty('domain') || isEmptyOrUndefinedOrNull(tempPayload["domain"]) ||
+         !tempPayload.hasOwnProperty('model_id') || isEmptyOrUndefinedOrNull(tempPayload["model_id"]) ||
+         !tempPayload.hasOwnProperty('test_type') || isEmptyOrUndefinedOrNull(tempPayload["test_type"]) ||
+         !tempPayload.hasOwnProperty('temperature') || isEmptyOrUndefinedOrNull(tempPayload["temperature"])
+         ) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        let inputData = tempPayload;
+        inputData.userinfo = req.session;
+        const result = await utils.fetchData(inputData, "genAI/createTemp", "createTemp", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        logger.info("Template created ");
+        res.status(201).send({ status: true, message: 'doc created' });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+// read the LLM template
+exports.readTemp = async (req, res) => {
+    logger.info("Inside Generate AI service: readTemp");
+    try {
+         if ( !req.session.userid) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        var inputs = {
+            "userid": req.session.userid
+        };
+        const result = await utils.fetchData(inputs, "genAI/readTemp", "readTemp", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        const sendRes = result[0] && result[0].rows ? result[0].rows : []
+        logger.info("user specific templates found : ",sendRes);
+        res.status(200).send({ status: true, data:sendRes,count:sendRes.length || 0  });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+// edit the template
+exports.editTemp = async (req, res) => {
+    logger.info("Inside Generate AI service: editTemp");
+    try {
+         if (!req.params.id) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        let updateFields = {}
+        updateFields.items = req.body; 
+       if(updateFields && Object.keys(updateFields).length === 0){
+            return res.status(400).json({status:false, error: 'Bad request: no fields to update' });  
+       }
+        updateFields.id = req.params.id;
+        updateFields.userinfo = req.session;
+        const result = await utils.fetchData(updateFields, "genAI/editTemp", "editTemp", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        const sendRes = result[0] && result[0].rows ? result[0].rows : []
+        logger.info("template updated successfully : ",sendRes);
+        res.status(200).send({ status: true, data:sendRes, message:"template updated" });
+
+    } catch (error) {
+        logger.error('Error:', error);
+        res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+// delete template
+exports.deleteTemp = async (req, res) => {
+    logger.info("Inside Generate AI service: deleteTemp");
+    try {
+         if (!req.params.id) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        let deleteInput = {
+            "id":req.params.id,
+            "userinfo":req.session
+        }
+        const result = await utils.fetchData(deleteInput, "genAI/deleteTemp", "deleteTemp", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        const sendRes = result[0] && result[0].rows ? result[0].rows : []
+        logger.info("template deleted successfully : ",sendRes);
+        res.status(200).send({ status: true, data:sendRes, message:"template deleted" });
 
     } catch (error) {
         logger.error('Error:', error);

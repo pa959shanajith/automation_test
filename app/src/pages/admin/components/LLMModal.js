@@ -33,21 +33,15 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const [modalToken, setModalToken] = useState('');
     const [openAiExtras, setOpenAiExtras] = useState({
         name: "",
-        api_type: "",
+        api_type: "azure",
         api_version: "",
         api_base: "",
+        deployment_name:""
     });
-    const [input2, setInput2] = useState('');
-    const [selectedDropdownValue, setSelectedDropdownValue] = useState(null);
-    const [dataTableValues, setDataTableValues] = useState([]);
     const [deleteRow, setDeleteRow] = useState(false);
-    // const [llmModel, setLlmModel] = useState(false);
-    const [inputDeploymentName, setInputDeploymentName] = useState('');
-    const [inputApiType, setInputApiType] = useState('');
-    const [inputApiVersion, setInputApiVersion] = useState('');
-    const [inputBaseUrl, setInputBaseUrl] = useState('');
-    // const [selectedDropdownValue, setSelectedDropdownValue] = useState(null);
-
+    const [selectedModelType, setSelectedModelType] = useState(null);
+    const [versionDropdownOptions, setVersionDropdownOptions] = useState([]);
+    const [version, setVersion] = useState('');
 
     const deleteGridConfig = (rowData) => {
         console.log(rowData);
@@ -256,12 +250,21 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const saveModel = async () => {
         try {
           setLoading('Saving...');
-          let payload = {};
-          payload["name"]=modalName;
-          payload["modeltype"]=modalType;
-          payload["api_key"]=modalToken;
-          if(modalType=="openAi"){
-            payload = {...payload, ...openAiExtras}
+          
+          let payload = {
+            name: modalName,
+            modeltype: modalType,
+            api_key: modalToken,
+            model: version
+          };
+      
+          // Additional fields for OpenAi
+          if (modalType === 'openAi') {
+            payload = { ...payload, ...openAiExtras };
+          } else if (modalType === 'cohere' || modalType === 'anthropic') {
+            // Additional fields for Cohere and Anthropic
+            // Adjust the field names based on your API requirements
+            payload = { ...payload, /* add Cohere/Anthropic specific fields here */ };
           }
       
           const response = await createModel(payload);
@@ -296,17 +299,49 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
 
     const NoDataFound = () => {
         return <div className="grid_img"> <img src="static/imgs/grid_page_image.svg" alt="Empty List Image" height="255" width='204' />
-            <span>No Grids Yet</span>
-            <Button className="grid_btn" label="New Grid" onClick={() => { setLlmModel(true); }} ></Button>
+            <span>No LLM Modal yet</span>
+            <Button className="grid_btn" label="Create" onClick={() => { setLlmModel(true); }} ></Button>
         </div>
     }
 
     const dropdownOptions = [
         { label: 'OpenAi', value: 'openAi' },
-        { label: 'Cohere', value: 'Cohere' },
-        { label: 'Anthropic', value: 'Anthropic' },
+        { label: 'cohere', value: 'cohere' },
+        { label: 'anthropic', value: 'anthropic' },
         // Add more options as needed
       ];
+
+      const versionDropdown = [
+        { label: 'Calude-2', value: 'Calude-2' },
+        { label: 'command', value: 'command' },
+        { label: 'azure', value: 'azure' },
+      ];
+
+      const versionDropdownOptions1 = {
+        openAi: [
+          { label: 'gpt-35-turbo-16k', value: 'gpt-35-turbo-16k' },
+          { label: 'gpt-35-turbo', value: 'gpt-35-turbo' },
+          { label: 'gpt-35-turbo-instruct', value: 'gpt-35-turbo-instruct' },
+          { label: 'gpt-4', value: 'gpt-4' },
+          // Add more options for OpenAi as needed
+        ],
+        cohere: [
+          { label: 'command', value: 'command' },
+          // Add more options for cohere as needed
+        ],
+        anthropic: [
+          { label: 'claude-2', value: 'claude-2' },
+          // Add more options for anthropic as needed
+        ],
+      };
+
+      const handleSecondDropdownChange = (selectedOption) => {
+        if(modalType === "openAi"){
+            setOpenAiExtras((prev) => { return { ...prev, deployment_name: selectedOption.value } });
+        }
+        setVersion(selectedOption.value);
+      };
+    
 
     const actionTemplate=()=>{
         return( <div>
@@ -334,7 +369,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                     <div className="flex flex-column">
                         <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Name <span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
-                            <InputText placeholder='Enter Modal Name' onChange={(e) => setModalName(e.target.value)} />
+                            <InputText placeholder='Enter Modal Name' onChange={(e) => { setModalName(e.target.value); setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } });}} />
 
                         </div>
                         <div className="flex flex-column pb-2">
@@ -346,14 +381,23 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                                 placeholder="Select an option"
                             />
                         </div>
-                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                        <div className="flex flex-column pb-2">
+                            <label className='pb-2 font-medium'> {modalType == 'openAi' ? 'Deployment Name' : 'Model Version'}<span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
+                            <Dropdown
+                                 options={versionDropdownOptions1[modalType] || []}
+                                 onChange={handleSecondDropdownChange}
+                                 value={version}
+                                 placeholder="Select an option"
+                            />
+                        </div>
+                        {/* {modalType == 'openAi' && <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Deployment Name <span style={{ color: "#d50000" }}>*</span></label>
                             <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } })} placeholder='Enter Deployment Name' />
-                        </div>}
-                        {modalType == 'openAi' && <div className="flex flex-column pb-2">
+                        </div>} */}
+                        {/* {modalType == 'openAi' && <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">API Type <span style={{ color: "#d50000" }}>*</span></label>
                             <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_type: e.target.value } })} placeholder='Enter Api Type' />
-                        </div>}
+                        </div>} */}
                         {modalType == 'openAi' && <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">API Version <span style={{ color: "#d50000" }}>*</span></label>
                             <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_version: e.target.value } })} placeholder='Enter Api Version'
