@@ -1,4 +1,4 @@
-import { React, useState, useRef, useEffect } from 'react';
+import  React, {useState, useRef, useEffect}  from 'react';
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
@@ -36,6 +36,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { BlockUI } from 'primereact/blockui';
+import { insertScreen } from '../../design/api';
 
 const CaptureModal = (props) => {
   const dispatch = useDispatch();
@@ -132,11 +133,14 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [elementRepo, setElementRepo] = useState(false);
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
-  const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+  const [selectedFolderValue,setSelectedFolderValue] = useState({});
   const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID);
   const selectedRepositoryInCapture = useSelector(state => state.design.selectedRepository);
   // const [emptyDatatable, setEmptyDatatable] =useState(false);
   const emptyDatatbleRepository = useSelector(state => state.design.emptyDatatable);
+  const [dialogForRepo, setDialogForRepo] = useState(false);
+  const [repositoryNewName, setRepositoryNewName] = useState("");
+  const [repoNameAdded, setRepoNameAdded] = useState(false);
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -145,6 +149,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   if (localStorageDefaultProject) {
     NameOfAppType = JSON.parse(localStorageDefaultProject);
     AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
+    
 }
 
 
@@ -1862,21 +1867,29 @@ const elementValuetitle=(rowdata)=>{
             setScreenData([]);
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
           else setScreenData(screens.screenList);
+            let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+            setSelectedFolderValue({type:newAddedRepo[0],key:true})
       } catch (error) {
           console.error('Error fetching User list:', error);
       }
   })();
-}, [NameOfAppType.projectId]);
+}, [NameOfAppType.projectId,repoNameAdded]);
 
  const handleScreenChange = (e) => {
-  setSelectedFolderValue(e.value)
+  if(typeof e.value === "string"){
+    setSelectedFolderValue({type:e.value,key:false})
+  }else{
+    setSelectedFolderValue({type:e.value,key:true})
+  } 
+  
   // const selectedFolderValue = e.value;
   // setSelectedScreen(selectedFolderValue);
   if(captureData.length >= 0){
     setScreenChange(true);
   }
-
-  // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+//  else if (e.value === buttonOption.value){
+//   setDialogForRepo(true);
+//  }
   else{
   // setSelectedScreen(e.value);
   
@@ -1893,27 +1906,29 @@ const elementValuetitle=(rowdata)=>{
 
 };
 
+useEffect(()=>{
+if(selectedFolderValue.key === true){
+   confirmScreenChange();
+   }
+},[selectedFolderValue.key])
+
+
 const confirmScreenChange = () => {
   
   (async () => {
     try {
-        // let params = {
-        //   param : "updateMindmapTestcaseScreen",
-        //   projectID :  NameOfAppType.projectId,
-        //   moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
-        //   parent:props.fetchingDetails["parent"]["_id"],
-        //   currentScreen:parentData.id,
-        //   updateScreen:selectedFolderValue.id
-        // }
-        if(!captureData.length){
+
+      if(selectedFolderValue.type === buttonOption.value){
+        setDialogForRepo(true);
+      }
+       else if(!captureData.length){
         let params = {
           'screenId': parentData.id,
           'userId': userInfo.user_id,
           'roleId': userInfo.role,
           'param': 'updateOrderList',
-          'orderList':selectedFolderValue.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
-
-          'elementrepoid':selectedFolderValue.id
+          'orderList':selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
+          'elementrepoid':selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id
           
     
         }
@@ -1925,8 +1940,8 @@ const confirmScreenChange = () => {
         if(res === 'fail') {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
         else {
-          dispatch(SetSelectedRepository(selectedFolderValue))
-          setSelectedScreen(selectedFolderValue);
+          dispatch(SetSelectedRepository(selectedFolderValue.type))
+          setSelectedScreen(selectedFolderValue.type);
           fetchScrapeData()
           // var req={
           //   tab:"createdTab",
@@ -1986,13 +2001,13 @@ const confirmScreenChange = () => {
         }
       }
       else{
-        dispatch(SetSelectedRepository(selectedFolderValue))
-        setSelectedScreen(selectedFolderValue);
+        dispatch(SetSelectedRepository(selectedFolderValue.type))
+        setSelectedScreen(selectedFolderValue.type);
 
         // let orderlist=selectedFolderValue.orderlist.some(
         //   value => { return typeof value == "object" });
         //   if(orderlist){
-           let orderlist=selectedFolderValue.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
+           let orderlist=selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
           // }
           // else{
           //   orderlist=selectedFolderValue.orderlist
@@ -2004,7 +2019,7 @@ const confirmScreenChange = () => {
           'roleId': userInfo.role,
           'orderList': orderlist,
           'oldOrderList':captureData.map(element=>element.objectDetails.objId),
-          'elementrepoid':selectedFolderValue.id
+          'elementrepoid':selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id
       }
       let res=scrapeApi.updateScreen_ICE(params)
       if(res === 'fail') {
@@ -2024,31 +2039,97 @@ const confirmScreenChange = () => {
 })();
 };
 
-const screenOption = screenData?.map((folder) => {
-  let tooltip;
-  if (!folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0) {
-    tooltip = "This option is disabled because of missing data";
-} else {
-    // Tooltip content for enabled options
-    tooltip = folder.name; // Set tooltip text to the full folder name
-}
- return {
+const screenOption = screenData?.map((folder) => ({
   label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
   parent:folder.parent,
   title:folder.name,
-  tooltip,
-  disabled: !folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0
- }
-});
+  // disabled: !folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0
+}));
 
-const optionTemplate = (option) => {
-  return (
-    <div title={option.tooltip}>{option.title}</div>
-  );
+const renderOption = (option) => {
+
+  if (option.value === 'add_repository') {
+    return (
+      <div className="p-dropdown-item">
+        <Button label={option.label} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="p-dropdown-item" title={option.title}>
+        {option.label}
+      </div>
+    );
+  }
 };
+
+
+const optionsWithTooltips = screenOption.map(option => ({
+  ...option,
+  title: option.title
+}));
+const buttonOption = { label: 'Add Repository', value: 'add_repository' };
+optionsWithTooltips.push(buttonOption)
+
+
+
+const footerSaveForRepo =()=>(
+  <Button label='Save' className='repository__save__btn' onClick={()=>{setDialogForRepo(false);handleAddAccordion()}} disabled={!repositoryNewName}/>
+)
+
+const handleRepoNewName =(e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
+  setRepositoryNewName(e.target.value)
+}
+
+
+const handleAddAccordion = () => {
+  const newScreen = {
+    label: repositoryNewName,
+    related_dataobjects: [],
+    orderlist:[],
+    title:repositoryNewName,
+    name:repositoryNewName
+  };
+  // setNewScreenCount(newScreenCount + 1);
+
+  let params ={
+    projectid: NameOfAppType.projectId,
+    name: newScreen.label,
+    versionnumber: 0,
+    createdby: userInfo.user_id,
+    createdbyrole: userInfo.role,
+    param : 'create'
+  }
+  insertScreen(params)
+  // insertRepository(params)
+  .then(response =>  {
+    if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
+    else if(response === "invalid session") return RedirectPage(history);
+    else {
+      const addingScreen = [newScreen,...screenData];
+      setScreenData(addingScreen);
+      setSelectedScreen(newScreen)
+      dispatch(loadUserInfoActions.updateElementRepository(true));
+      // setRepositoryNewName("")
+      setRepoNameAdded(true);
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
+    }
+})
+  
+  .catch(error => console.log(error))
+};
+
+// useEffect(()=>{
+//   renderOption();
+// },[screenData])
 
   return (
     <>
@@ -2276,7 +2357,9 @@ const optionTemplate = (option) => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedRepositoryInCapture?selectedRepositoryInCapture:selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" tooltipOptions="title" optionLabel='title' itemTemplate={optionTemplate}/></div>
+                  <div className="dropdown_container">
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder="Select repository" className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    </div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -2458,6 +2541,9 @@ const optionTemplate = (option) => {
         </div>
         </div>}
       {/* </Dialog> */}
+      <Dialog visible={dialogForRepo} header="Add Repository" onHide={()=>{setRepositoryNewName("");setDialogForRepo(false)}} footer={footerSaveForRepo}>
+         <InputText value={repositoryNewName} className='repository__input' onChange={handleRepoNewName} placeholder='Enter repository name'/>
+      </Dialog>
       <AvoConfirmDialog
         visible={screenChange}
         onHide={() => setScreenChange(false)}

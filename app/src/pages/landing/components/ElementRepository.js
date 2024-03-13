@@ -282,6 +282,7 @@ const ElementRepository = (props) => {
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
         setRepositoryName("")
+        setActiveAccordionIndex(0);
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
       }
 
@@ -917,13 +918,10 @@ const deleteElement = (selectedCapturedElement,screenDeatils) =>{
 
 const saveScreens = (screenDetails) => {
     let params = {
-        screenIds: [screenDetails._id],
-      scenarioIds:[],
-      testcaseIds:[],
-      param:'elementRepository'
+        repoId: screenDetails._id,
     }
   
-    scrapeApi.deleteScenario(params)
+    scrapeApi.deleteElementRepo(params)
       .then(response =>  {
         if (response == "success") {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Rpository deleted.', life: 5000 });
@@ -1006,9 +1004,6 @@ const handleRepositoryName =(e)=>{
           </span>
           <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>
           <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
-          <Dialog className='RepositoryDailog' header="Add repository" visible={showDialog} onHide={()=>{setRepositoryName("");setShowDialog(false)}} footer={footer}>
-            <InputText value={repositoryName} className='repository__input' onChange={handleRepositoryName} placeholder='Enter repository name'/>
-          </Dialog>
        </div>
       </>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
@@ -1132,6 +1127,9 @@ const handleRepositoryName =(e)=>{
             </DataTable>
           </div>
         </Dialog>: null }
+        <Dialog className='RepositoryDailog' header="Add repository" visible={showDialog} onHide={()=>{setRepositoryName("");setShowDialog(false)}} footer={footer}>
+            <InputText value={repositoryName} className='repository__input' onChange={handleRepositoryName} placeholder='Enter repository name'/>
+          </Dialog>
     </div>
     </>
   );

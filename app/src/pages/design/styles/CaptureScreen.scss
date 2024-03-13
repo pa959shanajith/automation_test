@@ -838,6 +838,23 @@
 }
 .dropdown_container{
   max-width: 100%;
+  pointer-events: all;
+//   .p-dropdown-item::after {
+//     content: attr(title);
+//     position: absolute;
+//     left: 100%;
+//     top: 0;
+//     background-color: #333;
+//     color: #fff;
+//     padding: 0.5rem;
+//     border-radius: 4px;
+//     white-space: nowrap;
+//     display: none;
+// }
+
+// .p-dropdown-item:hover::after {
+//     display: block;
+// }
 }
 .dropdown_container > div > span {
   // color: initial;

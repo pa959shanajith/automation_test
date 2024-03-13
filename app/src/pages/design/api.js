@@ -1906,3 +1906,22 @@ export const fetch_git_exp_details = async(projectId) => {
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }
+
+export const deleteElementRepo = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/deleteElementRepo", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+             data: arg,
+            
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
