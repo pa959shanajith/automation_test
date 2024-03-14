@@ -148,7 +148,9 @@ const GenAi = () => {
             <div className="doc_container flex flex-column border-round my-2">
                 <div className="doc_top">
                     {/* <FileUpload mode="basic" name="demo[]" multiple={false} accept=".pdf" maxFileSize={1000000} onUpload={onUpload} className="doc_fileupload ml-3" chooseOptions={{icon:"pi pi-upload",label:"Upload"}} /> */}
-                    <FileUpload autoComplete="off" url={''} name="pdf file" multiple={false} accept="application/pdf" uploadHandler={(e)=>myUploader(e)} maxFileSize={1000000} onUpload={(e)=>e} emptyTemplate={<div className="doc_btm flex justify-content-center align-items-center">
+                    <FileUpload customUpload={true} name="pdf file" multiple={false} accept="application/pdf" uploadHandler={myUploader} maxFileSize={20000000000} 
+                    // onUpload={(e)=>e}
+                     emptyTemplate={<div className="doc_btm flex justify-content-center align-items-center">
                         <span className="doc_btm_para">File type:pdf | File size:1,00,000 words | No. of files:1 </span>
                     </div>} />
                 </div>
