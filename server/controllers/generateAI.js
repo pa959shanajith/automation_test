@@ -15,7 +15,8 @@ exports.generateTestcase = async (req, res) => {
             "email": req.body.email,
             "project": req.body.projectname,
             "organization": req.body.organization,
-            "generateType": req.body.type
+            "generateType": req.body.type,
+            "template_id":req.body.template_id
         };
         const result = await utils.fetchData(inputs, "generate/testcase", "generateTestcase", true);
 
