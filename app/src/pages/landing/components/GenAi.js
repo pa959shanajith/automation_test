@@ -9,9 +9,9 @@ import { Fieldset } from 'primereact/fieldset';
 import { Dropdown } from 'primereact/dropdown';
 import RightPanelGenAi from "./RightPanelGenAi";
 import MiddleContainerGenAi from "./MiddleContainerGenAi";
-import { uploadgeneratefile, getall_uploadfiles } from '../../admin/api';
+import { uploadgeneratefile, getall_uploadfiles,readTemp} from '../../admin/api';
 import { useDispatch } from 'react-redux';
-import { screenType } from './../../settings/settingSlice';
+import { screenType,updateTemplateId } from './../../settings/settingSlice';
 import { useSelector } from 'react-redux';
 import JiraTestcase from './JiraTestcase';
 
@@ -25,11 +25,18 @@ const GenAi = () => {
     const dispatchAction = useDispatch();
     const [isJiraComponentVisible, setJiraComponentVisible] = useState(false)
     const [sortedData, setSortedData] = useState([]);
-    
+    const [readTempData, setReadTempData] = useState([]);
+    const [selectedTemp,setSelectedTemp] = useState(null);
 
+
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    const template_id = useSelector((state) => state.setting.template_id);
+    if (!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo;
     // const [requirementTool, setRequirementTool] = useState({})
     const onUpload = () => {
-        console.log("etnering")
+    console.log("etnering")
         toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     };
     const header = (
@@ -72,6 +79,40 @@ const GenAi = () => {
 
     }, []);
 
+    const templateDataforTable = async () => {
+        try {
+            const readData = await readTemp({
+                "userid": userInfo.user_id,
+
+            });
+            const data = readData.data.data || [];
+            const mapData = data.map((temp) => ({
+                name:temp.name,
+                value:temp._id
+            }))
+            setReadTempData(mapData);
+
+        } catch (error) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+        }
+    };
+
+    useEffect(() => {
+        templateDataforTable();
+    }, []);
+
+    const modalOptions = readTempData.map(item => ({
+        name: item.name,
+        value: item._id
+    }));
+
+    const onModelChange = (e) => {
+        setReadTempData(e.value);
+    }
+
+    const submitPayload = () => {
+        dispatchAction(updateTemplateId(selectedTemp));
+    }
    
 
     const myUploader = async (event) => {
@@ -148,7 +189,7 @@ const GenAi = () => {
             <div className="doc_container flex flex-column border-round my-2">
                 <div className="doc_top">
                     {/* <FileUpload mode="basic" name="demo[]" multiple={false} accept=".pdf" maxFileSize={1000000} onUpload={onUpload} className="doc_fileupload ml-3" chooseOptions={{icon:"pi pi-upload",label:"Upload"}} /> */}
-                    <FileUpload customUpload={true} name="pdf file" multiple={false} accept="application/pdf" uploadHandler={myUploader} maxFileSize={20000000000} 
+                    <FileUpload  mode="basic" customUpload={true} name="pdf file" multiple={false} accept="application/pdf" uploadHandler={myUploader} maxFileSize={20000000000} 
                     // onUpload={(e)=>e}
                      emptyTemplate={<div className="doc_btm flex justify-content-center align-items-center">
                         <span className="doc_btm_para">File type:pdf | File size:1,00,000 words | No. of files:1 </span>
@@ -170,17 +211,26 @@ const GenAi = () => {
                     onChange={(e) => handleJiraIconClick(e.value)}
                     options={requirementTool} optionLabel="name"
                     placeholder={<span className="left_btm_placeholder">Select a Tool</span>} className="w-full md:w-14rem" />
+                {/* <Dropdown
+                    // value={sortedData} 
+                    // onChange={(e) => handleJiraIconClick(e.value)}
+                    // options={requirementTool} optionLabel="name"
+                    placeholder={<span className="left_btm_placeholder">Jira Project</span>} className="w-full md:w-14rem" />
+                <Dropdown
+                    // value={sortedData} 
+                    // onChange={(e) => handleJiraIconClick(e.value)}
+                    // options={requirementTool} optionLabel="name"
+                    placeholder={<span className="left_btm_placeholder">Jira WorkItem</span>} className="w-full md:w-14rem" />     */}
             </div>
             <div className="left_btm_container pb-3">
                 <div className="left_btm_header my-2">Template</div>
                 <Dropdown
-                    // value={selectedCity} 
-                    // onChange={(e) => setSelectedCity(e.value)} 
-                    //  options={requirementTool} optionLabel="name" 
+                    value={selectedTemp}
+                    options={readTempData} optionLabel='name' onChange={(e) => setSelectedTemp(e.value)}
                     placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full md:w-14rem" />
             </div>
             <div>
-                <Button className="w-full" label="Submit" />
+                <Button className="w-full" label="Submit" onClick={() => submitPayload()} />
             </div>
         </div>
         <div className="genai_right_container"><MiddleContainerGenAi/></div>
