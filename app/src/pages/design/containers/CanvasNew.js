@@ -19,7 +19,7 @@ import * as DesignApi from "../api";
 import { RedirectPage} from '../../global';
 import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
-import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
+import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap,createNodeSingle} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
 import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import{ objValue} from '../designSlice';
@@ -306,18 +306,14 @@ const CanvasNew = (props) => {
                                 activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.parent.id;
                             }
                         }
-                        var res = createNode(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
-                        if(res !== undefined){
+                        var res = createNodeSingle(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
                           tree.links = res.linkDisplay
                           tree.dLinks = res.dLinks
                           tree.nodes = res.nodeDisplay
                           tree.dNodes = res.dNodes
                           count= {...count,...res.count}
                           typeo = typen;
-                        }else{
-                          toast.current.show({severity:'error', summary:"Error", detail:"Try to import multi test suite structure", life:5000})
-                        }
-                       
+                    
                     }
                 })
                 if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
