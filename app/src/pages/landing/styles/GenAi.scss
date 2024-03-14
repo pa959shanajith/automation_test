@@ -58,10 +58,14 @@
 }
 .genai_right_container {
     display: flex;
-    .p-card {
-        height: 45rem;
-    }
   }
+  .genai_right_content{
+    .p-card{
+        height: 45rem;
+        margin-top: 0.5rem;
+    }
+ }
+  
   
   .genai_main_content {
     flex: 1;
@@ -76,7 +80,19 @@
         margin-top: 1rem;
     }
   }
+  .gen-btn2{
+    .p-button{
+        width: 7rem;
+    }
+  }
   .label-genai{
+    font: $f7_semibold;
+  }
+  .label-genai2{
+    font: $f6_regular;
+    padding-left: 0.5rem;
+  }
+  .label-genai3{
     font: $f6_semibold;
   }
 .datatable_files > .p-datatable > .p-datatable-wrapper > .p-datatable-table > .p-datatable-tbody{
@@ -89,3 +105,8 @@
     overflow-x: hidden;
     display: block;
 }
+  .img-container{
+    align-items: center;
+    margin-top: 10rem;
+    margin-left: 10rem;
+  }

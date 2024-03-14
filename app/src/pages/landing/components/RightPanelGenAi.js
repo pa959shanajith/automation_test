@@ -21,7 +21,7 @@ const RightPanelGenAi = () => {
         <Card>
             <div className='flex flex-row pl-2 pb-2' style={{ gap: "4.5rem" }} >
                 <div className="flex flex-column">
-                    <label className="pb-2 font-medium">Parameters</label>
+                <span><img src="static/imgs/variables_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /><label className="pb-2 label-genai3">Parameters</label></span>
                     <label htmlFor="username" className="pb-2 font-medium">Industry Doamin <span style={{ color: "#d50000" }}>*</span></label>
                     <InputText value={value} onChange={(e) => setValue(e.target.value)} />
                     <label className="pb-2 font-medium">Test Case Type <span style={{ color: "#d50000" }}>*</span></label>
@@ -38,8 +38,8 @@ const RightPanelGenAi = () => {
                         <Slider value={range} onChange={(e) => setRange(e.value)} className="w-full" />
                     </div>
                     <div className="flex flex-row lable-div-temp">
-                    <label> Low</label>
-                    <label> High</label>
+                    <label style={{color:'green'}}> Low</label>
+                    <label style={{color:'red'}}> High</label>
                     </div>
                     <div className="gen-btn">
                     <Button label="Generate" ></Button>
