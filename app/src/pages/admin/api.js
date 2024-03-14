@@ -1612,7 +1612,7 @@ export const createModel = async(payload) => {
         if(res.status === 401 || res.data === "Invalid Session" ){
             RedirectPage(history)
             return {error:MSG.GENERIC.INVALID_SESSION};
-        }else if(res.status===200 && res.data !== "fail"){            
+        }else if(res.status===201 && res.data !== "fail"){            
             return res.data;
         }
         console.error(res.data)
@@ -1622,3 +1622,45 @@ export const createModel = async(payload) => {
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }
+
+export const readModel = async () => {
+    try {
+      const res = await axios.get(url + '/genAI/read');  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+
+  export const editModel = async (id,payload) => {
+    try {
+      const res = await axios.put(url + `/genAI/edit/${id}`,payload);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+
+  export const deleteModel = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/delete/${id}`);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };

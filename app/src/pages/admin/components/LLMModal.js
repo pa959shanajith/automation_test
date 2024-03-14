@@ -15,7 +15,7 @@ import { classNames } from 'primereact/utils';
 import { MultiSelect } from 'primereact/multiselect';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
-import { createModel } from '../api';
+import { createModel, readModel, editModel,deleteModel } from '../api';
 
 
 /* Component Grids List */
@@ -31,16 +31,20 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const [modalName, setModalName] = useState('');
     const [modalType, setModalType] = useState({});
     const [modalToken, setModalToken] = useState('');
-    const [openAiExtras, setOpenAiExtras] = useState({
+    const openAI_Obj = {
         name: "",
         api_type: "azure",
         api_version: "",
         api_base: "",
         deployment_name:""
-    });
+    }
+    const [openAiExtras, setOpenAiExtras] = useState(openAI_Obj);
     const [deleteRow, setDeleteRow] = useState(false);
     const [selectedModelType, setSelectedModelType] = useState(null);
-    const [versionDropdownOptions, setVersionDropdownOptions] = useState([]);
+    const [isEdit,setIsEdit] = useState(false);
+    const [currentId,setCurrentId] = useState('');
+
+    // const [versionDropdownOptions, setVersionDropdownOptions] = useState([]);
     const [version, setVersion] = useState('');
 
     const deleteGridConfig = (rowData) => {
@@ -250,49 +254,189 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     const saveModel = async () => {
         try {
           setLoading('Saving...');
+          if(isEdit){
+            setIsEdit(false);
+            let payload = {
+                name: modalName,
+                modeltype: modalType,
+                // api_key: modalToken,
+                // model: version
+              };
           
-          let payload = {
-            name: modalName,
-            modeltype: modalType,
-            api_key: modalToken,
-            model: version
-          };
-      
-          // Additional fields for OpenAi
-          if (modalType === 'openAi') {
-            payload = { ...payload, ...openAiExtras };
-          } else if (modalType === 'cohere' || modalType === 'anthropic') {
-            // Additional fields for Cohere and Anthropic
-            // Adjust the field names based on your API requirements
-            payload = { ...payload, /* add Cohere/Anthropic specific fields here */ };
+              // Additional fields for OpenAi
+              if (modalType === 'openAi') {
+                payload.openai_api_base = openAiExtras.api_base;
+                payload.openai_api_key = modalToken;
+                payload.openai_api_type = openAiExtras.api_type;
+                payload.openai_api_version = openAiExtras.api_version;
+                payload.openai_deployment_name = openAiExtras.deployment_name;
+
+                // payload = { ...payload, ...openAiExtras };
+              } else if (modalType === 'cohere' || modalType === 'anthropic') {
+                if(modalType === 'cohere'){
+                    payload.cohere_api_key = modalToken;
+                    payload.cohere_model = version;
+
+                }
+                else if(modalType === 'anthropic'){
+                    payload.anthropic_api_key = modalToken;
+                    payload.anthropic_model = version;
+                }
+                // payload = { ...payload, /* add Cohere/Anthropic specific fields here */ };
+              }
+          
+              const response = await editModel(currentId,payload);
+          
+              if (response.error) {
+                // Handle error response
+                console.error('Failed to create model:', response.error);
+              } else {
+                toastSuccess('model updated')
+                setLoading(false);
+                setLlmModel(false);
+                setOpenAiExtras(openAI_Obj);
+                setModalName('');
+                setModalType({});
+                setModalToken('');
+                setVersion('');
+                setCurrentId('');
+                const result = await readModel();
+                if (result.status) {
+                  setTableData(result.data);
+    
+                } else {
+                  console.error(result.error);
+                }
+                // Model created successfully
+                // Add any additional logic or state updates as needed
+                // toast.current.show({
+                //   severity: 'success',
+                //   summary: 'Success',
+                //   detail: 'The model was successfully created!',
+                //   life: 5000,
+                // });
+              }
           }
-      
-          const response = await createModel(payload);
-      
-          if (response.error) {
-            // Handle error response
-            console.error('Failed to create model:', response.error);
-          } else {
-            // Model created successfully
-            // Add any additional logic or state updates as needed
-            // toast.current.show({
-            //   severity: 'success',
-            //   summary: 'Success',
-            //   detail: 'The model was successfully created!',
-            //   life: 5000,
-            // });
+          else{
+            let payload = {
+                name: modalName,
+                modeltype: modalType,
+                api_key: modalToken,
+                model: version
+              };
+          
+              // Additional fields for OpenAi
+              if (modalType === 'openAi') {
+                payload = { ...payload, ...openAiExtras };
+              } else if (modalType === 'cohere' || modalType === 'anthropic') {
+                // Additional fields for Cohere and Anthropic
+                // Adjust the field names based on your API requirements
+                payload = { ...payload, /* add Cohere/Anthropic specific fields here */ };
+              }
+          
+              const response = await createModel(payload);
+          
+              if (response.error) {
+                // Handle error response
+                console.error('Failed to create model:', response.error);
+              } else {
+                toastSuccess('model created');
+                setLoading(false);
+                setLlmModel(false);
+                setOpenAiExtras(openAI_Obj);
+                setModalName('');
+                setModalType({});
+                setModalToken('');
+                setVersion('');
+                const result = await readModel();
+                if (result.status) {
+                  setTableData(result.data);
+    
+                } else {
+                  console.error(result.error);
+                }
+                // Model created successfully
+                // Add any additional logic or state updates as needed
+                // toast.current.show({
+                //   severity: 'success',
+                //   summary: 'Success',
+                //   detail: 'The model was successfully created!',
+                //   life: 5000,
+                // });
+              }
           }
+          
         } catch (error) {
           console.error('Error:', error);
         }
       };
-      
+
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const result = await readModel();
+    
+            if (result.status) {
+              setTableData(result.data);
+            } else {
+              console.error(result.error);
+            }
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          }
+        };
+    
+        fetchData();
+      }, []);
+
+    const handleEdit = async (rowData) => {
+        console.log(rowData)
+        setLlmModel(true);
+        setIsEdit(true);
+        setModalName(rowData?.name);
+        setModalType(rowData?.modeltype);
+        setCurrentId(rowData?._id);
+        if (rowData?.modeltype === "openAi") {
+            const { name, openai_api_key, openai_api_base, openai_api_type, openai_api_version, openai_deployment_name} = rowData;
+            setOpenAiExtras({ name, api_key: openai_api_key, api_base: openai_api_base, api_type: openai_api_type, api_version: openai_api_version, deployment_name:openai_deployment_name})
+            setModalToken(rowData?.openai_api_key)
+        } else if (rowData?.modeltype === "cohere" || rowData?.modeltype === "anthropic") {
+            const { name,cohere_api_key,cohere_model,anthropic_api_key,anthropic_model} = rowData;
+            setModalToken( rowData?.modeltype === "cohere" ? cohere_api_key : anthropic_api_key);
+            setVersion( rowData?.modeltype === "cohere" ? cohere_model : anthropic_model);
+            
+        }
+    }
+        const handleDelete = async (currId) => {
+            try {
+                const result = await deleteModel(currId);
+
+                if (result.error) {
+                    // Handle the error, e.g., show an error message
+                    console.error(result.error);
+                } else {
+                    // Handle success, e.g., update the UI or perform additional actions
+                    toastSuccess('Model deleted successfully');
+                    const result = await readModel();
+                    if (result.status) {
+                    setTableData(result.data);
+        
+                    } else {
+                    console.error(result.error);
+                    }
+                }
+            } catch (error) {
+                // Handle any unexpected errors
+                toastError('Unexpected error');
+            }
+        };
+    
 
 
 
     const footerContent = (
         <div>
-            <Button label="Cancel" onClick={() => setLlmModel(false)} className="p-button-text" />
+            <Button label="Cancel" onClick={() => onHideHandle()} className="p-button-text" />
             <Button label="Save" onClick={saveModel}  autoFocus />
         </div>
     );
@@ -311,13 +455,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         // Add more options as needed
       ];
 
-      const versionDropdown = [
-        { label: 'Calude-2', value: 'Calude-2' },
-        { label: 'command', value: 'command' },
-        { label: 'azure', value: 'azure' },
-      ];
-
-      const versionDropdownOptions1 = {
+      const versionDropdownOptions = {
         openAi: [
           { label: 'gpt-35-turbo-16k', value: 'gpt-35-turbo-16k' },
           { label: 'gpt-35-turbo', value: 'gpt-35-turbo' },
@@ -341,35 +479,57 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         }
         setVersion(selectedOption.value);
       };
-    
-
-    const actionTemplate=()=>{
+    const actionTemplate=(rowData)=>{
         return( <div>
-            <span className='pi pi-pencil' ></span>
-            <span className='pi pi-trash' onClick={()=> setDeleteRow(true) }  style={{marginLeft:'1rem'}} ></span>
-        </div>)
-        
+            {/* <span className='pi pi-pencil' onClick={()=>handleEdit(rowData)} ></span> */}
+            <span className='pi pi-trash' onClick={()=> {setDeleteRow(true);setCurrentId(rowData?._id)} }  style={{marginLeft:'1rem'}} ></span>
+        </div>)   
+    }
+    const getDeploymentValue = () =>{
+        if(modalType == "openAi"){
+            return openAiExtras?.deployment_name
+        }else if(modalType == "cohere" || modalType == "anthropic"){
+            return  version
+        }
+    }
+    const onHideHandle = () => {
+            setLlmModel(false);
+            setOpenAiExtras(openAI_Obj);
+            setModalName('');
+            setModalType({});
+            setModalToken('');
+            setVersion('');
     }
     return (
         <>
             {!tableData.length && <NoDataFound />}
             {(tableData.length) &&
             <div className="card">
-                <DataTable value={tableData} paginator rows={10} dataKey="id"
+
+                    <AvoConfirmDialog
+                        visible={deleteRow}
+                        onHide={() => setDeleteRow(false)}
+                        showHeader={false}
+                        message="Are you sure you want to delete ?"
+                        icon="pi pi-exclamation-triangle"
+                        accept={() => handleDelete(currentId)}
+                    />
+                <DataTable value={tableData} paginator rows={6} dataKey="id"
                     header={header} emptyMessage="No customers found." tableStyle={{ minWidth: '50rem' }}>
                     <Column field="name" header="Name" style={{ minWidth: '12rem' }} />
-                    <Column field="token" header="Token" style={{ minWidth: '12rem' }} />
-                    <Column field="actions" header="Actions" style={{ minWidth: '6rem' }} body={actionTemplate}/>
+                    <Column field="modeltype" header="LLM Model" style={{ minWidth: '12rem' }} />
+                    <Column field="createdAt" header="Created Date" style={{ minWidth: '12rem' }} />
+                    <Column field="actions" header="Actions" style={{ minWidth: '6rem' }} body={actionTemplate} />
                 </DataTable>
             </div>
             }
             {
-                llmModel && <Dialog className='llm_modal_container' visible={llmModel} onHide={() => setLlmModel(false)} header='Add LLM Modal' footer={footerContent} style={{ width: '60vh' }} >
+                llmModel && <Dialog className='llm_modal_container' visible={llmModel} onHide={() => onHideHandle()} header='Add LLM Modal' footer={footerContent} style={{ width: '60vh' }} >
 
                     <div className="flex flex-column">
                         <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Name <span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
-                            <InputText placeholder='Enter Modal Name' onChange={(e) => { setModalName(e.target.value); setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } });}} />
+                            <InputText value={modalName} placeholder='Enter Modal Name' onChange={(e) => { setModalName(e.target.value); setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } });}} />
 
                         </div>
                         <div className="flex flex-column pb-2">
@@ -384,9 +544,9 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                         <div className="flex flex-column pb-2">
                             <label className='pb-2 font-medium'> {modalType == 'openAi' ? 'Deployment Name' : 'Model Version'}<span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
                             <Dropdown
-                                 options={versionDropdownOptions1[modalType] || []}
+                                 options={versionDropdownOptions[modalType] || []}
                                  onChange={handleSecondDropdownChange}
-                                 value={version}
+                                 value={getDeploymentValue()}
                                  placeholder="Select an option"
                             />
                         </div>
@@ -400,28 +560,20 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                         </div>} */}
                         {modalType == 'openAi' && <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">API Version <span style={{ color: "#d50000" }}>*</span></label>
-                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_version: e.target.value } })} placeholder='Enter Api Version'
+                            <InputText value={openAiExtras?.api_version} onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_version: e.target.value } })} placeholder='Enter Api Version'
                             />
                         </div>}
                         {modalType == 'openAi' && <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Base URL <span style={{ color: "#d50000" }}>*</span></label>
-                            <InputText onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_base: e.target.value } })} placeholder='Enter Base URL'
+                            <InputText value={openAiExtras?.api_base} onChange={(e) => setOpenAiExtras((prev) => { return { ...prev, api_base: e.target.value } })} placeholder='Enter Base URL'
                             />
                         </div>}
                         <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Token<span style={{ color: "#d50000" }}>*</span></label>
-                            <InputText onChange={(e) => setModalToken(e.target.value)} placeholder='Enter Token' />
+                            <InputText value={modalToken} onChange={(e) => setModalToken(e.target.value)} placeholder='Enter Token' />
                         </div>
                     </div>
 
-                    {/* <AvoConfirmDialog 
-                        visible={deleteRow}
-                        onHide={() => setDeleteRow(false)}
-                        showHeader={false}
-                        message="Are you sure you want to delete the repository?"
-                        icon="pi pi-exclamation-triangle"
-                        accept={() =>setDeleteRow(false) } 
-                        /> */}
 
                 </Dialog>
             }

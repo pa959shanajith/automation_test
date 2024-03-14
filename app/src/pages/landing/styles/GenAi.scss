@@ -79,3 +79,13 @@
   .label-genai{
     font: $f6_semibold;
   }
+.datatable_files > .p-datatable > .p-datatable-wrapper > .p-datatable-table > .p-datatable-tbody{
+    tr{
+        display: table;
+        width: 100%;
+    }
+    overflow-y: auto;
+    height: 25vh;
+    overflow-x: hidden;
+    display: block;
+}
