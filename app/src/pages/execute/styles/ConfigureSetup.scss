@@ -330,3 +330,17 @@ margin-top: -0.5rem;
   border-radius: 50px !important;
   border: 1px solid #ff9800 !important; 
 }
+.profilenametooltip{
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  text-overflow: ellipsis;
+}
+.profileChildNametooltip{
+  width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  text-overflow: ellipsis;
+}

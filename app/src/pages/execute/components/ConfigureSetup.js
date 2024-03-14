@@ -123,6 +123,27 @@ const ConfigureSetup = ({
   const handleClearAllTags = () => {
     setSelectedTags([]);
   };
+
+ 
+  const profileNameTooltip = (name) => {
+    return <>
+      <Tooltip target={`.profilenametooltip_${name}`} content={name}></Tooltip>
+      <span
+        className={`profilenametooltip_${name} profilenametooltip`}
+      >
+        {name}
+      </span></>   
+};
+
+const profileChildNameTooltip = (name) => {
+  return <>
+    <Tooltip target={`.profileChildNametooltip${name}`} content={name}  ></Tooltip>
+    <span
+      className={`profileChildNametooltip${name} profileChildNametooltip`}  
+    >
+      {name}
+    </span></>   
+};
   
 
 
@@ -142,7 +163,7 @@ const ConfigureSetup = ({
           childTree.push({
             key: `${index}-${ind}`,
             data: {
-              name: e?.name,
+              name: profileChildNameTooltip(e?.name),
               dataParameterization: (
                 <InputText
                   value={dataparam[dataParamName]?.value}
@@ -186,7 +207,7 @@ const ConfigureSetup = ({
         key: `${index}`,
         id: el?.moduleid,
         data: {
-          name: el?.name,
+          name:profileNameTooltip(el?.name),
         },
         children: childTree,
       });
