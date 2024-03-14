@@ -11,12 +11,14 @@ import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
+import AiTemplate from '../components/AiTemplate';
+import GridTemplate from '../components/GridTemplate';
 import LLM from './LLM'
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
     const [createUserDialog, setCreateUserDialog] = useState(false)
-    // const [provisionDialog,setProvisionDialog] = useState(false)
+    // const [provisionDialog,setProvisionDialog] = useState(false)s
     return (<>
         <div className="rightContainer">
             {currentTab !== "session_management"?
@@ -31,8 +33,12 @@ const OriginContainer = (props) => {
             {currentTab === "grid_configuration" && <Grid/>}
             {currentTab === "LLM" && <LLM/>}
             {currentTab === "license_details" && <LicenseManagement/>}
+            {currentTab === "aitemplate" && <AiTemplate/>}
+            {currentTab === "grid_template" && <GridTemplate/>}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
+            
+
         </div>
     </>)
 }

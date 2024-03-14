@@ -1599,7 +1599,7 @@ export const fetch_git_exp_details = async(projectId) => {
     }
 }
 
-export const createModel = async(payload) => { 
+export const createModel = async(payload) => {
     try{
         const res = await axios(url+'/genAI/create', {
             method: 'POST',
@@ -1664,3 +1664,74 @@ export const readModel = async () => {
       return { error: 'Error in API call' };
     }
   };
+export const createTemp = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/createTemp', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'createTemp', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+
+export const readModel = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/read', {
+            method: 'GET',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'readModel', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+export const readTemp = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/readTemp', {
+            method: 'GET',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'readTemp', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
