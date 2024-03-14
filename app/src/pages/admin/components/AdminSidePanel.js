@@ -56,17 +56,26 @@ const AdminSidePanel = () => {
                     </div>
                 </AccordionTab>
 
-                <AccordionTab header="Feature Management">
+                <AccordionTab header="Feature management">
                     <div className='flex flex-column pl-4 sidepanel_admin'>
                         <ul>
-                            <li onClick={() => { setHeader('LLM Modal'); setScreen('LLM'); }} className={currentScreen === "LLM" ? "active_tab" : "not_active_tab"}>
+                        <li onClick={() => { setHeader('LLM Modal'); setScreen('LLM'); }} className={currentScreen === "LLM" ? "active_tab" : "not_active_tab"}>
                                 <img src="static/imgs/LLM.png" alt="PNG Image" style={{ marginRight: '0.5rem' }} />
                                <span className='useers_label'>LLM Modal</span> 
+                            </li>
+                            <li onClick={() => { setHeader('AI Template'); setScreen('aitemplate'); }} className={currentScreen === "aitemplate" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>AI Template</span> 
+                            </li>
+                            <li onClick={() => { setHeader('Grid'); setScreen('grid_template'); }} className={currentScreen === "grid_template" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>Grid</span> 
                             </li>
                         </ul>
                     </div>
                 </AccordionTab>
             </Accordion>
+         
             <div className='flex flex-column pl-2 pr-1 m-1 sidepanel_admin'>
                 <ul>
                     <li onClick={() => { setHeader('Email Server Configuration'); setScreen('email_server_configuration'); }} className={currentScreen === "email_server_configuration" ? "active_tab" : "not_active_tab"}>
