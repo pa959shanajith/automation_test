@@ -15,7 +15,9 @@ const tokenAuth = require('../lib/tokenAuth');
 const constants = require('../lib/execution/executionConstants');
 const Handlebars = require('../lib/handlebar.js');
 var axios  =  require('axios');
-var https = require('https')
+var https = require('https');
+const { response } = require('../../server.js');
+
 // PDF EXPORT
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
@@ -2076,8 +2078,8 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 exports.uploadGeneratefile = async (req, res) => {
     logger.info("Inside UI service: uploadGeneratefile");
     try {
-         // Validate request data
-         if (!req.file || !req.body.name || !req.body.email || !req.body.projectname || !req.body.organization) {
+        // Validate request data
+        if (!req.file || !req.body.name || !req.body.email || !req.body.projectname || !req.body.organization) {
             return res.status(400).json({ error: 'Bad request: Missing required data' });
         }
         var inputs = {
@@ -2089,20 +2091,28 @@ exports.uploadGeneratefile = async (req, res) => {
             "organization": req.body.organization,
             "type": req.body.type
         };
-        const result = await utils.fetchData(inputs, "upload/generateAIfile", "uploadGeneratefile", true);
 
-        // Check if an error response was received
-        if (result &&  result[1].statusCode !== 200) {
-            return res.status(result[1].statusCode).json({
-                error: result[1].statusMessage || 'Unknown error',
-            });
-        }
+        const upload_url = epurl + "upload/generateAIfile";
 
-        // If everything is successful, return a success response
-        res.status(200).json({ success: true, message: 'File uploaded successfully' });
+        // const result = await utils.fetchData(inputs, "upload/generateAIfile", "uploadGeneratefile", true);
+        await axios.post(upload_url, inputs, {
+            headers: { 'Content-Type': 'application/json' },
+            maxBodyLength: 104857600, //100mb
+            maxContentLength: 104857600, //100mb
+        }).then(response => {
+            if (response.status !== 200) {
+                return res.status(response.status).json({
+                    error: response.statusText || 'Unknown error',
+                });
+            }
+            return res.status(200).json({ success: true, message: 'File uploaded successfully' });
+        }).catch(apiError => {
+            // logger.error('Error: ', apiError);
+            return res.status(500).json({ error: 'Internal server error' });
+        })
     } catch (error) {
         logger.error('Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 
 }
