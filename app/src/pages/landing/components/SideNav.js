@@ -7,8 +7,9 @@ import { Ripple } from 'primereact/ripple';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { Carousel } from 'primereact/carousel';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
 import '../styles/SideNav.scss';
+import {loadUserInfoActions} from '../LandingSlice';
 
 
 const SideNav = () => {
@@ -18,6 +19,8 @@ const SideNav = () => {
     const [filteredMenuItems, setFilteredMenuItems] = useState([]);
     const [tabForDashboard, setTabForDashboard] = useState("");
     const recipientEmail = 'support@avoautomation.com';
+    const dispatch = useDispatch()
+    const collapseSideBar = useSelector((state) => state.landing.collapseSideBar);
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -94,6 +97,7 @@ const SideNav = () => {
             }
             else {
                 setTabSelected(route);
+                dispatch(loadUserInfoActions.collapseSideBar(false))
             }
         }
         else {
