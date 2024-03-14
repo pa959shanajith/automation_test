@@ -190,7 +190,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "method" : data['method'],
             "endPointURL" : data['endPointURL'],
             "header" : data['requestHeader'],
-            "param" : "",
+            "param" : data['param'],
             "authInput" : "",
             "authKeyword":""
         }
@@ -219,31 +219,32 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "remarks" : "",
             "addDetails" : "",
             "cord" : ""
-        }, 
-        {
-            "stepNo" : 3,
-            "custname" : "WebService List",
-            "keywordVal" : "setHeaderTemplate",
-            "inputVal" : [data['requestHeader']],
-            "outputVal" : "",
-            "appType" : "Webservice",
-            "remarks" : "",
-            "addDetails" : "",
-            "cord" : ""
-        }, 
-        {
-            "stepNo" : 4,
-            "custname" : "WebService List",
-            "keywordVal" : "setWholeBody",
-            "inputVal" : [data['requestBody']],
-            "outputVal" : "",
-            "appType" : "Webservice",
-            "remarks" : "",
-            "addDetails" : "",
-            "cord" : ""
-        }, 
-        {
-            "stepNo" : 5,
+        }]
+        if('requestHeader' in data && data['requestHeader']) res['steps'].push({
+          "stepNo" : res['steps'].length+1,
+          "custname" : "WebService List",
+          "keywordVal" : "setHeaderTemplate",
+          "inputVal" : [data['requestHeader']],
+          "outputVal" : "",
+          "appType" : "Webservice",
+          "remarks" : "",
+          "addDetails" : "",
+          "cord" : ""
+        })
+        
+        if('requestBody' in data && data['requestBody']) res['steps'].push({
+          "stepNo" : res['steps'].length+1,
+          "custname" : "WebService List",
+          "keywordVal" : "setWholeBody",
+          "inputVal" : [data['requestBody']],
+          "outputVal" : "",
+          "appType" : "Webservice",
+          "remarks" : "",
+          "addDetails" : "",
+          "cord" : ""
+        })
+        res['steps'].push({
+            "stepNo" : res['steps'].length+1,
             "custname" : "WebService List",
             "keywordVal" : "executeRequest",
             "inputVal" : [ 
@@ -254,7 +255,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "remarks" : "",
             "addDetails" : "",
             "cord" : ""
-        }];
+        });
       }
       console.log(res);
       return res;
@@ -293,6 +294,27 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
           let tempArr = [];
           let scenarioPID = indexCounter;
           let screenPID = indexCounter;
+          if('type' in data && data['type'] == 'Swagger'){
+            let scenarioCounter = 1;
+            for(let [scenario,scenarioValue] of Object.entries(data['APIS'])) {
+              scenarioPID = indexCounter;
+              tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, scenarioCounter++, scenario._id, scenario, "scenarios", 0,''));
+              let screenCounter = 1;
+              for( let screen of scenarioValue['screens']) {
+                screenPID = indexCounter
+                let apiData = {
+                  'requestBody':'body' in screen ? JSON.stringify(screen['body'][0]) : '',
+                  'requestHeader':'header' in screen ? (screen['header']) : '',
+                  'endPointURL': 'endPointURL' in screen ? screen['endPointURL'] : '',
+                  'param': 'query' in screen ? (screen['query']) : '',
+                  'method': 'method' in screen ? screen['method'].toUpperCase() : ''
+                }
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++,screenCounter++, screen._id, screen['name'], "screens", scenarioPID,apiData))
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, 1, '', screen['name'], "testcases", screenPID,apiData))
+              }
+            }
+            return tempArr;
+          }
           data['APIS'].forEach((scenario, idx) => {
             scenarioPID = indexCounter;
             tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, idx+1, scenario._id, Object.keys(scenario)[0], "scenarios", 0,''));

@@ -17,7 +17,7 @@ const archiver = require('archiver');
 const zlib = require('zlib');
 const unzipper = require('unzipper');
 const { Readable } = require('stream');
-
+const SwaggerParser = require("@apidevtools/swagger-parser");
 
 let headers
 module.exports.setReq = async (req) =>
@@ -1681,23 +1681,86 @@ exports.updateE2E = async (req, res) => {
 	}
 };
 
+const recurrNestedSwagger = (data)=> {
+	let value = {}
+	for(let [prop,propValue] of Object.entries(data['properties'])) {
+		if('properties' in propValue) {
+			value[prop] = recurrNestedSwagger(propValue)	
+		}else {
+			value[prop] = propValue['type']
+		}
+	}
+	return value
+}
+const swaggerToMindmapJson = async (data)=> {
+	return SwaggerParser.dereference(data)
+	.then((data) => {
+		let moduleName = {'CollectionName':data['info']['title']}
+		scenarios = {}
+		for(let [path,pathValue] of Object.entries(data['paths'])) {
+			for(let [screen,screenValue] of Object.entries(pathValue)) {
+				scenarioName = screenValue['tags'][0]
+				if(!(scenarioName in scenarios)){
+					scenarios[scenarioName] = {'screens': []}
+				}
+				let endPointURL = 'https://' + (data['host'] || "") + (data['basePath'] || "") + path
+				let screenData = {'name':screenValue['summary'].replace(/[&\/\\#, +()$~%.'":*?<>{}]/g, '_'), 'method': screen, 'endPointURL':endPointURL}
 
+				for (let params of screenValue['parameters']){
+					let value = {[params['in']]: ""}
+					if('schema' in params && 'properties' in params['schema']) {
+						value[params['in']] = {}
+						// for(let [prop,propValue] of Object.entries(params['schema']['properties'])) {
+						// 	value[params['in']][prop] = propValue['type']
+						// }
+						value[params['in']] = recurrNestedSwagger(params['schema'])
+						if (!(params['in'] in screenData)) {
+							screenData[params['in']] = []
+						}
+						if(params['schema']['type'] == 'object') {
+							if(!('header' in screenData)) screenData['header'] = ""
+							screenData['header']+='Content-Type:application/json\n'
+						}
+						screenData[params['in']].push(value[params['in']])
+					} else {
+						value[params['in']] += params['in'] !='query' ? `${[params['name']]}: ${params['type']}\n` :`${[params['name']]}=${params['type']}\n`
+						if (!(params['in'] in screenData)) {
+							screenData[params['in']] = ""
+						}
+						screenData[params['in']]+=value[params['in']]
+					}
+				}
+				scenarios[scenarioName]['screens'].push(screenData);
+			}
+		}
+		moduleName['APIS'] = scenarios
+		moduleName['type'] = 'Swagger'
+		return moduleName
+	})
+	.catch((err) => {
+		// Handle parsing error
+		console.error('Error parsing Swagger data:', err);
+		return 'Fail'
+	});
+}
 exports.importDefinition = async (req, res) => {
 	try {
         logger.info("Inside UI service: importDefinition");
         var username=req.session.username;
 		var clientName=utils.getClientName(req.headers.host);
         var icename = undefined
+		if(req.query == 'jsonToMindmap') {
+			let parsedData = await swaggerToMindmapJson(swaggerJsonData);
+			return res.send(parsedData)
+		}
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         // redisServer.redisSubServer.subscribe('ICE2_' + icename);
 		var action = req.body.param;
 		if(action == 'importDefinition_ICE' && icename!=undefined){
 			var sourceUrl = req.body.sourceUrl;
 			try {
-				// var wsdlurl = req.body.wsdlurl;
 				logger.info("Sending socket request for debugTestCase to cachedb");
 				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl};
-				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
 				var socket = require('../lib/socket');
 				var mySocket;
 				mySocket = socket.allSocketsMap[clientName][icename];
@@ -1705,7 +1768,7 @@ exports.importDefinition = async (req, res) => {
 
 					logger.info("Sending request to ICE for importDefinition_ICE");
 					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
-					function result_WS_ImportDefinition_listener(message) {
+					async function  result_WS_ImportDefinition_listener(message) {
 						let data = message;
 						//LB: make sure to send recieved data to corresponding user
 						mySocket.removeListener('result_WS_ImportDefinition', result_WS_ImportDefinition_listener);
@@ -1713,9 +1776,11 @@ exports.importDefinition = async (req, res) => {
 							if(!Object.keys(data).length){
 								logger.info('Error Occured in fetching');
 								// res.status(resultData.Error.status).send(resultData.Error.msg);
-								// return;
+								res.send('Fail')
+								return;
 							}
-							res.send(data);
+							let parsedData = await swaggerToMindmapJson(data);
+							res.send(parsedData)
 						} catch (exception) {
 							res.send("fail");
 							logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
