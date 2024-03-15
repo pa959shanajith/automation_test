@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful,SetSelectedRepository,SetEmptyDatatable} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -34,6 +34,8 @@ import WebserviceScrape from './WebServiceCapture';
 import EditIrisObject from '../components/EditIrisObject';
 import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
+import { insertScreen } from '../../design/api';
+import { loadUserInfoActions } from '../../landing/LandingSlice';
 
 const CaptureModal = (props) => {
     const dispatch = useDispatch();
@@ -131,6 +133,10 @@ const CaptureModal = (props) => {
     const [parentId, setParentId] = useState(null);
     const [screenChange, setScreenChange] = useState(false);
     const [selectedFolderValue,setSelectedFolderValue] = useState([]);
+    const [dialogForRepo, setDialogForRepo] = useState(false);
+    const [repositoryNewName, setRepositoryNewName] = useState("");
+    const [repoNameAdded, setRepoNameAdded] = useState(false);
+    const [emptyDatatable, setEmptyDatatable] = useState(false)
     const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
@@ -144,7 +150,7 @@ const CaptureModal = (props) => {
 
   useEffect(() => {
     fetchScrapeData()
-  }, [parentData,parentId])
+  }, [parentData,parentId,emptyDatatable])
     useEffect(() => {
         let browserName = (function (agent) {
 
@@ -509,7 +515,7 @@ const CaptureModal = (props) => {
         return new Promise((resolve, reject) => {
             setOverlay("Loading...");
 
-            let viewString = capturedDataToSave;
+            let viewString = emptyDatatable ?[]:capturedDataToSave;
             let haveItems = viewString.length !== 0;
             let newlyScrapeList = [];
             let Id = parentData.id
@@ -640,6 +646,7 @@ const CaptureModal = (props) => {
                     setCaptureData(newData);
                     setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
                     addMore.current = false;
+                    setEmptyDatatable(false);
                 })
                 .catch(error => {
                     dispatch(disableAction(haveItems));
@@ -1183,7 +1190,8 @@ const CaptureModal = (props) => {
             <div className='empty_msg flex flex-column align-items-center justify-content-center'>
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">Elements not captured</p>
-                {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
+                {(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
+                {(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
                 <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
             </div>
         </div>
@@ -1808,113 +1816,204 @@ const CaptureModal = (props) => {
                   setScreenData([]);
                   toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
                 else setScreenData(screens.screenList);
+                let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+                handleScreenChange(newAddedRepo[0])
             } catch (error) {
                 console.error('Error fetching User list:', error);
             }
         })();
-      }, [NameOfAppType.projectId]);
+      }, [NameOfAppType.projectId,repoNameAdded]);
       
-      const handleScreenChange = (e) => {
-        setSelectedFolderValue(e.value)
-        // const selectedFolderValue = e.value;
-        // setSelectedScreen(selectedFolderValue);
+    //   const handleScreenChange = (e) => {
+    //     setSelectedFolderValue(e.value)
+    //     // const selectedFolderValue = e.value;
+    //     // setSelectedScreen(selectedFolderValue);
       
-        if(captureData.length >= 0){
+    //     if(captureData.length >= 0){
+    //       setScreenChange(true);
+    //     }
+      
+    //     // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+    //     else{
+    //     setSelectedScreen(e.value);
+    //     // setParentId(e.value.id);
+    //     // fetchScrapeData();
+    //     setSaveDisable(false);
+    //     setElementRepo(true);
+    //     }
+    //     // addMore.current = true;
+    //     // let newData = capturedDataToSave;
+    //     // newData.push(...selectedFolderValue.related_dataobjects)
+    //     // setCapturedDataToSave(newData);
+    //     // // setCaptureData(newData);
+    //     // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
+      
+    //   };
+
+    const handleScreenChange = (e) => {
+        // if(typeof e.value === "string"){
+        //   setSelectedFolderValue({type:e.value,key:false})
+        // }else{
+        //   setSelectedFolderValue({type:e.value,key:true})
+        // } 
+      
+        const value = typeof e === 'object' && 'value' in e ? e.value : e;
+        if (typeof value === "string") {
+          setSelectedFolderValue({ type: value, key: false });
+        } else {
+          setSelectedFolderValue({ type: value, key: true });
+        }
+      
+        if(captureData.length > 0){
           setScreenChange(true);
         }
-      
-        // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+       else if (value === buttonOption.value){
+        setDialogForRepo(true);
+       }
         else{
-        setSelectedScreen(e.value);
-        // setParentId(e.value.id);
-        // fetchScrapeData();
-        setSaveDisable(false);
+      
+            let params = {
+              'screenId': parentData.id,
+              'userId': userInfo.user_id,
+              'roleId': userInfo.role,
+              'param': 'updateOrderList',
+              'orderList':value.type?value.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject):value.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
+              'elementrepoid':{id:value.type?value.type.id ? value.type.id : value.type._id:value.id ? value.id : value._id, name:value.type?value.type.title :value.title}
+            }
+        
+      
+            const res = scrapeApi.updateScreen_ICE(params);
+          
+            if(res === 'fail') {
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+            else {
+              dispatch(SetSelectedRepository(value.type?value.type:value))
+              setSelectedScreen(value.type?value.type:value);
+              setEmptyDatatable(true);
+              // fetchScrapeData()
+              
+            }
+          }
+      
+        // setSaveDisable(false);
         setElementRepo(true);
         }
-        // addMore.current = true;
-        // let newData = capturedDataToSave;
-        // newData.push(...selectedFolderValue.related_dataobjects)
-        // setCapturedDataToSave(newData);
-        // // setCaptureData(newData);
-        // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
       
-      };
+    //   const confirmScreenChange = () => {
+    //     (async () => {
+    //       try {
+    //           let params = {
+    //             param : "updateMindmapTestcaseScreen",
+    //             projectID :  NameOfAppType.projectId,
+    //             moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
+    //             parent:props.fetchingDetails["parent"]["_id"],
+    //             currentScreen:parentData.id,
+    //             updateScreen:selectedFolderValue.id
+    //           }
       
-      const confirmScreenChange = () => {
+    //           const res = await scrapeApi.updateScreen_ICE(params);
+    //           if(res === 'fail') {
+    //             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+    //           else {
+                
+    //             var req={
+    //               tab:"createdTab",
+    //               projectid:NameOfAppType.projectId,
+    //               version:0,
+    //               cycId: null,
+    //               modName:"",
+    //               moduleid:res
+    //             }
+    //             const dataScreen = await scrapeApi.getModules(req)
+    //             if(dataScreen.error)return;
+    //             else {
+    //               const screenData_1 = getReqScreen (dataScreen)
+    //               function getReqScreen (data){
+    //                 let sd = []
+    //                 data.children.forEach((child)=>{
+    //                   if(child._id === props.fetchingDetails["parent"]["_id"]){
+    //                     child.children.forEach((subChild)=>{
+    //                       if(subChild._id === selectedFolderValue.id){
+    //                         if(subChild.children.length > 0){
+    //                            const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
+    //                               return {
+    //                                 ...item,
+    //                                 parent:{...subChild,parent:{...child,parent:data}}
+    //                               }
+    //                            })}
+    //                            const childData = {...newData.children[0], type:'teststepsgroups', parent:newData}
+    //                            sd.push(childData);
+    //                         }
+    //                         else{
+    //                           sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
+    //                             return{
+    //                               ...data,parent:{...child,parent:data}
+    //                             }
+      
+    //                           })}})
+    //                         }
+    //                       }
+    //                     })
+    //                   }
+    //                 })
+    //                 return sd;
+    //               }
+                  
+    //             //   console.log(screenData_1);
+    //               if(screenData_1.length>0){
+    //                 props.setFetchingDetails(screenData_1[0])
+    //                 props.setModuleData({id:res, key:uuid()})
+    //                 setParentId(screenData_1[0].parent._id);
+    //                 toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
+    //               }else{
+    //                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
+    //               }
+    //               // props.setFetchingDetails(screenData_1[0])
+    //               // props.setModuleData({id:res, key:uuid()})
+    //               // setParentId(uuid());
+    //             }
+    //           }
+    //           }
+    //        catch (error) {
+    //           console.error('Error fetching User list:', error);
+    //       }
+    //   })();
+    //   };
+
+    const confirmScreenChange = () => {
+  
         (async () => {
           try {
-              let params = {
-                param : "updateMindmapTestcaseScreen",
-                projectID :  NameOfAppType.projectId,
-                moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
-                parent:props.fetchingDetails["parent"]["_id"],
-                currentScreen:parentData.id,
-                updateScreen:selectedFolderValue.id
-              }
       
-              const res = await scrapeApi.updateScreen_ICE(params);
-              if(res === 'fail') {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
-              else {
+            if(selectedFolderValue.type === buttonOption.value){
+              setDialogForRepo(true);
+            }
+            else{
+              dispatch(SetSelectedRepository(selectedFolderValue.type))
+      
+                 let orderlist=selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
                 
-                var req={
-                  tab:"createdTab",
-                  projectid:NameOfAppType.projectId,
-                  version:0,
-                  cycId: null,
-                  modName:"",
-                  moduleid:res
-                }
-                const dataScreen = await scrapeApi.getModules(req)
-                if(dataScreen.error)return;
-                else {
-                  const screenData_1 = getReqScreen (dataScreen)
-                  function getReqScreen (data){
-                    let sd = []
-                    data.children.forEach((child)=>{
-                      if(child._id === props.fetchingDetails["parent"]["_id"]){
-                        child.children.forEach((subChild)=>{
-                          if(subChild._id === selectedFolderValue.id){
-                            if(subChild.children.length > 0){
-                               const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
-                                  return {
-                                    ...item,
-                                    parent:{...subChild,parent:{...child,parent:data}}
-                                  }
-                               })}
-                               const childData = {...newData.children[0], type:'teststepsgroups', parent:newData}
-                               sd.push(childData);
-                            }
-                            else{
-                              sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
-                                return{
-                                  ...data,parent:{...child,parent:data}
-                                }
-      
-                              })}})
-                            }
-                          }
-                        })
-                      }
-                    })
-                    return sd;
-                  }
-                  
-                //   console.log(screenData_1);
-                  if(screenData_1.length>0){
-                    props.setFetchingDetails(screenData_1[0])
-                    props.setModuleData({id:res, key:uuid()})
-                    setParentId(screenData_1[0].parent._id);
-                    toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
-                  }else{
-                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
-                  }
-                  // props.setFetchingDetails(screenData_1[0])
-                  // props.setModuleData({id:res, key:uuid()})
-                  // setParentId(uuid());
-                }
+              let params={
+                'param':"updateOrderListAndRemoveParentId",
+                'screenId': parentData.id,
+                'userId': userInfo.user_id,
+                'roleId': userInfo.role,
+                'orderList': orderlist,
+                'oldOrderList':captureData.map(element=>element.objectDetails.objId),
+                'elementrepoid':{id:selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id,name:selectedFolderValue.type.title}
+            }
+            let res=scrapeApi.updateScreen_ICE(params)
+            if(res === 'fail') {
+              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+            else {
+              setSelectedScreen(selectedFolderValue.type);
+              setCaptureData([])
+              setCapturedDataToSave([])
+              setEmptyDatatable(true)
+              // fetchScrapeData()
               }
-              }
+            }
+          }
            catch (error) {
               console.error('Error fetching User list:', error);
           }
@@ -1928,6 +2027,88 @@ const CaptureModal = (props) => {
         orderlist:folder.orderlist,
         parent:folder.parent
       }));
+
+      const renderOption = (option) => {
+
+        if (option.value === 'add_repository') {
+          return (
+            <div className="p-dropdown-item">
+              <Button label={option.label} />
+            </div>
+          );
+        } else {
+          return (
+            <div className="p-dropdown-item" title={option.title}>
+              {option.label}
+            </div>
+          );
+        }
+      };
+      
+      
+      const optionsWithTooltips = screenOption.map(option => ({
+        ...option,
+        title: option.title
+      }));
+      const buttonOption = { label: 'Add Repository', value: 'add_repository' };
+      optionsWithTooltips.push(buttonOption)
+
+
+      const footerSaveForRepo =()=>(
+        <Button label='Save' className='repository__save__btn' onClick={()=>handleAddAccordion()} disabled={!repositoryNewName}/>
+      )
+      
+      const handleRepoNewName =(e)=>{
+        if (e.target.value.includes(' ') || e.keyCode === 32) {
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+          e.preventDefault();
+          return;
+        }
+        setRepositoryNewName(e.target.value)
+      }
+
+      const handleAddAccordion = () => {
+        if(screenData?.map((item)=>item.name).includes(repositoryNewName)){
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Duplicate repository names are not allowed', life: 5000 });
+        }
+        else{
+        const newScreen = {
+          label: repositoryNewName,
+          related_dataobjects: [],
+          orderlist:[],
+          title:repositoryNewName,
+          name:repositoryNewName
+        };
+        // setNewScreenCount(newScreenCount + 1);
+      
+        let params ={
+          projectid: NameOfAppType.projectId,
+          name: newScreen.label,
+          versionnumber: 0,
+          createdby: userInfo.user_id,
+          createdbyrole: userInfo.role,
+          param : 'create'
+        }
+        insertScreen(params)
+        // insertRepository(params)
+        .then(response =>  {
+          if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
+          else if(response === "invalid session") return RedirectPage(history);
+          else {
+            const addingScreen = [newScreen,...screenData];
+            setScreenData(addingScreen);
+            // setSelectedScreen(newScreen)
+            dispatch(loadUserInfoActions.updateElementRepository(true));
+            // setRepositoryNewName("")
+            setRepoNameAdded(true);
+            setDialogForRepo(false)
+            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
+          }
+      })
+        
+        .catch(error => console.log(error))
+      }
+      };
       
 
     return (
@@ -1945,13 +2126,16 @@ const CaptureModal = (props) => {
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
+                <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" /></div>
+                   <div className="dropdown_container">
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder="Select Repository" className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    </div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -2130,6 +2314,10 @@ const CaptureModal = (props) => {
                     </div>
                 </Dialog>
             </div>
+
+            <Dialog visible={dialogForRepo} header="Add Repository" onHide={()=>{setRepositoryNewName("");setDialogForRepo(false)}} footer={footerSaveForRepo}>
+                <InputText value={repositoryNewName} className='repository__input' onChange={handleRepoNewName} placeholder='Enter repository name'/>
+            </Dialog>
             <AvoConfirmDialog
         visible={screenChange}
         onHide={() => setScreenChange(false)}

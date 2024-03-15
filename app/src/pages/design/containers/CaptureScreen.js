@@ -1269,7 +1269,7 @@ else{
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
         {(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
-        {(screenData.length === 0 || !selectedScreen ) && <span>Select / Add Repository</span>}
+        {(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1936,7 +1936,7 @@ const elementValuetitle=(rowdata)=>{
         'roleId': userInfo.role,
         'param': 'updateOrderList',
         'orderList':value.type?value.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject):value.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
-        'elementrepoid':value.type?value.type.id ? value.type.id : value.type._id:value.id ? value.id : value._id
+        'elementrepoid':{id:value.type?value.type.id ? value.type.id : value.type._id:value.id ? value.id : value._id, name:value.type?value.type.title :value.title}
       }
   
 
@@ -1970,7 +1970,6 @@ const confirmScreenChange = () => {
       }
       else{
         dispatch(SetSelectedRepository(selectedFolderValue.type))
-        setSelectedScreen(selectedFolderValue.type);
 
            let orderlist=selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
           
@@ -1981,12 +1980,13 @@ const confirmScreenChange = () => {
           'roleId': userInfo.role,
           'orderList': orderlist,
           'oldOrderList':captureData.map(element=>element.objectDetails.objId),
-          'elementrepoid':{id:selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id,name:selectedFolderValue.type.name}
+          'elementrepoid':{id:selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id,name:selectedFolderValue.type.title}
       }
       let res=scrapeApi.updateScreen_ICE(params)
       if(res === 'fail') {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
       else {
+        setSelectedScreen(selectedFolderValue.type);
         setCaptureData([])
         setCapturedDataToSave([])
         setEmptyDatatable(true)
@@ -2319,6 +2319,7 @@ const handleAddAccordion = () => {
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
                 {/* <div class="zoom-in-out-box"></div> */}
+                  <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
