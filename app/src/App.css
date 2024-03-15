@@ -34,3 +34,11 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1rem 1rem 1rem;
+}
+
+.p-dialog .p-dialog-header {
+  background: #EBEBFF !important;
+}

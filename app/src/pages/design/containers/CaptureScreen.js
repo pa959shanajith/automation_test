@@ -111,7 +111,7 @@ const CaptureModal = (props) => {
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
   const imageRef4 = useRef(null);
-const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
+  const {endPointURL, method, opInput, reqHeader, reqBody,reqAuthKeyword,reqAuthInput,paramHeader, basicAuthPassword, basicAuthUsername} = useSelector(state=>state.design.WsData);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
@@ -558,7 +558,7 @@ const elementTypeProp =(elementProperty) =>{
             setOverlay("");
             setBlocked(false)
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(false));
             const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
            
 
@@ -573,7 +573,20 @@ const elementTypeProp =(elementProperty) =>{
 
               let localRespBody = "";
               if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
+              let basicAuthUsername ='', basicAuthPassword ='', oAuthUrl='', oAuthClientId='', oAuthClientSecret='', oAuthScope='', oAuthGrantTypechange='', bearerTokenValue ='';
+              if (data.authKeyword === "setBearerToken") {
+                bearerTokenValue = data.authInput.split(';');
+              }
+              else if (data.authKeyword === "setOAuth2.0") {
+                [oAuthUrl, oAuthClientId, oAuthClientSecret, oAuthScope, oAuthGrantTypechange] = data.authInput.split(';');
+              }
+              else if (data.authKeyword === 'setBasicAuth'){
+                [basicAuthUsername, basicAuthPassword] = data.authInput.split(';');
+              }
 
+              // if(data?.authKeyword){
+              //   [basicAuthUsername='', basicAuthPassword] = data?.authInput.split(';') 
+              // }
               dispatch(WsData({
                 endPointURL: data.endPointURL,
                 method: data.method,
@@ -582,28 +595,39 @@ const elementTypeProp =(elementProperty) =>{
                 reqBody: localReqBody,
                 paramHeader: data.param ? data.param.split("##").join("\n") : "",
                 respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
-                respBody: localRespBody
+                respBody: localRespBody,
+                reqAuthKeyword: data.authKeyword,
+                basicAuthUsername: basicAuthUsername,
+                basicAuthPassword: basicAuthPassword,
+                oAuthClientSecret: oAuthClientSecret,
+                oAuthScope: oAuthScope,
+                oAuthGrantTypechange: oAuthGrantTypechange,
+                oAuthClientId: oAuthClientId,
+                oAuthUrl: oAuthUrl,
+                bearerTokenValue: bearerTokenValue
               }));
+              dispatch(disableAppend(false));
               setSaved({ flag: true });
               // setHideSubmit(false);
             } else {
               setSaved({ flag: false });
               // setHideSubmit(true);
               dispatch(WsData({
-                endPointURL: "", method: "0", opInput: "", reqHeader: "",
-                reqBody: "", respHeader: "", respBody: "", paramHeader: "",
+                endPointURL: "", method: "", opInput: "", reqHeader: "", reqAuthKeyword:'',
+                reqBody: "", respHeader: "", respBody: "", paramHeader: "", basicAuthUsername:'', basicAuthPassword: '',
               }));
+              dispatch(disableAppend(true));
             }
             setOverlay("");
             setBlocked(false)
-            dispatch(disableAppend(!haveItems));
+            // dispatch(disableAppend(!haveItems));
             dispatch(disableAction(haveItems));
             dispatch(actionError([]));
             dispatch(wsdlError([]));
           }
           else {
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(true));
             setOverlay("");
             setBlocked(false)
             // screenshot
@@ -798,7 +822,7 @@ const elementTypeProp =(elementProperty) =>{
     if (typesOfAppType === "Webservice") {
       let arg = {}
       let testCaseWS = []
-      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeaderTemplate", "setWholeBody"];
       let wsdlInputs = [ 
           endPointURL, method, opInput, getFormattedValue(reqHeader), 
           getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
@@ -811,7 +835,7 @@ const elementTypeProp =(elementProperty) =>{
 
       let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
 
-      if (error) dispatch(actionError(error));
+      if (error) toastError(error)
 
       if (proceed) {
           dispatch(actionError([]));
@@ -820,6 +844,11 @@ const elementTypeProp =(elementProperty) =>{
 
           if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
           else wsdlInputs.splice(4, 1);
+
+          if(reqAuthKeyword != '' && basicAuthUsername != "" && basicAuthPassword  != "") {
+            keywordVal.push(reqAuthKeyword)
+            wsdlInputs.push(`${basicAuthUsername};${basicAuthPassword}`);
+          }
 
           setOverlay("Fetching Response Header & Body...");
           setBlocked(true)
@@ -847,7 +876,7 @@ const elementTypeProp =(elementProperty) =>{
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
                 toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess("Successfully fetched data"); // SCRAPESUCC_WEBSERVICE_RESP
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));
@@ -2117,7 +2146,8 @@ const screenOption = screenData?.map((folder) => ({
             : null
         }
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} 
+          toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -2315,7 +2345,7 @@ const screenOption = screenData?.map((folder) => ({
 
 
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -2389,8 +2419,10 @@ const screenOption = screenData?.map((folder) => ({
                 }
                 {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
                 {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
-                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
-                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                { NameOfAppType.appType !== 'Webservice' && <> 
+                    <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
+                    <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                </> }
                 {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
                 <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
             </div>

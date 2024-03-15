@@ -190,7 +190,9 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
             "method" : data['method'],
             "endPointURL" : data['endPointURL'],
             "header" : data['requestHeader'],
-            "param" : ""
+            "param" : "",
+            "authInput" : "",
+            "authKeyword":""
         }
       }
       if(type == 'testcases' && data != '') {
@@ -221,7 +223,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         {
             "stepNo" : 3,
             "custname" : "WebService List",
-            "keywordVal" : "setHeader",
+            "keywordVal" : "setHeaderTemplate",
             "inputVal" : [data['requestHeader']],
             "outputVal" : "",
             "appType" : "Webservice",

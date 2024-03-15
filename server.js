@@ -440,7 +440,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl,"version":uiConfig.version})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {
@@ -534,6 +534,7 @@ if (cluster.isMaster) {
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
+		app.post('/generateToken', auth.protect, mindmap.generateToken);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
@@ -849,9 +850,8 @@ if (cluster.isMaster) {
 		//-------------SERVER END------------//
 	} catch (e) {
 		logger.error(e);
-					setTimeout(function() {
-						cluster.worker.kill();
-					}, 200);
-				}
-			
+		setTimeout(function() {
+			cluster.worker.kill();
+		}, 200);
+	}
 }

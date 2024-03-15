@@ -591,6 +591,7 @@ export const generateTree = (tree,sections,count,verticalLayout,screenData,geniu
 
 export const createNewMap = (verticalLayout,types,name,sections) => {
     var nodeDisplay = {}
+    let selectedProject = JSON.parse(localStorage.getItem("DefaultProject"));
     var dNodes = []
     var translate
     var s = d3.select('.mp__canvas_svg');
@@ -598,7 +599,7 @@ export const createNewMap = (verticalLayout,types,name,sections) => {
     var node = {
         id: 0,
         childIndex: 0,
-        name: name?name:'TestSuite0',
+        name: selectedProject.appType === "Webservice" ? 'Collection0' : name ? name :'TestSuite0',
         type: types?types:'modules',
         children: [],
         parent: null,
@@ -798,6 +799,7 @@ export const toggleNode = (nid, nodeDisplay, linkDisplay, dNodes, dLinks) => {
 
 export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout,nodeID) => {
         //if nodeID ene then
+        let selectedProject = JSON.parse(localStorage.getItem("DefaultProject"));
         var uNix = dNodes.length
         var pi = activeNode;
         var pt = nodeDisplay[pi].type;
@@ -829,7 +831,7 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         if (obj) {
                 tempName = obj;
         } else {
-                tempName = (nNext[pt][0]==='Scenario'?'TestCase':nNext[pt][0]==='Testcase'?'TestSteps':'Screen')+count[(nNext[pt][0]).toLowerCase() + 's'];
+                tempName = (nNext[pt][0]==='Scenario'? selectedProject.appType === "Webservice" ? 'API' :'TestCase': nNext[pt][0]==='Testcase'?'TestSteps':  selectedProject.appType === "Webservice" ? 'Request' :'Screen')+count[(nNext[pt][0]).toLowerCase() + 's'];
         }
         var node = {
                 id: uNix,

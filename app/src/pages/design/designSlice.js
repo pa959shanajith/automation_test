@@ -40,10 +40,23 @@ const initialState = {
     opInput: "",
     reqHeader: "",
     reqBody: "",
+    reqAuthKeyword: "",
+    reqAuthInput: "",
     respHeader: "",
     respBody: "",
     paramHeader: "",
+    basicAuthUsername: "",
+    basicAuthPassword: "",
+    oAuthClientSecret:'',
+    oAuthScope: '',
+    oAuthGrantTypechange: 'client_credentials',
+    oAuthClientId: '',
+    oAuthUrl: '',
+    bearerTokenValue: ''
   },
+
+
+  
   wsdlError: [],
   actionError: [],
   copiedTestCases: {},
