@@ -215,7 +215,7 @@ const ProjectCreation = (props) => {
         title="Create test cases using AI"
         >
           <div>
-           <Button size="small" className='admin-btn'  > create</Button>
+           <Button size="small" className='admin-btn'  > Create</Button>
            </div>
         </Card>
         {/* {
