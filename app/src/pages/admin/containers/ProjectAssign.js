@@ -1,5 +1,5 @@
 import React ,  { useEffect, useState, useRef} from 'react';
-import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE} from '../api';
+import {getUserDetails, getDomains_ICE, getAssignedProjects_ICE, getDetails_ICE, assignProjects_ICE, unlockTestSuites} from '../api';
 import {ScreenOverlay, ModalContainer, ScrollBar, Messages, setMsg} from '../../global'
 import { useSelector} from 'react-redux'; 
 import '../styles/ProjectAssign.scss';
@@ -29,7 +29,8 @@ const ProjectNew = (props) => {
     const [statechange,setStateChange] = useState(true)
     const [selDomainsOptions,setSelDomainsOptions] = useState([])
     const [selectedUserName,setSelectedUserName] = useState("")
-    const [selectedProject,setSelectedProject] = useState("")
+    const [selectedProject,setSelectedProject] = useState(["banking"])
+    const [selectedProject1,setSelectedProject1] = useState("banking")
     const [selectedUserId,setSelectedUserId] = useState("")
     const [loading,setLoading] = useState(false)
     
@@ -106,12 +107,28 @@ const ProjectNew = (props) => {
 		setShowload(true);
         const data = await getDomains_ICE();
         if(data.error){displayError(data.error);return;}
-        setSelDomainsOptions(data);  
-        document.getElementById("selDomains").selectedIndex = "0";  
+        setSelDomainsOptions(data); 
+        if(document.getElementById("selDomains") !== null){
+            document.getElementById("selDomains").selectedIndex = "0";
+         }else{
+        document.addEventListener("selAssignUser", function() {
+            document.getElementById("selAssignUser").selectedIndex = "0";
+        });
+        document.addEventListener("selDomains", function() {
+            document.getElementById("selDomains").selectedIndex = "0";
+        });
     }
+    }
+    useEffect(()=>{
+        if(selectedUserId.length>0){
+            for(let i = 0; i<selectedProject.length; i++){
+                ClickSelDomains(selectedProject[i])
+            } 
+        }
 
+    },[selectedUserId])
     const ClickSelDomains = async(domainname) =>{
-        setSelectedProject(domainname);
+        setSelectedProject1(domainname);
 		setAssignProj({allProjectAP:[],assignedProjectAP:[]});
 		var requestedids = [];
 		requestedids.push(domainname);
@@ -208,11 +225,22 @@ const ProjectNew = (props) => {
                 newAssignProj.push(JSON.parse(selectId.options[i].value));
             }
         }
+        if(newAllProj.length>0){
+           findProject(newAllProj)
+        }
         newAllProj = assignProj.allProjectAP.concat(newAllProj);
         setAssignProj({allProjectAP:newAllProj,assignedProjectAP:newAssignProj});
         selectId.selectedIndex = "-1";
     };
-    
+    const findProject =async(data)=>{ 
+        let req = {
+            qurey:"projectDomain", 
+            projectidss:data
+        }
+        const projectDomain = await unlockTestSuites(req)
+        if(projectDomain.error)return;
+        else setSelectedProject(projectDomain)
+    }
 	const moveItemsRightgo = (from,to) =>{
 		setUnAssignedFlag(false);
 
@@ -233,11 +261,16 @@ const ProjectNew = (props) => {
 	};
 
 	const moveItemsLeftall =  ()=> {
+        let unAssignProjectList = []
 		setUnAssignedFlag(true);
         for(var i=0; i<assignProj.assignedProjectAP.length; i++){
+            unAssignProjectList.push(assignProj.assignedProjectAP[i])
             assignProj.allProjectAP.push(assignProj.assignedProjectAP[i]);
         }
         assignProj.assignedProjectAP=[];
+        if(unAssignProjectList.length>0){
+            findProject(unAssignProjectList)
+        }
         setAssignProj(assignProj);
         setStateChange(!statechange);
 	};
@@ -255,9 +288,11 @@ const ProjectNew = (props) => {
 
     const clickAssignProjects = () =>{
         if(unAssignedFlag === true) setShowAssignProjectModal(true);
-        else clickAssignProjects1();
+        else clickAssignProjects1(selectedProject1);
     }
-
+    const clickAssignProjects2 = () =>{
+            clickAssignProjects1();
+    }
     const clickAssignProjects1 = async () =>{
         setShowAssignProjectModal(false);
         setUnAssignedProjects([]);
@@ -296,7 +331,7 @@ const ProjectNew = (props) => {
 		var userId = selectedUserId;
 
 		var assignProjectsObj = {};
-		assignProjectsObj.domainname = selectedProject;
+		assignProjectsObj.domainname = selectedProject.reverse();
 		// assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
 		assignProjectsObj.assignedProjects = assignedProjects1;
@@ -322,7 +357,7 @@ const ProjectNew = (props) => {
         if(data.error){displayError(data.error);return;}
         setLoading(false);
         if (data === 'success') {
-            if (assignedProjects1.length !== 0) displaySuccess(Messages.ADMIN.SUCC_PROJECT_ASSIGN);
+            if (assignProjectsObj.deletetasksofprojects.length === 0) displaySuccess(Messages.ADMIN.SUCC_PROJECT_ASSIGN);
             else displaySuccess(Messages.ADMIN.SUCC_PROJECT_UNASSIGN);
             resetAssignProjectForm();
         } else  displayError(Messages.ADMIN.ERR_PROJECT_ASSIGN)
@@ -370,15 +405,15 @@ const ProjectNew = (props) => {
                         </select>
                     </div>
                     
-                    <div style={{display:'flex'}} className='userForm-project projectForm-project display-project'  >
+                    {/* <div style={{display:'flex'}} className='userForm-project projectForm-project display-project'  >
                         <div className='domainTxt'>Domain</div>
-                        <select defaultValue={""} onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
+                        {/* <select defaultValue={""} onChange={(event)=>{ClickSelDomains(event.target.value)}}  className={domainSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project ':"adminSelect-project-assign form-control__conv-project "} id="selDomains" style={{width: "100%",marginLeft:"16px"}} >
                                 <option disabled={true} key="" value="">Please Select Your Domain</option>
                                 {selDomainsOptions.map((data)=>(
                                     <option key={data} value={data}>{data}</option>
                                 ))}
                         </select>
-                    </div>
+                    </div> */}
                 </div>
 
 
@@ -423,17 +458,17 @@ const ProjectNew = (props) => {
                     </div>
                 </div>    
 
-                <Dialog header="Update Projects" visible={showAssignProjectModal} footer={ModalButtons(clickAssignProjects1, setShowAssignProjectModal)} onHide={()=>{setShowAssignProjectModal(false)}} className=" modal-sm" >
+                <Dialog header="Update Projects" visible={showAssignProjectModal} footer={ModalButtons(clickAssignProjects2, setShowAssignProjectModal)} onHide={()=>{setShowAssignProjectModal(false)}} className=" modal-sm" >
                     <span>Do you want to proceed?</span>
                 </Dialog>
         </div>
     )
 }
 
-const ModalButtons = (clickAssignProjects1, setShowAssignProjectModal) =>{
+const ModalButtons = (clickAssignProjects2, setShowAssignProjectModal) =>{
     return(
         <div className="modal-footer-edit">
-            <Button onClick={()=>{clickAssignProjects1()}} className=" btn-assign-popup" label='Yes'/>
+            <Button onClick={()=>{clickAssignProjects2()}} className=" btn-assign-popup" label='Yes'/>
             <Button  onClick={()=>{setShowAssignProjectModal(false)}} label='No' />
         </div>
     )
