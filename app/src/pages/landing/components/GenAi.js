@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { screenType,setGenAiParameters,setTemplateInfo,updateTemplateId } from './../../settings/settingSlice';
 import { useSelector } from 'react-redux';
 import JiraTestcase from './JiraTestcase';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 
 const GenAi = () => {
@@ -30,6 +31,7 @@ const GenAi = () => {
     const template_info = useSelector((state) => state.setting.template_info);
     console.log(template_info)
     const [tempExtras, setTempExtras] = useState({});
+    const [isUploadSuccess, setUploadSuccess] = useState(false);
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -151,6 +153,7 @@ const GenAi = () => {
         try {
             const data = await uploadgeneratefile(formData);
             setIsLoading(false);
+            setUploadSuccess(true);
             toast.current.show({ severity: 'success', summary: 'Success', detail: 'Uploaded sucessfully', life: 3000 });
             if (data === 'fail') {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'errorMessage', life: 3000 });
@@ -187,11 +190,20 @@ const GenAi = () => {
         { name: 'Jira', code: 'JA' },
     ];
 
+    const onFileUpload = () => {
+        toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
+    };
+
+    const onSubmitClick = () =>{
+        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Submitted Successfully' });
+    }
+
     return (<div className="genai_container flex">
-        <Toast ref={toast}></Toast>
+        
         {isJiraComponentVisible && <JiraTestcase/>}
         <div className="genai_left_container p-3">
-            <div className="context_container flex align-items-center border-bottom-1 pb-2 mb-3">
+        <Toast ref={toast}></Toast>
+            <div className="context_container flex align-items-center border-bottom-1 pb-2 mb-1">
                 <div className="w-1 context_logo_container flex justify-content-center align-items-center mr-2">
                     <img className="context_logo w-full" src="static\imgs\context setting.svg" />
                 </div>
@@ -199,15 +211,25 @@ const GenAi = () => {
             </div>
             <div className="context_doc my-2">Document</div>
             <div className="doc_container flex flex-column border-round my-2">
-                <div className="doc_top">
-                    {/* <FileUpload mode="basic" name="demo[]" multiple={false} accept=".pdf" maxFileSize={1000000} onUpload={onUpload} className="doc_fileupload ml-3" chooseOptions={{icon:"pi pi-upload",label:"Upload"}} /> */}
-                    <FileUpload  mode="basic" customUpload={true} name="pdf file" multiple={false} accept="application/pdf" uploadHandler={myUploader} maxFileSize={20000000000} 
-                    // onUpload={(e)=>e}
-                     emptyTemplate={<div className="doc_btm flex justify-content-center align-items-center">
-                        <span className="doc_btm_para">File type:pdf | File size:1,00,000 words | No. of files:1 </span>
-                    </div>} />
-                </div>
-
+          
+                <FileUpload
+                    mode="basic"
+                    url="/uploadgeneratefile"
+                    customUpload={true}
+                    name="pdf file"
+                    multiple={false}
+                    accept="application/pdf"
+                    uploadHandler={myUploader}
+                    maxFileSize={20000000000}
+                    emptyTemplate={
+                        <div className="doc_btm flex justify-content-center align-items-center">
+                            <span className="doc_btm_para">
+                                File type:pdf | File size:1,00,000 words | No. of files:1
+                            </span>
+                        </div>
+                    }
+                    onUpload={onFileUpload}
+                />
             </div>
             <div className="datatable_files">
                 <DataTable value={fileDetails} header={header} tableStyle={{}}>
@@ -215,9 +237,9 @@ const GenAi = () => {
                     {/* <Column field="action" header="Action" body={actionTemplate}></Column> */}
                 </DataTable>
             </div>
-            <div className="flex justify-content-center align-items-center my-3 leftandor">AND / OR</div>
-            <div className="left_btm_container pb-3">
-                <div className="left_btm_header my-2">Requirement Management Tool</div>
+            <div className="flex justify-content-center align-items-center my-1 leftandor">AND / OR</div>
+            <div className="left_btm_container pb-1">
+                <div className="left_btm_header my-1">Requirement Management Tool</div>
                 <Dropdown
                     value={sortedData} 
                     onChange={(e) => handleJiraIconClick(e.value)}
@@ -234,15 +256,15 @@ const GenAi = () => {
                     // options={requirementTool} optionLabel="name"
                     placeholder={<span className="left_btm_placeholder">Jira WorkItem</span>} className="w-full md:w-14rem" />     */}
             </div>
-            <div className="left_btm_container pb-3">
-                <div className="left_btm_header my-2">Template</div>
+            <div className="left_btm_container pb-1">
+                <div className="left_btm_header my-1">Template</div>
                 <Dropdown
                     value={selectedTemp}
                     options={readTempData} optionLabel='name' onChange={(e) => templateHandler(e)}
                     placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full md:w-14rem" />
             </div>
             <div>
-                <Button className="w-full" label="Submit" onClick={() => submitPayload()} />
+                <Button className="w-full" label="Submit" onClick={() =>{ submitPayload(); onSubmitClick()}} />
             </div>
         </div>
         <div className="genai_right_container"><MiddleContainerGenAi/></div>

@@ -15,7 +15,7 @@
     border-color: #DEE2E6;
 }
 .context_heading{
-    font : $f5_semibold;
+    font : $f6_semibold;
 }
 .context_doc{
     font : $f6_semibold
@@ -27,8 +27,9 @@
 }
 .doc_container{
     border: 1px solid #DEE2E6;
+    width: 33%;
 }
-.doc_top{
+.doc_top {
     background-color: #DEE2E6;
 }
 .doc_btm_para{
@@ -100,8 +101,11 @@
         display: table;
         width: 100%;
     }
+    td{
+        padding: 5px;
+    }
     overflow-y: auto;
-    height: 25vh;
+    height: 20vh;
     overflow-x: hidden;
     display: block;
 }
