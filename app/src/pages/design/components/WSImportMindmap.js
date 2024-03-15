@@ -46,18 +46,22 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
      
     const items = [
         { name: 'Determine Automatically', code: 'NY', value:'def-val', disabled:true },
-        { name: 'WSDL', code: 'WSDL', value:'WSDL'}
-        // { name: 'WADL', code: 'WADL', value:'WADL'},
+        { name: 'WSDL', code: 'WSDL', value:'WSDL'},
+        { name: 'Swagger', code: 'Swagger', value:'Swagger'},
     ]
 
     if(!Object.keys(projList).length >0) return null
     const importValue = (value)=>{
         setValueOfImport(value)
         if(value!='' && value.endsWith("?WSDL")){
-            setselectedProtocol('WSDL')        
+            setselectedProtocol('WSDL')
             setError('')
             setDisableSubmit(false)
-        } else {
+        } else if(value!='' && (value.includes('swagger'))) {
+          setselectedProtocol('Swagger')
+          setError('')
+          setDisableSubmit(false)
+        }else {
           setselectedProtocol(undefined)
         }
         // setDisableSubmit(false)
@@ -70,7 +74,7 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         const localStorageDefaultProject = localStorage.getItem('DefaultProject');
         let selectProj = JSON.parse(localStorageDefaultProject);
         setSelectedProject(selectProj)
-        let data = await api.importDefinition(valueOfImport)
+        let data = await api.importDefinition(valueOfImport,selectedProtocol)
         if(data['APIS'] && data['CollectionName']) {
           setWSImportDefinitionDetails(data)
           setModuleName(data['CollectionName'])
@@ -81,14 +85,14 @@ const WSImportMindmap = ({setImportPop,setBlockui,displayError,setOptions, isMul
         else if (data === "unavailableLocalServer"){
           displayError(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT);
         }else {
-          displayError('Error Occured While Loading WSDL Url')
+          displayError('Error Occured While Loading Url')
         }
         setImportPop(false)
         setLoading(false);
     }
 
     const changeImportType = (e) => {
-        setselectedProtocol(e.value)        
+        setselectedProtocol(e.value)
         setError('')
         setDisableSubmit(false)
     }

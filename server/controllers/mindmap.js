@@ -1749,7 +1749,7 @@ exports.importDefinition = async (req, res) => {
         var username=req.session.username;
 		var clientName=utils.getClientName(req.headers.host);
         var icename = undefined
-		if(req.query == 'jsonToMindmap') {
+		if(req.body.query == 'jsonToMindmap') {
 			let parsedData = await swaggerToMindmapJson(swaggerJsonData);
 			return res.send(parsedData)
 		}
@@ -1760,24 +1760,25 @@ exports.importDefinition = async (req, res) => {
 			var sourceUrl = req.body.sourceUrl;
 			try {
 				logger.info("Sending socket request for debugTestCase to cachedb");
-				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl};
+				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl,'type':req.body.type};
 				var socket = require('../lib/socket');
 				var mySocket;
 				mySocket = socket.allSocketsMap[clientName][icename];
 				if(mySocket.connected){
 
 					logger.info("Sending request to ICE for importDefinition_ICE");
-					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
+					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl,dataToIce.type);
 					async function  result_WS_ImportDefinition_listener(message) {
 						let data = message;
-						//LB: make sure to send recieved data to corresponding user
 						mySocket.removeListener('result_WS_ImportDefinition', result_WS_ImportDefinition_listener);
 						try {
 							if(!Object.keys(data).length){
 								logger.info('Error Occured in fetching');
-								// res.status(resultData.Error.status).send(resultData.Error.msg);
 								res.send('Fail')
 								return;
+							}
+							if('APIS' in data && 'CollectionName' in data) {
+								return res.send(data);
 							}
 							let parsedData = await swaggerToMindmapJson(data);
 							res.send(parsedData)
@@ -1786,7 +1787,6 @@ exports.importDefinition = async (req, res) => {
 							logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
 						}
 					}
-					// redisServer.redisSubServer.on("message",result_WS_ImportDefinition_listener);
 					mySocket.on("result_WS_ImportDefinition",result_WS_ImportDefinition_listener)
 				} else {
 					flag = "unavailableLocalServer";
