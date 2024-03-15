@@ -1268,8 +1268,8 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
-        {(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
+        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>  :(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1811,7 +1811,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
         {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
