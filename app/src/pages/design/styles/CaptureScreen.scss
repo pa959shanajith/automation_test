@@ -770,7 +770,7 @@
   flex-direction: column;
   padding:15px;
   font-family: "Open Sans";
-  width: 17%; 
+  width: 20%; 
   gap: 2vh;
   border-right: 1px solid #e2e2ed;
   z-index: 1;
@@ -875,5 +875,16 @@
   height: 1.5rem;
   cursor: pointer;
 }
-
+// .zoom-in-out-box {
+//   margin: 24px;
+//   width: 24px;
+//   border-radius: 50%;
+//   height: 50px;
+//   background: #f50057;
+//   animation: zoom-in-zoom-out 1s ease infinite;
+// }
+// @keyframes zoom-in-zoom-out {
+//   0% {transform: scale(1, 1);}
+//   50% {transform: scale(1.5, 1.5);}
+//   100% {transform: scale(1, 1);}}
 

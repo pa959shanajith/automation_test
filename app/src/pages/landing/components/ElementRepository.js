@@ -168,7 +168,7 @@ const ElementRepository = (props) => {
     setAccordionIndex(targetAccordionIndex);
     if (copiedRow !== null) {
       setScreenData((prevScreens) => {
-        const updatedScreens = prevScreens.map((screen, index) =>
+        const updatedScreens = prevScreens.reverse().map((screen, index) =>
           index === targetAccordionIndex
             ? {
                 ...screen,
@@ -257,6 +257,11 @@ const ElementRepository = (props) => {
 
 
   const handleAddAccordion = () => {
+
+    if(screenData?.map((item)=>item.name).includes(repositoryName)){
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Duplicate repository names are not allowed', life: 5000 });
+    }
+    else{
     const newScreen = {
       name: repositoryName,
       related_dataobjects: [] // Add your initial data structure here
@@ -283,6 +288,7 @@ const ElementRepository = (props) => {
         dispatch(loadUserInfoActions.updateElementRepository(true));
         setRepositoryName("")
         setActiveAccordionIndex(0);
+        setShowDialog(false)
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
       }
 
@@ -290,6 +296,7 @@ const ElementRepository = (props) => {
   })
     
     .catch(error => console.log(error))
+}
   };
 
 
@@ -964,7 +971,7 @@ const handleSearchChange=(event) => {
 }
 
 const footer =()=>(
-  <Button label='Save' className='repository__save__btn' onClick={()=>{setShowDialog(false);handleAddAccordion()}} disabled={!repositoryName}/>
+  <Button label='Save' className='repository__save__btn' onClick={()=>handleAddAccordion()} disabled={!repositoryName}/>
 )
 
 const handleRepositoryName =(e)=>{

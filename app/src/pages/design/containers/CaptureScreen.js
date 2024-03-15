@@ -141,6 +141,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [dialogForRepo, setDialogForRepo] = useState(false);
   const [repositoryNewName, setRepositoryNewName] = useState("");
   const [repoNameAdded, setRepoNameAdded] = useState(false);
+  const [emptyDatatable, setEmptyDatatable] = useState(false)
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -155,7 +156,7 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
 
   useEffect(() => {
     fetchScrapeData()
-  }, [parentData,parentId])
+  }, [parentData,parentId,emptyDatatable])
   useEffect(()=>{
     let browserName = (function (agent) {        
 
@@ -529,7 +530,7 @@ const elementTypeProp =(elementProperty) =>{
     return new Promise((resolve, reject) => {
       setOverlay("Loading...");
       setBlocked(true)
-      let viewString = emptyDatatbleRepository ?[]:capturedDataToSave;
+      let viewString = emptyDatatable ?[]:capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
       let Id = parentData.id
@@ -666,6 +667,7 @@ const elementTypeProp =(elementProperty) =>{
           setCaptureData(newData);
           setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
           addMore.current=false;
+          setEmptyDatatable(false);
         })
         .catch(error => {
           dispatch(disableAction(haveItems));
@@ -1237,7 +1239,8 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {(screenData.length === 0 || !selectedScreen ) && <span>Select / Add Repository</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1868,7 +1871,8 @@ const elementValuetitle=(rowdata)=>{
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
           else setScreenData(screens.screenList);
             let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
-            setSelectedFolderValue({type:newAddedRepo[0],key:true})
+            handleScreenChange(newAddedRepo[0])
+            // setSelectedFolderValue({type:newAddedRepo[0],key:true})
       } catch (error) {
           console.error('Error fetching User list:', error);
       }
@@ -1876,41 +1880,55 @@ const elementValuetitle=(rowdata)=>{
 }, [NameOfAppType.projectId,repoNameAdded]);
 
  const handleScreenChange = (e) => {
-  if(typeof e.value === "string"){
-    setSelectedFolderValue({type:e.value,key:false})
-  }else{
-    setSelectedFolderValue({type:e.value,key:true})
-  } 
-  
-  // const selectedFolderValue = e.value;
-  // setSelectedScreen(selectedFolderValue);
-  if(captureData.length >= 0){
+  // if(typeof e.value === "string"){
+  //   setSelectedFolderValue({type:e.value,key:false})
+  // }else{
+  //   setSelectedFolderValue({type:e.value,key:true})
+  // } 
+
+  const value = typeof e === 'object' && 'value' in e ? e.value : e;
+  if (typeof value === "string") {
+    setSelectedFolderValue({ type: value, key: false });
+  } else {
+    setSelectedFolderValue({ type: value, key: true });
+  }
+
+  if(captureData.length > 0){
     setScreenChange(true);
   }
-//  else if (e.value === buttonOption.value){
-//   setDialogForRepo(true);
-//  }
+ else if (value === buttonOption.value){
+  setDialogForRepo(true);
+ }
   else{
-  // setSelectedScreen(e.value);
+
+      let params = {
+        'screenId': parentData.id,
+        'userId': userInfo.user_id,
+        'roleId': userInfo.role,
+        'param': 'updateOrderList',
+        'orderList':value.type?value.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject):value.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
+        'elementrepoid':value.type?value.type.id ? value.type.id : value.type._id:value.id ? value.id : value._id
+      }
   
-  // fetchScrapeData();
-  setSaveDisable(false);
+
+      const res = scrapeApi.updateScreen_ICE(params);
+    
+      if(res === 'fail') {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+      else {
+        dispatch(SetSelectedRepository(value.type?value.type:value))
+        setSelectedScreen(value.type?value.type:value);
+        setEmptyDatatable(true);
+        // fetchScrapeData()
+        
+      }
+    }
+
+  // setSaveDisable(false);
   setElementRepo(true);
   }
-  // addMore.current = true;
-  // let newData = capturedDataToSave;
-  // newData.push(...selectedFolderValue.related_dataobjects)
-  // setCapturedDataToSave(newData);
-  // // setCaptureData(newData);
-  // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
 
-};
 
-useEffect(()=>{
-if(selectedFolderValue.key === true){
-   confirmScreenChange();
-   }
-},[selectedFolderValue.key])
 
 
 const confirmScreenChange = () => {
@@ -1921,97 +1939,12 @@ const confirmScreenChange = () => {
       if(selectedFolderValue.type === buttonOption.value){
         setDialogForRepo(true);
       }
-       else if(!captureData.length){
-        let params = {
-          'screenId': parentData.id,
-          'userId': userInfo.user_id,
-          'roleId': userInfo.role,
-          'param': 'updateOrderList',
-          'orderList':selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
-          'elementrepoid':selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id
-          
-    
-        }
-    
-        // scrapeApi.updateScreen_ICE(params)
-
-        const res = await scrapeApi.updateScreen_ICE(params);
-      
-        if(res === 'fail') {
-          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
-        else {
-          dispatch(SetSelectedRepository(selectedFolderValue.type))
-          setSelectedScreen(selectedFolderValue.type);
-          fetchScrapeData()
-          // var req={
-          //   tab:"createdTab",
-          //   projectid:NameOfAppType.projectId,
-          //   version:0,
-          //   cycId: null,
-          //   modName:"",
-          //   moduleid:res
-          // }
-          // const dataScreen = await scrapeApi.getModules(req)
-          // if(dataScreen.error)return;
-          // else {
-          //   const screenData_1 = getReqScreen (dataScreen)
-          //   function getReqScreen (data){
-          //     let sd = []
-          //     data.children.forEach((child)=>{
-          //       if(child._id === props.fetchingDetails["parent"]["_id"]){
-          //         child.children.forEach((subChild)=>{
-          //           if(subChild._id === selectedFolderValue.id){
-          //             if(subChild.children.length > 0){
-          //                const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
-          //                   return {
-          //                     ...item,
-          //                     parent:{...subChild,parent:{...child,parent:data}}
-          //                   }
-          //                })}
-          //                sd.push(newData);
-          //             }
-          //             else{
-          //               sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
-          //                 return{
-          //                   ...data,parent:{...child,parent:data}
-          //                 }
-
-          //               })}})
-          //             }
-          //           }
-          //         })
-          //       }
-          //     })
-          //     return sd;
-          //   }
-            
-          //   // console.log(screenData_1);
-          //   if(screenData_1.length>0){
-          //     props.setFetchingDetails(screenData_1[0])
-          //     props.setModuleData({id:res, key:uuid()})
-          //     setParentId(screenData_1[0]._id);
-          //     toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
-          //   }else{
-          //     toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
-          //   }
-          //   // props.setFetchingDetails(screenData_1[0])
-          //   // props.setModuleData({id:res, key:uuid()})
-          //   // setParentId(uuid());
-          // }
-        }
-      }
       else{
         dispatch(SetSelectedRepository(selectedFolderValue.type))
         setSelectedScreen(selectedFolderValue.type);
 
-        // let orderlist=selectedFolderValue.orderlist.some(
-        //   value => { return typeof value == "object" });
-        //   if(orderlist){
            let orderlist=selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
-          // }
-          // else{
-          //   orderlist=selectedFolderValue.orderlist
-          // }
+          
         let params={
           'param':"updateOrderListAndRemoveParentId",
           'screenId': parentData.id,
@@ -2019,7 +1952,7 @@ const confirmScreenChange = () => {
           'roleId': userInfo.role,
           'orderList': orderlist,
           'oldOrderList':captureData.map(element=>element.objectDetails.objId),
-          'elementrepoid':selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id
+          'elementrepoid':{id:selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id,name:selectedFolderValue.type.name}
       }
       let res=scrapeApi.updateScreen_ICE(params)
       if(res === 'fail') {
@@ -2027,9 +1960,8 @@ const confirmScreenChange = () => {
       else {
         setCaptureData([])
         setCapturedDataToSave([])
-        dispatch(SetEmptyDatatable(true))
-        fetchScrapeData()
-        // setParentId(uuid());
+        setEmptyDatatable(true)
+        // fetchScrapeData()
         }
       }
     }
@@ -2077,7 +2009,7 @@ optionsWithTooltips.push(buttonOption)
 
 
 const footerSaveForRepo =()=>(
-  <Button label='Save' className='repository__save__btn' onClick={()=>{setDialogForRepo(false);handleAddAccordion()}} disabled={!repositoryNewName}/>
+  <Button label='Save' className='repository__save__btn' onClick={()=>handleAddAccordion()} disabled={!repositoryNewName}/>
 )
 
 const handleRepoNewName =(e)=>{
@@ -2091,6 +2023,10 @@ const handleRepoNewName =(e)=>{
 
 
 const handleAddAccordion = () => {
+  if(screenData?.map((item)=>item.name).includes(repositoryNewName)){
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Duplicate repository names are not allowed', life: 5000 });
+  }
+  else{
   const newScreen = {
     label: repositoryNewName,
     related_dataobjects: [],
@@ -2116,20 +2052,20 @@ const handleAddAccordion = () => {
     else {
       const addingScreen = [newScreen,...screenData];
       setScreenData(addingScreen);
-      setSelectedScreen(newScreen)
+      // setSelectedScreen(newScreen)
       dispatch(loadUserInfoActions.updateElementRepository(true));
       // setRepositoryNewName("")
       setRepoNameAdded(true);
+      setDialogForRepo(false)
       toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
     }
 })
   
   .catch(error => console.log(error))
+}
 };
 
-// useEffect(()=>{
-//   renderOption();
-// },[screenData])
+
 
   return (
     <>
@@ -2144,146 +2080,146 @@ const handleAddAccordion = () => {
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
-          // typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
           
-          //   <div className="capture_card_modal">
-          //     {/* Select From Repository */}
-          //     <div className="capture_card">
-          //       <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">Select Repository</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
-          //           <div title={option.label}>{option.label}</div>
-          //         )}/></div>
-          //       </div>}
-          //     </div>
-          //     {/* In Sprint Automation */}
-          //     <div className="capture_card">
-          //       <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
-          //       {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
-          //       {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">In Sprint Automation</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
-          //           <div className='capture_bottom_btn_img_wrapper'>
-          //             <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Add Element</p>
-          //         </div>
-          //         <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
-          //           <div className="capture_bottom_btn_img_wrapper">
-          //             <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Map Element</p>
-          //         </div>
-          //       </div>}
-          //     </div>
-          //     {/* Upgrade Analyzer */}
-          //     <div className="capture_card">
-          //       <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
-          //       {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
-          //       {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">Upgrade Analyzer</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className="capture_bottom_btn" onClick={handleCompareClick}>
-          //           <div className='capture_bottom_btn_img_wrapper'>
-          //             <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Compare Element</p>
-          //         </div>
-          //         <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
-          //           <div className="capture_bottom_btn_img_wrapper">
-          //             <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Replace Element</p>
-          //         </div>
-          //       </div>}
-          //     </div>
-          //     {/* Capture From Pdf */}
-          //     <div className="capture_card disabled">
-          //       <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
-          //       {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">Capture from PDF</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className="capture_bottom_btn">
-          //           <div className='capture_bottom_btn_img_wrapper'>
-          //             <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">PDF <br/>Utility</p>
-          //         </div>
-          //       </div>}
-          //     </div>
-          //     {/* Create Manually */}
-          //     <div className="capture_card">
-          //       <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">Create Manually</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
-          //           <div className='capture_bottom_btn_img_wrapper'>
-          //             <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Create <br/> Element</p>
-          //         </div>
-          //       </div>}
-          //     </div>
-          //     {/* Import Export Screen */}
-          //     <div className="capture_card import_export">
-          //       <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
-          //       {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
-          //       {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
-          //       <div className="capture_card_top_section">
-          //         <h4 className="capture_card_header">File Handling</h4>
-          //         <div className='capture_card_info_wrapper'>
-          //           <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
-          //         </div>
-          //       </div>
-          //       {showPanel && <div className="capture_card_bottom_section">
-          //         <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
-          //           <div className='capture_bottom_btn_img_wrapper'>
-          //             <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Import Screen</p>
-          //         </div>
-          //         <div className="capture_bottom_btn" onClick={handleExportClick}>
-          //           <div className="capture_bottom_btn_img_wrapper">
-          //             <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
-          //           </div>
-          //           <p className="capture_bottom_heading">Export Screen</p>
-          //         </div>
-          //       </div>}
-          //       <div onClick={togglePanel} className="expandCollapseIconWrapper">
-          //         <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
-          //         <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
-          //       </div>
-          //     </div>
-          //   </div>
+            <div className="capture_card_modal">
+              {/* Select From Repository */}
+              <div className="capture_card">
+                <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Select Repository</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select Repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                    <div title={option.label}>{option.label}</div>
+                  )}/></div>
+                </div>}
+              </div>
+              {/* In Sprint Automation */}
+              <div className="capture_card">
+                <Tooltip target=".insprintToolTip" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />
+                {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
+                {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">In Sprint Automation</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Add Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Map Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Upgrade Analyzer */}
+              <div className="capture_card">
+                <Tooltip target=".upgradeToolTip" position="bottom" content="Easily upgrade Test Automation as application changes" />
+                {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
+                {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Upgrade Analyzer</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Compare Element</p>
+                  </div>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Replace Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Capture From Pdf */}
+              {/* <div className="capture_card disabled">
+                <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
+                {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Capture from PDF</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img pdfToolTip" ref={imageRef3} onMouseEnter={() => handleMouseEnter("pdf")} onMouseLeave={() => handleMouseLeave("pdf")} src="static/imgs/info.png" alt="Capture from PDF Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn">
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">PDF <br/>Utility</p>
+                  </div>
+                </div>}
+              </div> */}
+              {/* Create Manually */}
+              <div className="capture_card">
+                <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">Create Manually</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                  </div>
+                </div>}
+              </div>
+              {/* Import Export Screen */}
+              <div className="capture_card import_export">
+                <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
+                {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
+                {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
+                <div className="capture_card_top_section">
+                  <h4 className="capture_card_header">File Handling</h4>
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
+                  </div>
+                </div>
+                {showPanel && <div className="capture_card_bottom_section">
+                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                    <div className='capture_bottom_btn_img_wrapper'>
+                      <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
+                    </div>
+                    <p className="capture_bottom_heading">Import Screen</p>
+                  </div>
+                  <div className="capture_bottom_btn" onClick={handleExportClick}>
+                    <div className="capture_bottom_btn_img_wrapper">
+                      <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
+                    </div>
+                    <p className="capture_bottom_heading">Export Screen</p>
+                  </div>
+                </div>}
+                <div onClick={togglePanel} className="expandCollapseIconWrapper">
+                  <Tooltip target=".icon-tooltip" content={showPanel ? 'Collapse Action Panel' : 'Expand Action Panel'} position="left" />
+                  <i style={{color:'blue',fontWeight:'800'}} className={showPanel ? 'pi pi-chevron-circle-up icon-tooltip expandCollapseIcon' : 'pi pi-chevron-circle-down icon-tooltip expandCollapseIcon'}></i>
+                </div>
+              </div>
+            </div>
           
-          //   : null
+            : null
         }
         <div className='card'>
           {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
@@ -2307,13 +2243,14 @@ const handleAddAccordion = () => {
             scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
+            sortMode="multiple"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
-            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
+            <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
               editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
               onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
@@ -2351,6 +2288,7 @@ const handleAddAccordion = () => {
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
+                {/* <div class="zoom-in-out-box"></div> */}
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
@@ -2358,7 +2296,7 @@ const handleAddAccordion = () => {
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
                   <div className="dropdown_container">
-                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder="Select repository" className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder="Select Repository" className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
                     </div>
                 </div>}
               </div>
@@ -2415,7 +2353,7 @@ const handleAddAccordion = () => {
                 </div>}
               </div>
               {/* Capture From Pdf */}
-              <div className="capture_card disabled">
+              {/* <div className="capture_card disabled">
                 <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
                 {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
                 <div className="capture_card_top_section">
@@ -2432,7 +2370,7 @@ const handleAddAccordion = () => {
                     <p className="capture_bottom_heading">PDF <br/>Utility</p>
                   </div>
                 </div>}
-              </div>
+              </div> */}
               {/* Create Manually */}
               <div className="capture_card">
                 <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
@@ -2507,13 +2445,14 @@ const handleAddAccordion = () => {
             scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
+            sortMode="multiple"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
             {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
-            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
+            <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
               editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
               onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
               bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
