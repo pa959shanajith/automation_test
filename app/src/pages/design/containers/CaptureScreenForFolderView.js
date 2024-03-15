@@ -601,17 +601,17 @@ const CaptureModal = (props) => {
 
                                 selectall: item.custname,
                                 objectProperty: item.tag.includes("iris") ? elementTypeProp(item.tag.split(";")[1]) : elementTypeProp(item.tag),
-                                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={item.objId ? (event) => {
+                                screenshots: (item.left && item.top && item.width) ? <span className="btn__screenshot" onClick={(event) => {
                                     setScreenshotY(event.clientY);
                                     setScreenshotData({
                                         header: item.custname,
-                                        imageUrl: data.mirror || "",
+                                        imageUrl: data.mirror ?data.mirror: mirror.scrape || "",
                                         enable: true,
                                         isIris: item.xpath.split(';')[0] == "iris" ? true : false
                                     });
                                     onHighlight();
                                     // setHighlight(true);
-                                } : () => toastError('Please save element')}>View Screenshot</span> : <span>No Screenshot Available</span>,
+                                }}>View Screenshot</span> : <span>No Screenshot Available</span>,
                                 actions: '',
                                 objectDetails: item,
 
@@ -638,6 +638,7 @@ const CaptureModal = (props) => {
                         )
                     })
                     setCaptureData(newData);
+                    setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
                     addMore.current = false;
                 })
                 .catch(error => {
@@ -1722,9 +1723,10 @@ const CaptureModal = (props) => {
                     <div
                         className={`tooltip__target-${rowdata.objectDetails.objId}
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : "")}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId) ? " ss__newObj" : (rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
                     {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
                     {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
+                    {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
                 </div>
             </>
         )
@@ -2121,7 +2123,7 @@ const CaptureModal = (props) => {
                             <div className="scrsht_outerContainer" id="ss_ssId">
                                 <div data-test="ssScroll" className="ss_scrsht_insideScroll">
                                     {highlight && <div style={{ display: "flex", position: "absolute", ...highlight }}></div>}
-                                    {(mirror.scrape || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : mirror.scrape}`} /> : "No Screenshot Available"}
+                                    {(screenshotData.imageUrl || (mirror.compare && compareFlag)) ? <img id="ss_screenshot" className="screenshot_img" alt="screenshot" src={`data:image/PNG;base64,${compareFlag ? mirror.compare : screenshotData.imageUrl}`} /> : "No Screenshot Available"}
                                 </div>
                             </div>
                         </div>
@@ -2452,7 +2454,8 @@ function generateScrapeItemList(lastIdx, viewString, type = "old") {
             left: scrapeObject.left,
             height: scrapeObject.height,
             width: scrapeObject.width,
-            identifier: scrapeObject.identifier
+            identifier: scrapeObject.identifier,
+            reused:scrapeObject.reused
         }
         if (scrapeObject.fullSS != undefined && !scrapeObject.fullSS && scrapeObject.viewTop != undefined) {
             scrapeItem['viewTop'] = scrapeObject.viewTop;

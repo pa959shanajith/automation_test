@@ -207,7 +207,7 @@ exports.updateScenarioComparisionStatus = async (req, res) => {
 
         if (result == "fail") return res.send("fail");
 
-        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+        logger.info("Scenario comparison status sent successfully from designscreen/"+fnName+" service");
 
         res.send(JSON.stringify(result))
 
@@ -249,7 +249,7 @@ exports.updateTestSuiteInUseBy = async (req, res) => {
 
         if (result == "fail") return res.send("fail");
 
-        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+        logger.info("Scenario comparison status sent successfully from designscreen/"+fnName+" service");
 
         res.send(JSON.stringify(result))
 

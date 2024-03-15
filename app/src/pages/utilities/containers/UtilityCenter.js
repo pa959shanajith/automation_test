@@ -8,6 +8,7 @@ import ApiUtils from './ApiUtils';
 import {setMsg ,ScreenOverlay} from '../../global/index.js';
 import '../styles/UtilityCenter.scss'
 import {Encrypt_ICE } from '../api';
+import MigrateScreen from '../components/MigrateScreen.js';
 
 const UtilityCenter=(props)=>{
     const factref = useRef() //ref for input in factor in optimization screen
@@ -181,6 +182,12 @@ const UtilityCenter=(props)=>{
                         setBlockui={setBlockui}
                         setScreenType={props.setScreenType}
                     />}
+            {
+                props.screenType === "migration" && <MigrateScreen
+                setBlockui={setBlockui}
+                setScreenType={props.setScreenType}
+            />
+            }
                 
         </div>
         </div>
