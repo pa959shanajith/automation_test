@@ -1623,19 +1623,19 @@ export const createModel = async(payload) => {
     }
 }
 
-export const readModel = async () => {
-    try {
-      const res = await axios.get(url + '/genAI/read');  
-      if (res.status === 200) {
-        return res.data;
-      }
-      console.error(res.data);
-      return { error: 'Error in API call' };
-    } catch (err) {
-      console.error(err);
-      return { error: 'Error in API call' };
-    }
-  };
+// export const readModel = async () => {
+//     try {
+//       const res = await axios.get(url + '/genAI/read');  
+//       if (res.status === 200) {
+//         return res.data;
+//       }
+//       console.error(res.data);
+//       return { error: 'Error in API call' };
+//     } catch (err) {
+//       console.error(err);
+//       return { error: 'Error in API call' };
+//     }
+//   };
 
   export const editModel = async (id,payload) => {
     try {
