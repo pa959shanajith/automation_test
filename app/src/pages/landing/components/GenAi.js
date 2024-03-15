@@ -11,7 +11,7 @@ import RightPanelGenAi from "./RightPanelGenAi";
 import MiddleContainerGenAi from "./MiddleContainerGenAi";
 import { uploadgeneratefile, getall_uploadfiles,readTemp} from '../../admin/api';
 import { useDispatch } from 'react-redux';
-import { screenType,updateTemplateId } from './../../settings/settingSlice';
+import { screenType,setGenAiParameters,setTemplateInfo,updateTemplateId } from './../../settings/settingSlice';
 import { useSelector } from 'react-redux';
 import JiraTestcase from './JiraTestcase';
 
@@ -27,6 +27,9 @@ const GenAi = () => {
     const [sortedData, setSortedData] = useState([]);
     const [readTempData, setReadTempData] = useState([]);
     const [selectedTemp,setSelectedTemp] = useState(null);
+    const template_info = useSelector((state) => state.setting.template_info);
+    console.log(template_info)
+    const [tempExtras, setTempExtras] = useState({});
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -91,6 +94,8 @@ const GenAi = () => {
                 value:temp._id
             }))
             setReadTempData(mapData);
+            dispatchAction(setTemplateInfo(data));
+            
 
         } catch (error) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
@@ -112,6 +117,13 @@ const GenAi = () => {
 
     const submitPayload = () => {
         dispatchAction(updateTemplateId(selectedTemp));
+    }
+
+    const templateHandler = (e)=>{
+        setSelectedTemp(e.value);
+        const result= template_info.filter(item => item._id == e.value)
+        dispatchAction(setGenAiParameters(result[0]));
+
     }
    
 
@@ -226,7 +238,7 @@ const GenAi = () => {
                 <div className="left_btm_header my-2">Template</div>
                 <Dropdown
                     value={selectedTemp}
-                    options={readTempData} optionLabel='name' onChange={(e) => setSelectedTemp(e.value)}
+                    options={readTempData} optionLabel='name' onChange={(e) => templateHandler(e)}
                     placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full md:w-14rem" />
             </div>
             <div>
@@ -234,7 +246,7 @@ const GenAi = () => {
             </div>
         </div>
         <div className="genai_right_container"><MiddleContainerGenAi/></div>
-        <div className="genai_right_content"><RightPanelGenAi /></div>
+        <div className="genai_right_content"><RightPanelGenAi/></div>
 
     </div>)
 }

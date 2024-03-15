@@ -250,7 +250,8 @@ const MiddleContainerGenAi = () =>{
             <div className="card-body">
               {userlevel ? (<>
                 <div style={{ textAlign: 'left', padding: '5px' }}>
-                  <pre> {userTestcase}</pre>
+                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => setApiResponse(e.target.value)} rows={20} cols={1000} style={{width:'30rem'}}/>
+                 
                 </div>
               </>) :
                 (<>
