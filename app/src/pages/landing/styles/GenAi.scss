@@ -3,7 +3,7 @@
     width:100%;
 }
 .genai_left_container{
-    width:30%;
+    width:25%;
     overflow-y: auto;
     height: 95vh;
     overflow-x: hidden;
@@ -114,3 +114,43 @@
     margin-top: 10rem;
     margin-left: 10rem;
   }
+
+.blockCard {
+    box-shadow: rgba(0, 0, 0, 0.14) 0px 3px 8px;
+    width: 360px;
+    height: 118px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.flexRow {
+    display: flex;
+}
+
+.flexColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.centerContent {
+    align-items:center;
+}
+
+.parentDiv {
+    // height: 80vh;
+    // min-height: 80vh;
+    width: 125vh;
+    flex-direction: center;
+    align-items:center;
+    // align-content: center;
+    justify-content: center 
+}
+
+.imgDiv {
+    margin-bottom: 20px;
+    margin: auto;
+    margin-top: 15%;
+}

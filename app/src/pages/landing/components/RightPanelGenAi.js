@@ -35,7 +35,7 @@ const RightPanelGenAi = () => {
             <div className='flex flex-row pl-2 pb-2' style={{ gap: "4.5rem" }} >
                 <div className="flex flex-column">
                 <span><img src="static/imgs/variables_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /><label className="pb-2 label-genai3">Parameters</label></span>
-                    <label htmlFor="username" className="pb-2 font-medium">Industry Doamin <span style={{ color: "#d50000" }}>*</span></label>
+                    <label htmlFor="username" className="pb-2 font-medium">Industry Domain <span style={{ color: "#d50000" }}>*</span></label>
                     <InputText value={value} onChange={(e) => setValue(e.target.value)} />
                     <label className="pb-2 font-medium">Test Case Type <span style={{ color: "#d50000" }}>*</span></label>
 
