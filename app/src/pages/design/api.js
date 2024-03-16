@@ -1728,7 +1728,7 @@ export const updateIrisDataset = data => {
 }
 
 
-export const importDefinition = async(sourceUrl) => {
+export const importDefinition = async(sourceUrl,type) => {
     console.log("inside API importDefinition")
     try{
         const res = await axios(url+'/importDefinition', {
@@ -1738,7 +1738,8 @@ export const importDefinition = async(sourceUrl) => {
             },
             data : {
                 param : 'importDefinition_ICE',
-                sourceUrl: sourceUrl
+                sourceUrl: sourceUrl,
+                type: type
             },
             credentials: 'include'
         });
