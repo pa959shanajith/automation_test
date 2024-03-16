@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
 import { geniusMigrate, showGenuis, showSmallPopup, migrateProject } from '../../global/globalSlice';
 import "primeicons/primeicons.css";
+import {loadUserInfoActions} from "../LandingSlice"
 
 
 const ProjectCreation = (props) => {
@@ -110,6 +111,10 @@ const ProjectCreation = (props) => {
     dispatch(showGenuis({ showGenuisWindow: true, geniusWindowProps: {} }))
     dispatch(migrateProject(""))
   };
+  const handleRepository=()=>{
+    // navigate("/elementRepository");
+    dispatch(loadUserInfoActions.setElementRepositoryIndex(3))
+  }
 
   return (
     <>
@@ -123,23 +128,24 @@ const ProjectCreation = (props) => {
             <Card
               className="CreateProj-card"
               id="Createproj-title"
-              title="Do you want to create a new project?"
+              title="Create new element repository"
             >
               <Button
                 className="CreateProj_btn"
                 size="small"
-                onClick={handleOpenDialog}
+                onClick={handleRepository}
               >
-                Create Project
+                Create 
               </Button>
-              <CreateProject
+              {/* <CreateProject
                 visible={visible}
                 onHide={handleCloseDialog}
                 setHandleManageProject={setHandleManageProject}
                 handleManageProject={handleManageProject}
                 toastSuccess={props.toastSuccess}
                 toastError={props.toastError}
-              />
+              /> */}
+              
             </Card>
           </>
         ) : null}
@@ -187,7 +193,7 @@ const ProjectCreation = (props) => {
           </Card>
         ) : null} */}
 
-        {userInfo && userInfo.isadminuser === true ? (
+        {/* {userInfo && userInfo.isadminuser === true ? (
           <Card
             className="gotoadmin-card"
             title="Wish to do some housekeeping today?"
@@ -207,8 +213,16 @@ const ProjectCreation = (props) => {
               </Link>
             </div>
             <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
-        </Card>) : null}
-        {
+        </Card>) : null} */}
+        <Card
+        className="gotoadmin-card"
+        title="Create test cases using AI"
+        >
+          <div>
+           <Button size="small" className='admin-btn'  > Create</Button>
+           </div>
+        </Card>
+        {/* {
           (userInfo && userInfo?.rolename === "Quality Manager") && (projectInfoFromRedux && projectInfoFromRedux?.appType === "Web") && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
             <Button className="CreateProj_btn m-3" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
@@ -217,6 +231,7 @@ const ProjectCreation = (props) => {
           <div><Button size='small' className='Genai_button' onClick={CreateGenAi}>Create</Button></div>
         </Card>
 
+} */}
       </div>
     </>
 
