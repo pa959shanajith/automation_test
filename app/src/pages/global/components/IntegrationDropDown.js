@@ -442,7 +442,7 @@ const MiddleContent = (credentials, setCredentials, urlErrBor, usernameErrBor, p
                                 <Dropdown disabled={selectedTestrailRunsPlans?.plan == ""} style={{ width: "45%" }}
                                     placeholder="Select Test Run"
                                     options={testrailRuns} optionLabel="name"
-                                    value={selectedTestrailRunsPlans?.run || testrailPlanRunDetails.run}
+                                    value={selectedTestrailRunsPlans?.run || testrailPlanRunDetails?.run}
                                     onChange={(e) => onDropdownChange(e.value, "runs")}
                                 />
                             </div>
