@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import "../styles/GenAi.scss";
-import { generate_testcase } from '../../admin/api';
+import { generate_testcase, save_testcase } from '../../admin/api';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { InputText } from 'primereact/inputtext';
@@ -9,10 +9,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { useSelector } from 'react-redux';
 
 const SystemLevelTestcase = () => {
-    const [apiData, setApiData] = useState("");
     const [apiResponse, setApiResponse] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    // const [buttonDisabled, setButtonDisabled] = useState(false);
+    const [buttonDisabled, setButtonDisabled] = useState(false);
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
     const editParameters = useSelector((state) => state.setting.editParameters);
@@ -29,8 +28,8 @@ const SystemLevelTestcase = () => {
                 "summary": ""
             };
             const formData = { name, email, projectname, organization, type, template_id };
-            Object.assign(formData,editParameters);
-            setApiData("");
+            Object.assign(formData, editParameters);
+            setApiResponse("");
             const response = await generate_testcase(formData);
             if (response.error) {
                 toast.current.show({
@@ -51,6 +50,7 @@ const SystemLevelTestcase = () => {
                 });
                 setIsLoading(false);
             }
+            setButtonDisabled(false);
             setIsLoading(false);
         } catch (err) {
             setIsLoading(false);
@@ -65,24 +65,30 @@ const SystemLevelTestcase = () => {
         }
     };
 
-    const moduleTestCase = (e) => {
-        e.preventDefault();
-        //console.log("----Module level  test case---")
-        // setShowSearchBox(true);
-        // setuserstoryLevel(true);
-        setApiResponse("");
-        // setShowGenarateIcon(false)
-        // setButtonDisabled(true);
-    }
-
+    const saveTestcases = async () => {
+        try {
+            const formData = {
+                "name": "nandini.gorla",
+                "email": "gorla.nandini@avoautomation.com",
+                "organization": "Avo Assure",
+                "projectname": "test2",
+                "testcase": apiResponse,
+                "type": "system"
+            };
+            const response = await save_testcase(formData);
+            toast.current.show({ severity: 'success', summary: 'Success', detail: 'generated testcases saved successfully', life: 3000 });
+        } catch (error) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+        }
+    };
 
     return (
         <div className='flexColumn parentDiv'>
             {!apiResponse &&
                 <>
                     <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
-                    <p>Generate test cases for whole system</p>
-                    <Button loading={isLoading} label='Generate' style={{ marginTop: '20px' }} onClick={() => {
+                    <label className='labelText'>Generate test cases for whole system</label>
+                    <Button loading={isLoading} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
                         if (template_id.length > 0) {
                             generateTestcase();
                         } else {
@@ -106,7 +112,23 @@ const SystemLevelTestcase = () => {
                 )
             }
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
-            {apiResponse && <InputTextarea style={{ border:" 1p xsolid red", minHeight: "500px"}} autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} rows={80} cols={100} />}
+            {apiResponse && <InputTextarea
+                className='inputTestcaseSystem'
+                autoResize={true}
+                value={apiResponse}
+                onChange={(e) => setApiResponse(e.target.value)}
+            />}
+            {
+                apiResponse &&
+                <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
+                    <div className="gen-btn2">
+                        <Button label="Generate" onClick={generateTestcase} disabled={buttonDisabled}></Button>
+                    </div>
+                    <div className="gen-btn2">
+                        <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                    </div>
+                </div>
+            }
         </div>
     )
 };

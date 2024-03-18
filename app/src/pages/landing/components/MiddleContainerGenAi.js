@@ -460,8 +460,7 @@ const MiddleContainerGenAi = () =>{
               
               {userlevel ? (<>
                 <div style={{ textAlign: 'left', padding: '5px' }}>
-                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => setApiResponse(e.target.value)} rows={20} cols={1000} style={{width:'32rem', height:"33rem", overflow:'auto'}}/>
-                 
+                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => userStoryTestCase(e.target.value)} className="text-area-user-story" style={{width:'30rem'}}/>                 
                 </div>
               </>) :
                
@@ -534,23 +533,16 @@ const MiddleContainerGenAi = () =>{
                             <Dropdown
                               style={{ backgroundColor: "primary" }}
                               placeholder="Automate" onChange={async(e) => {
-                                console.log("event", e);
                                 setDropDownValue(e.value);
                                 await fetchData(e.value.code)
-                                console.log("dropDownValue", dropDownValue);
                               }}
                               options={multiLevelTestcase}
                               optionLabel="name"
                               value={dropDownValue}
-                            // itemTemplate={countryOptionTemplate} 
-                            // valueTemplate={selectedCountryTemplate} 
-                            // disabled={projectInfo.appType === "Desktop" || projectInfo.appType === "Mainframe" || projectInfo.appType === "OEBS" || projectInfo.appType === "SAP"}
                             />
                         </div>
                     </div>)
 }
-       
-        {/* <Toast ref={toast} position="botton-center" baseZIndex={10000}/> */}
         </>
     )
     

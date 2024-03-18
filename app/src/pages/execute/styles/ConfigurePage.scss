@@ -475,16 +475,14 @@
 }
 
 #footerBar {
-  border:1px solid black;
-  gap: 1rem;
-  display: flex;
-  justify-content:'flex-end';
-  position: absolute;
-  bottom: 0;
-  z-index: 1000;
-  width: 100%;
-  padding: 2px 0;
-  background-color: white;
+    gap: 1rem;
+    display: flex;
+    // justify-content: "flex-end";
+    position: absolute;
+    bottom: 0rem;
+    right: 18rem;
+    z-index: 1000;
+    padding: 2px 0;
 }
 
 .loginBox {
