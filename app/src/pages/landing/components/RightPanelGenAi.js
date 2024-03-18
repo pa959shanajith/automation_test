@@ -21,7 +21,7 @@ const RightPanelGenAi = () => {
     useEffect(()=>{
       setValue(genAiParameters.domain)
       setRange(genAiParameters.temperature)
-      setTestType({name : genAiParameters.test_type})
+      setTestType({name : genAiParameters.test_type ? genAiParameters.test_type.toLowerCase() : ''})
 
     },[genAiParameters])
    

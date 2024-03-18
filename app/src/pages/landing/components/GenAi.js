@@ -19,6 +19,8 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 
 const GenAi = () => {
     const toast = useRef(null);
+    const fileUploadRef = useRef(null);
+    const [uploadedFile, setUploadedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState("");
     const [fileDetails, setFileDetails] = useState([]);
@@ -32,6 +34,7 @@ const GenAi = () => {
     console.log(template_info)
     const [tempExtras, setTempExtras] = useState({});
     const [isUploadSuccess, setUploadSuccess] = useState(false);
+    const [fileUploading, setFileUploading] = useState(false);
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -117,8 +120,8 @@ const GenAi = () => {
         setReadTempData(e.value);
     }
 
-    const submitPayload = () => {
-        dispatchAction(updateTemplateId(selectedTemp));
+    const submitPayload = (template_id) => {
+        dispatchAction(updateTemplateId(template_id));
     }
 
     const templateHandler = (e)=>{
@@ -127,11 +130,14 @@ const GenAi = () => {
         dispatchAction(setGenAiParameters(result[0]));
 
     }
-   
+
 
     const myUploader = async (event) => {
+        setFileUploading(true)
         setIsLoading(true);
         const files = event.files[0];
+        const uploadedFile = event.files && event.files.length ? event.files[0] : null;
+        setUploadedFile(uploadedFile);
         setSelectedFile(files);
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const name = userInfo.username;
@@ -152,6 +158,7 @@ const GenAi = () => {
         formData.append('type', "maindocument");
         try {
             const data = await uploadgeneratefile(formData);
+            setFileUploading(false)
             setIsLoading(false);
             setUploadSuccess(true);
             toast.current.show({ severity: 'success', summary: 'Success', detail: 'Uploaded sucessfully', life: 3000 });
@@ -159,6 +166,7 @@ const GenAi = () => {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'errorMessage', life: 3000 });
             } else {
                 try {
+                    refreshFileUpload()
                     const uploadFilesData = await getall_uploadfiles(querystrg)
                     // axios.get('/getall_uploadfiles', {
                     //    params: {
@@ -197,8 +205,16 @@ const GenAi = () => {
     const onSubmitClick = () =>{
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Submitted Successfully' });
     }
+    const refreshFileUpload = () => {
+        setUploadedFile(null); // Clear uploaded file state
+        if (fileUploadRef.current) {
+            fileUploadRef.current.clear(); // Clear the input element
+        }
+    };
 
-    return (<div className="genai_container flex">
+    return (
+  
+    <div className="genai_container flex" >
         
         {isJiraComponentVisible && <JiraTestcase/>}
         <div className="genai_left_container p-3">
@@ -210,16 +226,19 @@ const GenAi = () => {
                 <div className="context_heading">Context Setting</div>
             </div>
             <div className="context_doc my-2">Document</div>
-            <div className="doc_container flex flex-column border-round my-2">
-          
+            <div className="doc_container flex flex-row border-round my-2">
                 <FileUpload
+                    ref={fileUploadRef}
+                    disabled={fileUploading}
                     mode="basic"
                     url="/uploadgeneratefile"
                     customUpload={true}
-                    name="pdf file"
-                    multiple={false}
+                    // name="demo[]"
+                    // multiple={false}
                     accept="application/pdf"
                     uploadHandler={myUploader}
+                    // onBeforeUpload={handleBeforeUpload}
+                    multiple
                     maxFileSize={20000000000}
                     emptyTemplate={
                         <div className="doc_btm flex justify-content-center align-items-center">
@@ -228,8 +247,8 @@ const GenAi = () => {
                             </span>
                         </div>
                     }
-                    onUpload={onFileUpload}
                 />
+                {fileUploading && <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)"/>}
             </div>
             <div className="datatable_files">
                 <DataTable value={fileDetails} header={header} tableStyle={{}}>
@@ -260,17 +279,18 @@ const GenAi = () => {
                 <div className="left_btm_header my-1">Template</div>
                 <Dropdown
                     value={selectedTemp}
-                    options={readTempData} optionLabel='name' onChange={(e) => templateHandler(e)}
+                    options={readTempData} optionLabel='name' onChange={(e) => {templateHandler(e);submitPayload(e.value)}}
                     placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full md:w-14rem" />
             </div>
-            <div>
+            {/* <div>
                 <Button className="w-full" label="Submit" onClick={() =>{ submitPayload(); onSubmitClick()}} />
-            </div>
+            </div> */}
         </div>
         <div className="genai_right_container"><MiddleContainerGenAi/></div>
         <div className="genai_right_content"><RightPanelGenAi/></div>
 
-    </div>)
+    </div>
+   )
 }
 
 export default GenAi;
