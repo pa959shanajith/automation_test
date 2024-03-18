@@ -1,6 +1,7 @@
 import { React, useRef , useState} from "react"
 import "../styles/GenAi.scss";
 import { RadioButton } from 'primereact/radiobutton';
+import { useNavigate } from 'react-router-dom';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { InputTextarea } from "primereact/inputtextarea";
@@ -15,17 +16,30 @@ import { screenType,updateTemplateId } from './../../settings/settingSlice';
 import BlankScreenGenAI from "./BlankScreenGenAI";
 import SystemLevelTestcase from "./SystemLevelTestcase";
 import ModuleLevelTestcase from "./ModuleLevelTestcase";
+import { saveMindmap, getModules } from '../../design/api';
+import { RedirectPage} from '../../global';
+import * as scrapeApi from "../../design/api";
+import * as DesignApi from '../../design/api'
+import {ScreenOverlay} from '../../global';
+import axios from 'axios';
+import {Messages as MSG} from '../../global';
+import { v4 as uuid } from 'uuid';
 
 const MiddleContainerGenAi = () =>{
+    const history = useNavigate();
     // const [selectedOption, setSelectedOption] = useState(null);
     const [sprints, setSprints] = useState(null);
     const [userStory, setUserStory] = useState(null);
+    const [overlay, setOverlay] = useState(null);
+    const [blockui, setBlockui] = useState({ show: false })
+    const [loading, setLoading] = useState(false);
     const [value, setValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showGenarateIcon, setShowGenarateIcon] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const toast = useRef(null);
     const [apiResponse, setApiResponse] = useState(null);
+    const navigate = useNavigate();
     const [apiDataReceived, setApiDataReceived] = useState(false);
     const [userstoryLevel, setuserstoryLevel] = useState(true);
     const [selectedTestCases, setSelectedTestCases] = useState([]);
@@ -43,7 +57,6 @@ const MiddleContainerGenAi = () =>{
     const [isJiraComponentVisible, setJiraComponentVisible] = useState(false);
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
-    const editParameters = useSelector((state) => state.setting.editParameters);
     console.log(template_id)
 
     const ToastMessage = ({ message }) => (
@@ -56,6 +69,14 @@ const MiddleContainerGenAi = () =>{
       { name: 'Function', code: "function" },
       { name: 'API', code: "api" },
     ];
+
+    const displayError = (error) => {
+    
+      setBlockui({ show: false })
+      setLoading(false)
+  (typeof error === "object" ? error : MSG.CUSTOM(error, "error"))
+    }
+
 
     const sprint = [
         { name: 'Positive', code: 'NY' },
@@ -130,7 +151,7 @@ const MiddleContainerGenAi = () =>{
           const instancename = "Avo Assure";
           const generateType = {
             typename: 'userstories',
-            summary: selectedSummaries
+            summary: selectedSummaries+ ". One step should have only one action, actionable object and a value. The name of all actionable objects should be in double quotes and their values in single quotes. Show only one test case."
           };
           const formData3 = {
             "name": username,
@@ -140,7 +161,6 @@ const MiddleContainerGenAi = () =>{
             "type": generateType,
             "template_id":template_id
           };
-          Object.assign(formData3,editParameters);
           const response = await generate_testcase(formData3)
           toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level testcases genarate sucessfully', life: 3000 });
           setUserTestcase(response.data.response);
@@ -180,17 +200,180 @@ const MiddleContainerGenAi = () =>{
 
       const fetchData = async (code) => {
         if (code === "function") {
-          try {
-            const response = await fetch("https://avoaiapidev.avoautomation.com/generate_response");
-            const data = await response.json();
-            console.log("data", data);
-          } catch (error) {
-            console.error("Error fetching data:", error);
-          }
+          try{
+            setOverlay("Mind Map generation in progress...")
+            const data = userTestcase;
+            const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                data: data
+                })
+                if(testData.status === 401 || testData.data === "Invalid Session"){
+                RedirectPage(history)
+                return {error:MSG.GENERIC.INVALID_SESSION};
+            }
+            else if(testData.status === "fail" ){
+                return {error:MSG.ADMIN.ERR_FETCH_OPENID}
+            }
+            const testSteps = testData.data[1]
+            const dataObjects = testData.data[0]
+            let random_suffix = (Math.random() + 1).toString(36).substring(7)
+            const mindmap_data = {
+                "action": "/saveData",
+                "createdthrough": "Web",
+                "cycId":undefined,
+                "write": 10,
+                "map": [
+                {
+                    "id": 0,
+                    "childIndex": 0,
+                    "_id": null,
+                    "oid": null,
+                    "name": "AI_testsuite-"+random_suffix,
+                    "type": "modules",
+                    "pid": null,
+                    "pid_c": null,
+                    "task": null,
+                    "renamed": false,
+                    "orig_name": null,
+                    "taskexists": null,
+                    "state": "created",
+                    "cidxch": null
+                },
+                {
+                    "id": 1,
+                    "childIndex": 1,
+                    "_id": null,
+                    "oid": null,
+                    "name": "AI_testcase-"+random_suffix,
+                    "type": "scenarios",
+                    "pid": 0,
+                    "pid_c": null,
+                    "task": null,
+                    "renamed": false,
+                    "orig_name": null,
+                    "taskexists": null,
+                    "state": "created",
+                    "cidxch": null
+                },
+                {
+                    "id": 2,
+                    "childIndex": 2,
+                    "_id": null,
+                    "oid": null,
+                    "name": "AI_screen-"+random_suffix,
+                    "type": "screens",
+                    "pid": 1,
+                    "pid_c": null,
+                    "task": null,
+                    "renamed": false,
+                    "orig_name": null,
+                    "taskexists": null,
+                    "state": "generated",
+                    "cidxch": null
+                },
+                {
+                    "id": 3,
+                    "childIndex": 3,
+                    "_id": null,
+                    "oid": null,
+                    "name": "AI_teststeps-"+random_suffix,
+                    "type": "testcases",
+                    "pid": 2,
+                    "pid_c": null,
+                    "task": null,
+                    "renamed": false,
+                    "orig_name": null,
+                    "taskexists": null,
+                    "state": "generated",
+                    "cidxch": null
+                }
+                ],
+                "deletednode": [],
+                "unassignTask": [],
+                "prjId": JSON.parse(localStorage.getItem('DefaultProject')).projectId,
+                "createdthrough": "Web",
+                "relId": null
+            }
+        
+        
+            var moduleRes = await saveMindmap(mindmap_data);
+            if (moduleRes === "Invalid Session") return RedirectPage(history);
+            if (moduleRes.error) { displayError(moduleRes.error); return }
+                var moduledata = await getModules({ "tab": "tabCreate", "projectid": JSON.parse(localStorage.getItem('DefaultProject')).projectId , "moduleid": [moduleRes], cycId: null })
+                if (moduledata === "Invalid Session") return RedirectPage(history);
+                if (moduledata.error) { displayError(moduledata.error); return; }
+        
+                var screenId = moduledata.children[0].children[0]._id;
+                var testcasesId = moduledata.children[0].children[0].children[0]._id;
+                var orderList = []
+                dataObjects.map(dataObject=>{dataObject['tempOrderId']=uuid(); orderList.push(dataObject['tempOrderId'])}) 
+        
+                var addedObj = {createdthrough:"",
+                        mirror:"",
+                        name:"AI_screen-"+random_suffix,
+                        orderList:[],
+                        reuse:false,  
+                        scrapedurl:"",
+                        view:dataObjects
+                        };
+                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                let params = {
+                'deletedObj': [],
+                'modifiedObj': [],
+                'addedObj': addedObj,
+                'screenId': screenId,
+                'userId': userInfo.user_id,
+                'roleId': userInfo.role,
+                'param': 'saveScrapeData',
+                'orderList': orderList
+            }
+            await scrapeApi.updateScreen_ICE(params)
+            .then(response =>  {
+                if (response == "Success") {
+                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements Captured Successfully.', life: 5000 });
+            }
+            else {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
+                }
+            })
+            .catch(error => {
+                setOverlay("");
+                console.error("ERROR::::", error)
+            });
+            await DesignApi.updateTestCase_ICE(testcasesId,"AI_teststeps-"+random_suffix,testSteps,userInfo,0,false,[])
+            .then(data => {
+                setOverlay("");
+                if (data === "Invalid Session") RedirectPage(history);
+                if (data === "success") toast.current.show({ severity: 'success', summary: 'Success', detail: 'Mindmap Created Successfully.', life: 5000 });;
+            })
+            .catch(error => {
+                setOverlay("");
+                console.error("ERROR::::", error)
+            });
+        
+            navigate("/design");
+            // var reqForOldModule={
+            //   tab:"createTab",
+            //   projectid:JSON.parse(localStorage.getItem('DefaultProject')).projectId,
+            //   version:0,
+            //   cycId: null,
+            //   modName:"",
+            //   moduleid:null
+            // }
+            // await getModules(reqForOldModule)
+            }
+            catch (error) {
+            setOverlay("");
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Network Error.', life: 3000 });
+            }
         }
       };
     return(
         <>
+         {overlay ? <ScreenOverlay content={overlay} /> : null}
          {/* <ToastMessage message={toastMessage} /> */}
           <Toast ref={toast} ></Toast>
 
