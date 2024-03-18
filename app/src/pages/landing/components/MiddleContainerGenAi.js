@@ -43,6 +43,7 @@ const MiddleContainerGenAi = () =>{
     const [isJiraComponentVisible, setJiraComponentVisible] = useState(false);
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
+    const editParameters = useSelector((state) => state.setting.editParameters);
     console.log(template_id)
 
     const ToastMessage = ({ message }) => (
@@ -139,6 +140,7 @@ const MiddleContainerGenAi = () =>{
             "type": generateType,
             "template_id":template_id
           };
+          Object.assign(formData3,editParameters);
           const response = await generate_testcase(formData3)
           toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level testcases genarate sucessfully', life: 3000 });
           setUserTestcase(response.data.response);

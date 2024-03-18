@@ -16,6 +16,7 @@ const ModuleLevelTestcase = () => {
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
+    const editParameters = useSelector((state) => state.setting.editParameters);
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
@@ -50,6 +51,7 @@ const ModuleLevelTestcase = () => {
                 "summary": query
             };
             const formData = { name, email, projectname, organization, type, template_id };
+            Object.assign(formData,editParameters);
             setApiResponse("");
             const response = await generate_testcase(formData);
             if (response.error) {

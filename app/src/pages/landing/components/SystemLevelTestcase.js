@@ -15,6 +15,7 @@ const SystemLevelTestcase = () => {
     // const [buttonDisabled, setButtonDisabled] = useState(false);
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
+    const editParameters = useSelector((state) => state.setting.editParameters);
 
     const generateTestcase = async () => {
         try {
@@ -28,6 +29,7 @@ const SystemLevelTestcase = () => {
                 "summary": ""
             };
             const formData = { name, email, projectname, organization, type, template_id };
+            Object.assign(formData,editParameters);
             setApiData("");
             const response = await generate_testcase(formData);
             if (response.error) {
