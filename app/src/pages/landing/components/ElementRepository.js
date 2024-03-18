@@ -238,7 +238,7 @@ const ElementRepository = (props) => {
               item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
             ))}
           </div>
-          <div>
+          {/* <div>
             <img src='static/imgs/elements_used_in tescases_icon.svg' className='element_used_testcase' onMouseEnter={(e) => op.current.toggle(e)} onMouseLeave={()=> op.current.hide()}/>
           </div>
             <OverlayPanel ref={op} className='overlay_panel'>
@@ -248,7 +248,7 @@ const ElementRepository = (props) => {
                   return <span className='flex flex-column testcase_name_list'>{testcase.label}</span>
                 })}
               </div>
-            </OverlayPanel>
+            </OverlayPanel> */}
       </div>
       </>
     );
