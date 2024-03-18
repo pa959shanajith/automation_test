@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .compare__object__note {
   .p-dialog-header-icons {
@@ -874,6 +875,11 @@
 .reused__icon{
   height: 1.5rem;
   cursor: pointer;
+}
+
+.choose__repo__txt{
+  font: $f6_regular;
+  color: #212121;
 }
 // .zoom-in-out-box {
 //   margin: 24px;

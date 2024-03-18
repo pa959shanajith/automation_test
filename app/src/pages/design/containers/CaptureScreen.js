@@ -143,6 +143,8 @@ const CaptureModal = (props) => {
   const [repoNameAdded, setRepoNameAdded] = useState(false);
   const [emptyDatatable, setEmptyDatatable] = useState(false);
   const [selectedRepoName,setSelectedRepoName] = useState("");
+  const [showDailogForOnDelete,setShowDailogForOnDelete] = useState(false);
+  const [showDailogForDelete,setShowDailogForDelete] = useState(false)
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -1182,6 +1184,7 @@ else{
    let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
   //  setIrisObject(scrapeType[0]);
     return (
+      <>
       <div >
         
         
@@ -1206,12 +1209,13 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+          className="delete__icon" onClick={() => {setSelectedCapturedElement(rowData);setShowDailogForDelete(true)}} alt='' />
           
 
         
 
       </div>
+      </>
     )
 
   };
@@ -1271,7 +1275,7 @@ else{
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
         {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>  :(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
-        {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
+        {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span class="choose__repo__txt">Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -2323,7 +2327,7 @@ const handleAddAccordion = () => {
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
                 {/* <div class="zoom-in-out-box"></div> */}
-                  <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>
+                  {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
@@ -2331,7 +2335,7 @@ const handleAddAccordion = () => {
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
                   <div className="dropdown_container">
-                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName}</span>} className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName ? selectedRepoName : "Select Repository"}</span>} className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
                     </div>
                 </div>}
               </div>
@@ -2536,7 +2540,7 @@ const handleAddAccordion = () => {
                 </div> : null
                 }
                 {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
-                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={()=>setShowDailogForOnDelete(true)} ></Button> : null}
                 { NameOfAppType.appType !== 'Webservice' && <> 
                     <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
                     <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
@@ -2605,6 +2609,20 @@ const handleAddAccordion = () => {
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        <AvoConfirmDialog
+          visible={showDailogForDelete}
+          onHide={() => setShowDailogForDelete(false)}
+          showHeader={false}
+          message="This element is used in repository also, Are you sure you want to delete the element?"
+          icon="pi pi-exclamation-triangle"
+          accept={()=>handleDelete(...selectedCapturedElement)} />
+        <AvoConfirmDialog
+          visible={showDailogForOnDelete}
+          onHide={() => setShowDailogForOnDelete(false)}
+          showHeader={false}
+          message="This element is used in repository also, Are you sure you want to delete the element?"
+          icon="pi pi-exclamation-triangle"
+          accept={onDelete} />
         
         {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
