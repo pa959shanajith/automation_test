@@ -14,11 +14,14 @@ import Privileges from './preferences';
 import AiTemplate from '../components/AiTemplate';
 import GridTemplate from '../components/GridTemplate';
 import LLM from './LLM'
+import Project from './ProjectAssign';
+import UnlockTestSuites from './UnLockTestSuites';
 
 const OriginContainer = (props) => {
     const currentTab = useSelector(state => state.admin.screen);
     const [createUserDialog, setCreateUserDialog] = useState(false)
-    // const [provisionDialog,setProvisionDialog] = useState(false)s
+    const [resetMiddleScreen,setResetMiddleScreen] =useState({assignProjectTab:true})
+    // const [provisionDialog,setProvisionDialog] = useState(false)
     return (<>
         <div className="rightContainer">
             {currentTab !== "session_management"?
@@ -37,8 +40,8 @@ const OriginContainer = (props) => {
             {currentTab === "grid_template" && <GridTemplate/>}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
-            
-
+            {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}
+            {currentTab === "Locked_TestSuites" && <UnlockTestSuites/>}
         </div>
     </>)
 }

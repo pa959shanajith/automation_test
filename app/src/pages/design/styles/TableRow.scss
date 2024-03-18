@@ -178,3 +178,10 @@
     position: sticky;
     left: 5rem;
 }
+.custom-tooltip .p-tooltip {
+    background-color: transparent !important;
+    color: inherit !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }

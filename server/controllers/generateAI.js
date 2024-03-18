@@ -16,7 +16,11 @@ exports.generateTestcase = async (req, res) => {
             "project": req.body.projectname,
             "organization": req.body.organization,
             "generateType": req.body.type,
-            "template_id":req.body.template_id
+            "template_id":req.body.template_id,
+            "domain":req.body.domain || "",
+            "test_type":req.body.test_type || "",
+            "temperature":req.body.temperature || ""
+
         };
         const result = await utils.fetchData(inputs, "generate/testcase", "generateTestcase", true);
 

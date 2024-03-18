@@ -19,7 +19,7 @@ import * as DesignApi from "../api";
 import { RedirectPage} from '../../global';
 import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
-import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
+import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap,createNodeSingle} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
 import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import{ objValue} from '../designSlice';
@@ -306,18 +306,15 @@ const CanvasNew = (props) => {
                                 activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.parent.id;
                             }
                         }
-                        var res = createNode(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
-                        if(res !== undefined){
-                          tree.links = res.linkDisplay
-                          tree.dLinks = res.dLinks
-                          tree.nodes = res.nodeDisplay
-                          tree.dNodes = res.dNodes
-                          count= {...count,...res.count}
-                          typeo = typen;
-                        }else{
-                          toast.current.show({severity:'error', summary:"Error", detail:"Try to import multi test suite structure", life:5000})
-                        }
-                       
+                        var res = createNodeSingle(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
+            
+                        tree.links = res.linkDisplay
+                        tree.dLinks = res.dLinks
+                        tree.nodes = res.nodeDisplay
+                        tree.dNodes = res.dNodes
+                        count= {...count,...res.count}
+                        typeo = typen;
+                    
                     }
                 })
                 if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
@@ -486,8 +483,8 @@ const CanvasNew = (props) => {
       };
 
     const menuItemsModule = [
-        { label: 'Add Testcase',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Add Multiple Testcases',icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: `Add ${appType !== "Webservice" ?'Testcase': 'API'}`,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: `Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
@@ -506,13 +503,13 @@ const CanvasNew = (props) => {
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
         
     ]:[
-      { label: 'Add Screen',icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-      { label: 'Add Multiple Screens',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
+      { label: `Add ${appType !== "Webservice" ?'Screen': 'Request'}`,icon:<img src="static/imgs/add-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
+      { label: `Add Multiple ${appType !== "Webservice" ?'Screens': 'Requests'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
       {separator: true},
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value || typeOfView !== "mindMapView"),command:()=>{confirm1()},title:(agsLicense.msg)},
       { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
       { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
-      {label:'Tag a test Case',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
+      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType === "Webservice"?true:false, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -748,6 +745,32 @@ const CanvasNew = (props) => {
         }
         // setCreateNew('autosave')
     }
+
+    const checkTestStepGroup = (teststep, dNode, sids, types, ids) => {
+      let check = [];
+  
+      const checkRecursively = (children) => {
+          children.forEach((child) => {
+              if (child['reuse']) {
+                  check.push(child['reuse']);
+              } else if (child.children && child.children.length > 0) {
+                  checkRecursively(child.children);
+              }
+          });
+      };
+  
+      checkRecursively(teststep);
+  
+      if (check.includes(true)) {
+          reusedNode(dNode, sids, types);
+          setReuseDelContent("Selected Test Scenario has reused Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permanently?");
+          setSelectedDelNode(ids);
+          setReuseDelConfirm(true);
+      } else {
+          setSelectedDelNode(ids);
+          setDelConfirm(true);
+      }
+  };
     const clickDeleteNode=(id)=>{
       var sid = parseFloat(id.split('node_')[1]);
       var type =[...dNodes][sid]['type'];
@@ -781,18 +804,28 @@ const CanvasNew = (props) => {
               return;
           }
           else if([...dNodes][sid]['children']){
+            if([...dNodes][sid]['children'].length>0 && [...dNodes][sid]['children'][0].type !== 'teststepsgroups'){
               for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
-                  if ([...dNodes][sid]['children'][i]["reuse"]){
-                      reusedNode(dNodes,sid,type);
-                      setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
-                      setSelectedDelNode(id);
-                      setReuseDelConfirm(true);
-                      return;
-                  }
-                  else {
-                      continue;
-                  }
-          }} 
+                if ([...dNodes][sid]['children'][i]["reuse"]){
+                    reusedNode(dNodes,sid,type);
+                    setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
+                    setSelectedDelNode(id);
+                    setReuseDelConfirm(true);
+                    return;
+                }
+                else {
+                    continue;
+                }
+              }
+            }else if([...dNodes][sid]['children'].length>0){
+              checkTestStepGroup([...dNodes][sid]['children'], dNodes, sid, type, id)
+              return;
+            }else{
+              setSelectedDelNode(id);
+              setDelConfirm(true);
+              return;
+            }
+          } 
           setSelectedDelNode(id);
           setDelConfirm(true);
           return;
@@ -1130,7 +1163,7 @@ const CanvasNew = (props) => {
                             }
                             scenarioComparisionData.push(screenComparisonKeys)
                             setMarqueItem({...screenComparisonKeys,newlyfound:data['view'][3]['newElements'].new_obj_in_screen.length,screenHealth:screenHealth,screenName:screenAnalysisData['screenName']})           
-                            setOverlay(`Comparision of ${i+1}/${dataObjects.length} screen(s) in progress..`)
+                            setOverlay(`Comparison of ${i+1}/${dataObjects.length} screen(s) in progress..`)
                            
                             let compareObj = generateCompareObject(screenAnalysisData, screenAnalysisData.currentScrapedObjects.filter(object => object.xpath.substring(0, 4)==="iris"));
                             screenAnalysisData.view=compareObj
@@ -1735,12 +1768,12 @@ const CanvasNew = (props) => {
     // },
     {
       field: "addScenario",
-      header: "Add Testcase",
+      header: `Add ${appType !== "Webservice" ?'Testcase': 'API'}`,
       headerClassName: 'scenario-header',
       body: (rowData) => {
         if (showInput && rowData.id === addScenario.length) {
           return (
-            <InputText name="inputValue" className='scenario_inp' placeholder='Testcase Name' value={inputValue} onChange={handleInputChange}
+            <InputText name="inputValue" className='scenario_inp' placeholder={`${appType !== "Webservice" ?'Testcase': 'API'} Name`} value={inputValue} onChange={handleInputChange}
             onBlur={() => {
               updateRow(rowData, inputValue);
               setShowInput(false);
@@ -1806,13 +1839,13 @@ const CanvasNew = (props) => {
     // },
     {
       field: "addScreen",
-      header: "Add Screen",
+      header: `Add Multiple ${appType !== "Webservice" ? 'Screens' : 'Requests'}`,
       headerClassName: 'scenario-header',
       body: (rowDataScreen) => {
         if (showInputScreen && rowDataScreen.id === addScreen.length) {
           return (
             // <InputText className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={(e) => setinputValScreen(e.target.value)} onBlur={() => updateRowScreen(rowDataScreen, inputValScreen)} />
-            <InputText name="inputValScreen" className='scenario_inp' placeholder='Add Screen Name' value={inputValScreen} onChange={handleInputChange}
+            <InputText name="inputValScreen" className='scenario_inp' placeholder={`Add ${appType !== "Webservice" ?'Screen' : 'Request'} Name`} value={inputValScreen} onChange={handleInputChange}
             onBlur={() => {
               updateRowScreen(rowDataScreen, inputValScreen);
               setShowInputScreen(false);
@@ -1938,13 +1971,13 @@ const CanvasNew = (props) => {
   
   const footerContentScenario = (
     <div>
-        <Button label="Add Testcase"  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
+        <Button label={`Add ${appType !== "Webservice" ?'Testcase' : 'API'}`}  onClick={()=>{setVisibleScenario(false);createMultipleNode(box.split("node_")[1],addScenario);setInputValue("");setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValue ) ?  false: true} /> 
     </div> 
 );
 
 const footerContentScreen =(
     <div>
-              <Button label="Add Screens"  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);setinputValScreen("");setAddScreen([{ id: 1, value: inputValScreen, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValScreen ) ?  false: true} /> 
+              <Button label={`Add ${appType !== "Webservice" ?'Screens' : 'Request'}`}  onClick={() => {setVisibleScreen(false);createMultipleNode(box.split("node_")[1],addScreen);setinputValScreen("");setAddScreen([{ id: 1, value: inputValScreen, isEditing: false }]);}} className="add_scenario_btn"  disabled={ (inputValScreen ) ?  false: true} /> 
           </div>
     )
     const footerContentTeststep =(
@@ -2672,7 +2705,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 {visibleDesignStep && <DesignModal   fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup?fetchingDetailsForGroup:fetchingDetails} appType={typesOfAppType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} testSuiteInUse={testSuiteInUse}/>}
             <ContextMenu model={menuItemsModule} ref={menuRef_module}/>
 
-             <Dialog  className='Scenario_dialog' visible={visibleScenario} header="Add Multiple Testcase" style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
+             <Dialog  className='Scenario_dialog' visible={visibleScenario} header={`Add Multiple ${appType !== "Webservice" ?'Testcase': 'APIs'}`} style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScenario(false)}  footer={footerContentScenario}>
         {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
        
         <div style={{ height: '100%', overflow: 'auto' }}>
@@ -2689,7 +2722,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             </div>
             </Dialog>
 
-            <Dialog  className='Scenario_dialog' header="Add Multiple Screens" visible={visibleScreen} style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScreen(false)}  footer={footerContentScreen}>
+            <Dialog  className='Scenario_dialog' header={`Add Multiple ${appType !== "Webservice" ? 'Screens' : 'Requests'}`} visible={visibleScreen} style={{ width: '45vw', height:'30vw' }} onHide={() => setVisibleScreen(false)}  footer={footerContentScreen}>
             {/* <Toolbar  className="toolbar_scenario" start={startContent}  /> */}
             <div style={{ height: '100%', overflow: 'auto' }}>
             <DataTable value={addScreen}  tableStyle={{ minWidth: '20rem' }}  headerCheckboxSelection={true} scrollable scrollHeight="calc(100% - 38px)" >

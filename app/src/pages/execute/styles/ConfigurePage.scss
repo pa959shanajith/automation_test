@@ -474,6 +474,24 @@
   }
 }
 
+#footerBar {
+  border:1px solid black;
+  gap: 1rem;
+  display: flex;
+  justify-content:'flex-end';
+  position: absolute;
+  bottom: 0;
+  z-index: 1000;
+  width: 100%;
+  padding: 2px 0;
+  background-color: white;
+}
+
+.loginBox {
+  align-items: center;
+  justify-content: center;
+}
+
 .cloud-test-provider{
   .p-placeholder {
     color: #605bff !important;

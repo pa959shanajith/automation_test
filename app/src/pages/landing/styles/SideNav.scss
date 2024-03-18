@@ -19,6 +19,7 @@
             transition: all 0.5s;
             text-align-last: center;
             cursor: pointer;
+            border-bottom: 1px solid #ccc;
             &_disabled {
                 display: flex;
                 flex-direction: column;
@@ -46,6 +47,7 @@
                     font:$f8_regular;
                 }
             }
+           
             &:hover{
                 background: rgb(208, 207, 209);
                 color: #fff;
@@ -60,13 +62,25 @@
                 font-size: 0.7rem;
                 text-align: center;
                 font:$f8_regular;
+                font-weight: bold;
             }
+            // &::after {
+            //     content: '';
+            //     position: absolute;
+            //     bottom: 0;
+            //     left: 50%;
+            //     transform: translateX(-50%);
+            //     height: 1px;
+            //     width: calc(100% - 0.1rem); 
+            //     background-color: #ccc; 
+            // }
+            
         }
         .active{
-            border-left: solid 0.2rem rgb(150, 4, 187);
-            color: rgb(150, 4, 187);
+            border-left: solid 0.2rem #605BFF;
+            color: #605BFF;
             border-radius: 0.2rem;
-            border-bottom: none;
+            // border-bottom: none;
             font:$f8_semibold;
         }
         .inactive{

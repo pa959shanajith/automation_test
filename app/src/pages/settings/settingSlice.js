@@ -60,7 +60,12 @@ const initialState = {
     updateTestrailMapping: true,
     template_id:'',
     template_info:[],
-    genAiParameters:{}
+    genAiParameters:{},
+    editParameters:{
+        domain:'',
+        test_type:'',
+        temperature:''
+    }
 
 }
 
@@ -218,7 +223,11 @@ export const settingSlice=createSlice({
             state.template_info = action.payload
         },
         setGenAiParameters : (state, action) => {
-            state.genAiParameters= action.payload
+            state.genAiParameters = action.payload;
+        },
+        setEditParameters : (state, action) => {
+            console.log(action,' its action');
+            state.editParameters = {...state.editParameters, ...action.payload};
         },
     }
 })
@@ -272,7 +281,8 @@ export const {
     updateTestrailMapping,
     updateTemplateId,
     setTemplateInfo,
-    setGenAiParameters
+    setGenAiParameters,
+    setEditParameters
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

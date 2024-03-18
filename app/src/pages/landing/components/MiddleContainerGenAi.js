@@ -11,6 +11,10 @@ import { Toast } from 'primereact/toast';
 import '../styles/Ai_Output_styles.scss';
 import genarateIcon from '../../../../src/assets/imgs/genarate.svg';
 import { screenType,updateTemplateId } from './../../settings/settingSlice';
+// import StartScreenGenAI from "./StartScreenGenAI";
+import BlankScreenGenAI from "./BlankScreenGenAI";
+import SystemLevelTestcase from "./SystemLevelTestcase";
+import ModuleLevelTestcase from "./ModuleLevelTestcase";
 
 const MiddleContainerGenAi = () =>{
     // const [selectedOption, setSelectedOption] = useState(null);
@@ -25,6 +29,7 @@ const MiddleContainerGenAi = () =>{
     const [apiDataReceived, setApiDataReceived] = useState(false);
     const [userstoryLevel, setuserstoryLevel] = useState(true);
     const [selectedTestCases, setSelectedTestCases] = useState([]);
+    const [dropDownValue, setDropDownValue] = useState({});
     const [userTestcase, setUserTestcase] = useState(null)
     const [buttonDisabled, setButtonDisabled] = useState(false);
      const [userlevel, setUserlevel] = useState(false);
@@ -38,6 +43,7 @@ const MiddleContainerGenAi = () =>{
     const [isJiraComponentVisible, setJiraComponentVisible] = useState(false);
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
+    const editParameters = useSelector((state) => state.setting.editParameters);
     console.log(template_id)
 
     const ToastMessage = ({ message }) => (
@@ -45,6 +51,12 @@ const MiddleContainerGenAi = () =>{
           {message}
         </Toast>
       );
+
+    const multiLevelTestcase = [
+      { name: 'Function', code: "function" },
+      { name: 'API', code: "api" },
+    ];
+
     const sprint = [
         { name: 'Positive', code: 'NY' },
         { name: 'Negative', code: 'RM' },
@@ -128,6 +140,7 @@ const MiddleContainerGenAi = () =>{
             "type": generateType,
             "template_id":template_id
           };
+          Object.assign(formData3,editParameters);
           const response = await generate_testcase(formData3)
           toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level testcases genarate sucessfully', life: 3000 });
           setUserTestcase(response.data.response);
@@ -162,6 +175,18 @@ const MiddleContainerGenAi = () =>{
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'generated testcases saved successfully', life: 3000 });
         } catch (error) {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+        }
+      };
+
+      const fetchData = async (code) => {
+        if (code === "function") {
+          try {
+            const response = await fetch("https://avoaiapidev.avoautomation.com/generate_response");
+            const data = await response.json();
+            console.log("data", data);
+          } catch (error) {
+            console.error("Error fetching data:", error);
+          }
         }
       };
     return(
@@ -208,6 +233,9 @@ const MiddleContainerGenAi = () =>{
 
 
         </div>
+        {selectedOption == null && <BlankScreenGenAI />}
+        {selectedOption === 'a' && <SystemLevelTestcase />} 
+        {selectedOption === 'b' && <ModuleLevelTestcase />} 
        {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container'>
                    <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
                    <label> Select any one of the three methods mentioned above</label>
@@ -297,14 +325,7 @@ const MiddleContainerGenAi = () =>{
           )
       ) : null
       }
- <div className="flex flex-row" style={{ gap: "1rem" , justifyContent:'flex-end' }}>
-                        <div className="gen-btn2">
-                            <Button label="Generate" onClick={testCaseGenaration}  disabled={buttonDisabled}></Button>
-                        </div>
-                        <div className="gen-btn2">
-                            <Button label="Save"  disabled={buttonDisabled} onClick={saveTestcases}></Button>
-                        </div>
-                    </div>
+
                     </div>
 
                     {/* <div className="card flex justify-content-center">
@@ -315,6 +336,36 @@ const MiddleContainerGenAi = () =>{
                 )}
 
         </div>
+        {/* <FooterGenAi /> */}
+        {
+          selectedOption == 'c'
+        &&
+        (<div id="footerBar">
+                        <div className="gen-btn2">
+                            <Button label="Generate" onClick={testCaseGenaration}  disabled={buttonDisabled}></Button>
+                        </div>
+                        <div className="gen-btn2">
+                            <Button label="Save"  disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                        </div>
+                        <div className="cloud-test-provider">
+                            <Dropdown
+                              style={{ backgroundColor: "primary" }}
+                              placeholder="Automate" onChange={async(e) => {
+                                console.log("event", e);
+                                setDropDownValue(e.value);
+                                await fetchData(e.value.code)
+                                console.log("dropDownValue", dropDownValue);
+                              }}
+                              options={multiLevelTestcase}
+                              optionLabel="name"
+                              value={dropDownValue}
+                            // itemTemplate={countryOptionTemplate} 
+                            // valueTemplate={selectedCountryTemplate} 
+                            // disabled={projectInfo.appType === "Desktop" || projectInfo.appType === "Mainframe" || projectInfo.appType === "OEBS" || projectInfo.appType === "SAP"}
+                            />
+                        </div>
+                    </div>)
+}
        
         {/* <Toast ref={toast} position="botton-center" baseZIndex={10000}/> */}
         </>

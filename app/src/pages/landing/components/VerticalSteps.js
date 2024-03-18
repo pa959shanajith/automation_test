@@ -20,7 +20,7 @@ import { getModules,updateTestSuiteInUseBy } from '../../design/api'
 import { Toast } from 'primereact/toast';
 import { loadUserInfoActions } from '../LandingSlice';
 import { RedirectPage } from "../../global";
-
+import { Tag } from 'primereact/tag';
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
 const VerticalSteps = (props) => {
@@ -40,10 +40,10 @@ const VerticalSteps = (props) => {
       project = JSON.parse(localStorageDefaultProject);
     }
     const buttonStyle_design = {
-      background:" #605bff",color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem"
+      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"10rem",
     };
     const buttonStyle_genius = {
-      background:" #605bff",color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"10rem",marginTop:"2rem"
     };
     const buttonStyle_genius_disabled = {
       background:"rgb(160, 200, 255)" ,color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
@@ -53,11 +53,13 @@ const VerticalSteps = (props) => {
       background: (Button!="Execute"&& activeStep <1)? '#a0c8ff' : '#605bff',
       color: 'white',
       padding: '0.3rem 0.7rem',
-      marginRight: '13.4rem',
+      // marginRight: '2rem',
+      minWidth:"10rem"
     };
     const buttonStyle_report = {
       background:(Button!="Report"&& activeStep <2)? '#a0c8ff' : '#605bff',
-      color:"white" ,padding:"0.3rem 0.8rem",marginRight: "13.7rem"
+      color:"white" ,padding:"0.3rem 0.8rem",minWidth:"10rem"
+      // marginRight: "13.7rem"
     };
     
     const agsLicense = {
@@ -68,19 +70,46 @@ const VerticalSteps = (props) => {
     const navigate = useNavigate();
     const steps = [
     {
-        label: activeStep  > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows',
-        description: ` Visualize testcases through mindmaps, capture elements and design test steps. `,
-        title:(<div><Button className={agsLicense.value ? 'geniusDisable_tooltip' : 'genius_tooltip'} disabled={project.appType !== "Web" && project.appType!=="SAP" || agsLicense.value} type="AVOgenius" size="small" style={project.appType !== "Web" && project.appType!=="SAP" || agsLicense.value ? buttonStyle_genius_disabled : buttonStyle_genius} onClick={(e) => handleNext("AVO Genius")} title={agsLicense.value ? agsLicense.msg : "AVO Genius(Smart Recorder)"}><img style={{ color: "white", fill: "white", marginRight: "10px" }} src="static/imgs/avo_genius_18x18_icon.svg" />  AVO Genius</Button> <span style={{ color: 'black', fontWeight: "bold", fontFamily: "Open Sans", padding: "0.1rem 0.2rem" }}> OR </span><Button type="designStudio" size="small" style={buttonStyle_design} onClick={(e) => handleNext("Design Studio")} > <img src="static/imgs/design_studio_18x18_icon.svg" style={{ marginRight: '10px' }} />Design Studio</Button></div>) 
+        label: <>
+          <span>{activeStep > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}</span>
+          <Tag value="Recommended for complex applications" className="tag_label" ></Tag>
+        </>,
+        description: (<>
+        <span>Visualize testcases through mindmaps, capture elements and design test steps.</span><div style={{margin:"0.5rem 0rem"}}><strong>OR</strong></div>
+        <div className='label'>
+          <span >{activeStep > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}
+          </span>
+          <Tag value="Recommended for simple applications" className="tag_label" ></Tag>
+        </div>
+        <div>Create rapid automation using Smart recorder.</div>
+        </>),
+        title:(
+          <div className='flex flex-column justify-content-center align-items-center'>
+             <Button type="designStudio" size="small" style={buttonStyle_design} onClick={(e) => handleNext("Design Studio")} >
+              <div className='flex justify-content-center align-items-center'>
+                <img src="static/imgs/design_studio_icon 1.svg" style={{ color: "white", fill: "white", width: "100%" }} />
+              </div>
+              <div>Design Studio</div>
+            </Button>
+            <Button className={agsLicense.value ? 'geniusDisable_tooltip' : 'genius_tooltip'} disabled={project.appType !== "Web" && project.appType !== "SAP" || agsLicense.value} type="AVOgenius" size="small" style={project.appType !== "Web" && project.appType !== "SAP" || agsLicense.value ? buttonStyle_genius_disabled : buttonStyle_genius} onClick={(e) => handleNext("AVO Genius")} title={agsLicense.value ? agsLicense.msg : "AVO Genius(Smart Recorder)"}>
+              <div className='flex justify-content-center align-items-center'>
+                <img style={{ color: "white", fill: "white", width: "100%" }} src="static/imgs/avo_genius_icon1.svg" />
+              </div>
+              <div style={{marginRight:"1.5rem"}}>AVO Genius</div>
+            </Button>
+           
+          </div>
+        ) 
     },
     {
         label: ' Configure and test execution profiles',
         description:'  Trigger test execution locally, via DevOps pipeline/cloud test provider or schedule it',
-        title:<Button disabled = {(Button!="Execute"&& activeStep <1)}  size="small" style={buttonStyle_execute} onClick={(e)=>handleNext("Execute")}><img src="static/imgs/execute_18x18_icon.svg"   style={{ marginRight: '10px' }} /> Execute</Button>
+        title:<Button disabled = {(Button!="Execute"&& activeStep <1)}  size="small" style={buttonStyle_execute} onClick={(e)=>handleNext("Execute")}><img src="static/imgs/execution_icon.svg"   style={{ marginRight: '10px' }} /> <div style={{marginRight:"2.6rem"}}>Execute</div></Button>
     },
     {
         label: 'View Test Reports ',
         description: `View and analyze executed test automations.`,
-        title:<Button  disabled = {(Button!="Report"&& activeStep <2)} size="small" style={buttonStyle_report}onClick={(e)=>handleNext("Report")} ><img src="static/imgs/reports_18x18_icon.svg" style={{ marginRight: '10px' }} />  Report</Button>
+        title:<Button  disabled = {(Button!="Report"&& activeStep <2)} size="small" style={buttonStyle_report}onClick={(e)=>handleNext("Report")} ><img src="static/imgs/reports_icon1.svg" style={{ marginRight: '10px' }} /> <div style={{marginRight:"3rem"}}>Report</div> </Button>
     },
     ];
 
@@ -158,17 +187,17 @@ const VerticalSteps = (props) => {
   return (
     <Card className='verticalcard' >
       <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
-      <h2 className= "GetStd">{(activeStep > 0) ? "Welcome Back !" : "Get Started"}</h2>
+      <h2 className= "GetStd"> <img src="static/imgs/get_started_icon.svg"></img>{(activeStep > 0) ? "Welcome Back !" : "Get Started"}</h2>
         <Box > 
-        <Stepper  className='Stepper' activeStep = {activeStep} orientation="vertical">
+        <Stepper  className='Stepper customStepper' activeStep = {activeStep} orientation="vertical">
           {steps.map((step, index) => ( 
             <Step key={step.label}>
-              <StepLabel  className='stepLabel'>
+              <StepLabel  className='stepLabel' >
                 <Box className='titleDescBut' >
                      <Box>
                         <Box className='label'>
                           {step.label}
-                        </Box>
+                        </Box>                                                
                         <Typography className='description'>{step.description}</Typography>
                      </Box>
                      <Box className='buttonNav'>
@@ -182,7 +211,7 @@ const VerticalSteps = (props) => {
           {/* {console.log(e.target.value)} */}
                      </Box>
                 </Box>
-              </StepLabel>
+              </StepLabel>  
             </Step>
            ))
           }
