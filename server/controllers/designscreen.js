@@ -269,7 +269,8 @@ exports.getScrapeDataScreenLevel_ICE = async (req, res) => {
 		const inputs = {
 			"screenid": req.body.screenId,
 			"projectid": req.body.projectId,
-			"query": "getscrapedata"
+			"query": "getscrapedata",
+			"params":req.body.param
 		};
 		if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
 			inputs.query = "getWSscrapedata";
@@ -354,6 +355,21 @@ exports.insertScreen = async (req, res) =>{
         res.send(data)
     } catch (exception) {
         logger.error("Error occurred in insertScreen/"+fnName+":", exception);
+        res.status(500).send('fail');
+    }
+};
+exports.insertRepository = async (req, res) =>{
+    const fnName = "insertRepository";
+    try {
+        logger.info("Inside UI service: " + fnName);
+        // var d = req.body;
+        var inputs = req.body.data;
+        inputs.userId = req.session.userid;
+        inputs.roleId = req.session.activeRoleId;
+        var data = await utils.fetchData(inputs, "design/insertRepository", fnName);
+        res.send(data)
+    } catch (exception) {
+        logger.error("Error occurred in insertRepository/"+fnName+":", exception);
         res.status(500).send('fail');
     }
 };

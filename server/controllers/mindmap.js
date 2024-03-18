@@ -130,6 +130,26 @@ exports.getModules = async (req, res) => {
 	}
 };
 
+exports.deleteElementRepo = async (req, res) => {
+	const fnName = "deleteElementRepo";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const inputs= {
+			"repoId":req.body.repoId,
+			"param" : "Elementdelete"			
+		}
+		const result = await utils.fetchData(inputs, "mindmap/deleteElementRepo", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
 exports.reviewTask = async (req, res) => {
 	const fnName = "reviewTask";
 	logger.info("Inside UI service: " + fnName);
