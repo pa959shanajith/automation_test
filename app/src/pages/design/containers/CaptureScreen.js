@@ -2327,7 +2327,7 @@ const handleAddAccordion = () => {
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
                 {/* <div class="zoom-in-out-box"></div> */}
-                  {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
+                  {(!selectedRepoName || captureData.length===0) && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
