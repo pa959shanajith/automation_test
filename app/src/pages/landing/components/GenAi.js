@@ -35,6 +35,7 @@ const GenAi = () => {
     const [tempExtras, setTempExtras] = useState({});
     const [isUploadSuccess, setUploadSuccess] = useState(false);
     const [fileUploading, setFileUploading] = useState(false);
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -74,8 +75,9 @@ const GenAi = () => {
                 //    },
                 // })
                 if (uploadFilesData) {
-                    setFileDetails(uploadFilesData.data);
-                    setBadgeValue(Object.keys(uploadFilesData.data).length);
+                    const filteredData = uploadFilesData.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
+                    setFileDetails(filteredData);
+                    setBadgeValue(Object.keys(filteredData).length);
                 }
             } catch (error) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });

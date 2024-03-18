@@ -467,8 +467,7 @@ const MiddleContainerGenAi = () =>{
                 (<>
                    <div className="card card-data bg-light ml-2 p-2" >
             <div className="card-body">
-                
-                  <div style={{ marginTop: '11rem' }}>what ever selected .genarate those user stories</div>
+                  <div style={{ marginTop: '11rem' }}>Generate test cases of selected user story</div>
                   </div>
           </div>
                 </>)}
