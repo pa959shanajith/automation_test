@@ -7,9 +7,12 @@ import { generate_testcase } from '../../admin/api';
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
 import { useSelector } from 'react-redux';
+import { importDefinition, saveMindmap } from '../../design/api';
+
 
 const ModuleLevelTestcase = () => {
     const [apiResponse, setApiResponse] = useState("");
+    const [swaggerResponseData, setSwaggerResponseData] = useState("");
     const [query, setQuery] = useState("");
     const [dropDownValue, setDropDownValue] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +20,7 @@ const ModuleLevelTestcase = () => {
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
     const editParameters = useSelector((state) => state.setting.editParameters);
+    const [loading,setLoading] = useState(false)
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
@@ -65,6 +69,7 @@ const ModuleLevelTestcase = () => {
             }
             if (response.data) {
                 setApiResponse(response?.data?.response);
+                setSwaggerResponseData(response?.data?.swagger)
                 toast.current.show({
                     severity: 'success', summary: 'Success', detail: 'Module level test cases generated successfully!', life: 3000
                 });
@@ -112,7 +117,231 @@ const ModuleLevelTestcase = () => {
     //         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
     //     }
     // };
-
+    const handleModuleCreate = async (data) => {
+        const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+        let selectedProject = JSON.parse(localStorageDefaultProject);
+          const module_data = {
+            "action": "/saveData",
+            "write": 10,
+            "map": [
+              {
+                "id": 0,
+                "childIndex": 0,
+                "_id": null,
+                "oid": null,
+                "name": data['CollectionName'],
+                "type": "modules",
+                "pid": null,
+                "pid_c": null,
+                "task": null,
+                "renamed": false,
+                "orig_name": null,
+                "taskexists": null,
+                "state": "created",
+                "cidxch": null
+              }
+            ],
+            "deletednode": [],
+            "unassignTask": [],
+            "prjId": selectedProject ? selectedProject.projectId : null,
+            "createdthrough": "Web",
+            "relId": null
+          }
+          try {
+            const response = await saveMindmap(module_data);
+    
+            if (response.error) { return }
+            // setMsg(MSG.CUSTOM("Module Created Successfully", "success"));
+            // let modulesdata = await getModules({ "tab": "tabCreate", "projectid": selectedProject ? selectedProject.projectId : "", "moduleid": null });
+    
+            // if (modulesdata.error) { displayError(modulesdata.error); return; }
+    
+            const newModule={
+              key:response,
+              text:data['CollectionName']
+            }
+            return newModule;
+          } catch (err) {
+            console.log(err);
+            return 'Fail'
+          }
+      }
+      const templateObjectFunc = (prj_id, id, childIndex, _id, name, type, pid,data) => {
+        let res = {
+          "projectID": prj_id,
+          "id": id,
+          "childIndex": childIndex,
+          "_id": null,
+          "oid": null,
+          "name": name,
+          "type": type,
+          "pid": pid,
+          "task": null,
+          "renamed": false,
+          "orig_name": null,
+          "taskexists": null,
+          "state": "created",
+          "cidxch": null
+        }
+        if(type == 'screens' && data != '') {
+          res["scrapedurl"] = data['endPointURL'];
+          res["scrapeinfo"] = {
+              "body" : data['requestBody'],
+              "operations" : data['operations'],
+              "responseHeader" : "",
+              "responseBody" : "",
+              "method" : data['method'],
+              "endPointURL" : data['endPointURL'],
+              "header" : data['requestHeader'],
+              "param" : data['param'],
+              "authInput" : "",
+              "authKeyword":""
+          }
+        }
+        if(type == 'testcases' && data != '') {
+          res['steps'] = [{
+              "stepNo" : 1,
+              "custname" : "WebService List",
+              "keywordVal" : "setEndPointURL",
+              "inputVal" : [ 
+                  data['endPointURL']
+              ],
+              "outputVal" : "",
+              "appType" : "Webservice",
+              "remarks" : "",
+              "addDetails" : "",
+              "cord" : ""
+          }, 
+          {
+              "stepNo" : 2,
+              "custname" : "WebService List",
+              "keywordVal" : "setMethods",
+              "inputVal" : [data['method']],
+              "outputVal" : "",
+              "appType" : "Webservice",
+              "remarks" : "",
+              "addDetails" : "",
+              "cord" : ""
+          }, 
+          {
+              "stepNo" : 3,
+              "custname" : "WebService List",
+              "keywordVal" : "setHeaderTemplate",
+              "inputVal" : [data['requestHeader']],
+              "outputVal" : "",
+              "appType" : "Webservice",
+              "remarks" : "",
+              "addDetails" : "",
+              "cord" : ""
+          }, 
+          {
+              "stepNo" : 4,
+              "custname" : "WebService List",
+              "keywordVal" : "setWholeBody",
+              "inputVal" : [data['requestBody']],
+              "outputVal" : "",
+              "appType" : "Webservice",
+              "remarks" : "",
+              "addDetails" : "",
+              "cord" : ""
+          }, 
+          {
+              "stepNo" : 5,
+              "custname" : "WebService List",
+              "keywordVal" : "executeRequest",
+              "inputVal" : [ 
+                  ""
+              ],
+              "outputVal" : "",
+              "appType" : "Webservice",
+              "remarks" : "",
+              "addDetails" : "",
+              "cord" : ""
+          }];
+        }
+        return res;
+      };
+      const handleScenarioCreate = async (data,moduleData) => {
+        const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+        let selectedProject = JSON.parse(localStorageDefaultProject);
+        let indexCounter = 1;
+      
+        const getMindmapInternals = () => {
+          let tempArr = [];
+          let scenarioPID = indexCounter;
+          let screenPID = indexCounter;
+          if('type' in data && data['type'] == 'Swagger'){
+            let scenarioCounter = 1;
+            for(let [scenario,scenarioValue] of Object.entries(data['APIS'])) {
+              scenarioPID = indexCounter;
+              tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, scenarioCounter++, scenario._id, scenario, "scenarios", 0,''));
+              let screenCounter = 1;
+              for( let screen of scenarioValue['screens']) {
+                screenPID = indexCounter
+                let apiData = {
+                  'requestBody':'body' in screen ? JSON.stringify(screen['body'][0]) : '',
+                  'requestHeader':'header' in screen ? (screen['header']) : '',
+                  'endPointURL': 'endPointURL' in screen ? screen['endPointURL'] : '',
+                  'param': 'query' in screen ? (screen['query']) : '',
+                  'method': 'method' in screen ? screen['method'].toUpperCase() : ''
+                }
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++,screenCounter++, screen._id, screen['name'], "screens", scenarioPID,apiData))
+                tempArr.push(templateObjectFunc(selectedProject.projectId, indexCounter++, 1, '', screen['name'], "testcases", screenPID,apiData))
+              }
+            }
+          }
+          return tempArr;
+        }
+    
+        const scenario_data = {
+          "write": 10,
+          "map": [
+            {
+              "projectID": selectedProject ? selectedProject.projectId : null,
+              "id": 0,
+              "childIndex": 0,
+              "_id": moduleData ? moduleData.key : null,
+              "oid": null,
+              "name": moduleData ? moduleData.text : null,
+              "type": "modules",
+              "pid": null,
+              "pid_c": null,
+              "task": null,
+              "renamed": false,
+              "orig_name": null,
+              "taskexists": null,
+              "state": "saved",
+              "cidxch": null
+            },
+            ...getMindmapInternals(),
+          ],
+          "deletednode": [],
+          "unassignTask": [],
+          "prjId": selectedProject ? selectedProject.projectId : null,
+          "createdthrough": "Web"
+        }
+        try {
+          const response = await saveMindmap(scenario_data);
+          if (response.error) { return }
+          // setMsg(MSG.CUSTOM("Scenario Created Successfully", "success"));
+        } catch (err) {
+          console.log(err);
+        }
+      }
+      const CreationOfMindMap = async(data) => {
+          try {
+                // Added Changes to Create Mindmap
+                setLoading('Creating Mindmap')
+                let swaggerMindmapData = await importDefinition(data,'swaggerAI')
+                if(swaggerMindmapData['APIS'] && swaggerMindmapData['CollectionName']) {
+                  const moduleData = await handleModuleCreate(swaggerMindmapData)
+                  await handleScenarioCreate(swaggerMindmapData,moduleData)
+                }
+          } catch(err) {
+            console.error('Error While ')
+          }
+          setLoading(false)
+      }
     return (
         <div className='flexColumn parentDiv'>
             {!apiResponse &&
@@ -174,7 +403,10 @@ const ModuleLevelTestcase = () => {
                         placeholder="Automate" onChange={async (e) => {
                             console.log("event", e);
                             setDropDownValue(e.value);
-                            await fetchData(e.value.code)
+                            if(e.value.name == 'API') {
+                                await CreationOfMindMap(swaggerResponseData)
+                             }
+                            // await fetchData(e.value.code)
                             console.log("dropDownValue", dropDownValue);
                         }}
                         options={multiLevelTestcase}

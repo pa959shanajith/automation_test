@@ -1749,8 +1749,8 @@ exports.importDefinition = async (req, res) => {
         var username=req.session.username;
 		var clientName=utils.getClientName(req.headers.host);
         var icename = undefined
-		if(req.body.query == 'jsonToMindmap') {
-			let parsedData = await swaggerToMindmapJson(swaggerJsonData);
+		if(req.body.type == 'swaggerAI') {
+			let parsedData = await swaggerToMindmapJson(req.body.sourceUrl);
 			return res.send(parsedData)
 		}
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
