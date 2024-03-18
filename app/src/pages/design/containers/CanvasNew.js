@@ -390,6 +390,9 @@ const CanvasNew = (props) => {
             var p = d3.select('#node_' + createnew);
             setCreateNew(false)
             if(p['_groups'][0][0] === null){p = d3.select('#node_' + (createnew - 1))}
+            else if(dNodes[createnew].type === 'testcases' && dNodes[createnew].parent.state === 'created'){
+              p = d3.select('#node_' + (createnew - 1))
+            }
             setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
