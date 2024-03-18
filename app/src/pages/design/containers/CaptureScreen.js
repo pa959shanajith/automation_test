@@ -141,7 +141,8 @@ const CaptureModal = (props) => {
   const [dialogForRepo, setDialogForRepo] = useState(false);
   const [repositoryNewName, setRepositoryNewName] = useState("");
   const [repoNameAdded, setRepoNameAdded] = useState(false);
-  const [emptyDatatable, setEmptyDatatable] = useState(false)
+  const [emptyDatatable, setEmptyDatatable] = useState(false);
+  const [selectedRepoName,setSelectedRepoName] = useState("");
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -688,6 +689,7 @@ const elementTypeProp =(elementProperty) =>{
               }
             )
           })
+          setSelectedRepoName(data.elementrepoused.name);
           setCaptureData(newData);
           setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
           addMore.current=false;
@@ -1900,6 +1902,8 @@ const elementValuetitle=(rowdata)=>{
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
           else setScreenData(screens.screenList);
             let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+            newAddedRepo[0].label=newAddedRepo[0].name
+            newAddedRepo[0].title = newAddedRepo[0].name
             handleScreenChange(newAddedRepo[0])
             // setSelectedFolderValue({type:newAddedRepo[0],key:true})
       } catch (error) {
@@ -2327,7 +2331,7 @@ const handleAddAccordion = () => {
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
                   <div className="dropdown_container">
-                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder="Select Repository" className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName}</span>} className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
                     </div>
                 </div>}
               </div>

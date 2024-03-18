@@ -231,7 +231,7 @@ const ElementRepository = (props) => {
     return (
       <>
         <div className='flex justify-content-between'>
-          <div className={`flex flex-row ${Array.isArray(uniqueArray) && uniqueArray.length > 0 && uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          <div className="flex flex-row" title={rowData.custname}>
           {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
           </div>
           <div>{Array.isArray(uniqueArray) && uniqueArray.length > 0 && uniqueArray.map((item)=>(
