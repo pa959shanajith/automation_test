@@ -246,19 +246,23 @@ const MiddleContainerGenAi = () =>{
           {isLoading && <div className="spinner" style={{ position: 'absolute', top: '29rem', left: '32rem' }}>
             <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
           </div>}
-          <div className="card card-data bg-light ml-2 p-2" >
-            <div className="card-body">
+              
               {userlevel ? (<>
                 <div style={{ textAlign: 'left', padding: '5px' }}>
-                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => setApiResponse(e.target.value)} rows={20} cols={1000} style={{width:'30rem'}}/>
+                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => setApiResponse(e.target.value)} rows={20} cols={1000} style={{width:'32rem', height:"33rem", overflow:'auto'}}/>
                  
                 </div>
               </>) :
+               
                 (<>
+                   <div className="card card-data bg-light ml-2 p-2" >
+            <div className="card-body">
+                
                   <div style={{ marginTop: '11rem' }}>what ever selected .genarate those user stories</div>
-                </>)}
-            </div>
+                  </div>
           </div>
+                </>)}
+          
         </div>
       ) : null
       }
