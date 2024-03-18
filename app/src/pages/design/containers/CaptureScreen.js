@@ -774,7 +774,7 @@ const elementTypeProp =(elementProperty) =>{
           if(parentId !== null){
             const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
             if (foundItem) {
-              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid()});
             }
             orderList.push(scrapeItem.objId);
   
