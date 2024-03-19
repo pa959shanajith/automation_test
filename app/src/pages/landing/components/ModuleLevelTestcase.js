@@ -15,6 +15,8 @@ import * as DesignApi from '../../design/api'
 import axios from 'axios';
 import { Messages as MSG } from '../../global';
 import { v4 as uuid } from 'uuid';
+import {ScreenOverlay} from '../../global';
+
 
 const ModuleLevelTestcase = () => {
     const history = useNavigate();
@@ -516,7 +518,7 @@ const ModuleLevelTestcase = () => {
     const CreationOfMindMap = async (data) => {
         try {
             // Added Changes to Create Mindmap
-            setLoading('Creating Mindmap')
+            setOverlay('Creating Mindmap')
             let swaggerMindmapData = await importDefinition(data, 'swaggerAI')
             if (swaggerMindmapData['APIS'] && swaggerMindmapData['CollectionName']) {
                 const moduleData = await handleModuleCreate(swaggerMindmapData)
@@ -525,81 +527,83 @@ const ModuleLevelTestcase = () => {
         } catch (err) {
             console.error('Error While ')
         }
-        setLoading(false)
+        setOverlay('')
     }
     return (
-        <div className='flexColumn parentDiv'>
-            {!apiResponse &&
-                <>
-                    <img className='imgDiv' src={'static/imgs/moduleLevelTestcaseEmpty.svg'} width='200px' />
-                    <p>Generate test cases for a module of your system</p>
-                </>}
-            <p><strong>Module</strong></p>
-            <div className={`${!apiResponse ? "flexColumn" : "flexRow loginBox"}`}>
-                {/* <div className="flexColumn"> */}
-                <InputText placeholder='enter module' style={{ width: `${apiResponse ? '50vw' : ""} ` }} value={query} onChange={handleInputChange} />
-                {!apiResponse && <Button loading={isLoading} disabled={query?.length == 0} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
-                    if (template_id.length > 0) {
-                        generateTestcase();
-                    } else {
-                        toast.current.show({
-                            severity: 'info',
-                            summary: 'Info',
-                            detail: 'Please choose template!',
-                            life: 3000
-                        });
-                    }
-                }}></Button>}
-            </div>
-            <label className='labelText'>Eg. of module name: login, sign up</label>
-            {
-                apiResponse && (
-                    <div className="card flex justify-content-center">
-                        {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
-                            <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
-                        </div>}
-                        <InputTextarea className='inputTestcaseModule' autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} />
-                    </div>
-                )
-            }
-            <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
-
-            {/* Generate, Save, Automate Button */}
-            {
-                apiResponse &&
-                <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%" }}>
-                    <div className="gen-btn2">
-                        <Button loading={isLoading} label="Generate" onClick={() => {
-                            if (template_id.length > 0) {
-                                generateTestcase();
-                            } else {
-                                toast.current.show({
-                                    severity: 'info',
-                                    summary: 'Info',
-                                    detail: 'Please choose template!',
-                                    life: 3000
-                                });
-                            }
-                        }} disabled={buttonDisabled}></Button>
-                    </div>
-                    <div className="gen-btn2">
-                        <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
-                    </div>
-                    <Dropdown
-                        style={{ backgroundColor: "primary" }}
-                        placeholder="Automate" onChange={async (e) => {
-                            setDropDownValue(e.value);
-                            if (e.value.name == 'API') {
-                                await CreationOfMindMap(swaggerResponseData)
-                            }
-                        }}
-                        options={multiLevelTestcase}
-                        optionLabel="name"
-                        value={dropDownValue}
-                    />
+        <>
+            {overlay ? <ScreenOverlay content={overlay} /> : null}
+            <div className='flexColumn parentDiv'>
+            {/* {overlay ? <ScreenOverlay content={overlay} /> : null} */}
+                {!apiResponse &&
+                    <>
+                        <img className='imgDiv' src={'static/imgs/moduleLevelTestcaseEmpty.svg'} width='200px' />
+                        <p>Generate test cases for a module of your system</p>
+                    </>}
+                <p><strong>Module</strong></p>
+                <div className={`${!apiResponse ? "flexColumn" : "flexRow loginBox"}`}>
+                    {/* <div className="flexColumn"> */}
+                    <InputText placeholder='enter module' style={{ width: `${apiResponse ? '50vw' : ""} ` }} value={query} onChange={handleInputChange} />
+                    {!apiResponse && <Button loading={isLoading} disabled={query?.length == 0} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
+                        if (template_id.length > 0) {
+                            generateTestcase();
+                        } else {
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Info',
+                                detail: 'Please choose template!',
+                                life: 3000
+                            });
+                        }
+                    }}></Button>}
                 </div>
-            }
-        </div>
+                <label className='labelText'>Eg. of module name: login, sign up</label>
+                {
+                    apiResponse && (
+                        <div className="card flex justify-content-center">
+                            {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
+                                <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
+                            </div>}
+                            <InputTextarea className='inputTestcaseModule' autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} />
+                        </div>
+                    )
+                }
+                <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
+
+                {/* Generate, Save, Automate Button */}
+                {
+                    apiResponse &&
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%" }}>
+                        <div className="gen-btn2">
+                            <Button loading={isLoading} label="Generate" onClick={() => {
+                                if (template_id.length > 0) {
+                                    generateTestcase();
+                                } else {
+                                    toast.current.show({
+                                        severity: 'info',
+                                        summary: 'Info',
+                                        detail: 'Please choose template!',
+                                        life: 3000
+                                    });
+                                }
+                            }} disabled={buttonDisabled}></Button>
+                        </div>
+                        <div className="gen-btn2">
+                            <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                        </div>
+                        <Dropdown
+                            style={{ backgroundColor: "primary" }}
+                            placeholder="Automate" onChange={async (e) => {
+                                setDropDownValue(e.value);
+                                await fetchData(e.value.code)
+                            }}
+                            options={multiLevelTestcase}
+                            optionLabel="name"
+                            value={dropDownValue}
+                        />
+                    </div>
+                }
+            </div>
+        </>
     )
 };
 
