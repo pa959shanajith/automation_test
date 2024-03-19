@@ -1182,7 +1182,9 @@ exports.assignProjects_ICE = function (req, res) {
 		var valid_domainId, valid_objects, valid_userId;
 		function validateAssignProjects() {
 			logger.info("Inside function validateAssignProjects");
-			var check_domainId = validator.isEmpty(assignProjectsDetails.domainname);
+			var check_domainId = assignProjectsDetails.domainname.some(function(domain) {
+				return validator.isEmpty(domain);
+			});
 			if (check_domainId == false) {
 				valid_domainId = true;
 			}

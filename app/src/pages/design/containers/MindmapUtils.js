@@ -895,7 +895,101 @@ export const createNode = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sect
         }
         return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
 }
-
+export const createNodeSingle = (activeNode,nodeDisplay,linkDisplay,dNodes,dLinks,sections,count,obj,verticalLayout,nodeID) => {
+    //if nodeID ene then
+    let selectedProject = JSON.parse(localStorage.getItem("DefaultProject"));
+    var uNix = dNodes.length
+    var pi = activeNode;
+    var pt = nodeDisplay[pi].type;
+    if (pt === 'testcases') return;
+    if (false && nodeDisplay[pi]._children != null)
+            return ;// openDialogMindmap('Error', 'Expand the node');
+    if (dNodes[pi].children === undefined) dNodes[pi]['children'] = [];
+    var nNext = {
+            'endtoend': ['Scenario', 1],
+            'modules': ['Scenario', 1],
+            'scenarios': ['Screen', 2],
+            'screens': ['Testcase', 4]
+    };
+    var mapSvg = d3.select('.mp__canvas_svg');
+    var w = parseFloat(mapSvg.style('width'));
+    var h = parseFloat(mapSvg.style('height'));
+    var arr_co = [];
+    dNodes.forEach(function(d) {
+            if(d.state !== 'deleted'){
+                    var objj = {
+                            x: parseInt(d.x),
+                            y: parseInt(d.y)
+                    };
+                    arr_co.push(objj);
+            }
+    });
+    count[(nNext[pt][0]).toLowerCase() + 's'] += 1
+    var tempName;
+    if (obj) {
+            tempName = obj;
+    } else {
+            tempName = (nNext[pt][0]==='Scenario'? selectedProject.appType === "Webservice" ? 'API' :'TestCase': nNext[pt][0]==='Testcase'?'TestSteps':  selectedProject.appType === "Webservice" ? 'Request' :'Screen')+count[(nNext[pt][0]).toLowerCase() + 's'];
+    }
+    var node = {
+            id: uNix,
+            children: [],
+            y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
+            x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
+            parent: dNodes[pi],
+            state: 'created',
+            path: '',
+            name: tempName,
+            childIndex: '',
+            type: (nNext[pt][0]).toLowerCase() + 's'
+    }; 
+    getNewPosition(dNodes,node, pi, arr_co,verticalLayout,sections);
+    if(nodeID){
+            node._id=nodeID
+    }
+    dNodes.push(node);
+    if(Object.isExtensible(dNodes[pi])){
+        const newObject = { ...dNodes[pi], children: [...dNodes[pi].children, dNodes[uNix]] };
+        dNodes[pi] = newObject;
+    }
+    else dNodes[pi].children.push(dNodes[uNix]);
+    dNodes[uNix].childIndex = dNodes[pi].children.length;
+    dNodes[uNix].cidxch = 'true'; // child index updated
+    if( dNodes[uNix].type === 'screens')
+    for(var i =0; dNodes[0].children.length>i; i++){
+        if(dNodes[0].children[i].id === dNodes[uNix].parent.id){
+              const newObject = { ...dNodes[0].children[i], children: [...dNodes[0].children[i].children, dNodes[uNix]] };
+              dNodes[0].children[i] = newObject;
+        }
+    }
+    else if (dNodes[uNix].type === 'testcases') {
+        for (var k = 0; k < dNodes[0].children.length; k++) {
+          for (var j = 0; j < dNodes[0].children[k].children.length; j++) {
+            if (dNodes[0].children[k].children[j].id === dNodes[uNix].parent.id) {
+              const newObject = { ...dNodes[0].children[k].children[j], children: [...dNodes[0].children[k].children[j].children, dNodes[uNix]] };
+              dNodes[0].children[k].children[j] = newObject;
+              for (var m = 0; dNodes.length>m;m++){
+                if(newObject.parent.id === dNodes[m].id){
+                    dNodes[m].children = [newObject]
+                }
+              } 
+            }
+          }
+        }
+      }
+    var currentNode = addNode(dNodes[uNix]);
+    var link = {
+            id: uuid(),
+            source: dNodes[pi],
+            target: dNodes[uNix]
+    };
+    var lid = 'link-' + link.source.id + '-' + link.target.id
+    dLinks.push(link);
+    var currentLink = addLink(dNodes[pi], dNodes[uNix],verticalLayout);
+    nodeDisplay[uNix] = currentNode;
+    linkDisplay[lid] = currentLink;
+    return {nodeDisplay,linkDisplay,dNodes,dLinks,count}
+}
 export const deleteNode = (activeNode,dNodes,dLinks,linkDisplay,nodeDisplay) =>{
     var deletedNodes = []
     var sid = parseFloat(activeNode.split('node_')[1])
