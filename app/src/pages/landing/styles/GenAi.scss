@@ -3,10 +3,12 @@
     width:100%;
 }
 .genai_left_container{
-    width:25%;
+    width:23%;
     overflow-y: auto;
     height: 95vh;
     overflow-x: hidden;
+    // border-color: #DEE2E6;
+    border: 1px solid #DEE2E6 ;
 }
 .genai_right_container{
     width: 65%;
@@ -26,8 +28,8 @@
     border: 1px solid #605BFF;
 }
 .doc_container{
-    border: 1px solid #DEE2E6;
-    width: 33%;
+    // border: 1px solid #DEE2E6;
+    // width: 33%;
 }
 .doc_top {
     background-color: #DEE2E6;
@@ -48,7 +50,7 @@
     font: $f7_regular;
 }
 .left_btm_container{
-    border-bottom: 1px solid #DEE2E6;
+    // border-bottom: 1px solid #DEE2E6;
 }
 .left_btm_header{
     font: $f6_semibold;
@@ -153,4 +155,31 @@
     margin-bottom: 20px;
     margin: auto;
     margin-top: 15%;
+}
+
+.inputTestcaseSystem {
+    max-height: 70vh !important;
+    overflow: auto !important;
+    height: 70vh !important;
+    margin-bottom: 25px;
+    width: 100% !important;
+}
+
+.labelText {
+    margin: 5px 0 5px 0;
+}
+
+.inputTestcaseModule {
+    max-height: 70vh !important;
+    overflow: auto !important;
+    height: 55vh !important;
+    margin-bottom: 15px;
+    width: 120vh !important;
+}
+.text-area-user-story{
+    height: 30rem !important;
+    overflow: auto !important;
+}
+  .p-datatable .p-datatable-thead > tr > th {
+    display: none !important;
 }

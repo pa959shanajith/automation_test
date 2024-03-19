@@ -7,11 +7,9 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
-import AvoModal from '../../../globalComponents/AvoModal';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import { Tag } from 'primereact/tag';
-import { classNames } from 'primereact/utils';
 import { MultiSelect } from 'primereact/multiselect';
 import { TriStateCheckbox } from 'primereact/tristatecheckbox';
 import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
@@ -301,9 +299,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 setVersion('');
                 setCurrentId('');
                 const result = await readModel();
-                if (result.status) {
-                  setTableData(result.data);
-    
+                if (result.data.data) {
+                  setTableData(result.data.data);
                 } else {
                   console.error(result.error);
                 }
@@ -349,8 +346,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 setModalToken('');
                 setVersion('');
                 const result = await readModel();
-                if (result.status) {
-                  setTableData(result.data);
+                if (result.data.data) {
+                  setTableData(result.data.data);
     
                 } else {
                   console.error(result.error);
@@ -376,8 +373,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
           try {
             const result = await readModel();
     
-            if (result.status) {
-              setTableData(result.data);
+            if (result.data.data) {
+              setTableData((prev) => result.data.data);
             } else {
               console.error(result.error);
             }
@@ -418,9 +415,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                     // Handle success, e.g., update the UI or perform additional actions
                     toastSuccess('Model deleted successfully');
                     const result = await readModel();
-                    if (result.status) {
-                    setTableData(result.data);
-        
+                    if (result.data.data) {
+                    setTableData(result.data.data);
                     } else {
                     console.error(result.error);
                     }
@@ -443,7 +439,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
 
     const NoDataFound = () => {
         return <div className="grid_img"> <img src="static/imgs/grid_page_image.svg" alt="Empty List Image" height="255" width='204' />
-            <span>No LLM Modal yet</span>
+            <span>No LLM Model yet</span>
             <Button className="grid_btn" label="Create" onClick={() => { setLlmModel(true); }} ></Button>
         </div>
     }
@@ -500,6 +496,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
             setModalToken('');
             setVersion('');
     }
+
+    console.log("tableData", tableData);
     return (
         <>
             {!tableData.length && <NoDataFound />}
@@ -524,12 +522,12 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
             </div>
             }
             {
-                llmModel && <Dialog className='llm_modal_container' visible={llmModel} onHide={() => onHideHandle()} header='Add LLM Modal' footer={footerContent} style={{ width: '60vh' }} >
+                llmModel && <Dialog className='llm_modal_container' visible={llmModel} onHide={() => onHideHandle()} header='Add LLM Model' footer={footerContent} style={{ width: '60vh' }} >
 
                     <div className="flex flex-column">
                         <div className="flex flex-column pb-2">
                             <label className="pb-2 font-medium">Name <span className='ml-1' style={{ color: "#d50000" }}>*</span></label>
-                            <InputText value={modalName} placeholder='Enter Modal Name' onChange={(e) => { setModalName(e.target.value); setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } });}} />
+                            <InputText value={modalName} placeholder='Enter Model Name' onChange={(e) => { setModalName(e.target.value); setOpenAiExtras((prev) => { return { ...prev, name: e.target.value } });}} />
 
                         </div>
                         <div className="flex flex-column pb-2">

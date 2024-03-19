@@ -62,12 +62,11 @@ width: 350px;
   color:rgb(34, 36, 37);
 }
 .card-data {
-   width: 50%;
-    height: 33rem;
-    overflow-y: scroll;
-    border: 1px solid #6366f1;
-    margin: 5px;
-
+  width: 50%;
+  height: 30rem;
+  overflow-y: scroll;
+  border: 1px solid #6366f1;
+  margin: 5px;
 }
 .Review_testcase .card-group {
   border: 1px solid rgb(204, 204, 204);
@@ -148,8 +147,8 @@ width: 350px;
     background-color:#000;
     border-radius: 6px;
     color: #ccc;
-    left: 40%;
-    margin-left: -75px;
+    left: 0;
+    top: 2rem;
     opacity: 0;
     padding: 5px;
     position: absolute;

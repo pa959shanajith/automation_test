@@ -59,9 +59,9 @@ const AdminSidePanel = () => {
                 <AccordionTab header="Feature management">
                     <div className='flex flex-column pl-4 sidepanel_admin'>
                         <ul>
-                        <li onClick={() => { setHeader('LLM Modal'); setScreen('LLM'); }} className={currentScreen === "LLM" ? "active_tab" : "not_active_tab"}>
+                        <li onClick={() => { setHeader('LLM Model'); setScreen('LLM'); }} className={currentScreen === "LLM" ? "active_tab" : "not_active_tab"}>
                                 <img src="static/imgs/LLM.png" alt="PNG Image" style={{ marginRight: '0.5rem' }} />
-                               <span className='useers_label'>LLM Modal</span> 
+                               <span className='useers_label'>LLM Model</span> 
                             </li>
                             <li onClick={() => { setHeader('AI Template'); setScreen('aitemplate'); }} className={currentScreen === "aitemplate" ? "active_tab" : "not_active_tab"}>
                                 <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
