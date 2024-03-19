@@ -67,10 +67,10 @@ const AdminSidePanel = () => {
                                 <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
                                <span className='useers_label'>AI Template</span> 
                             </li>
-                            <li onClick={() => { setHeader('Grid'); setScreen('grid_template'); }} className={currentScreen === "grid_template" ? "active_tab" : "not_active_tab"}>
+                            {/* <li onClick={() => { setHeader('Grid'); setScreen('grid_template'); }} className={currentScreen === "grid_template" ? "active_tab" : "not_active_tab"}>
                                 <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
                                <span className='useers_label'>Grid</span> 
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
                 </AccordionTab>

@@ -1698,8 +1698,8 @@ export const createTemp = (data) => {
             credentials : 'include',
         })
         .then(res=>{
-            if (res.status === 200){
-                resolve({data:res.data});
+            if (res.status === 200 || res.status === 201){
+                resolve(res.data);
             }
             else{
                 reject(res.status)

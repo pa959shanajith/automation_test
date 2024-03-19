@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import "../styles/AiTemplate.scss";
 import { Button } from 'primereact/button';
@@ -7,7 +7,9 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Slider } from 'primereact/slider';
 import { InputSwitch } from 'primereact/inputswitch';
-import {createTemp, readModel} from "../api";
+import {createTemp, readModel , readTemp} from "../api";
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 
 
@@ -21,10 +23,16 @@ const AiTemplate = () => {
     const [accuracy, setAccuracy] = useState(0);
     const [activeCheck, setActiveCheck] = useState(false);
     const [defaultChcek, setDefaultCheck] = useState(false);
+    const [modelData , setModelData] = useState([]);
+    const isTemplateDataPresent =useSelector(state => state.admin.isTemplateDataPresent);
+    const [currentGrid, setCurrentGrid] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const [gridList, setGridList] = useState([]);
+    const [tempData , setTempData] = useState([]);
+    const [refreshTable, setRefreshTable] = useState(true);
+
     const toast = useRef(null);
-    const [modelData , setModelData] = useState([])
-
-
+    let serialNumber = 0;
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     if (!userInfo) userInfo = userInfoFromRedux;
@@ -79,11 +87,13 @@ const AiTemplate = () => {
                 "name": name,
                 "description":description
             });
+            setRefreshTable(true);
 
             console.log(templateData);
             if (templateData.status) {
                 toast.current.show({ severity: 'success', summary: 'Success', detail: 'Template created successfully', life: 3000 });
                 resetForm();
+                // templateDataforTable();
               } else {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: templateData.error || 'Unknown error', life: 3000 });
               }
@@ -127,6 +137,58 @@ const AiTemplate = () => {
       <Button label="Save" icon="pi pi-check" className="p-button-text" onClick = {hideTemplate}/>
     </div>
   );
+
+  const templateDataforTable = async () => {
+    try {
+        const readData = await readTemp({
+          "userid": userInfo.user_id,
+        
+        });
+        const data = readData.data.data || [];
+        setTempData(data);
+        setRefreshTable(false);
+    } catch (error) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+     }
+  };
+
+  useEffect(() => {
+    templateDataforTable();
+  }, [refreshTable == true]);
+
+  const renderInputSwitch = (rowData, property) => {
+    return (
+      <InputSwitch
+        checked={rowData[property]}
+        onChange={(e) => handleSwitchChange(e, rowData, property)}
+      />
+    );
+  };
+  
+  const handleSwitchChange = (e, rowData, property) => {
+    // Handle switch change
+    // You can access the rowData, the selected value (e.value), and the property name (property)
+    // Update the corresponding property in rowData based on the property
+  }
+  const renderActions = (rowData) => {
+    return (
+      <div>
+        <Button icon="pi pi-pencil" className="p-button-rounded p-button-warning" onClick={() => handleEdit(rowData)} />
+        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => handleDelete(rowData)} />
+      </div>
+    );
+  };
+
+  const handleEdit = (rowData) => {
+    // Handle edit action
+    // You can access the rowData for the selected record
+  };
+
+  const handleDelete = (rowData) => {
+    // Handle delete action
+    // You can access the rowData for the selected record
+  };
+
 
 
     return(
@@ -176,15 +238,38 @@ const AiTemplate = () => {
           </div>
 
         </Dialog>
+        {tempData ? (<>
+          <label className="pb-2 font-medium">List of Templates</label>
+          <div className='search_newGrid'>
+                        <InputText placeholder="Search" className='search_grid' value={searchText}  />
+                 
+                    <Button className="grid_btn_list" label="Add new template" onClick={showTemplate}  ></Button>
+                    </div>
+         <div style={{ position: 'absolute', width: '74%', height: '-webkit-fill-available', top: '13rem' }}>
+         <DataTable value={tempData} paginator rows={5} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
+         <Column
+    header="Sl No"
+    body={() => ++serialNumber}
+  />
+        <Column field="name" header="Name" />
+        <Column field="description" header="Description" />
+        <Column field="createdAt" header="Created On" />
+        <Column header="Default" body={(rowData) => renderInputSwitch(rowData, 'default')} />
+        <Column header="Status" body={(rowData) => renderInputSwitch(rowData, 'active')} />
+        <Column header="Actions" body={renderActions} />
+      </DataTable>
+                    </div>
 
-<div className='empty_template_div'>
-<img src="static/imgs/template.svg" alt="SVG Image"  />
-<span>
-            No AI templates yet
-        </span>
-        <Button label='Create' onClick={showTemplate} ></Button>
+        </>) :
+          <div className='empty_template_div'>
+            <img src="static/imgs/template.svg" alt="SVG Image" />
+            <span>
+              No AI templates yet
+            </span>
+            <Button label='Create' onClick={showTemplate} ></Button>
+
+          </div>}
         
-</div>
       
         </>
     )

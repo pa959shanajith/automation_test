@@ -37,7 +37,7 @@ const OriginContainer = (props) => {
             {currentTab === "LLM" && <LLM/>}
             {currentTab === "license_details" && <LicenseManagement/>}
             {currentTab === "aitemplate" && <AiTemplate/>}
-            {currentTab === "grid_template" && <GridTemplate/>}
+            {/* {currentTab === "grid_template" && <GridTemplate/>} */}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
             {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}
