@@ -298,7 +298,7 @@ if (cluster.isMaster) {
 		app.put("/genAI/edit/:id",generateAI.editModel);
 		app.delete("/genAI/delete/:id",generateAI.deleteModel);
 		app.post("/genAI/createTemp",generateAI.createTemp);
-		// app.get("/genAI/readTemp",generateAI.readTemp);
+		app.get("/genAI/readTemp",generateAI.readTemp);
 		// app.put("/genAI/editTemp/:id",generateAI.editTemp);
 		// app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
 
