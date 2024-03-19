@@ -185,6 +185,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
   const [runningStatusTimer, setRunningStatusTimer] = useState("");
+  
   const [browserlist, setBrowserlist] = useState([
     {
         key: '3',
@@ -239,7 +240,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [batchInfo, setBatchInfo] = useState([]);
   const [profileName, setProfileName] = useState(null);
   const [configbtnsave,setConfigbtnsave]=useState(null);
-  
+  const [selectedTab, setSelectedTab] = useState("Normal Execution");
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
@@ -752,6 +753,7 @@ fi`,
 }
   const handleOptionChange = async (selected,type,fetechConfig,index,idx) => {
     // setDropdownSelected(selected);
+    console.log("@@@selected",selected)
     setDropdownSelected(prevValues => {
         const newValues = [...prevValues];
         newValues[index] = selected;
@@ -1039,6 +1041,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
+    console.log("executionData",executionData);
     if (Array.isArray(executionData.targetUser)) {
       for (let icename in executionData.targetUser) {
         let ice_id = iceNameIdMap[executionData.targetUser[icename]];
@@ -1095,7 +1098,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
         />,
             [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
             availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
@@ -1103,7 +1106,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
-    if (executionData === undefined) executionData = dataExecution;
+       if (executionData === undefined) executionData = dataExecution;
     if(executionData["executionEnv"] != 'saucelabs' && executionData["executionEnv"] != 'browserstack') {
       executionData["executionEnv"]=execEnv;
       executionData["browserType"]=browserTypeExe;
@@ -1114,7 +1117,11 @@ const handleSubmit1 = async (SauceLabPayload) => {
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
     executionData["exectionMode"] = execAction;
-    // executionData["executionEnv"] = execEnv;
+  //   if(executionData["exectionMode"] == selectedTab){
+  //    executionData["exectionMode"]="browserstack_parallel";
+  //  }
+
+    // executionData["executionEnv"] == execEnv;
     // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
@@ -1200,6 +1207,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       setModuleInfo([]);
       setExecAction("serial");
       setExecEnv("default");
+      
     }
   };
 
