@@ -49,7 +49,7 @@ const MigrateScreen = props => {
             <div className='w-4'>
                 <img src='static/imgs/migrateimg.svg' className='w-full'></img>
             </div>
-            <div className='my-4'>Want to migrate from Non Avo Automation to Avo Automation</div>
+            <div className='my-4'>Convert non-Avo automation scripts to Avo Automation</div>
             <div className='flex flex-column'>
                 <Button onClick={handleMigration} size='small' className='migratebtn'> Migrate</Button>
             </div>
