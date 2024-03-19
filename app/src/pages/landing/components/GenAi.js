@@ -200,13 +200,6 @@ const GenAi = () => {
         { name: 'Jira', code: 'JA' },
     ];
 
-    const onFileUpload = () => {
-        toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
-    };
-
-    const onSubmitClick = () =>{
-        toast.current.show({ severity: 'success', summary: 'Success', detail: 'Submitted Successfully' });
-    }
     const refreshFileUpload = () => {
         setUploadedFile(null); // Clear uploaded file state
         if (fileUploadRef.current) {

@@ -68,7 +68,7 @@ const MiddleContainerGenAi = () =>{
       );
 
     const multiLevelTestcase = [
-      { name: 'Function', code: "function" },
+      { name: 'Functional', code: "function" },
       { name: 'API', code: "api" },
     ];
 
