@@ -265,20 +265,6 @@ exports.fetchALM_Testcases = async function (req,res) {
         return res.status(500).json({ code:'500', error: 'error while processing' });
     }
       if(getProfile[0].rows && getProfile[0].rows.executionData){
-        // fetching active ice list
-        // const ice_status = await getICEList([""],req.session.userid,req.headers.host);
-        // var find_active_ice = ''
-        // if(ice_status && ice_status.unallocatedICE && Object.keys(ice_status.unallocatedICE).length){
-        //   for(let each_ice in ice_status.unallocatedICE){
-        //     if(ice_status.unallocatedICE[each_ice]['connected']){
-        //       find_active_ice = ice_status.unallocatedICE[each_ice];
-        //       break;
-        //     } 
-        //   } 
-        // }
-        // console.log(find_active_ice,' its ice_status');
-        // const prepare_Execution = await prepareExec(getProfile[0].rows.executionData,find_active_ice);
-
         let agent_exec = {
           "key": getProfile[0].rows.executionData.configurekey,
           "executionThrough": "AvoAgent/AvoGrid",
@@ -286,9 +272,6 @@ exports.fetchALM_Testcases = async function (req,res) {
       }
         req.body = agent_exec;
         let agent_ExecResult = await execAutomation(req, res);
-        // console.log(agent_ExecResult,' its agent_ExecResult');
-        // attaching the ice details for execute
-        // socket_io.emit("triggerExecution",agent_exec);
 
         // fetching executionListId
         if(agent_ExecResult && agent_ExecResult.status === 'pass' ){
@@ -300,16 +283,10 @@ exports.fetchALM_Testcases = async function (req,res) {
             send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
             return res.status(500).json({ code:'500', error: send_res });
           }
-          // fetch job running url
-          // req.query.configurekey = getProfile[0].rows.executionData.configurekey;
-          // req.query.executionListId = fetchJOB[0].rows.executionListId;
-
-          // var fetch_jobURL = await runningStatus(req,res);
-          // console.log(fetch_jobURL,' its fetch_jobURL ');
 
           send_res['data'][0]['jobId'] = fetchJOB[0].rows.executionListId;
           send_res['data'][0]['jobName'] = fetchJOB[0].rows.executionData.configurename;
-          send_res['data'][0]['jobUrl'] =`${req.protocol}://${req.get('host')}/runningStatus?configurekey=${getProfile[0].rows.executionData.configurekey}&executionListId=${fetchJOB[0].rows.executionListId}`
+          send_res['data'][0]['jobUrl'] =`${req.protocol}://${req.get('host')}/jobmonitor/${fetchJOB[0].rows.executionListId}`
           const keyToRemove = 'error';
           var modifies_res = send_res.data.map(obj => {
             let { [keyToRemove]: _, ...rest } = obj;
@@ -319,13 +296,13 @@ exports.fetchALM_Testcases = async function (req,res) {
           return res.status(202).send(modifies_res);
         }
         logger.error(' Failed to fetch Execution details');
-        return  res.status(500).json({ code:'500', error: 'error while processing' });
+        return  res.status(500).json({ code:'500', message: 'testcase execution details not found' });
       }
         logger.error(' Execute_Testcase Error ');
-        return  res.status(500).json({ code:'500', error: 'error while processing' });
+        return  res.status(500).json({ code:'500', message: 'error while executing the job' });
     } catch (error) {
         logger.error(' Execute_Testcase Error: ', error);
-        return res.status(500).json({ code:'500', error: 'error while processing' });
+        return res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
   
@@ -443,6 +420,76 @@ exports.fetchALM_Testcases = async function (req,res) {
     return result;
   }
 
+  exports.JobMonitor = async function (req, res) {
+ 
+    logger.info("ALM Job Status service called");
+    try {
+      logger.info("request params : "+ req.params
+      );
+      let jobIds = []
+      var send_res = {
+        "jobstatuses": []
+      }
+        var jobID = req.params.jobID;
+        if(jobID){
+          jobIds.push(jobID)
+        }
+        var job_inputs = {"executionListIds":jobIds,"type":"jobId"};
+        const fetchJOB = await utils.fetchData(job_inputs, "/getExecutionJob", "getExecutionJob", true);
+        if(fetchJOB && fetchJOB.length && !(fetchJOB[1].statusCode >= 200 && fetchJOB[1].statusCode <= 299)){
+          send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
+          send_res['data'][0]['error']["errorCode"] = fetchJOB[1].statusCode;
+          send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
+          return res.status(500).json({ code:'500', message: send_res });
+        }
+        // fetch job running url
+          if(fetchJOB[0].rows && fetchJOB[0].rows.length){
+            const eventType = "CALM";
+            await Promise.all(fetchJOB[0].rows.map(async each_exec => {
+              req.query.executionListId = each_exec.executionListId;
+              req.query.configurekey = each_exec.configkey;
+              req.query.eventType = eventType;
+              var percentage = 0;
+              var jobStatus = "unknown"
+              var fetch_jobStatus = await runningStatus(req,res);
+              logger.info(fetch_jobStatus,' its fetch_jobStatus ');
+              if(!fetch_jobStatus){
+                logger.error('Job_Status Error ...... ');
+                return res.status(500).json({ code:'500', message: 'error while processing' });
+              }
+              if(fetch_jobStatus["Modules"] && fetch_jobStatus["Modules"].length){
+                fetch_jobStatus["Modules"].forEach((_module) => {
+                  if(_module && _module["Scenarios"] && _module["Scenarios"].length){
+                    _module["Scenarios"].forEach((scn_report) => {
+                      if(scn_report && scn_report.Report && scn_report.Report.overallstatus && Object.keys(scn_report.Report.overallstatus).length)
+                      jobStatus = setStatus(scn_report.Report.overallstatus.overallstatus);
+                    })
+                  }
+                })
+              }
+            percentage = jobStatus === "finished"  ? 100 : percentage;
+            percentage = fetch_jobStatus['Completed'] ? calculatePercentage(fetch_jobStatus['Completed']) : percentage;
+            send_res["jobstatuses"].push({"id":each_exec.executionListId,
+            "status":fetch_jobStatus['status'] === "Inprogress" ? "running": jobStatus,
+            "percentage":percentage
+          })
+            }))
+          }
+          else if(!send_res.jobstatuses.length){
+            logger.error('Job_Status Error: no jobstatus found for this job',);
+           return res.status(500).json({ code:'500', message: 'no jobstatus found for this job' });
+          }
+
+        console.log(send_res,' its send_res ');
+        logger.info("send response : "+send_res)
+       return res.status(200).send(send_res);
+ 
+    } catch (error) {
+        logger.error('Job_Status Error: ', error);
+        return  res.status(500).json({ code:'500', message: 'error while processing' });
+    }
+  };
+
   exports.Job_Status = async function (req, res) {
  
     logger.info("ALM Job Status service called");
@@ -494,7 +541,7 @@ exports.fetchALM_Testcases = async function (req,res) {
               logger.info(fetch_jobStatus,' its fetch_jobStatus ');
               if(!fetch_jobStatus){
                 logger.error('Job_Status Error ...... ');
-                res.status(500).json({ code:'500', error: 'error while processing' });
+                return res.status(500).json({ code:'500', message: 'error while fetching job status' });
               }
               if(fetch_jobStatus["Modules"] && fetch_jobStatus["Modules"].length){
                 fetch_jobStatus["Modules"].forEach((_module) => {
@@ -517,11 +564,11 @@ exports.fetchALM_Testcases = async function (req,res) {
 
         console.log(send_res,' its send_res ');
         logger.info("send response : "+send_res)
-        res.status(200).send(send_res);
+        return res.status(200).send(send_res);
  
     } catch (error) {
         logger.error('Job_Status Error: ', error);
-        res.status(500).json({ code:'500', error: 'error while processing' });
+        return res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
   function setStatus(jobStatus){
@@ -588,7 +635,7 @@ exports.fetchALM_Testcases = async function (req,res) {
           // send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
           // send_res['data'][0]['error']["errorCode"] = fetchJOB[1].statusCode;
           // send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
-          return res.status(500).json({ code:'500', error: 'error while processing' });
+          return res.status(500).json({ code:'500', message: 'error while fetching job details' });
         }
         
         if(fetchJOB[0].rows && fetchJOB[0].rows.length){
@@ -634,7 +681,7 @@ exports.fetchALM_Testcases = async function (req,res) {
               console.log("API Response for job:", job, "Response:", getReport,' getting from DAS'); 
               if( getReport[0].rows && Object.keys(getReport[0].rows).length){
                 let execHistory = getReport[0].rows;
-                let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
+                let jobURL = `${req.protocol}://${req.get('host')}/jobmonitor/${job.exec.executionListId}`
                 let logURL = `${req.protocol}://${req.get('host')}/devOpsReport?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
                 testcaseshistory.push({
                     "testCaseId": job.exec.executionData.testcaseRefId || "",
@@ -677,7 +724,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     } catch (error) {
         logger.error('Execution_History Error: ', error);
-        return res.status(500).json({ code:'500', error: 'error while processing' });
+        return res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
 
