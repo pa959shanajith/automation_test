@@ -195,7 +195,7 @@ const AiTemplate = () => {
         <>
          <Toast ref={toast} />
 
-        <Dialog header="Add Template" visible={displayTemplate} style={{ width: '30vw', height: '40vw' }} onHide={hideTemplate} footer={customFooter}>
+        <Dialog header="Add Template" visible={displayTemplate} style={{ width: '33vw', height: '40vw' }} onHide={hideTemplate} footer={customFooter}>
           <div className='flex flex-row justify-content-between pl-2 pb-2'>
             <div className="flex flex-column">
               <label className="pb-2 font-medium"> Name </label>
@@ -238,7 +238,7 @@ const AiTemplate = () => {
           </div>
 
         </Dialog>
-        {tempData ? (<>
+        {tempData.length ? (<>
           <label className="pb-2 font-medium">List of Templates</label>
           <div className='search_newGrid'>
                         <InputText placeholder="Search" className='search_grid' value={searchText}  />
