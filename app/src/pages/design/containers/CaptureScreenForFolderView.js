@@ -1195,8 +1195,8 @@ const CaptureModal = (props) => {
             <div className='empty_msg flex flex-column align-items-center justify-content-center'>
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">Elements not captured</p>
-                {showCaptureScreen ? <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button> :(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
-                {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
+                {showCaptureScreen ? <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button> :(!props.testSuiteInUse && selectedRepoName) && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
+                {showCaptureScreen ? "" :!selectedRepoName && <span>Select a repository or add new repository to capture elements</span>}
                 <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
             </div>
         </div>
@@ -1822,6 +1822,8 @@ const CaptureModal = (props) => {
                   toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
                 else setScreenData(screens.screenList);
                 let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+                newAddedRepo[0].label=newAddedRepo[0].name
+                newAddedRepo[0].title = newAddedRepo[0].name
                 handleScreenChange(newAddedRepo[0])
             } catch (error) {
                 console.error('Error fetching User list:', error);
@@ -2030,7 +2032,8 @@ const CaptureModal = (props) => {
         id:folder["_id"],
         related_dataobjects: folder.related_dataobjects,
         orderlist:folder.orderlist,
-        parent:folder.parent
+        parent:folder.parent,
+        title:folder.name,
       }));
 
       const renderOption = (option) => {
@@ -2131,7 +2134,7 @@ const CaptureModal = (props) => {
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
+                {!selectedRepoName && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
                   <h4 className="capture_card_header">Select Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
