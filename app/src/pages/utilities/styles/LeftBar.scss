@@ -45,6 +45,10 @@
 }
 .encrypt_drodown{
     height: 2.5rem !important;
+    font: $f6_regular;
+    .p-dropdown-label{
+        padding: 0.3rem !important;
+    }
 }
 
 #selected{
@@ -65,8 +69,9 @@
     display: flex;
     align-items: center;
     width: 95%;
-    background: #e3cff0 !important;
-    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    background: #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
     top: 2rem;
 }
@@ -77,6 +82,8 @@
     display: flex;
     align-items: center;
     position: relative;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    width: 95%;
     top: 2rem;
 }
 
@@ -84,10 +91,11 @@
     display: flex;
     align-items: center;
     width: 95%;
-    background: #e3cff0 !important;
-    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    background: #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
-    top: 3rem;
+    top: 2rem;
 }
 
 .not_active_tab_data {
@@ -96,7 +104,9 @@
     display: flex;
     align-items: center;
     position: relative;
-    top: 3rem;
+    top: 2rem;
+    width: 95%;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
 }
 .left_side_panel{
     position: relative;
@@ -104,7 +114,7 @@
     height: 100%;
 }
 .notelabel{
-    margin-left: 1rem;
+    margin-left: 1.3rem;
     font: $f6_semibold;
 }
 .notecontent{
@@ -116,10 +126,11 @@
     display: flex;
     align-items: center;
     width: 95%;
-    background: #e3cff0 !important;
-    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    background:  #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
-    top: 3rem;
+    top: 2rem;
 }
 .not_active_tab_migrate {
     background-color: none !important;
@@ -127,5 +138,13 @@
     display: flex;
     align-items: center;
     position: relative;
-    top: 3rem;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    top: 2rem;
+}
+.page-taskName-utility{
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.Encryption_Method{
+    font: $f7_semibold;
 }
