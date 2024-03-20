@@ -80,8 +80,8 @@ const ConfigureSetup = ({
 
   
   const searchOptions = [
-    { label: 'search by names', value: 'option1' },
-    { label: 'search by tags', value: 'option2' }
+    { label: 'Search by name', value: 'option1' },
+    { label: 'Search by tag', value: 'option2', className:"tagSearch" }
   ];
 
   const handleDropdownChange = (e) => {
@@ -123,6 +123,27 @@ const ConfigureSetup = ({
   const handleClearAllTags = () => {
     setSelectedTags([]);
   };
+
+ 
+  const profileNameTooltip = (name) => {
+    return <>
+      <Tooltip target={`.profilenametooltip_${name}`} content={name}></Tooltip>
+      <span
+        className={`profilenametooltip_${name} profilenametooltip`}
+      >
+        {name}
+      </span></>   
+};
+
+const profileChildNameTooltip = (name) => {
+  return <>
+    <Tooltip target={`.profileChildNametooltip${name}`} content={name}  ></Tooltip>
+    <span
+      className={`profileChildNametooltip${name} profileChildNametooltip`}  
+    >
+      {name}
+    </span></>   
+};
   
 
 
@@ -142,7 +163,7 @@ const ConfigureSetup = ({
           childTree.push({
             key: `${index}-${ind}`,
             data: {
-              name: e?.name,
+              name: profileChildNameTooltip(e?.name),
               dataParameterization: (
                 <InputText
                   value={dataparam[dataParamName]?.value}
@@ -186,7 +207,7 @@ const ConfigureSetup = ({
         key: `${index}`,
         id: el?.moduleid,
         data: {
-          name: el?.name,
+          name:profileNameTooltip(el?.name),
         },
         children: childTree,
       });
@@ -344,6 +365,7 @@ const ConfigureSetup = ({
   };
 
   const tableTreeHeader = (
+    <div className="flex flex-column">
     <div className="flex  justify-content-between treehead">
       <div className="flex ">
       <div className="radioButton"
@@ -403,24 +425,7 @@ const ConfigureSetup = ({
                     placeholder="Search by tags"
                     className="searchtag"
                   />
-                  <div className="selected-tags-container ">
-                    {selectedTags.map((tag, index) => (
-
-                      <div className="chip" key={index}>
-                        {tag}
-
-                        <span className="close-icon" onClick={() => handleRemoveTag(tag)}>
-                          &#10006;
-                        </span>
-                      </div>
-                    ))}
-                     {selectedTags.length > 1 && (
-                        <div >
-                        <img className="clear-all-button" src="static/imgs/clear all_icon.svg" onClick={handleClearAllTags} ></img>
-                        <Tooltip target=".clear-all-button" position="right" content="Clear all tag(s)."/>
-                       </div>
-                      )}
-                  </div>
+                 
                 </div>
               )}
 
@@ -439,6 +444,26 @@ const ConfigureSetup = ({
           </div>
         </div>
 
+    </div>
+      <div className="selected-tags-container ">
+        {selectedTags.map((tag, index) => (
+
+          <div className="chip" key={index}>
+            {tag}
+
+            {/* <img className="close-icon" src="static/imgs/ic-delete-bin.png" onClick={() => handleRemoveTag(tag)} /> */}
+            {/* &#10006; */}
+            {/* </img> */}
+            <i className="pi pi-trash close-icon"  onClick={() => handleRemoveTag(tag)} />
+          </div>
+        ))}
+        {selectedTags.length > 1 && (
+          <div >
+            <img className="clear-all-button" src="static/imgs/clear all_icon.svg" onClick={handleClearAllTags} ></img>
+            <Tooltip target=".clear-all-button" position="right" content="Clear all tag(s)." />
+          </div>
+        )}
+      </div>
     </div>
   );
 

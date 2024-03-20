@@ -282,26 +282,26 @@ const CreateNew = ({ importRedirect }) => {
                             <FolderView setBlockui={setBlockui}/></div>}
                         {(handleTypeOfViewMap ==='tableView') && <h1>hello i am Table view</h1>}
                         
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
-                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
-                            
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <>
+                        <div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
+                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />  
                         </div>
-                        <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> </>}
-
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <div id='mp__canvas' className='mp__canvas'>
-                            {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
-                                <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
-                                : <Fragment>
-                                    <ExportMapButton />
-                                    <SaveMapButton disabled={true} />
-                                </Fragment>
-                            )
-                                : ((Object.keys(moduleSelect).length > 0) ?
-                                    <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                            <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/>
+                            <div id='mp__canvas' className='mp__canvas'>
+                                {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
+                                    <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
                                     : <Fragment>
+                                        <ExportMapButton />
                                         <SaveMapButton disabled={true} />
-                                    </Fragment>)}
-                        </div>}
+                                    </Fragment>
+                                )
+                                    : ((Object.keys(moduleSelect).length > 0) ?
+                                        <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                                        : <Fragment>
+                                            <SaveMapButton disabled={true} />
+                                        </Fragment>)}
+                            </div>
+                        </>}
             </div> : null
                 }
             </Fragment>

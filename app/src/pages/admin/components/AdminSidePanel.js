@@ -55,7 +55,27 @@ const AdminSidePanel = () => {
                         </ul>
                     </div>
                 </AccordionTab>
+
+                <AccordionTab header="Feature management">
+                    <div className='flex flex-column pl-4 sidepanel_admin'>
+                        <ul>
+                        <li onClick={() => { setHeader('LLM Model'); setScreen('LLM'); }} className={currentScreen === "LLM" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/LLM.png" alt="PNG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>LLM Model</span> 
+                            </li>
+                            <li onClick={() => { setHeader('AI Template'); setScreen('aitemplate'); }} className={currentScreen === "aitemplate" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>AI Template</span> 
+                            </li>
+                            {/* <li onClick={() => { setHeader('Grid'); setScreen('grid_template'); }} className={currentScreen === "grid_template" ? "active_tab" : "not_active_tab"}>
+                                <img src="static/imgs/AI_Icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} />
+                               <span className='useers_label'>Grid</span> 
+                            </li> */}
+                        </ul>
+                    </div>
+                </AccordionTab>
             </Accordion>
+         
             <div className='flex flex-column pl-2 pr-1 m-1 sidepanel_admin'>
                 <ul>
                     <li onClick={() => { setHeader('Email Server Configuration'); setScreen('email_server_configuration'); }} className={currentScreen === "email_server_configuration" ? "active_tab" : "not_active_tab"}>
@@ -81,6 +101,14 @@ const AdminSidePanel = () => {
                     <li onClick={() => { setHeader('Privileges'); setScreen('privileges'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
                         <img src="static/imgs/privileges.svg" alt="SVG Image" style={{ marginRight: '0.5rem', width: '1.5rem' }} />
                        <span className='privileges_label'>Privileges</span> 
+                    </li>
+                    <li onClick={() => { setHeader('Project'); setScreen('project'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
+                        <i className='pi pi-briefcase' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem' }} />
+                       <span className='privileges_label'>Manage Project</span> 
+                    </li>
+                    <li onClick={() => { setHeader('Locked_TestSuites'); setScreen('Locked_TestSuites'); }} className={currentScreen === "privileges" ? "active_tab" : "not_active_tab"}>
+                        <i className='pi pi-unlock' style={{ marginRight: '0.5rem',width: '24px',color: '#6366f1',height: '24px',fontSize: '1.35rem' }} />
+                       <span className='privileges_label'>Locked_TestSuites</span> 
                     </li>
                 </ul>
             </div>

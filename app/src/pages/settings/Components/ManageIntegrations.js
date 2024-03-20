@@ -285,7 +285,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
             setToast("success", "Success", `${selectedscreen.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(testrailProjects);
-            testrailRef.current.callViewMappedFiles();
+            // testrailRef.current.callViewMappedFiles();
         }
         setIsSpin(false);
     }
@@ -404,7 +404,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setSelectedNodes([]);
         dispatchAction(enableSaveButton(false))
         onHide();
-
+        setDomainDetails([]);
     }
 
     const handleTabChange = (index) => {

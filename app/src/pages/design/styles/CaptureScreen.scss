@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .compare__object__note {
   .p-dialog-header-icons {
@@ -770,7 +771,7 @@
   flex-direction: column;
   padding:15px;
   font-family: "Open Sans";
-  width: 17%; 
+  width: 20%; 
   gap: 2vh;
   border-right: 1px solid #e2e2ed;
   z-index: 1;
@@ -838,6 +839,23 @@
 }
 .dropdown_container{
   max-width: 100%;
+  pointer-events: all;
+//   .p-dropdown-item::after {
+//     content: attr(title);
+//     position: absolute;
+//     left: 100%;
+//     top: 0;
+//     background-color: #333;
+//     color: #fff;
+//     padding: 0.5rem;
+//     border-radius: 4px;
+//     white-space: nowrap;
+//     display: none;
+// }
+
+// .p-dropdown-item:hover::after {
+//     display: block;
+// }
 }
 .dropdown_container > div > span {
   // color: initial;
@@ -854,4 +872,25 @@
   flex-grow: 1;
 }
 
+.reused__icon{
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.choose__repo__txt{
+  font: $f6_regular;
+  color: #212121;
+}
+// .zoom-in-out-box {
+//   margin: 24px;
+//   width: 24px;
+//   border-radius: 50%;
+//   height: 50px;
+//   background: #f50057;
+//   animation: zoom-in-zoom-out 1s ease infinite;
+// }
+// @keyframes zoom-in-zoom-out {
+//   0% {transform: scale(1, 1);}
+//   50% {transform: scale(1.5, 1.5);}
+//   100% {transform: scale(1, 1);}}
 

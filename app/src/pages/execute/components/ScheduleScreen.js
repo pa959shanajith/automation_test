@@ -458,7 +458,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="scheduletype"
-                header="Recurrance Type"
+                header=" Recurrence Type"
               ></Column>
               <Column
                 align="center"
@@ -536,7 +536,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="scheduletype"
-                header="Recurrance Type"
+                header=" Recurrence Type"
               ></Column>
               <Column
                 align="center"

@@ -15,7 +15,9 @@ const tokenAuth = require('../lib/tokenAuth');
 const constants = require('../lib/execution/executionConstants');
 const Handlebars = require('../lib/handlebar.js');
 var axios  =  require('axios');
-var https = require('https')
+var https = require('https');
+var os = require('os');
+
 // PDF EXPORT
 wkhtmltopdf.command = path.join(__dirname, "..",'wkhtmltox', 'bin', 'wkhtmltopdf'+((process.platform == "win32")? '.exe':''));
 var templatepdf = '';
@@ -2044,6 +2046,42 @@ exports.reportStatusScenarios_ICE = async (req, res) => {
     }
 };
 
+exports.downloadVideo = async (req, res) => {
+    const fnName = "downloadVideo";
+    const osPf = os.platform();
+    const videoPathLinux = "" //options.screenShotPath.linux;
+    logger.info("os platform is '%s'", osPf);
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var videoPath = req.body.videoPath;
+        if (osPf == 'linux') {
+            if (videoPathLinux != ""){
+                /*Below logic is to manipulate or change the Video Path from windows to linux specific*/
+                logger.info("Requested video file path is '%s'", videoPath);
+                var ss_path = videoPath.split("Screenshots")[1];
+                var temp_videoPath = videoPathLinux.concat(ss_path);
+                videoPath = temp_videoPath.replace(/\\/g,"/");
+                logger.info("Final video file path is '%s'", videoPath);
+            } else {
+                logger.error("Please enter the value of linux for screenShotPath in config");
+            }
+        }
+        if (fs.existsSync(videoPath)) {
+            res.writeHead(200, {
+                'Content-Type': 'video/mp4',
+            });
+            const filestream = fs.createReadStream(videoPath);
+            filestream.pipe(res);
+        } else {
+            logger.error("Requested video file '%s' is not available", videoPath);
+            return res.status(404).send("fail");
+        }
+    } catch (exception) {
+        logger.error("Exception in the service %s - Error: %s", fnName, exception);
+        res.send("fail");
+    }
+}
+
 exports.getAccessibilityTestingData_ICE = async function(req, res) {
     try {
 		const fnName = "getAccessibilityTestingData_ICE"
@@ -2076,8 +2114,8 @@ exports.getAccessibilityTestingData_ICE = async function(req, res) {
 exports.uploadGeneratefile = async (req, res) => {
     logger.info("Inside UI service: uploadGeneratefile");
     try {
-         // Validate request data
-         if (!req.file || !req.body.name || !req.body.email || !req.body.projectname || !req.body.organization) {
+        // Validate request data
+        if (!req.file || !req.body.name || !req.body.email || !req.body.projectname || !req.body.organization) {
             return res.status(400).json({ error: 'Bad request: Missing required data' });
         }
         var inputs = {
@@ -2089,20 +2127,28 @@ exports.uploadGeneratefile = async (req, res) => {
             "organization": req.body.organization,
             "type": req.body.type
         };
-        const result = await utils.fetchData(inputs, "upload/generateAIfile", "uploadGeneratefile", true);
 
-        // Check if an error response was received
-        if (result &&  result[1].statusCode !== 200) {
-            return res.status(result[1].statusCode).json({
-                error: result[1].statusMessage || 'Unknown error',
-            });
-        }
+        const upload_url = epurl + "upload/generateAIfile";
 
-        // If everything is successful, return a success response
-        res.status(200).json({ success: true, message: 'File uploaded successfully' });
+        // const result = await utils.fetchData(inputs, "upload/generateAIfile", "uploadGeneratefile", true);
+        await axios.post(upload_url, inputs, {
+            headers: { 'Content-Type': 'application/json' },
+            maxBodyLength: 104857600, //100mb
+            maxContentLength: 104857600, //100mb
+        }).then(response => {
+            if (response.status !== 200) {
+                return res.status(response.status).json({
+                    error: response.statusText || 'Unknown error',
+                });
+            }
+            return res.status(200).json({ success: true, message: 'File uploaded successfully' });
+        }).catch(apiError => {
+            // logger.error('Error: ', apiError);
+            return res.status(500).json({ error: 'Internal server error' });
+        })
     } catch (error) {
         logger.error('Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 
 }

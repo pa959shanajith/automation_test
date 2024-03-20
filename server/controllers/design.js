@@ -420,8 +420,8 @@ exports.debugTestCase_ICE = function (req, res) {
 												};
 												responsedata.endPointURL.push(wsdlurl.split('?')[0]);
 												responsedata.operations.push(operations);
-												if (data.value != "fail" && data.value != undefined && data.value != "") {
-													response = data.value.split('rEsPONseBOdY:');
+												if (data != "fail" && data != undefined && data != "") {
+													response = data.split('rEsPONseBOdY:');
 													if (response.length == 2) {
 														responsedata.header.push(response[0]);
 														responsedata.body.push(response[1]);

@@ -161,7 +161,7 @@ const Messages={
         SUCC_TASK_REASSIGN: {"CONTENT":"Task Reassigned successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_APPROVED: {"CONTENT":"Task Approved successfully.", "VARIANT": VARIANT.SUCCESS},
         SUCC_TASK_SUBMIT: {"CONTENT":"Task Submitted successfully.", "VARIANT": VARIANT.SUCCESS},
-        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"custom keyword saved successfully", "VARIANT": VARIANT.SUCCESS},
+        SUCC_CUSTOMKEY_ENTERED:{"CONTENT":"custom keyword saved", "VARIANT": VARIANT.SUCCESS},
 
         WARN_DELETED_TC_FOUND: {"CONTENT":"Deleted objects found in some teststeps, Please delete or modify those steps.", "VARIANT": VARIANT.WARNING},
         WARN_DELETE: {"CONTENT":"No steps to Delete.", "VARIANT": VARIANT.WARNING},
@@ -209,8 +209,10 @@ const Messages={
         ERR_FETCH_REPORT: {"CONTENT":"Failed to fetch report data.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_SUITE_DETAILS: {"CONTENT":"Failed to fetch suite details.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_REPORT_STATUS: {"CONTENT":"Failed to fetch report status.", "VARIANT": VARIANT.ERROR},
+        ERR_FETCH_VIDEO: { "CONTENT": "Error while exporting report Video", "VARIANT": VARIANT.ERROR },
         ERR_FETCH_REPORT_DETAILS: {"CONTENT":"Failed to fetch report details.", "VARIANT": VARIANT.ERROR},
         ERR_NO_ACC_SCREEN: {"CONTENT":"No accessibility screen is created yet.", "VARIANT": VARIANT.ERROR},
+        SUCC_EXPORT_REPORT: { "CONTENT": "Exported Report Video Successfully.", "VARIANT": VARIANT.SUCCESS },
     },
     PROFJ:{
         ERR_FETCH_RESULTS: {"CONTENT":"Failed to Fetch Results.", "VARIANT": VARIANT.ERROR},
