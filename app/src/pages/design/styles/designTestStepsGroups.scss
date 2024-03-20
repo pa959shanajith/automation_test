@@ -1,6 +1,7 @@
+@import "../../global/styles/ColorVariables.scss";
 .designGroup_dialog_box {
     .p-dialog-header {
-        background: #E2E2ED !important;
+        background: #ffffff !important;
         border-top-right-radius: 4px;
         padding: 0.3rem 0 !important;
         height: 3rem !important;
@@ -16,11 +17,10 @@
         .p-dialog-title {
             .dailog_headerGroups {
                 color: rgba(3, 2, 41, .6);
-                font-family: Open Sans;
-                font-weight: 500;
+                font: $f6_semibold;
                 left: 4rem !important;
+                top: 1rem;
                 position: absolute;
-                top: 0.5rem;
             }
 
             .dailog_headerGroups1 {
@@ -42,9 +42,6 @@
 .groupsTabPosition{
     position: fixed;
     left: calc(100% - 676px);
-}
-.designTestGroups{
-    padding: 1rem;
 }
 .tabViewHeader{
     left: 40%;
