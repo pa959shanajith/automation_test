@@ -1082,7 +1082,7 @@ setPreventDefaultModule(true);
                         <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
                         {WSimportPop ? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true} importPop={WSimportPop} /> : null}</>
                         : null}
-                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
+                      <img className={!isQualityEngineer?"importimg pi pi-file-import mindmapImport":"import_quaEng"} src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={!isQualityEngineer?() => setImportPop(true):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }></img>
                       <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                       {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} projectName={projectInfo.projectName} projectID={projectInfo.projectId}/> : null}
                       <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
@@ -1163,7 +1163,7 @@ setPreventDefaultModule(true);
                   {
                     (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? null :
                       <>
-                        <img src="static/imgs/plusNew.png" onClick={() => { setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                        <img src="static/imgs/plusNew.png" onClick={() => {if(!isQualityEngineer){ setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }}} alt="PlusButtonOfE2E" className={!isQualityEngineer?'E2E':"disable_E2Ecreate_btn"}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } />
                         <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                       </>
                   }
