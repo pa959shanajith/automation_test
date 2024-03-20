@@ -360,9 +360,9 @@ const ProjectNew = (props) => {
         if (data === 'success') {
             if (assignProjectsObj.deletetasksofprojects.length === 0) displaySuccess(Messages.ADMIN.SUCC_PROJECT_ASSIGN);
             else displaySuccess(Messages.ADMIN.SUCC_PROJECT_UNASSIGN);
-            resetAssignProjectForm();
+            // resetAssignProjectForm();
         } else  displayError(Messages.ADMIN.ERR_PROJECT_ASSIGN)
-        fetchUsers();
+        // fetchUsers();
     }
 
     const getDifferentProjects= (assignedProjects1)=>{
