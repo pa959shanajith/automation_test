@@ -43,6 +43,7 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
+  avodropdown = { ...avodropdown, avogrid: { ...avodropdown.avogrid, disabled: avodropdown.avogrid?.status === "inactive" ? true : false } }
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
   const [integrationType, setIntegrationType] = useState("");
   

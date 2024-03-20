@@ -6,6 +6,7 @@ import '../styles/ProjectAssign.scss';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { Dialog } from 'primereact/dialog';
+import { Dropdown } from 'primereact/dropdown';
 
 /*Component ProjectAssign
   use: renders Project Assign Middle Screen
@@ -359,9 +360,9 @@ const ProjectNew = (props) => {
         if (data === 'success') {
             if (assignProjectsObj.deletetasksofprojects.length === 0) displaySuccess(Messages.ADMIN.SUCC_PROJECT_ASSIGN);
             else displaySuccess(Messages.ADMIN.SUCC_PROJECT_UNASSIGN);
-            resetAssignProjectForm();
+            // resetAssignProjectForm();
         } else  displayError(Messages.ADMIN.ERR_PROJECT_ASSIGN)
-        fetchUsers();
+        // fetchUsers();
     }
 
     const getDifferentProjects= (assignedProjects1)=>{
@@ -390,19 +391,40 @@ const ProjectNew = (props) => {
                     <span>Assign Project</span>
                 </div> */}
 
-                <div className="adminActionBtn" style={{float:'inline-end'}}>
+                {/* <div className="adminActionBtn" style={{float:'inline-end'}}>
                     <Button className=" a__btn " size='small' onClick={()=>{clickAssignProjects()}} label='Save' title="Save"></Button>
-                </div> 
+                </div>  */}
 
                 <div className="col-xs-9 form-group" style={{width: "83%", paddingBottom:'20px'}}>
                     <div style={{display:'flex'}} className='userForm-project projectForm-project project-custom-top' >
-                        <div className='domainTxt'>User</div>
-                        <select defaultValue={""} onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
+                    <div className='flex  flex-column'>
+                        <div className='usernameTxt'>Username<span className="required">*</span></div>
+                        {/* <select defaultValue={""} onChange={(event)=>{clickSelAssignUser(event.target.value)}} className={userSelectErrorBorder===true?'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin':"adminSelect-project-assign form-control__conv-project select-margin"} id="selAssignUser" >
                             <option disabled={true} key="" value="" >Select User</option>
                             {selectBox.map((data)=>(
                                 <option key={data[0]} data-id={data[1]} value={data[0]}>{data[0]}</option>
                             ))}
-                        </select>
+                        </select> */}
+                         <div className='flex align-content-center justify-content-center w-19rem user_dropdown'>
+                            <Dropdown
+                                value={selectedUserName}
+                                onChange={(event) => clickSelAssignUser(event.target.value)}
+
+                                className={userSelectErrorBorder === true ? 'selectErrorBorder adminSelect-project-assign form-control__conv-project select-margin' : 'adminSelect-project-assign form-control__conv-project select-margin'}
+                                id="selAssignUser"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="----Select----"
+                                disabled={false}
+                                options={selectBox.map(data => ({ label: data[0], value: data[0] }))}
+                                filter={true}
+                                style={{ display: 'flex', alignItems: 'center', fontFamily:"Open Sans",lineHeight:"2rem" }}
+                                // required
+                            // showClear={true}
+
+                            />
+                        </div>
+                    </div>
                     </div>
                     
                     {/* <div style={{display:'flex'}} className='userForm-project projectForm-project display-project'  >
@@ -422,7 +444,7 @@ const ProjectNew = (props) => {
                         {/* <!--Left Select Box--> */}
                         <div className="wrap assign-select">
                             {/* <!--Labels--> */}
-                            <label className="labelStyle1">All Projects</label>
+                            <label className="labelStyle1">All Projects<span className="chip_totalProj">{assignProj.allProjectAP.length}</span></label>
                             <div className="seprator" >
                                 <select multiple id="allProjectAP">
                                     {assignProj.allProjectAP.map((prj) => ( 
@@ -435,17 +457,17 @@ const ProjectNew = (props) => {
 
                         {/* <!--Center Input--> */}
                         <div className="wrap wrap-editpro center-button">
-                            <button type="button" id="rightgo"  onClick={()=>{moveItemsRightgo('#allProjectAP', '#assignedProjectAP')}} title="Move to right"> &gt; </button>
-                            <button id="rightall" type="button" onClick={()=>{moveItemsRightall('#allProjectAP', '#assignedProjectAP')}} title="Move all to right"> &gt;&gt; </button>
-                            <button id="leftall" type="button" onClick={()=>{moveItemsLeftall('#assignedProjectAP','#allProjectAP')}} title="Move all to left"> &lt;&lt; </button>
-                            <button type="button" id="leftgo" onClick={()=>{moveItemsLeftgo('#assignedProjectAP','#allProjectAP')}} title="Move to left"> &lt; </button>
+                            <Button className='p-button-outlined' type="button" id="rightgo"  onClick={()=>{moveItemsRightgo('#allProjectAP', '#assignedProjectAP')}} title="Move to right"> &gt; </Button>
+                            <Button className='p-button-outlined' id="rightall" type="button" onClick={()=>{moveItemsRightall('#allProjectAP', '#assignedProjectAP')}} title="Move all to right"> &gt;&gt; </Button>
+                            <Button className='p-button-outlined' id="leftall" type="button" onClick={()=>{moveItemsLeftall('#assignedProjectAP','#allProjectAP')}} title="Move all to left"> &lt;&lt; </Button>
+                            <Button className='p-button-outlined' type="button" id="leftgo" onClick={()=>{moveItemsLeftgo('#assignedProjectAP','#allProjectAP')}} title="Move to left"> &lt; </Button>
                             </div>
                         {/* <!--Center Input--> */}
 
                         {/* <!--Right Select Box--> */}
                         <div className="wrap assign-select">
                             {/* <!--Labels--> */}
-                            <label className="labelStyle1">Assigned Projects</label>
+                            <label className="labelStyle1">Assigned Projects<span className="chip_totalProj">{assignProj.assignedProjectAP.length}</span></label>
                             <div className="seprator seprator-custom" >
                                 <select multiple id="assignedProjectAP"  size="">
                                     {assignProj.assignedProjectAP.map((prj,index) => ( 
@@ -461,6 +483,9 @@ const ProjectNew = (props) => {
                 <Dialog header="Update Projects" visible={showAssignProjectModal} footer={ModalButtons(clickAssignProjects2, setShowAssignProjectModal)} onHide={()=>{setShowAssignProjectModal(false)}} className=" modal-sm" >
                     <span>Do you want to proceed?</span>
                 </Dialog>
+                <div className="adminActionBtn" style={{float:'inline-end'}}>
+                    <Button className=" a__btn save_btn" size='small' onClick={()=>{clickAssignProjects()}} label='Save' title="Save"></Button>
+                </div> 
         </div>
     )
 }
