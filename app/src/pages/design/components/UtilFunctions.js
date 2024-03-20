@@ -1,3 +1,4 @@
+const moment = require('moment');
 export const getObjNameList = (appType, data) => {
     let obnames = [];
 
@@ -667,4 +668,49 @@ export const getRoleId = (roleName) =>{
       default:
         return "";
     }
+}
+
+export const DateTimeFormat = (inputDate, createDate) => {
+    // Provided date
+    const providedDate = new Date(inputDate);
+    const createddate = new Date(createDate);
+    let createdNowProject = false;
+    { providedDate.toISOString() === createddate.toISOString() ? createdNowProject = true : createdNowProject = false }
+    // Current date
+    const currentDate = new Date();
+    // Calculate years, months, days, hours, and seconds
+    const millisecondsInASecond = 1000;
+    const millisecondsInAMinute = 60 * millisecondsInASecond;
+    const millisecondsInAnHour = 60 * millisecondsInAMinute;
+    const millisecondsInADay = 24 * millisecondsInAnHour;
+    const millisecondsInAYear = 365 * millisecondsInADay;
+    const date1 = moment(providedDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
+    const date2 = moment(new Date(), 'ddd MMM DD YYYY HH:mm:ss ZZ');
+    //convert the difference to other units, such as seconds, minutes, hours, etc.
+    const seconds = date2.diff(date1, 'seconds');
+    const minutes = date2.diff(date1, 'minutes');
+    const hours = date2.diff(date1, 'hours');
+    const days = date2.diff(date1, 'days');
+    const months = date2.diff(date1, 'months');
+    const years = date2.diff(date1, 'years');
+    let output = "";
+    if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0) {
+        output = createdNowProject ? "Created now" : "Edited Now";
+    }
+    else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {
+        output = `Last Edited ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months <= 0 && days <= 0 && hours >= 1) {
+        output = `Last Edited ${hours} hr${hours > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months <= 0 && days >= 1) {
+        output = `Last Edited ${days} day${days > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months >= 1) {
+        output = `Last Edited ${months} month${months > 1 ? 's' : ''} ago`;
+    }
+    else {
+        output = `Last Edited ${years} year${years > 1 ? 's' : ''} ago`;
+    }
+    return output;
 }
