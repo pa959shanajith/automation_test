@@ -108,7 +108,7 @@ const ElementRepository = (props) => {
             else if(screens === "invalid session") return RedirectPage(history);
             else {
               setOverlay("")
-              setScreenData(screens.screenList);
+              setScreenData(screens.screenList.reverse());
               setFilteredData(screens.screenList)
               setScreenId(false);
             }
@@ -168,7 +168,7 @@ const ElementRepository = (props) => {
     setAccordionIndex(targetAccordionIndex);
     if (copiedRow !== null) {
       setScreenData((prevScreens) => {
-        const updatedScreens = prevScreens.reverse().map((screen, index) =>
+        const updatedScreens = prevScreens.map((screen, index) =>
           index === targetAccordionIndex
             ? {
                 ...screen,
@@ -1014,7 +1014,7 @@ const handleRepositoryName =(e)=>{
        </div>
       </>}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
-        {screenData?.slice().reverse().map((screenDetails,index) => (
+        {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={
             <div className='scenario-accordion'>
               <span
@@ -1069,7 +1069,7 @@ const handleRepositoryName =(e)=>{
               onSelectionChange={(e)=>onRowClick(e)} 
               // dataKey="id"
             >
-              <Column selectionMode="multiple" headerStyle={{ width: '3rem' }}></Column>
+              <Column selectionMode={screenDetails.related_dataobjects.length === 0?'none':"multiple" } headerStyle={{ width: '3rem' }}></Column>
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
               editor={(options) => {
                 if (!options.rowData || Object.keys(options.rowData).length === 0) {

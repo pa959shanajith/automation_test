@@ -248,7 +248,7 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab, delet
     if (d.children) d.children.forEach((e) => { recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
     if (d.state === "deleted") return;
     if (d._id) {
-        var parentid = d.parent._id;
+        var parentid = d.parent.type === "teststepsgroups"?d.parent.parent._id:d.parent.type === "scenarios"?d.parent.parent._id:d.parent._id;
         deletedNodes.push([d._id, d.type, parentid]);
     }
     d.parent = null;
