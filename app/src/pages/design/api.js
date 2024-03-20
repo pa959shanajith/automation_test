@@ -945,20 +945,35 @@ export const getUserDetails = async(action, args) => {
 /*Component DesignContent
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
 */
-export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
+export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId,params="") =>	{
+    let data={}    
+            if(!params){
+data={
+    param: 'getScrapeDataScreenLevel_ICE',
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+            }
+else{
+data={
+    param:params,
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+}
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
             },
-            data : {
-                param: 'getScrapeDataScreenLevel_ICE',
-                screenId: screenId,
-                projectId: projectId,
-                type: type,
-                testCaseId: testCaseId
-            },
+        
+            
+            data : data,
             credentials : 'include',
         }).then(res=>{
             if (res.status === 200){
@@ -1107,6 +1122,26 @@ export const getScrapeDataScenarioLevel_ICE = (type, scenarioID) => {
 export const updateScreen_ICE = arg => {
     return new Promise((resolve, reject)=>{
         axios(url+"/updateScreen_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+export const generateToken = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/generateToken", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -1708,7 +1743,7 @@ export const updateIrisDataset = data => {
 }
 
 
-export const importDefinition = async(sourceUrl) => {
+export const importDefinition = async(sourceUrl,type) => {
     console.log("inside API importDefinition")
     try{
         const res = await axios(url+'/importDefinition', {
@@ -1718,7 +1753,8 @@ export const importDefinition = async(sourceUrl) => {
             },
             data : {
                 param : 'importDefinition_ICE',
-                sourceUrl: sourceUrl
+                sourceUrl: sourceUrl,
+                type: type
             },
             credentials: 'include'
         });
@@ -1743,6 +1779,25 @@ export const importDefinition = async(sourceUrl) => {
 export const insertScreen = arg => {
     return new Promise((resolve, reject)=>{
         axios(url+"/insertScreen", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const insertRepository = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/insertRepository", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -1871,4 +1926,23 @@ export const fetch_git_exp_details = async(projectId) => {
         console.error(err)
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
+}
+
+export const deleteElementRepo = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/deleteElementRepo", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+             data: arg,
+            
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
 }

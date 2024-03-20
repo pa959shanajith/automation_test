@@ -38,7 +38,7 @@ const ProjectOverview = (props) => {
         { label: 'Analysis' },
         { label: 'Settings' },
         { label: 'Element Repository', command: ()=>handleElementRepository()},
-        // { label: 'AI Testcase' },
+        { label: 'AI Testcase' },
         // { label: 'Capabalities'},
     ];
     const handleToggleCollapse = () => {
