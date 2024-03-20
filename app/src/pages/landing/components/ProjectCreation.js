@@ -42,6 +42,10 @@ const ProjectCreation = (props) => {
     "Custom Keyword 3",
   ];
 
+  const CreateGenAi = () =>{
+    navigate("/GenAI");
+  }
+
   const keywordListElements = dummyData.map((item, index) => (
     <>
       <Card
@@ -210,19 +214,14 @@ const ProjectCreation = (props) => {
             </div>
             <Button size="small" className='admin-btn' onClick={handleClick} > Go to Admin</Button>
         </Card>) : null} */}
-        <Card
-        className="gotoadmin-card"
-        title="Create test cases using AI"
-        >
-          <div>
-           <Button size="small" className='admin-btn'  > Create</Button>
-           </div>
-        </Card>
         {/* {
           (userInfo && userInfo?.rolename === "Quality Manager") && (projectInfoFromRedux && projectInfoFromRedux?.appType === "Web") && <Card className="gotoadmin-card" title="Want to migrate from Non Avo Automation to Avo Automation?">
             <Button className="CreateProj_btn m-3" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
-} */}
+        } */}
+        <Card title="Create TestCase using AI" className="CreateProj-card" id="Createproj-title">
+          <div><Button size='small' className="CreateProj_btn" onClick={CreateGenAi}>Create</Button></div>
+        </Card>
       </div>
     </>
 

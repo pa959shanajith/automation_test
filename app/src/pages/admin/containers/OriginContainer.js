@@ -11,6 +11,9 @@ import Grid from './Grid'
 import LicenseManagement from './LicenseManagement';
 import SessionManagement from './SessionManagement';
 import Privileges from './preferences';
+import AiTemplate from '../components/AiTemplate';
+import GridTemplate from '../components/GridTemplate';
+import LLM from './LLM'
 import Project from './ProjectAssign';
 import UnlockTestSuites from './UnLockTestSuites';
 
@@ -31,7 +34,10 @@ const OriginContainer = (props) => {
             {currentTab === "email_server_configuration" && <EmailConfiguration/>}
             {currentTab === "manage_agents" && <Agents/>}
             {currentTab === "grid_configuration" && <Grid/>}
+            {currentTab === "LLM" && <LLM/>}
             {currentTab === "license_details" && <LicenseManagement/>}
+            {currentTab === "aitemplate" && <AiTemplate/>}
+            {/* {currentTab === "grid_template" && <GridTemplate/>} */}
             {currentTab === "session_management" && <SessionManagement/>}
             {currentTab === "privileges" && <Privileges/>}
             {currentTab === "project" && <Project resetMiddleScreen={resetMiddleScreen} setResetMiddleScreen={setResetMiddleScreen}/>}

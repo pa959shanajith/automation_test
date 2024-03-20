@@ -57,7 +57,16 @@ const initialState = {
     checkedReleaseIds:[],
     reference:'',
     enableSaveButton:false,
-    updateTestrailMapping: true
+    updateTestrailMapping: true,
+    template_id:'',
+    template_info:[],
+    genAiParameters:{},
+    editParameters:{
+        domain:'',
+        test_type:'',
+        temperature:''
+    }
+
 }
 
 // const saucelabsInitialState = {
@@ -206,7 +215,20 @@ export const settingSlice=createSlice({
         },
         updateTestrailMapping : (state, action) => {
             state.updateTestrailMapping = action.payload
-        }
+        },
+        updateTemplateId : (state, action) => {
+            state.template_id = action.payload
+        },
+        setTemplateInfo : (state, action) => {
+            state.template_info = action.payload
+        },
+        setGenAiParameters : (state, action) => {
+            state.genAiParameters = action.payload;
+        },
+        setEditParameters : (state, action) => {
+            console.log(action,' its action');
+            state.editParameters = {...state.editParameters, ...action.payload};
+        },
     }
 })
 
@@ -256,7 +278,11 @@ export const {
     checkedReleaseIds,
     enableSaveButton,
     resetAzureLogin,
-    updateTestrailMapping
+    updateTestrailMapping,
+    updateTemplateId,
+    setTemplateInfo,
+    setGenAiParameters,
+    setEditParameters
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

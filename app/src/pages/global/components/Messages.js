@@ -125,7 +125,7 @@ const Messages={
         WARN_TOKEN_EXIST: {"CONTENT":"Failed to generate token, Token Name already exists.", "VARIANT": VARIANT.WARNING},
         WARN_ICE_EXCEEDS: {"CONTENT":"Number of ICE assigned exceeds available ICE.", "VARIANT": VARIANT.WARNING},
         WARN_GITCONFIG_EXIST: {"CONTENT":"Git configration name already exists.", "VARIANT": VARIANT.WARNING},
-        WARN_GIT_PROJECT_CONFIGURED: {"CONTENT":"Project is already Git configured for the specified user.", "VARIANT": VARIANT.WARNING},
+        WARN_GIT_PROJECT_CONFIGURED: {"CONTENT":"Git configuration already exists for this user and project combination.", "VARIANT": VARIANT.WARNING},
         WARN_GIT_URL: {"CONTENT":"Invalid URL provided. URL must start with 'https://' .", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_APPTYPE: {"CONTENT":"Please select Application Type.", "VARIANT": VARIANT.WARNING},
         WARN_ADD_RELEASE: {"CONTENT":"Please add atleast one release.", "VARIANT": VARIANT.WARNING},
