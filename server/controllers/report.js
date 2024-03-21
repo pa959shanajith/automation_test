@@ -1918,7 +1918,9 @@ exports.fetchExecutionDetail = async (req, res) => {
 			"ProjName":paramDetails.ProjName || "Default",			
 			"prefixRegexProjName": paramDetails.prefixRegexProjName || "Default",
 			"startDate":paramDetails.startDate,
-			"endDate":paramDetails.endDate
+			"endDate":paramDetails.endDate,
+            "reporttype":paramDetails.reporttype || "summary",
+            "actualRun":paramDetails.actualRun || false
 		};
 		const result = await utils.fetchData(inputs, "reports/fetchExecutionDetail", "fetchExecutionDetail")
 		return res.send(result);
@@ -2456,4 +2458,24 @@ exports.moduleLevel_ExecutionStatus = async function (req, res) {
         logger.error('Error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+}
+exports.fetchDefectExecutionDetail = async (req, res) => {
+    logger.info("Inside UI service: fetchDefectExecutionDetail");
+    var paramDetails = req.body;
+    logger.info(paramDetails);
+    if(paramDetails.authToken==="awdtbkob4g80h-jnlhge43stgjb7hj7g"){
+        var inputs = {
+            "query": "fetchDefectExecutionDetail",
+            "ProjName":paramDetails.ProjName || "Default",			
+            "prefixRegexProjName": paramDetails.prefixRegexProjName || "Default",
+            "startDate":paramDetails.startDate,
+            "endDate":paramDetails.endDate,
+            "actualRun":paramDetails.actualRun || false
+        };
+        const result = await utils.fetchData(inputs, "reports/fetchDefectExecutionDetail", "fetchDefectExecutionDetail")
+        return res.send(result);
+    }
+    else{
+        return res.send({ status: 'fail'});
+    };
 }
