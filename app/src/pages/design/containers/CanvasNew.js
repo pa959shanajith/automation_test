@@ -21,7 +21,7 @@ import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
 import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap,createNodeSingle} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
-import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
+import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer,setTestCaseAssign} from '../designSlice';
 import{ objValue} from '../designSlice';
 import '../styles/MindmapCanvas.scss';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
@@ -50,7 +50,9 @@ import { checkRole, roleIdentifiers } from "../../design/components/UtilFunction
 import { Card } from '@mui/material';
 import { AutoComplete } from 'primereact/autocomplete';
 import NavigatetoCaptureDesign from './NavigatetoCaptureDesign';
-
+import { getUserDetails,getUsers_ICE} from '../../landing/api';
+import {assignedUserMM} from '../api'
+import 'primeicons/primeicons.css';   
 /*Component Canvas
   use: return mindmap on a canvas
 */
@@ -106,6 +108,7 @@ const CanvasNew = (props) => {
     const [selectedDelNode,setSelectedDelNode] = useState()
     const [DelConfirm,setDelConfirm] = useState(false)
     const [reuseDelContent,setReuseDelContent] = useState()
+    const [assignUser,setAssignUser] = useState(false);
     const [endToEndDelConfirm,setEndToEndDelConfirm] = useState(false)
     const [verticalLayout,setVerticalLayout] = useState(typeOfView === "mindMapView"?true:false);
     const proj = useSelector(state=>state.design.selectedProj)
@@ -120,6 +123,7 @@ const CanvasNew = (props) => {
     const menuRef_Teststep = useRef(null);
     const menuRef_Teststepgroup=useRef(null);
     readCtScale = () => ctScale
+    const [showTestAssigment,setShowTestAssigment] =useState(false);
     const [box, setBox] = useState(null);
     const [visibleScenario, setVisibleScenario] = useState(false);
     const[visibleScenarioAnalyze,setVisibleScenarioAnalyze]=useState(false)
@@ -486,10 +490,98 @@ const CanvasNew = (props) => {
         }
       };
 
+      const [optionElement_02, setOptionElement_02] = useState([]);
+      const [selectedTestAction, setSelectedTestAction] = useState([]);
+      const handleTestAssigment = async () => {
+    const projectId = proj ? proj : Proj.projectId;
+    const users_obj = await getUsers_ICE(projectId);
+    const optionElement = [userInfo, ...users_obj.assignedUsers, ...users_obj.unassignedUsers]
+    const option = optionElement.map((option, index) => {
+      if (index !== 0 && option.name.trim() !== userInfo.username.trim()) {
+        return {
+          name: option.name,
+          value: option
+        };
+      } else if (index === 0) {
+        return {
+          name: option.username,
+          value: option
+        };
+      }
+    }).filter(option => option !== undefined);
+    setOptionElement_02(option);
+    setShowTestAssigment(true);
+  }
+      const handleTestActionChange = (e,data, index) => {
+        const { value } = e;
+        setSelectedTestAction(prevActions => {
+          const updatedActions = [...prevActions];
+          updatedActions[index] = value;
+          return updatedActions;
+        });
+      };
+      useEffect(() => {
+        if (optionElement_02 !== undefined && optionElement_02.length > 0 && optionElement_02[0] !== undefined) {
+          const firstOption = optionElement_02[0];
+          let len = fetchingDetails?.children?.length;
+          let temp=[];
+          const { value } = firstOption;
+          for (let i = 0; i < len; i++) {
+            if (
+              fetchingDetails?.children[i].assigneduser !== '' &&
+              optionElement_02.find(option => option.name === fetchingDetails?.children[i].assigneduser)
+            ) {
+              const foundOption = optionElement_02.find(option => option.name === fetchingDetails?.children[i].assigneduser);
+              if (foundOption) {
+                temp.push(foundOption.value);
+              } else {
+                temp.push(value);
+              }
+            } else {
+              temp.push(value);
+            }
+          }
+          setSelectedTestAction(temp)
+        }
+      }, [optionElement_02,fetchingDetails]);
+
+  const handleSaveTestAssine = async () => {
+    const req = [];
+    for (let i = 0; i < selectedTestAction.length; i++) {
+      var data = {
+        assigne_to: selectedTestAction[i].name ? selectedTestAction[i].name : selectedTestAction[i].username,
+        testcaseId: fetchingDetails?.children[i]._id,
+        testcaseName: fetchingDetails?.children[i].name
+      }
+      req.push(data);
+    }
+    const assine = await assignedUserMM(req)
+    if (assine == 'pass') {
+      dispatch(setTestCaseAssign({key:fetchingDetails._id, id:uuid()}))
+      toast.current.show({ severity: "success", summary: "Success", detail: 'Successfully assigned testcases', life: 2000 });
+    } else {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: "error", life: 2000 });
+    }
+  }
+      const renderFooter = () => {
+        return (
+          <div>
+            <Button label="Cancel" className="p-button-text" onClick={() => { setShowTestAssigment(false); setSelectedTestAction([]);}} />
+            <Button label="Save"  onClick={() => {setShowTestAssigment(false);setSelectedTestAction([]);handleSaveTestAssine()}} />
+          </div>
+        );
+      };
     const menuItemsModule = [
         { label: `Add ${appType !== "Webservice" ?'Testcase': 'API'}`,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
         { label: `Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
-        {separator: true},
+        { separator: true },
+        { 
+           label: 'Assign Testcase', 
+           icon: <img src="static/imgs/add-icon.png" alt='add icon' style={{ height: "25px", width: "25px", marginRight: "0.5rem"}} />, 
+           style: { display: userInfo.rolename === "Quality Manager" ? 'block' : 'none' },
+           command: () => { handleTestAssigment(); d3.select('#'+box).classed('node-highlight',false); } 
+        },
+        { separator: true },
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
@@ -519,14 +611,14 @@ const CanvasNew = (props) => {
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
     ];
     const menuItemsScreen = !testSuiteInUse?[
-        { label: 'Add Test Steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: 'Add Test Steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }, disabled:!assignUser},
+        { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser},
         {separator: true},
         { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
         {separator: true},
-        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
-        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser},
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser },
       ]:[
         { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
   
@@ -549,8 +641,8 @@ const CanvasNew = (props) => {
       const menuItemsTestSteps = !testSuiteInUse?[
         { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
         {separator: true},
-        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser},
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser }
 
       ]:[
           { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
@@ -1433,7 +1525,7 @@ const CanvasNew = (props) => {
   }
 
   const reject = () => {}
-  const handleContext=(e,type,value)=>{
+  const handleContext=(e,type,value,node)=>{
     if(props.module.currentlyInUse!=="" && props.module.currentlyInUse!==undefined && props.module.currentlyInUse!==userInfo.username){
       if(type==="modules"){
         toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
@@ -1443,6 +1535,14 @@ const CanvasNew = (props) => {
         toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
+    }
+    if(type=="scenarios" && node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){
+      toastWarnMsg(`This Test Case is assigned to ${node[1].assignedUser}`);
+      return;
+    }
+    if((type=="screens"|| type=="testcases")){
+       if(node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){setAssignUser(false)}
+       else{setAssignUser(true)}
     }
     if (value === "created"){
       setToastData(true);
@@ -2844,7 +2944,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
             {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} setFetchingDetailsForGroup={setFetchingDetailsForGroup} />}
-            {visibleCaptureAndDesign && <NavigatetoCaptureDesign visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick} dNodes={dNodes} setFetchingDetails={setFetchingDetails}/>}
+            {visibleCaptureAndDesign && <NavigatetoCaptureDesign assignUser={assignUser} visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick} dNodes={dNodes} setFetchingDetails={setFetchingDetails}/>}
             <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
             <ContextMenu model={menuItemsScreen} ref={menuRef_screen} />
@@ -2904,7 +3004,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             })}
             {Object.entries(nodes).map((node)=>
                 <g id={'node_'+node[0]} key={node[0]} className={"ct-node"+(node[1].hidden?" no-disp":"")} data-nodetype={node[1].type} transform={node[1].transform}>
-                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type,node[1].state)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
+                   <image onClick={(e)=>nodeClick(e)} onMouseDownCapture={(e)=>{handleContext(e,node[1].type,node[1].state,node)}} style={{height:'45px',width:'45px',opacity:(node[1].state==="created")?0.5:1}} className="ct-nodeIcon" xlinkHref={node[1].img_src}></image>
                     <text className="ct-nodeLabel" textAnchor="middle" x="20" y="50" title={node[1].title}>{node[1].name}</text>
                     {(node[1].type==="screens" && (node[1].statusCode!==undefined)) ? (
                 <g transform={node[1].transformImpact} className='node_'>
@@ -2913,7 +3013,25 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </g>
                 ):null}
-                    <title val={node[0]} className="ct-node-title">{node[1].title}</title>         
+                    {(node[1].type === "scenarios" && node[1]?.assignedUser != userInfo.username&& node[1]?.assignedUser!='') ? (
+                  <g transform={node[1].transformImpact} className='node_'>
+                    <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon ct-nodeIcon_02 pi pi-eye"
+                    ></image>
+                  </g>
+            ) : null}
+                 {(node[1].type === "screens" && node[1]?.assignedUser!=userInfo.username && node[1]?.assignedUser!='') ? (
+                  <g transform={node[1].transformImpact} className='node_'>
+                    <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon pi pi-eye" ></image>
+                  </g>
+                ) : null}
+                 {(node[1].type === "testcases" && node[1]?.assignedUser!=userInfo.username && node[1]?.assignedUser!='') ? (
+                  <g transform={node[1].transformImpact} className='node_'>
+                    <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon pi pi-eye" ></image>
+                  </g>
+                ) : null}
+                    <title val={node[0]} className="ct-node-title">{node[1].title} 
+                    {/* {((node[1].type === "scenarios") && node[1]?.assignedUser != userInfo.username) && `is assigned to ${node[1]?.assignedUser}`} */}
+                    </title>         
                     {(node[1].type!=='testcases')?
                     <circle onClick={(e)=>clickCollpase(e)} className={"ct-"+node[1].type+" ct-cRight"+(!dNodes[node[0]]?._children?" ct-nodeBubble":"")} cx={verticalLayout ? 20 : 44} cy={verticalLayout ? 55 : 20} r="4"></circle>
                     :null}
@@ -2965,6 +3083,26 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             //     modalClass='modal-sm'
             // />
             :null}
+        <Dialog draggable={false} header="Test Case Assigment" visible={showTestAssigment} style={{ width: '50vw', padding: '0px' }} onHide={() => {
+          setShowTestAssigment(false);
+          setSelectedTestAction([]);
+        }} className="no-padding-dialog" footer={renderFooter()}>
+          <div className="m-0 flex " style={{ flexDirection: 'column' }}>
+            <div className='flex flex-col assigmentbox'>
+              <div className='assigmentSubbox_2' >Test Case</div>
+              <div className='assigmentSubbox_2' >Assign</div>
+            </div>
+            {fetchingDetails && fetchingDetails?.children?.map((data, index) => {
+              return (
+                <div className='flex flex-col assigmentbox_2'>
+                  <div className='assigmentSubbox_2'>{data.name}</div>
+                  <div className='assigmentSubbox_2'>
+                    <Dropdown style={{ border: '1px solid #605BFF' }} value={selectedTestAction[index]} options={optionElement_02} optionLabel="name" onChange={(e) => handleTestActionChange(e, data, index)} placeholder="Choose Action" className="w-full md:w-9.5rem p-0" />
+                  </div>
+                </div>)
+            })}
+          </div>
+        </Dialog>
             {endToEndDelConfirm?<ModalContainer 
                 title='Confirmation'
                 content={<DelReuseMsgContainer message={reuseDelContent}/>}                         
