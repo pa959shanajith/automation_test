@@ -211,9 +211,47 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab , dele
         }
     }
 };
+function propagateAssignedUserTotestStep(data, assignedUser) {
+    if (Array.isArray(data) && data.length>0) {
+        data = data.map(child => {
+            const updatedChild = { ...child };
+            updatedChild.assigneduser = assignedUser; 
+            return updatedChild; 
+        });
+    }
+    return data;
+}
 
+function propagateAssignedUserToChildren(data, assignedUser) {
+    if (Array.isArray(data) && data.length>0) {
+        data = data.map(child => {
+            var updatedChild = { ...child };
+             updatedChild = {
+                ...child,
+                children: propagateAssignedUserTotestStep(child.children, assignedUser)
+            };
+            updatedChild.assigneduser = assignedUser; 
+            return updatedChild;
+        });
+    }
+    return data;
+}
 export const generateTree = (tree,sections,count,verticalLayout,screenData,geniusMindmap,isAssign,cycleID) =>{
     unfoldtree(tree)
+    if (Array.isArray(tree?.children)) {
+        const updatedChildren = tree.children.map(child => {
+            const assignedUser = child.assigneduser;
+            const updatedChild = {
+                ...child,
+                children: propagateAssignedUserToChildren(child.children, assignedUser)
+            };
+            return updatedChild;
+        });
+        tree = {
+            ...tree,
+            children: updatedChildren
+        };
+    }
     var translate;
     var nodeDisplay = {}
     var linkDisplay = {}
@@ -661,6 +699,7 @@ export const addNode = (n,screenData) =>{
         '_id': n._id || null,
         'state':n.state || "created",
         'reuse':n.reuse || false,
+        'assignedUser':n.assigneduser|| '',
     };
     if(statusCode){
         nodeDisplay['statusCode']=statusCode

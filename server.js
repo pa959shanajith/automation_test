@@ -546,6 +546,7 @@ if (cluster.isMaster) {
 		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
 		app.post('/deleteElementRepo', auth.protect, mindmap.deleteElementRepo);
 		app.post('/generateToken', auth.protect, mindmap.generateToken);
+		app.post('/assignedUserMM', auth.protect, mindmap.assignedUserMM);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);

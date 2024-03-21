@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import WSImportMindmap from'../components/WSImportMindmap.js';
-import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId} from '../designSlice';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId, setTestCaseAssign} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -78,6 +78,7 @@ const ModuleListDrop = (props) =>{
     const [collapseWhole, setCollapseWhole] = useState(true);
     const [initialText, setInitialText] = useState(E2EName? false : true);
     const prjList = useSelector(state=>state.design.projectList)
+    const testAssign = useSelector(state=>state.design.testCaseAssign);
 
     ////  /////ModuleListSidePanel'S dependencies
     const [showInput, setShowInput] = useState(false);
@@ -149,7 +150,8 @@ const ModuleListDrop = (props) =>{
         if(Object.entries(updateModuleId).length !== 0)
         {loadModule(updateModuleId.id)}
      // eslint-disable-next-line react-hooks/exhaustive-deps
-     }, [moduleLists, initProj, currentId,updateModuleId])
+     if(Object.entries(testAssign).length>0){loadModule(testAssign.key)}
+     }, [moduleLists, initProj, currentId,updateModuleId,testAssign])
      useEffect(()=> {
         return () => {
           handleReaOnlyTestSuite({oldModuleForReset:localStorage.getItem('OldModuleForReset'),modID:localStorage.getItem('CurrentModuleForReset'),userInfo,appType:props.appType,module:props.module,proj:proj})
@@ -158,6 +160,7 @@ const ModuleListDrop = (props) =>{
             // this comment is removed when auto save of mod will effect default mod
             dispatch(dontShowFirstModule(false))
             dispatch(setUpdateScreenModuleId(""))
+            dispatch(setTestCaseAssign({}))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
@@ -873,7 +876,7 @@ setPreventDefaultModule(true);
       localStorage.removeItem('OldModuleForReset')
       
       }
-
+console.log(moduleLists,'moduleListsmoduleLists');
     return(
         <Fragment>
           {showE2EPopup &&
@@ -1138,6 +1141,7 @@ setPreventDefaultModule(true);
                             <div style={{ width: '13rem', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                               <h4 className="moduleName" onClick={(e) => selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{ textOverflow: 'ellipsis', textAlign: 'left', fontWeight: '300' }}>{e.name}</h4>
                             </div>
+                            {e?.currentlyinuse != '' && e?.currentlyinuse!==userInfo?.username && <img src="static/imgs/eye_view_icon.svg" style={{ width: '20px', height: '20px', marginLeft: '0.5rem' }} alt="modules" title={`This test suite is in read only mode and currently in use by ${e.currentlyinuse}`}/>}
                           </div>
                         </div>
                       </>
