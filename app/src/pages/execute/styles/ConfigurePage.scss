@@ -1814,6 +1814,50 @@ bottom: 21%;
   font:$f6_regular;
   color: var(--surface-900);
 }
+
+.proxy_label {
+  font:$f6_semibold;
+  color: var(--surface-900);
+  margin-left: 3rem;
+  margin-top: 1rem;
+}
+
+.ss__proxy_type_rad {
+  margin-right: 1rem;
+  // margin-left: 5rem;
+}
+
+.ss__proxy_type_label {
+  font:$f6_regular;
+  color: var(--surface-900);
+}
+
+.proxy-rad-enable {
+  margin-left: 12.5rem;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.proxy-rad-disable {
+  margin-left: 3rem;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+.proxy_url_label {
+  font:$f6_semibold;
+  color: var(--surface-900);
+  margin-left: 3rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.proxy-fields {
+  gap: 11rem;
+  display:flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
   
 
 
