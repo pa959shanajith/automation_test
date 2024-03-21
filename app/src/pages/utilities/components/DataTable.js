@@ -8,6 +8,7 @@ import * as utilApi from '../api';
 import "../styles/DataTable.scss";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Tooltip } from 'primereact/tooltip';
 
 const DataTable = props => {
 
@@ -46,7 +47,8 @@ const DataTable = props => {
             <span className="page-taskName-encryption" data-test="dt__pageTitle">
             <img src="static/imgs/Datatable_icon.svg" className='current_img_icon' alt="SVG Image" />
             Data Table
-            <img src="static/imgs/info-circle.svg" className='relative left-1' alt="SVG Image" />
+            <Tooltip target=".utilitydatatable" position="bottom" content="Create a data table and utilize them for test data management and parameterization."/>
+            <img src="static/imgs/info-circle.svg" className='utilitydatatable relative left-1' alt="Your Image" />
             </span>
         </div>
         
@@ -151,7 +153,7 @@ const EditScreen = props => {
                     /> 
                 }
             </div>
-            <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} dataValue={props.dataValue} setDataValue={props.setDataValue}/>
+            {!tableName ? '' : <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} dataValue={props.dataValue} setDataValue={props.setDataValue}/>}
         </>
     );
 }

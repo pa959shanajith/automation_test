@@ -260,15 +260,16 @@
         box-shadow: none !important;
     } 
     .p-datatable .p-datatable-thead>tr>th {
-        padding: 0rem !important;
+        padding: 0.5rem !important;
     }
     .p-datatable .p-datatable-footer {
         padding: 0rem !important;
     }
     .p-inputtext{
         color: none !important;
-        // padding: 0rem !important;
         border: none !important;
+        width: 100%;
+        background-color: #e9ecef;
     }
     .btn_add{
         margin: 0.5rem ;
@@ -278,10 +279,18 @@
         background:none;
         // padding-right: 1rem;
     }
+    .add_column{
+        position: relative;
+        left: 20rem;
+    }
 }
 .ellipsis_column{
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 21rem;
-  }
+}
+.disabled_export{
+    opacity: 0.5;
+    cursor: not-allowed;
+}

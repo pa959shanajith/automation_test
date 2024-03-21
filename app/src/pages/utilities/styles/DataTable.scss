@@ -42,19 +42,23 @@
 .dt__taskBtns{
     align-items: center;
     display: flex;
-    flex-grow: 1;
-    position: relative;
-    left: 49rem;
-    gap: 1rem;
+    // flex-grow: 1;
+    // position: relative;
+    // left: 49rem;
+    // gap: 1rem;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
 }
 
 .dt__taskBtns_create{
     align-items: center;
     display: flex;
-    flex-grow: 1;
+    // flex-grow: 1;
     position: relative;
-    left: 58rem;
-    gap: 1rem;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
 }
 
 .dt__taskBtn{

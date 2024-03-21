@@ -12,6 +12,7 @@ import ExportDataTable from './ExportDataTable';
 import "../styles/Table.scss";
 import DtPasteStepDialog from './DtPasteStepDialog';
 import { Toast } from 'primereact/toast';
+import { Tooltip } from 'primereact/tooltip';
 import * as utilApi from '../api';
 
 
@@ -27,22 +28,17 @@ const Table = (props) => {
     const toast = useRef();
     const [importPopup, setImportPopup] = useState(false);
     const [showExportPopup, setShowExportPopup] = useState(false);
+    const [editingHeader, setEditingHeader] = useState(null);
 
 
         const data = Array.isArray(props.data) ? props.data : [];
 
         const handleRowSelect = (e) => {
-            // setSelectedRows([e.value.__CELL_ID__]); // Selecting single row
             updateCheckList(e, "row", e.value.__CELL_ID__)
-            // props.checkList = {...props.checkList , list: [...props.checkList.list,`sel||row||${e.value.__CELL_ID__}`]}
         };
 
-        const onSelectionChange = (e) => {
-            setSelectedItem(e.value);
-        };
-
-        const handleColumnSelect = (headerId) => {
-            setSelectedColumns([headerId]); // Selecting single column
+        const handleColumnSelect = (e) => {
+            return props.setData(e.value)
         };
     
         const onAdd = (type) => {
@@ -77,6 +73,7 @@ const Table = (props) => {
         };
 
         const updateHeaderName = (newName, headerId) => {
+            pushToHistory({ headers: props.headers, data: props.data });
             const newHeaders = props.headers.map(header => {
                 if (header.__CELL_ID__ === headerId) {
                     return { ...header, name: newName };
@@ -86,15 +83,6 @@ const Table = (props) => {
             props.setHeaders(newHeaders);
         };
     
-        const headerEditor = (rowData, columnMeta) => {
-            return (
-                <InputText
-                    value={columnMeta.header}
-                    onChange={(e) => updateHeaderName(e.target.value, columnMeta.column.__CELL_ID__)}
-                />
-            );
-        };
-
          // loc => id for header, index for row
     const updateCheckList = (e, type, loc) => {
         let newCheckList = props.checkList.type === type ? { ...props.checkList } : { type: type, list: [] }
@@ -128,44 +116,23 @@ const Table = (props) => {
                 />
             );
         };
-        
-    
+        const handleHeaderClick = (field) => {
+            setEditingHeader(field);
+          };
+
         const dynamicColumns = props.headers.map((header) => (
             <Column
                 key={`header-${header.__CELL_ID__}`}
-                header={header.name}
+                header={editingHeader === header.name ? <InputText value={header.name} onChange={(e) => updateHeaderName(e.target.value, header.__CELL_ID__)} /> : <span onClick={() => handleHeaderClick(header.name)}>{header.name}</span>}
                 field={header.__CELL_ID__}
-                initialValue={header.__CELL_ID__ || ''}
-                headerStyle={{ textAlign: 'center' }}
-                bodyStyle={{ textAlign: 'center' }}
+                columnKey={header.__CELL_ID__}
+                // initialValue={header.__CELL_ID__ || ''}
+                headerStyle={{ textAlign: 'center',width: '21rem' }}
+                bodyStyle={{ textAlign: 'center',width: '21rem' }}
                 editor={(props) => rowEditor(props.rowData, props,header.__CELL_ID__)}
                 bodyClassName={"ellipsis_column"}
-                onHeaderCheckboxChange={handleColumnSelect}
             />
         ));
-    
-        const addColumnButton = (
-            <Column
-                key="addColumnButton"
-                header={<div><button className="btn_add" onClick={() => onAdd('col')} >+ Add column</button></div>}
-                style={{ width: '10em', textAlign: 'center' }}
-                bodyClassName={"ellipsis_column"}
-            />
-        );
-        
-        const updateHeaders = (newHeader, headerId, invalidFlag) => {
-            if (invalidFlag) {
-                return; // Handle invalid header name
-            }
-            pushToHistory({ headers: props.headers, data: props.data });
-            const newHeaders = props.headers.map(header => {
-                if (header.__CELL_ID__ === headerId) {
-                    return { ...header, name: newHeader };
-                }
-                return header;
-            });
-            props.setHeaders(newHeaders);
-        };
     
         const updateTableData = (value, rowId, headerId) => {
             pushToHistory({ headers: props.headers, data: props.data });
@@ -177,18 +144,6 @@ const Table = (props) => {
             });
             props.setData(newData);
         };
-
-        // const headerTemplate = (rowData) => {
-        //             // Add template for header
-        //         };
-        //         const rowEditor = (rowData, rowMeta) => {
-        //             return (
-        //                 <InputText
-        //                     value={rowData[rowMeta.field]}
-        //                     onChange={(e) => updateTableData(e.target.value, rowData.__CELL_ID__, rowMeta.field)}
-        //                 />
-        //             );
-        //         };
     
         const toastError = (errorMessage) => {
             if (toast.current && errorMessage) {
@@ -378,34 +333,48 @@ const Table = (props) => {
         }
 
     const header = (
-        <div className="flex align-items-center gap-5">
-            <span data-pr-tooltip="CSV" onClick={onAddRowcol}>
-                <img src="static/imgs/plus.svg" alt="add selected Row/Column" />
-            </span>
-            <span className="dt_separation" data-pr-tooltip="XLS" onClick={() => setImportPopup(true)}>
-                <img src="static/imgs/import.svg" alt="import" />
-            </span>
-            <span className="dt_separation" data-pr-tooltip="CSV" onClick={()=>setShowExportPopup(true)}>
-                <img src="static/imgs/paste.svg" alt="Paste" />
-            </span>
-            <span data-pr-tooltip="PDF" onClick={onCopy}>
-                <img src="static/imgs/copy.svg" alt="Copy" />
-            </span>
-            <span className="dt_separation" data-pr-tooltip="CSV" onClick={onPaste}>
-                <img src="static/imgs/paste.svg" alt="Paste" />
-            </span>
-            <span data-pr-tooltip="XLS" onClick={onRedo}>
-                <img src="static/imgs/redo.svg" alt="Redo" />
-            </span>
-            <span className="dt_separation" data-pr-tooltip="PDF" onClick={onUndo}>
-                <img src="static/imgs/undo.svg" alt="Undo" />
-            </span>
-            <span data-pr-tooltip="CSV" onClick={goToEditScreen}>
-                <img src="static/imgs/pencil.svg" alt="Edit" />
-            </span>
-            <span data-pr-tooltip="XLS" onClick={onDelete}>
-                <img src="static/imgs/trash.svg" alt="Delete" />
-            </span>
+        <div className="flex align-items-center justify-content-between">
+            <div className='flex gap-5'>
+                <Tooltip target=".plus-img" position="bottom" content="Add Selected Row" />
+                <span className='plus-img' data-pr-tooltip="Add Selected Row" onClick={onAddRowcol}>
+                    <img src="static/imgs/plus.svg" alt="add selected Row/Column" />
+                </span>
+                <Tooltip target=".import-img" position="bottom" content="Import" />
+                <span className="import-img" data-pr-tooltip='Import' onClick={() => setImportPopup(true)}>
+                    <img src="static/imgs/import.svg" alt="import" />
+                </span>
+                <Tooltip target=".export-img" position="bottom" content="Export" />
+                <span className={props.tableName ? "export-img dt_separation" : "disabled_export"} data-pr-tooltip="Export" onClick={props.tableName ? () => setShowExportPopup(true) : null}>
+                    <img src="static/imgs/export_icon 1.svg" alt="export" />
+                </span>
+                <Tooltip target=".copy-img" position="bottom" content="Copy Row" />
+                <span className="copy-img" data-pr-tooltip="Copy Row" onClick={onCopy}>
+                    <img src="static/imgs/copy.svg" alt="Copy" />
+                </span>
+                <Tooltip target=".paste-img" position="bottom" content="Paste Row" />
+                <span title="Paste Row" className="paste-img dt_separation" data-pr-tooltip="Paste Row" onClick={onPaste}>
+                    <img src="static/imgs/paste.svg" alt="Paste" />
+                </span>
+                <Tooltip target=".redo_img" position="bottom" content="Redo" />
+                <span title="Redo" className='redo_img' data-pr-tooltip="Redo" onClick={onRedo}>
+                    <img src="static/imgs/redo.svg" alt="Redo" />
+                </span>
+                <Tooltip target=".undo_img" position="bottom" content="Undo" />
+                <span title="Undo" className="undo_img dt_separation" data-pr-tooltip="Undo" onClick={onUndo}>
+                    <img src="static/imgs/undo.svg" alt="Undo" />
+                </span>
+                <Tooltip target=".edit_img" position="bottom" content="Edit" />
+                <span className="edit_img" data-pr-tooltip="Edit" onClick={goToEditScreen}>
+                    <img src="static/imgs/pencil.svg" alt="Edit" />
+                </span>
+                <Tooltip target=".delete_img" position="bottom" content="Remove Selected Row" />
+                <span title="Remove Selected Row" className='delete_img' data-pr-tooltip="Remove Selected Row" onClick={onDelete}>
+                    <img src="static/imgs/trash.svg" alt="Delete" />
+                </span>
+            </div>
+            <div>
+                <button className="btn_add" onClick={() => onAdd('col')} >+ Add column</button>
+            </div>
         </div>
     );
 
@@ -417,11 +386,10 @@ const Table = (props) => {
         { importPopup && <ImportPopUp setImportPopup={setImportPopup} importPopup={importPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />}
         { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} showExportPopup={showExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} /> }
         { showPS && <DtPasteStepDialog setShow={setShowPS} show={showPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
-            <div className="card table_cell">
-                <DataTable value={props.data} reorderableColumns selectionMode="single" reorderableRows onRowReorder={(e) =>props.setData(e.value)}showGridlines header={header} footer={<div className='table__footer'><button className='btn_add' onClick={()=>onAdd('row')}> + Add row</button></div>} onSelectionChange={handleRowSelect} selection={selectedItem}>
-                    <Column rowReorder style={{ width: '3rem' }} />
+            <div className="card flex table_cell">
+                <DataTable value={props.data} reorderableColumns selectionMode="single" reorderableRows onRowReorder={handleColumnSelect} showGridlines header={header} footer={<div className='table__footer'><button className='btn_add' onClick={()=>onAdd('row')}> + Add row</button></div>} onSelectionChange={handleRowSelect} scrollable scrollHeight='243px' style={{overflowY : "auto"}}>
+                <Column rowReorder style={{ width: '3rem' }} />
                     {dynamicColumns}
-                    {addColumnButton}
                 </DataTable>
             </div>
         </>

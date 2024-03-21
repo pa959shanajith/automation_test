@@ -272,7 +272,7 @@ const MenubarDemo = (props) => {
   };
 
   return (
-    <div className='Topbar_Menu'>
+    <div className='Topbar_Menu surface-100'>
       <Toast ref={toast} position="bottom-center" baseZIndex={1300} />
       <Menubar className='Header_size' start={start} end={end} />
       <div className='Need_Help_menu'>

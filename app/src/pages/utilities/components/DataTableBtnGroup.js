@@ -379,8 +379,8 @@ const EditScreenActionButtons = props => {
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
         <div className="dt__taskBtns">
             {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Export" label='Export' onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} ></Button> */}
-            <Button className="dt__taskBtn dt__btn" title="Delete" label='Delete' onClick={confirmDelete} disabled={!props.tableName}></Button>
-            <Button className="dt__taskBtn dt__btn" title="Update"  label='Update' onClick={updateTable} ></Button>
+            <Button className='mr-2' outlined title="Delete" label='Delete' onClick={confirmDelete} disabled={!props.tableName}></Button>
+            <Button title="Update"  label='Update' onClick={updateTable} ></Button>
         </div>
         </>
     );
@@ -446,7 +446,6 @@ const SearchDataTable = props => {
     return(
         <>
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-        {/* <div>Enter Table Name:</div> */}
         <ClickAwayListener onClickAway={()=>setDropdown(false)}>
         <div className="dt__selectTable flex flex-column gap-1 pb-8 pl-3">
         <label data-test="Data Table Name" className='dt_name' style={{ paddingLeft: '0.2rem',paddingBottom:'0.3rem' }}>Select Data Table</label>

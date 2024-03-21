@@ -2,6 +2,7 @@
 .Topbar_Menu{
     .p-menubar {
         padding: 0;
+        border: none !important;
     }
     .p-menubar-start {
         width: 37%;
@@ -15,7 +16,6 @@
         .Header_size {
         position: relative;
         height: 100%;
-        background: #ffffff !important;
 }
 
 .Headers {

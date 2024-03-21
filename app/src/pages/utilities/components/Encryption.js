@@ -3,6 +3,7 @@ import { Dropdown } from 'primereact/dropdown';
 import "../styles/LeftBar.scss";
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Tooltip } from 'primereact/tooltip';
 
 
 const Encrypt = (props) => {
@@ -18,7 +19,8 @@ const Encrypt = (props) => {
                 <span className="page-taskName-encryption">
                 <img src="static/imgs/encryption_icon.svg" className='current_img_icon' alt="SVG Image" />
                     Encryption
-                <img src="static/imgs/info-circle.svg" className='relative left-1' alt="SVG Image" />
+                <Tooltip target=".encryptdata" position="bottom" content="Encrypt your data."/>
+                <img src="static/imgs/info-circle.svg" className='encryptdata relative left-1' alt="SVG Image" />
                 </span>
             </div>
             <div className='method_dropdown flex flex-column'>
