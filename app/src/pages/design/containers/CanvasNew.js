@@ -242,7 +242,8 @@ const CanvasNew = (props) => {
                       testcaseIds.push(deletedNoded[i][0]);                    
                   }
                   if(deletedNoded[i][1]==="teststepsgroups"){  
-                    testcaseIds.push(deletedNoded[i][0]);                    
+                    testcaseIds.push(deletedNoded[i][0]); 
+                    screenIds.push(deletedNoded[i][2]);                     
                 }
               }
               
@@ -356,7 +357,7 @@ const CanvasNew = (props) => {
               tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
-              let number = tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
+              let number = tree.children.length === 1 && tree.children.length === 1 && tree.children[0].children[0].children.length>5?4: tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
               journey = transformDataFromTreetoJourney(tree)
               tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData,number)
               count= {...count,...tree.count}
@@ -390,6 +391,9 @@ const CanvasNew = (props) => {
             var p = d3.select('#node_' + createnew);
             setCreateNew(false)
             if(p['_groups'][0][0] === null){p = d3.select('#node_' + (createnew - 1))}
+            else if(dNodes[createnew].type === 'testcases' && dNodes[createnew].parent.state === 'created'){
+              p = d3.select('#node_' + (createnew - 1))
+            }
             setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
