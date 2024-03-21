@@ -241,7 +241,7 @@ exports.fetchALM_Testcases = async function (req,res) {
     try {
       logger.info("request payload : "+ req.body.project+', '
       + req.body.scope + ', '
-      +req.body.testcases
+      + JSON.stringify(req.body.testcases,null,2)
       );
       var send_res = {'data':[
         {
@@ -973,7 +973,8 @@ exports.fetchALM_Testcases = async function (req,res) {
             }
         },
         "batchInfo": prepareBatchObj,
-        "donotexe": generateExe.donotexe,
+        // "donotexe": generateExe.donotexe,
+        "donotexe": reqData.donotexe,
         "scenarioFlag": false,
         "isExecuteNow": false,
         "emailNotificationSender": "avoassure-alerts@avoautomation.com",

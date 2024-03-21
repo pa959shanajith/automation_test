@@ -26,6 +26,8 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
     const [updatedTreeData, setUpdatedTreeData] = useState([]);
     const [almTestcases, setAlmTestcases] = useState([]);
     const [populateProject,setPopulateProject] = useState([]);
+    const [allmodulesData,setAllmodulesData] = useState([]);
+    const [donotexe,setDonotexe] = useState({'current':{}});
 
     // selectors/redux
     const dispatch = useDispatch();
@@ -93,15 +95,10 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                 "scenarioname": avoTestCaseDetails.name, // avo test case name of mentioned above
                 "mindmapid": testSuiteId[0],
                 "cycleId":findCycleId,
-                "getparampaths": [
-                    ""
-                ],
-                "conditioncheck": [
-                    0
-                ],
-                "accessibilityParameters": [
-                    []
-                ]
+                "getparampaths": fetchTestSuiteId[testSuiteId[0]]["dataparam"] || [""], 
+                "conditioncheck": fetchTestSuiteId[testSuiteId[0]]["condition"] || [0],
+                "accessibilityParameters": [[]],
+                "donotexecute": fetchTestSuiteId[testSuiteId[0]]["executestatus"] || []
             };
 
             batchDetails = [...batchDetails, obj];
@@ -119,6 +116,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
                 }
             ],
             batchDetails,
+            "donotexe":donotexe,
             "configurekey": _uuid,
             "action": "saveSAP_ALMDetails_ICE"
         };
@@ -132,6 +130,25 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
 
     const handleNode = (e, node) => {
         if (e.checked) {
+            // using this function to prepare donotexe
+            if(allmodulesData && allmodulesData.length){
+                allmodulesData[0].mindmapList.forEach((ele) => {
+                    if(ele._id === node.testSuite._id){
+                        if(ele.scenarioList && ele.scenarioList.length){
+                            ele.scenarioList.forEach((each_scn,scn_index) => {
+                                if(each_scn._id === node._id){
+                                    const newDonotexe = { ...donotexe };
+                                    if (!newDonotexe.current[ele._id]) {
+                                        newDonotexe.current[ele._id] = [];
+                                    }
+                                    newDonotexe.current[ele._id].push(scn_index);
+                                    setDonotexe(newDonotexe);
+                                }
+                            })
+                        }
+                    }
+                })
+            }
             setAvoSelected([...avoSelected, node._id])
         }
         else {
@@ -182,6 +199,7 @@ const CloudALMContent = ({ activeIndex, handleTabChange, testCaseData: allCalmTe
     useEffect(() => {
         const fetchAvoModules = async () => {
             const getModulesData = await getProjectsMMTS(projectDetails.projectId);
+            setAllmodulesData(getModulesData);
             const testCasesList = getModulesData[0].mindmapList?.flatMap(({ scenarioList, ...rest }) => (
                 scenarioList.map(scenario => ({
                     ...scenario,
