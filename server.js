@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-														var redisStore = require('connect-redis')(sessions);
+																var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -162,7 +162,7 @@ if (cluster.isMaster) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
 									}
-															return next();
+																								return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -301,7 +301,7 @@ if (cluster.isMaster) {
 		app.get("/genAI/readTemp",generateAI.readTemp);
 		// app.put("/genAI/editTemp/:id",generateAI.editTemp);
 		// app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
-
+		app.delete("/genAI/deletefile/:id",generateAI.deleteUploadFile);
 		app.use(csrf({
 		cookie: true
 		}));
