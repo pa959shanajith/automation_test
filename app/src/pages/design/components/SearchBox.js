@@ -63,7 +63,7 @@ const SearchBox = (props) => {
                     if(drag){drag=false; return;}
                     setInp(!inp)}
                     } 
-                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Testcases'/>
+                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Test cases'/>
                 <input data-test="searchBox" id='search-canvas' type="text" onKeyDown={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={((inp?" search-visible":"")+(err?" inputErrorBorderFull":""))} style={{width:'93%',marginLeft:'6px', fontFamily:'Open Sans'}} placeholder="Search"/>
             </div>
         // </Rnd>
