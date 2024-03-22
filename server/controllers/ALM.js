@@ -17,7 +17,7 @@ exports.create_ALM_Testcase = async function (req, res) {
     try {
         logger.info("validating the request payload");
         console.log(req.body);
-         if ( !req.body.projectName || !req.body.project || !req.body.processGlobalId || !req.body.testCaseName || !req.body.testCaseDescription) {
+         if ( !req.body.projectName || !req.body.project || !req.body.processGlobalId || !req.body.testCaseName ) {
           console.log( 'error: Bad request: Missing required data');  
           return res.status(400).json({ error: 'Bad request: Missing required data' });
         }
@@ -44,7 +44,7 @@ exports.create_ALM_Testcase = async function (req, res) {
             logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
             console.log(`request error :` ,result[1].statusMessage || 'Unknown error');
             return res.status(result[1].statusCode).json({
-                error: result[1].statusMessage || 'Unknown error',
+                message: result[1].statusMessage || 'Unknown error',
             });
         }
         emit_data['testcaseId'] = result[0].rows || ''
@@ -53,8 +53,8 @@ exports.create_ALM_Testcase = async function (req, res) {
         res.status(201).send({  "testCaseId": result[0].rows || '',"url": `${req.protocol}://${req.get('host')}/sap-calm-testautomation/api/v1/testcases/${result[0].rows}` });
  
     } catch (error) {
-        logger.error('Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        logger.error('Error:', error.message);
+        res.status(500).json({ code:"500", message: 'Internal server error' });
     }
   };
 
@@ -69,15 +69,16 @@ exports.fetchALM_Testcases = async function (req,res) {
       if (result &&  !(result[1].statusCode >= 200 && result[1].statusCode <= 299)) {
           logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
           return res.status(result[1].statusCode).json({
-              error: result[1].statusMessage || 'Unknown error',
+            code:'500',
+            message: result[1].statusMessage || 'Unknown error',
           });
       }
       logger.info("info : ALM testcases found");
       res.status(result[1].statusCode).send({  "testCases": result[0].rows || [] });
 
   } catch (error) {
-      logger.error('Error: ', error);
-      res.status(500).json({ error: 'Internal server error' });
+      logger.error('Error: ', error.message);
+      res.status(500).json({ code:'500', message: 'Internal server error' });
   }
 }  
   exports.getALM_Testcases = async function (req, res) {
@@ -150,7 +151,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     } catch (error) {
         logger.error('getALM_Testcases Error:', error);
-        res.status(500).json({ code:'500', error: 'error while processing' });
+        res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
   
@@ -224,8 +225,8 @@ exports.fetchALM_Testcases = async function (req,res) {
         res.status(200).send(send_res);
  
     } catch (error) {
-        logger.error('getALM_Datavariants Error:', error);
-        res.status(500).json({ code:'500', error: 'error while processing' });
+        logger.error('getALM_Datavariants Error:', error.message);
+        res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
 
@@ -262,7 +263,7 @@ exports.fetchALM_Testcases = async function (req,res) {
       if (getProfile &&  !(getProfile[1].statusCode >= 200 && getProfile[1].statusCode <= 299)) {
         logger.error(`request error :` ,getProfile[1].statusMessage || 'Unknown error');
         console.log(`request error :` ,getProfile[1].statusMessage || 'Unknown error');
-        return res.status(500).json({ code:'500', error: 'error while processing' });
+        return res.status(500).json({ code:'500', message: 'error while processing' });
     }
       if(getProfile[0].rows && getProfile[0].rows.executionData){
         let agent_exec = {
@@ -281,7 +282,7 @@ exports.fetchALM_Testcases = async function (req,res) {
             send_res['data'][0]['error']["errorType"] = fetchJOB[1].statusMessage;
             send_res['data'][0]['error']["errorCode"] = fetchJOB[1].statusCode;
             send_res['data'][0]['error']["errorShortMessage"] = "error while fetching job details";
-            return res.status(500).json({ code:'500', error: send_res });
+            return res.status(500).json({ code:'500', message: send_res });
           }
 
           send_res['data'][0]['jobId'] = fetchJOB[0].rows.executionListId;
@@ -485,7 +486,7 @@ exports.fetchALM_Testcases = async function (req,res) {
        return res.status(200).send(send_res);
  
     } catch (error) {
-        logger.error('Job_Status Error: ', error);
+        logger.error('Job_Status Error: ', error.message);
         return  res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
@@ -567,7 +568,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         return res.status(200).send(send_res);
  
     } catch (error) {
-        logger.error('Job_Status Error: ', error);
+        logger.error('Job_Status Error: ', error.message);
         return res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
@@ -657,13 +658,13 @@ exports.fetchALM_Testcases = async function (req,res) {
             logger.info(fetch_jobStatus,' its fetch_jobStatus ');
             if(!fetch_jobStatus){
               logger.error('Job_Status Error...... ');
-              res.status(500).json({ code:'500', error: 'error while processing' });
+              res.status(500).json({ code:'500', message: 'error while processing' });
             }
             if(fetch_jobStatus[0].rows && fetch_jobStatus[0].rows.length){
               all_jobstatus.push({"job_status":fetch_jobStatus[0].rows,"exec":each_exec});
             }
             } catch (error) {
-              logger.error('Error:', error);
+              logger.error('Error:', error.message);
               console.log(error,' its errror from promise');
             }
             
@@ -705,7 +706,7 @@ exports.fetchALM_Testcases = async function (req,res) {
             // }
             }
             catch (error) {
-              console.error("Error fetching data:", error);
+              console.error("Error fetching data:", error.message);
               throw error;
           } 
             };
@@ -723,7 +724,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         return res.status(200).send(send_res);
  
     } catch (error) {
-        logger.error('Execution_History Error: ', error);
+        logger.error('Execution_History Error: ', error.message);
         return res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
@@ -753,20 +754,13 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     logger.info("ALM Scope Change service called");
     try {
-      logger.info("request payload : "+ req.query.data);
+      logger.info("request payload : "+ req.body);
       var send_res = { 'data':
       [
           {
-            "process": "BD9",
-            "processGlobalId": "ERL-619d2c82cbe94af99f762d27af62017e",
-            "created": true,
-            "error": {
-              "errorType": "string",
-              "errorCode": 0,
-              "errorShortMessage": "string",
-              "errorLongMessage": "string",
-              "errorUrl": "string"
-            }
+            "process": req.body[0].process,
+            "processGlobalId": req.body[0].processGlobalId,
+            "created": true
           }
         ]
         }
@@ -786,11 +780,11 @@ exports.fetchALM_Testcases = async function (req,res) {
         // socket_io.emit('messageFromServer',req.body);
         logger.info("info : Scope_Changed api called ");
         logger.info("send response : "+send_res)
-        res.status(201).send(send_res);
+        res.status(201).send(send_res.data);
  
     } catch (error) {
-        logger.error('Scope_Changed Error: ', error);
-        res.status(500).json({ code:'500', error: 'error while processing' });
+        logger.error('Scope_Changed Error: ', error.message);
+        res.status(500).json({ code:'500', message: 'error while processing' });
     }
   };
 
@@ -875,8 +869,8 @@ exports.fetchALM_Testcases = async function (req,res) {
       if (!flag) return res.status(statusCode).json({error:statusMessage});
       res.status(statusCode).json({message:statusMessage});
     } catch (exception) {
-      logger.error("Error occurred in ALM/"+fnName+":", exception);
-      res.status(500).json({error:exception.message});
+      logger.error("Error occurred in ALM/"+fnName+":", exception.message);
+      res.status(500).json({message:exception.message});
     }
   };
 
@@ -1002,7 +996,7 @@ exports.fetchALM_Testcases = async function (req,res) {
 		if (result == "fail") res.send('fail');
 		else res.send(result);
 	} catch (exception) {
-		logger.error("Error occurred in zephyr/"+fnName+":", exception);
+		logger.error("Error occurred in zephyr/"+fnName+":", exception.message);
 		res.send("fail");
 	}
 };
