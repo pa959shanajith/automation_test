@@ -61,4 +61,17 @@
 .modal-spinner {
     z-index: 101;
   }
-  
+  .manageprojEnngrole{
+    opacity: 0.3;
+    cursor: not-allowed !important;
+    pointer-events: all !important;
+    .p-disabled, .p-disabled * {
+         cursor: not-allowed !important;
+        pointer-events: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+  }
+  .enggrole > .p-disabled, .p-disabled *{
+    cursor: not-allowed !important;
+  }

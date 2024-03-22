@@ -193,6 +193,8 @@ const CanvasNew = (props) => {
     const [visibleCaptureAndDesign,setVisibleCaptureAndDesign] = useState(false);
     const [captureClick, setCaptureClick] = useState(false);
     const [designClick, setDesignClick] = useState(false);
+
+    const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
     const [enteredTags, setEnteredTags] = useState([]);
     const [tagAdded, setTagAdded] = useState(false);
     const [saveDisabled, setSaveDisabled] = useState(true);
@@ -572,8 +574,14 @@ const CanvasNew = (props) => {
         );
       };
     const menuItemsModule = [
-        { label: `Add ${appType !== "Webservice" ?'Testcase': 'API'}`,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: `Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: <div className='block'>{`Add ${appType !== "Webservice" ?'Testcase': 'API'}`}</div>,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
+        { label: <div className='block'>{`Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`}</div>,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
         { separator: true },
         { 
            label: 'Assign Testcase', 
@@ -581,8 +589,11 @@ const CanvasNew = (props) => {
            style: { display: userInfo.rolename === "Quality Manager" ? 'block' : 'none' },
            command: () => { handleTestAssigment(); d3.select('#'+box).classed('node-highlight',false); } 
         },
-        { separator: true },
-        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
+        {separator: true},
+        { label: <span className='block'>Rename</span>,icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
     ];
@@ -591,7 +602,7 @@ const CanvasNew = (props) => {
         { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:true,command:()=>{confirm1()},title:(agsLicense.msg)},
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} />, disabled:true},
         { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
         {separator: true},
@@ -603,9 +614,21 @@ const CanvasNew = (props) => {
       { label: `Add Multiple ${appType !== "Webservice" ?'Screens': 'Requests'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
       {separator: true},
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value || typeOfView !== "mindMapView"),command:()=>{confirm1()},title:(agsLicense.msg)},
-      { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-      { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
-      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType === "Webservice"?true:false, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
+      { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} />, disabled:true},
+      // { label:  'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web"?true:false || isQualityEngineer), command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}, className: (appType !== "Web" || isQualityEngineer) ? 'disabled-menu-item' : '',},
+      {
+        label: <span className='block'>Impact Analysis</span>,
+        icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />,
+        disabled: (appType !== "Web" ? true : false || isQualityEngineer),
+        command: () => { setVisibleScenarioAnalyze(true); d3.select('#' + box).classed('node-highlight', false) },
+        title: (appType !== "Web" || isQualityEngineer) ? 'Disabled for Quality Engineer' : "Impact Analysis", 
+        style: { 
+          cursor: (appType !== "Web" || isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: (appType !== "Web" || isQualityEngineer) ? 'all !important' : 'none',
+        
+        }
+      },
+      {label:'Tag a test Case',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -615,7 +638,7 @@ const CanvasNew = (props) => {
         { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser},
         {separator: true},
         { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser },
@@ -630,7 +653,7 @@ const CanvasNew = (props) => {
         {separator: true},
         { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
         {separator: true},
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
@@ -929,7 +952,7 @@ const CanvasNew = (props) => {
       else if (type=='screens'){
               if (reu){
                   reusedNode(dNodes,sid,type);
-                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Testcase.\n \n Are you sure you want to Delete permenantly?");
+                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Case.\n \n Are you sure you want to Delete permenantly?");
                   setSelectedDelNode(id);
                   setReuseDelConfirm(true);
                   return;

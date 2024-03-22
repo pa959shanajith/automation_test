@@ -3,11 +3,11 @@ import { Dropdown } from 'primereact/dropdown';
 import "../styles/LeftBar.scss";
 import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Tooltip } from 'primereact/tooltip';
 
 
 const Encrypt = (props) => {
     const options = [
-        { label: 'Select Method', value: 'SelectMethod' },
         { label: 'AES', value: 'AES' },
         { label: 'MD5', value: 'MD5' },
         { label: 'Base64', value: 'Base64' },
@@ -15,12 +15,16 @@ const Encrypt = (props) => {
 
     return (
         <Fragment>
-            <div className="page-taskName" >
+            <div className="page-taskName-utility card shadow-2" >
                 <span className="page-taskName-encryption">
+                <img src="static/imgs/encryption_icon.svg" className='current_img_icon' alt="SVG Image" />
                     Encryption
+                <Tooltip target=".encryptdata" position="bottom" content="Encrypt your data."/>
+                <img src="static/imgs/info-circle.svg" className='encryptdata relative left-1' alt="SVG Image" />
                 </span>
             </div>
-            <div className='method_dropdown'>
+            <div className='method_dropdown flex flex-column'>
+            <label data-test="Encryption Method" className='Encryption_Method' style={{ paddingLeft: '1.7rem' }}>Encryption Method</label>
                 <Dropdown
                     className='encrypt_drodown'
                     id="dropdown"

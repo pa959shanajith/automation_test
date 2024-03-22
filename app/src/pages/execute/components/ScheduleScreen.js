@@ -590,7 +590,7 @@ const ScheduleScreen = ({
             <Column
               align="center"
               field="scenariodetail"
-              header="Testcase Name"
+              header="Test case Name"
             ></Column>
             <Column align="center" field="status" header="Status"></Column>
           </DataTable>
