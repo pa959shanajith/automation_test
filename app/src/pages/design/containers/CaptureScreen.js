@@ -2766,7 +2766,7 @@ function getProcessedBody(body, type) {
   if (body.indexOf("{") === 0 || body.indexOf("[") === 0)
     processedBody = JSON.stringify(JSON.parse(body), null, '\t');
   else
-    // processedBody = formatXml(body.replace(/>\s+</g, '><'));
+    processedBody = formatXml(body.replace(/>\s+</g, '><'));
 
     if (type === 'scrape')
       processedBody = processedBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
