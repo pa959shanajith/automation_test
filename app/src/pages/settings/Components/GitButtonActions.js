@@ -37,13 +37,43 @@ const GitButtonActions = (props) => {
     const gitConfigAction = async (action) => {
         if (!gitValidate(action, user, domain, Project, gitConfigName ,gitAccToken, gitUrl, gitUsername, gitEmail,gitBranch)) return;
         setLoading("Loading...");
-        const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim(), gitBranch.current.value.trim());
+        const apiPayloadData = props.screenName === "Git" ? {
+                                    param: "git",
+                                    action: action,
+                                    userId: userData[user.current.value],
+                                    projectId: projectData[Project.current.value],
+                                    gitConfigName: gitConfigName.current.value.trim(),
+                                    gitAccToken: gitAccToken.current.value.trim(),
+                                    gitUrl: gitUrl.current.value.trim(),
+                                    gitUsername:gitUsername.current.value.trim(),
+                                    gitEmail:gitEmail.current.value.trim(),
+                                    gitBranch:gitBranch.current.value.trim()
+                                } : props.screenName === "Bitbucket" ? {
+                                    param: "bit",
+                                    action: action,
+                                    userId: userData[user.current.value],
+                                    projectId: projectData[Project.current.value],
+                                    bitConfigName: gitConfigName.current.value.trim(),
+                                    bitAccToken: gitAccToken.current.value.trim(),
+                                    bitUrl: gitUrl.current.value.trim(),
+                                    bitUsername:gitUsername.current.value.trim(),
+                                    bitWorkSpace:gitEmail.current.value.trim(),
+                                    bitBranch:gitBranch.current.value.trim()
+                                } : ''
+ // const data = await gitSaveConfig(action, userData[user.current.value],projectData[Project.current.value],gitConfigName.current.value.trim(),gitAccToken.current.value.trim(),gitUrl.current.value.trim(),gitUsername.current.value.trim(),gitEmail.current.value.trim(), gitBranch.current.value.trim());
+
+        const data = await gitSaveConfig(apiPayloadData);
         if(data.error){displayError(data.error);return;}
         else if (data === 'GitConfig exists') props.toastWarn(Messages.ADMIN.WARN_GITCONFIG_EXIST);
         else if(data  === 'GitUser exists')  props.toastWarn(Messages.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
         else props.toastSuccess(Messages.CUSTOM("Git configuration "+action+ "d successfully",VARIANT.SUCCESS));
         setLoading(false);
         resetFields();
+        if(action === "update"){
+            Project.current.value = '';
+            user.current.value = '';
+            props.setSelectProject('');
+        }
     }
 
     return (

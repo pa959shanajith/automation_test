@@ -15,6 +15,7 @@ import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import TestArtifacts from "./TestArtifacts.js";
 import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
@@ -34,7 +35,7 @@ import { getDetails_SAUCELABS } from "../../execute/api";
 import { useNavigate } from 'react-router-dom';
 export var navigate;
 
-const ManageIntegrations = ({ visible, onHide }) => {
+const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastError }) => {
     // selectors
     const navigate = useNavigate();
     const currentProject = useSelector(state => state.setting.selectedProject);
@@ -365,6 +366,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const integrationItems = [
         { label: 'Tool Based Integration' },
         { label: 'Cloud Based Integration' },
+        { label: 'Versioning'}
     ];
 
    ////pagination for  jira testcases/////////////////////////////////////////////////////////////////////////////
@@ -914,6 +916,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     <div className="card">
                         {showLoginCard  ? <TabMenu model={integrationItems} activeIndex={Index}  onTabChange={handleTabIndexChange} /> : ""}
                         {Index === 1 && <CloudSettings createSaucelabs={createSaucelabs} setCreateSaucelabs={setCreateSaucelabs} SaucelabsURL={SaucelabsURL} setSaucelabsURL={setSaucelabsURL} SaucelabsUsername={SaucelabsUsername} setSaucelabsUsername={setSaucelabsUsername} SaucelabsAPI={SaucelabsAPI} setSaucelabsAPI={setSaucelabsAPI} />}
+                        {Index === 2 && <TestArtifacts toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/>}
                     </div>
                     <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Are you sure you want to go Back ?"
                             header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />

@@ -118,7 +118,12 @@ const GitDropdown = (props) => {
   }
 
   const editConfig = async () => {
-    const data = await gitEditConfig(props.userId, props.projectId);
+    const apiPayload = {
+      param: props.screenName === "Bitbucket" ? "bit" : props.screenName === 'Git' ? 'git' : '',
+      projectId: props.projectId,
+      userId: props.userId
+  }
+    const data = await gitEditConfig(apiPayload);
     if (data.error) { props.toastError(data.error); return; }
     else if (data == "empty") {
       // props.toastWarn(MSG.ADMIN.WARN_NO_CONFIG)
@@ -306,7 +311,7 @@ const GitDropdown = (props) => {
               />
             </div>
 
-            : <div onClick={clickhandler} style={{ width: "6rem" }}> <span className='git_icon_and_icon'><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
+            : <div onClick={clickhandler} style={{ width: "6rem" }}> <span className='git_icon_and_text'><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
       }
 
       <Toast ref={toast} position="bottom-center" />

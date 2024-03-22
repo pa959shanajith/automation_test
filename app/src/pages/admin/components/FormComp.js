@@ -48,13 +48,13 @@ const FormInputGit = (props) => {
         inpRef.current.value = ValidationExpression(inpRef.current.value, validExp);
     }
     return (
-        <Fragment>
-            <div>
+        <>
+            <div className='flex w-full justify-content-between'>
                 <label>{name}</label>
-                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-20rem" style={{position : 'relative' , right : '10.4rem' }} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
+                <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-25rem"  placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
                 {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}
             </div>
-        </Fragment>
+        </>
     )
 }
 const FormInputEmail = (props) => {
