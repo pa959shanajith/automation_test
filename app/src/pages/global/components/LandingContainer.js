@@ -29,7 +29,7 @@ const LandingContainer = (props) => {
                 <div className={collapseSideBar?"sidepanel_collapsed":'sidepanel_container'}>
                     {props.sidePanel}
                 </div>
-                <div className={collapseSideBar?"origin_container_when_collapsed":'origin_container surface-100 flex flex-column h-full'}>
+                <div className={collapseSideBar?"origin_container_when_collapsed":'origin_container flex flex-column h-full'}>
                     {props.contentPage}
                 </div>
             </div>
