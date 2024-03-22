@@ -52,7 +52,7 @@ const Legends = ({isEnE}) => {
                     </g>
                     <g data-test="scenarios">
                         <circle className="ct-scenarios" cx="789" cy="0" r="10"></circle>
-                        <text className="ct-nodeLabel" x="804" y="3">TestCase</text>
+                        <text className="ct-nodeLabel" x="804" y="3">Test Case</text>
                     </g>
                 </> )}
             </g>
