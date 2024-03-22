@@ -19,7 +19,7 @@ import * as DesignApi from "../api";
 import { RedirectPage} from '../../global';
 import ScreenOverlayImpact from '../../global/components/ScreenOverlayImpact';
 import { useDispatch, useSelector} from 'react-redux';
-import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap} from './MindmapUtils'
+import {generateTree,toggleNode,moveNodeBegin,moveNodeEnd,createNode,deleteNode,createNewMap,createNodeSingle} from './MindmapUtils'
 import {generateTreeOfView} from './MindmapUtilsForOthersView'
 import { ImpactAnalysisScreenLevel ,CompareObj, CompareData,SetOldModuleForReset,setElementRepoModuleID,SetTagTestCases, dontShowFirstModule,selectedModuleReducer} from '../designSlice';
 import{ objValue} from '../designSlice';
@@ -189,6 +189,8 @@ const CanvasNew = (props) => {
     const [visibleCaptureAndDesign,setVisibleCaptureAndDesign] = useState(false);
     const [captureClick, setCaptureClick] = useState(false);
     const [designClick, setDesignClick] = useState(false);
+
+    const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
     const [enteredTags, setEnteredTags] = useState([]);
     const [tagAdded, setTagAdded] = useState(false);
     const [saveDisabled, setSaveDisabled] = useState(true);
@@ -242,7 +244,8 @@ const CanvasNew = (props) => {
                       testcaseIds.push(deletedNoded[i][0]);                    
                   }
                   if(deletedNoded[i][1]==="teststepsgroups"){  
-                    testcaseIds.push(deletedNoded[i][0]);                    
+                    testcaseIds.push(deletedNoded[i][0]); 
+                    screenIds.push(deletedNoded[i][2]);                     
                 }
               }
               
@@ -306,18 +309,15 @@ const CanvasNew = (props) => {
                                 activeNode = tree.dNodes[tree.dNodes.length - 1].parent.parent.parent.id;
                             }
                         }
-                        var res = createNode(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
-                        if(res !== undefined){
-                          tree.links = res.linkDisplay
-                          tree.dLinks = res.dLinks
-                          tree.nodes = res.nodeDisplay
-                          tree.dNodes = res.dNodes
-                          count= {...count,...res.count}
-                          typeo = typen;
-                        }else{
-                          toast.current.show({severity:'error', summary:"Error", detail:"Try to import multi test suite structure", life:5000})
-                        }
-                       
+                        var res = createNodeSingle(activeNode,{...tree.nodes},{...tree.links},[...tree.dNodes],[...tree.dLinks],{...tree.sections},{...count},e.name,verticalLayout)
+            
+                        tree.links = res.linkDisplay
+                        tree.dLinks = res.dLinks
+                        tree.nodes = res.nodeDisplay
+                        tree.dNodes = res.dNodes
+                        count= {...count,...res.count}
+                        typeo = typen;
+                    
                     }
                 })
                 if(props.module.importData.createdby==='pd'|| props.module.importData.createdby==='sel')setCreateNew('save')
@@ -359,7 +359,7 @@ const CanvasNew = (props) => {
               tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
-              let number = tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
+              let number = tree.children.length === 1 && tree.children.length === 1 && tree.children[0].children[0].children.length>5?4: tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
               journey = transformDataFromTreetoJourney(tree)
               tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData,number)
               count= {...count,...tree.count}
@@ -393,6 +393,9 @@ const CanvasNew = (props) => {
             var p = d3.select('#node_' + createnew);
             setCreateNew(false)
             if(p['_groups'][0][0] === null){p = d3.select('#node_' + (createnew - 1))}
+            else if(dNodes[createnew].type === 'testcases' && dNodes[createnew].parent.state === 'created'){
+              p = d3.select('#node_' + (createnew - 1))
+            }
             setInpBox(p)
         }
        // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -486,10 +489,19 @@ const CanvasNew = (props) => {
       };
 
     const menuItemsModule = [
-        { label: `Add ${appType !== "Webservice" ?'Testcase': 'API'}`,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)}},
-        { label: `Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: <div className='block'>{`Add ${appType !== "Webservice" ?'Testcase': 'API'}`}</div>,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
+        { label: <div className='block'>{`Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`}</div>,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
         {separator: true},
-        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}},
+        { label: <span className='block'>Rename</span>,icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
+          cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+        }},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
     ];
@@ -498,7 +510,7 @@ const CanvasNew = (props) => {
         { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
         {separator: true},
         { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:true,command:()=>{confirm1()},title:(agsLicense.msg)},
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} />, disabled:true},
         { label: 'Impact Analysis', icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />, disabled: ((appType !== "Web") || ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)))) ?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
         {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
         {separator: true},
@@ -510,9 +522,21 @@ const CanvasNew = (props) => {
       { label: `Add Multiple ${appType !== "Webservice" ?'Screens': 'Requests'}`,icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScreen([]);setVisibleScreen(true);d3.select('#'+box).classed('node-highlight',false)}},
       {separator: true},
       { label: 'Avo Genius (Smart Recorder)' ,icon:<img src="static/imgs/genius-icon.png" alt="genius" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web" || agsLicense.value || typeOfView !== "mindMapView"),command:()=>{confirm1()},title:(agsLicense.msg)},
-      { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:true},
-      { label: 'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType !== "Web"?true:false, command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}},
-      {label:'Tag a testcase',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:appType === "Webservice"?true:false, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
+      { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} />, disabled:true},
+      // { label:  'Impact Analysis ',icon:<img src="static/imgs/brain.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled:(appType !== "Web"?true:false || isQualityEngineer), command:()=>{setVisibleScenarioAnalyze(true);d3.select('#'+box).classed('node-highlight',false)}, className: (appType !== "Web" || isQualityEngineer) ? 'disabled-menu-item' : '',},
+      {
+        label: <span className='block'>Impact Analysis</span>,
+        icon: <img src="static/imgs/brain.png" alt="execute" style={{ height: "25px", width: "25px", marginRight: "0.5rem" }} />,
+        disabled: (appType !== "Web" ? true : false || isQualityEngineer),
+        command: () => { setVisibleScenarioAnalyze(true); d3.select('#' + box).classed('node-highlight', false) },
+        title: (appType !== "Web" || isQualityEngineer) ? 'Disabled for Quality Engineer' : "Impact Analysis", 
+        style: { 
+          cursor: (appType !== "Web" || isQualityEngineer) ? 'not-allowed' : 'pointer',
+          pointerEvents: (appType !== "Web" || isQualityEngineer) ? 'all !important' : 'none',
+        
+        }
+      },
+      {label:'Tag a test Case',icon:<img src="static/imgs/tag.svg" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: () =>{d3.select('#'+box).classed('node-highlight',false);handleTags()}},
       {separator: true},
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
@@ -522,7 +546,7 @@ const CanvasNew = (props) => {
         { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}},
         {separator: true},
         { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, disabled: appType !=="Mainframe"?false:true, command: ()=>handleCapture() },
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem",display:"block" }} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
@@ -537,7 +561,7 @@ const CanvasNew = (props) => {
         {separator: true},
         { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
         {separator: true},
-        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> , disabled:true},
+        { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}} /> , disabled:true},
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
@@ -748,6 +772,32 @@ const CanvasNew = (props) => {
         }
         // setCreateNew('autosave')
     }
+
+    const checkTestStepGroup = (teststep, dNode, sids, types, ids) => {
+      let check = [];
+  
+      const checkRecursively = (children) => {
+          children.forEach((child) => {
+              if (child['reuse']) {
+                  check.push(child['reuse']);
+              } else if (child.children && child.children.length > 0) {
+                  checkRecursively(child.children);
+              }
+          });
+      };
+  
+      checkRecursively(teststep);
+  
+      if (check.includes(true)) {
+          reusedNode(dNode, sids, types);
+          setReuseDelContent("Selected Test Scenario has reused Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permanently?");
+          setSelectedDelNode(ids);
+          setReuseDelConfirm(true);
+      } else {
+          setSelectedDelNode(ids);
+          setDelConfirm(true);
+      }
+  };
     const clickDeleteNode=(id)=>{
       var sid = parseFloat(id.split('node_')[1]);
       var type =[...dNodes][sid]['type'];
@@ -781,18 +831,28 @@ const CanvasNew = (props) => {
               return;
           }
           else if([...dNodes][sid]['children']){
+            if([...dNodes][sid]['children'].length>0 && [...dNodes][sid]['children'][0].type !== 'teststepsgroups'){
               for ( let i=0; i< [...dNodes][sid]['children'].length;i++) {
-                  if ([...dNodes][sid]['children'][i]["reuse"]){
-                      reusedNode(dNodes,sid,type);
-                      setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
-                      setSelectedDelNode(id);
-                      setReuseDelConfirm(true);
-                      return;
-                  }
-                  else {
-                      continue;
-                  }
-          }} 
+                if ([...dNodes][sid]['children'][i]["reuse"]){
+                    reusedNode(dNodes,sid,type);
+                    setReuseDelContent("Selected Test Scenario has re used Screens and Test cases. By deleting this will impact other Test Scenarios.\n \n Are you sure you want to Delete permenantly?" )
+                    setSelectedDelNode(id);
+                    setReuseDelConfirm(true);
+                    return;
+                }
+                else {
+                    continue;
+                }
+              }
+            }else if([...dNodes][sid]['children'].length>0){
+              checkTestStepGroup([...dNodes][sid]['children'], dNodes, sid, type, id)
+              return;
+            }else{
+              setSelectedDelNode(id);
+              setDelConfirm(true);
+              return;
+            }
+          } 
           setSelectedDelNode(id);
           setDelConfirm(true);
           return;
@@ -800,7 +860,7 @@ const CanvasNew = (props) => {
       else if (type=='screens'){
               if (reu){
                   reusedNode(dNodes,sid,type);
-                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Testcase.\n \n Are you sure you want to Delete permenantly?");
+                  setReuseDelContent("Selected Screen is re used. By deleting this will impact other Test Case.\n \n Are you sure you want to Delete permenantly?");
                   setSelectedDelNode(id);
                   setReuseDelConfirm(true);
                   return;
@@ -1130,7 +1190,7 @@ const CanvasNew = (props) => {
                             }
                             scenarioComparisionData.push(screenComparisonKeys)
                             setMarqueItem({...screenComparisonKeys,newlyfound:data['view'][3]['newElements'].new_obj_in_screen.length,screenHealth:screenHealth,screenName:screenAnalysisData['screenName']})           
-                            setOverlay(`Comparision of ${i+1}/${dataObjects.length} screen(s) in progress..`)
+                            setOverlay(`Comparison of ${i+1}/${dataObjects.length} screen(s) in progress..`)
                            
                             let compareObj = generateCompareObject(screenAnalysisData, screenAnalysisData.currentScrapedObjects.filter(object => object.xpath.substring(0, 4)==="iris"));
                             screenAnalysisData.view=compareObj

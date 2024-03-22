@@ -237,20 +237,20 @@ const WebserviceScrape = (props) => {
         let arg = {};
         let callApi = true;
         //eslint-disable-next-line
-        // let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
-        let rReqHeader = reqHeader;
+        let rReqHeader = reqHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        // let rReqHeader = reqHeader;
         //eslint-disable-next-line
-        // let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
-        let rParamHeader = paramHeader;
+        let rParamHeader = paramHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        // let rParamHeader = paramHeader;
         //eslint-disable-next-line
-        // let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
-        let rReqBody = reqBody;
+        let rReqBody = reqBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"').replace(/'+/g, "\"");
+        // let rReqBody = reqBody;
         //eslint-disable-next-line
-        let rRespHeader = respHeader;
-        // let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
+        // let rRespHeader = respHeader;
+        let rRespHeader = respHeader.replace(/[\n\r]/g, '##').replace(/"/g, '\"');
         //eslint-disable-next-line
-        let rRespBody = respBody;
-        // let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+        // let rRespBody = respBody;
+        let rRespBody = respBody.replace(/[\n\r]/g, '').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 
         let newAuthInputData = '';
 

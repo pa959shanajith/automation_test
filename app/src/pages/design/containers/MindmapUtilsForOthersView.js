@@ -248,7 +248,7 @@ const recurseDelChild = (d, linkDisplay, nodeDisplay, dNodes, dLinks, tab, delet
     if (d.children) d.children.forEach((e) => { recurseDelChild(e, linkDisplay, nodeDisplay, dNodes, dLinks, tab, deletedNodes) });
     if (d.state === "deleted") return;
     if (d._id) {
-        var parentid = d.parent._id;
+        var parentid = d.parent.type === "teststepsgroups"?d.parent.parent._id:d.parent.type === "scenarios"?d.parent.parent._id:d.parent._id;
         deletedNodes.push([d._id, d.type, parentid]);
     }
     d.parent = null;
@@ -1050,7 +1050,7 @@ export const createNodeForJourneyView = (activeNode, nodeDisplay, linkDisplay, d
                     x: dNodes[pi].children[0].x,
                     y: dNodes[pi].children[0].y,
                     children: [...dNodes[pi].children],
-                    parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [{ ...dNodes[uNix], id: dNodes[pi].children[0].id }] }
+                    parent: { ...dNodes[uNix].parent, parent: dNodes[pi].parent.parent, children: [dNodes[uNix]] }
                 }]
             };
 
@@ -2145,10 +2145,10 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 // Recursive function to update IDs
                 function updateIdsRecursive(node, level) {
                     // Update the id of the current node
-                    node.id = node.id + level;
+                    // node.id = node.id + level;
                     if (level === 1) {
                         node.y = node.y + 150
-                        node.id = node.children.length>0?node.children[0].id: (uNix + 1)
+                        // node.id = node.children.length>0?node.children[0].id: (uNix + 1)
                     }
                     if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                         node.children = obj[0].children
@@ -2176,10 +2176,10 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                     ...dNodes[pi],
                     children: [{
                         ...dNodes[uNix],
-                        id: dNodes[pi].children[0].id,
+                        // id: dNodes[pi].children[0].id,
                         x: dNodes[pi].children[0].x,
                         y: dNodes[pi].children[0].y,
-                        children: [{...dNodes[pi].children[0],id:dNodes[pi].children[0].children[0].id}],
+                        children: [{...dNodes[pi].children[0]}],
                         parent:{...dNodes[uNix].parent, children:[{...dNodes[uNix]}]}
                     }]
                 };
@@ -2201,10 +2201,10 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
             // Recursive function to update IDs
             function updateIdsRecursive(node, level) {
                 // Update the id of the current node
-                node.id = node.id + level;
+                // node.id = node.id + level;
                 if (level === 1) {
                     node.y = node.y + 150
-                    node.id = node.children.length>0?node.children[0].id: (uNix + 1)
+                    // node.id = node.children.length>0?node.children[0].id: (uNix + 1)
                 }
                 if (lt === true && node.children.length > 0 && node.children[0]._id === obj[0]._id) {
                     node.children = obj[0].children
@@ -2221,7 +2221,7 @@ export const pasteNodeData = (activeNode, nodeDisplay, linkDisplay, dNodes, dLin
                 ...dNodes[pi],
                 children: [{
                     ...dNodes[uNix],
-                    id: dNodes[pi].children[0].id,
+                    // id: dNodes[pi].children[0].id,
                     x: dNodes[pi].children[0].x,
                     y: dNodes[pi].children[0].y,
                     children: [...dNodes[pi].children]

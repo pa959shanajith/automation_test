@@ -25,6 +25,8 @@ export const loadUserInfo = createSlice({
         openCaptureScreen: false,
         updateElementRepository: false,
         sapGeniusScrapeData: {},
+        collapseSideBar:false,
+        setElementRepositoryIndex:0
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -101,6 +103,12 @@ export const loadUserInfo = createSlice({
         updateElementRepository: (state, action) => {
             state.updateElementRepository = action.payload;
         },
+        collapseSideBar:(state,action)=>{
+            state.collapseSideBar = action.payload;
+        },
+        setElementRepositoryIndex:(state,action)=>{
+            state.setElementRepositoryIndex = action.payload;
+        }
         // need it in future
         // ----------------------------------
         // CLEAR_NOTIFY: (state, action) => {

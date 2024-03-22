@@ -12,6 +12,8 @@ import { Dialog } from 'primereact/dialog';
 import { getScreens } from '../api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Tooltip } from 'primereact/tooltip';
+
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -62,6 +64,7 @@ const TableRow = (props) => {
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const advanceDebug=useSelector(state=>state.design.advanceDebug)
     const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
+    const currentplaybutton=useSelector(state=>state.design.currentplaybutton)
    
     const [elementData, setElementData] = useState([]);
     const [visible, setVisible] = useState(false);
@@ -78,7 +81,8 @@ const TableRow = (props) => {
   }
   const CustomMenu = (value) => {
     return (
-      <MenuList {...value} style={{ width: '100%' }}>
+    <div style={{ width: '100%', position: 'relative', paddingBottom: "3rem"  }}>
+      <MenuList {...value} style={{ width: '100%'}}>
         {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
           <div key={index}>
             {child.props && child.props.data && child.props.data.isCode !== "" ? (
@@ -91,13 +95,15 @@ const TableRow = (props) => {
               ) : (
                 child
               )} */}
-                <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
+                <img src='static/imgs/pencil-edit_old.svg' alt='editImg' className='optionstyle_img testTooltip'
                   onClick={() => {
                     props.setStepOfCustomKeyword(props.stepSelect.check[0]);
                     props.setCustomKeyWord(objType);
                     hanldlecustomClick(child, objType);
                     setCustomEdit(true);
-                  }}
+                  }
+                }
+                title={'Edit'}
                 />
               </div>
             ) : (
@@ -110,10 +116,10 @@ const TableRow = (props) => {
             )}
           </div>
         ))}
-
-        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
-        </Button>
       </MenuList >
+        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%", position: 'absolute', bottom: 0, left: 0,backgroundColor:'#FFFF',zIndex:'2'}} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+        </Button>
+      </div>
 
       // <MenuList {...value}>
       //   {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
@@ -616,10 +622,10 @@ const TableRow = (props) => {
 
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
                 <span className="step_col" onMouseEnter={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null:null} onMouseLeave={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
-                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
                 <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>

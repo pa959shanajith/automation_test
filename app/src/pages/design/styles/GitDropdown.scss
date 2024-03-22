@@ -135,6 +135,22 @@
   border: 1.5px solid lightgrey;
   cursor: pointer;
 }
+.git_icon_and_icon_engg {
+  display: flex;
+  flex-direction: row;
+  height: 32px;
+  position: relative;
+  /* bottom: 0.3rem; */
+  align-items: center;
+  justify-content: center;
+  background-color: #ffff;
+  border-radius: 7px;
+  border: 1.5px solid lightgrey;
+  // cursor: not-allowed;
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
 
 .GitVersion_cls > .p-inputgroup > .p-inputgroup-addon{
   background: #ffff !important;
@@ -168,4 +184,10 @@
   .git_input {
     margin-bottom: 16px;
   }
+}
+
+.git_config_after_create_project {
+  .p-dialog-header {
+    background-color: #ebebff !important;
+}
 }

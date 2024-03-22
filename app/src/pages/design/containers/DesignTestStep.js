@@ -23,7 +23,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton, setCurrentDebugPlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -110,6 +110,7 @@ const DesignModal = (props) => {
     const [isNameValid, setIsNameValid] = useState(false);
     const [isSpaceError, setIsSpaceError] = useState(false);
     const [customEdit , setCustomEdit] =useState(false);
+    const[advDebugDisable,setAdvDebugDisable]=useState(false)
     // const [keywordtypes,setKeywordtypes] = useState("Specific")
  
 
@@ -344,17 +345,30 @@ const DesignModal = (props) => {
                                 for(let object in keywordData) {
                                     let firstList = [];
                                     let secondList = [];
-                                    for(let keyword in keywordData[object]){
-                                        if(keywordData[object][keyword]['ranking']){
-                                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
-                                                [keyword] : keywordData[object][keyword]
-                                            });
+                                    for (let keyword in keywordData[object]) {
+                                        if (keywordData[object][keyword]['ranking']) {
+                                            const index = keywordData[object][keyword]['ranking'] - 1;
+                                            let key = keyword;
+                                    
+                                            // Check if the index already exists in firstList
+                                            let newIndex = index;
+                                            while (firstList[newIndex]) {
+                                                newIndex++;
+                                            }
+                                    
+                                            // Create a new object at the new index if necessary
+                                            if (!firstList[newIndex]) {
+                                                firstList[newIndex] = {};
+                                            }
+                                    
+                                            // Assign the keyword to the new index
+                                            firstList[newIndex][key] = keywordData[object][keyword];
                                         } else {
-                                            secondList.push(({
-                                                [keyword] :keywordData[object][keyword]
-                                            }));
+                                            secondList.push({
+                                                [keyword]: keywordData[object][keyword]
+                                            });
                                         }
-                                    };
+                                    }
                                     secondList = [...firstList, ...secondList];
                                     let keyWordObject = {};
                                     for(let keyword of secondList){
@@ -673,15 +687,22 @@ const DesignModal = (props) => {
         DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,"")
             .then(data => {
                 if(advanceDebug && debuggerPoints){
+                    setAdvDebugDisable(true)
+                    if(watchlist.length){
+                        setWatchList([])
+                    }
                     setOverlay("");
                 //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
-                if(data=="success"){
-                    toast.current.show({severity: 'success',summary: 'Success', detail:'Debug completed successfully', life:2000})
-                    dispatch(SetEnablePlayButton(false))
-                    return
-                }
+                if (data === "Invalid Session") return ;
+                else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+                else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+                else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+                else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+                else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+                else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+                else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
                 else{
-               
+               dispatch(setCurrentDebugPlayButton(data.length+1))
                 dispatch(SetEnablePlayButton(true))
                 console.log(data)
                 let dataforstep=data.map(steps=>{
@@ -1420,9 +1441,9 @@ const DesignModal = (props) => {
         function handleArrow(){
             setArrow(!arrow)
             if(!arrow){
-                toast.current.show({severity:'success', summary: 'Success', detail:'New keywords has been changed to Old keywords', life: 5000}) 
+                toast.current.show({severity:'success', summary: 'Success', detail:'Descriptive Keyword has been changed to Technical Keyword', life: 5000}) 
             }else{
-                toast.current.show({severity:'success', summary: 'Success', detail:'Old keywords has been changed to New keywords', life: 5000})
+                toast.current.show({severity:'success', summary: 'Success', detail:'Technical Keyword has been changed to Descriptive Keyword', life: 5000})
             }
         }
      
@@ -1439,7 +1460,7 @@ const DesignModal = (props) => {
                     <span className="step_col d__step_head" >{advanceDebug?'Break Point':''}</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"Descriptive Keyword":"Technical Keyword"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to Technical Keyword ":"Switch to Descriptive Keyword "} onClick={handleArrow} style={{ fontSize: '1rem',left: '0.6rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={arrow?"Switch to Descriptive Keyword ":"Switch to Technical Keyword "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1502,11 +1523,34 @@ const DesignModal = (props) => {
         dispatch(SetEnablePlayButton(false))
         debuggerPointShift.shift()
         let newDebuggerPoints=debuggerPointShift
-        dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"play")
+        // dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
         .then(data => {
-            if(data){
+            
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+        else{
                 dispatch(SetEnablePlayButton(true))
+                // let watchlistinindexformat=watchlist.map(step=>{
+                //     return {...step,index:step.teststep}
+                // })
+                // let applplaybuttononstep=[...watchlistinindexformat,...data]
+                // let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                //     var existObj = acc.find(item => item.index === obj.index);
+                //     if(existObj){
+                //           return acc;
+                //         }
+                //         acc.push(obj);
+                //         return acc;
+                //       },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index +1))
                 let dataforstep=data.map(steps=>{
                     return {teststep:steps.index,
                     name:steps.custname,
@@ -1519,8 +1563,8 @@ const DesignModal = (props) => {
                 return [...watchlist,...dataforstep]
                 })
             }
-            console.log(data)
         }
+        
         )
     }
     const handleMoveToNext=()=>{
@@ -1529,10 +1573,34 @@ const DesignModal = (props) => {
         let debuggerPointShift=[...debuggerPoints]
         debuggerPointShift.shift()
         let newDebuggerPoints=[nextVal,...debuggerPointShift]
-        dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
+        // dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
 
-        DesignApi.debugTestCase_ICE(null, null, null, null,false,newDebuggerPoints,advanceDebug,"nextStep")
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
         .then(data => {
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+            
+            else{
+                let watchlistinindexformat=watchlist.map(step=>{
+                    return {...step,index:step.teststep}
+                })
+                let applplaybuttononstep=[...watchlistinindexformat,...data]
+                let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                    var existObj = acc.find(item => item.index === obj.index);
+                    if(existObj){
+                          return acc;
+                        }
+                        acc.push(obj);
+                        return acc;
+                      },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index + 1))
             let dataforstep=data.map(steps=>{
                 return {teststep:steps.index,
                 name:steps.custname,
@@ -1544,8 +1612,9 @@ const DesignModal = (props) => {
             setWatchList((watchlist)=>{
             return [...watchlist,...dataforstep]
             })
-            console.log(data)
+           
         }
+    }
         )
         }
     const handleRemoveDebuggerPoints=()=>{
@@ -1556,14 +1625,14 @@ const DesignModal = (props) => {
     const approvalOnClick = async () => {
 
         if (inputKeywordName === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 ,style: { zIndex:999999999 }  })
         }
 
         else if (inputEditor === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
         }
         else if (customTooltip === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
         }
         else {
             try {
@@ -1646,18 +1715,23 @@ const DesignModal = (props) => {
         setInputEditor('');
         setCustomEdit(false);
     }
-
-    const createCustomeKeywordFooter = () => <>
+const createCustomeKeywordFooter = () => (
+    <>
+      <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>
+        <p>*mandatory field</p>
+      </div>
+      <div style={{ paddingTop: '10px', float: 'right' }}>
         <Button
-            data-test="createButton"
-            label={"save keyword"}
-            onClick={approvalOnClick}
-            style={{padding: '0.5rem 1rem' }}
-            disabled={isNameValid && !customEdit} 
-        >
-
-        </Button>
+          data-test="createButton"
+          label={customEdit ? "Save Keyword" : "Create Keyword"}
+          onClick={approvalOnClick}
+          style={{ padding: '0.5rem 1rem' }}
+          disabled={isNameValid && !customEdit}
+        />
+      </div>
     </>
+  );
+  
 
     return (
         <>
@@ -1717,7 +1791,9 @@ const DesignModal = (props) => {
             </Dialog>
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
-            <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false);setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+            <Dialog  draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false);setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/>
+                <Tooltip target=".p-dialog-header-maximize" position="bottom" content="Maximize/Minimize" />
                 <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
                     <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
                         {/* <div className="flex flex-row gap-2 align-items-center">
@@ -1726,7 +1802,7 @@ const DesignModal = (props) => {
                         </div> */}
                         <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
-                            <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
+                            <label htmlFor='firstName' className="pb-2 font-semibold ">Name<span style={{color:'red'}}>*</span>:</label>
                             <div className="flex" style={{flexDirection:"column"}}>
                             <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
@@ -1755,7 +1831,7 @@ const DesignModal = (props) => {
                         
                         </div>
                         <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
-                            <label htmlFor='TooltipNamme' className="pb-2 font-medium ">Tooltip: </label>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-semibold ">Tooltip<span style={{color:'red'}}>*</span>: </label>
                             <AvoInput htmlFor="keywordtooltip" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
@@ -1822,17 +1898,17 @@ const DesignModal = (props) => {
 
             </Dialog>
             <div className='AdvanceDebug'>
-                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);SetDebuggerPoints({push:'reset',points:[]});dispatch(SetAdvanceDebug(false));setIngredients([])}}>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetDebuggerPoints({push:'reset',points:[]}));dispatch(SetAdvanceDebug(false));setIngredients([]);dispatch(setCurrentDebugPlayButton(null));dispatch(SetEnablePlayButton(false));setAdvDebugDisable(false)}}>
                     <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
-                    <div style={{display:'flex',justifyContent:'space-between'}}>
+                    <div style={{display:'flex',justifyContent:'space-between', marginBottom:'1.5rem'}}>
                     <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
-                        {(enablePlayButton)?<img src='static/imgs/Start.svg' onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' title="Move to next debugger point" onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
                         
-                        <img src='static/imgs/StepInto.svg'  onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        <img src='static/imgs/StepInto.svg' title ="Move to next step" onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
                         
                         <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
                                             </div>
-                    <div><Button label="DEBUG" style={{height:'30px'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan)}}/></div>
+                    <div><Button label="DEBUG" title ={advDebugDisable?"Already in progress":"Start debugging" } disabled={advDebugDisable} style={advDebugDisable?{height:'30px',cursor:'not-allowed'}:{height:'30px',cursor:'pointer'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan);setAdvDebugDisable(true)}}/></div>
 
                     </div>
                     <div className="card">
