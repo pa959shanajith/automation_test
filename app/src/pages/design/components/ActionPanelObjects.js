@@ -730,7 +730,7 @@ const isSaveEnabled = () => {
       'type': 'modal',
       'title': 'Warning !',
       'content': <div className="ss__dup_labels">
-        Do you want to update the object and all dependent testcases ?
+        Do you want to update the object and all dependent test cases ?
       </div>,
       'footer': <Button onClick={() => {
     props.setShowPop("")

@@ -329,66 +329,66 @@ initListeners = mySocket => {
 	let queue = require("./execution/executionQueue");
 	const username = mySocket.handshake.query.icename;
 	logger.debug("Initializing ICE Engine connection for %s",username);
-	mySocket.evdata = {};
-	mySocket.pckts = [];
+	// mySocket.evdata = {};
+	// mySocket.pckts = [];
 	queue.Execution_Queue.register_execution_trigger_ICE(username);
-	mySocket.use((args, cb) => {
-		const ev = args[0];
-		const ack = (typeof  args[args.length-1] === 'function')? args.pop():() => {};
-		const fullPcktId = args.splice(1,1)[0];
-		const pcktId = fullPcktId.split('_')[0];
-		const index = fullPcktId.split('_')[1];
+	// mySocket.use((args, cb) => {
+	// 	const ev = args[0];
+	// 	const ack = (typeof  args[args.length-1] === 'function')? args.pop():() => {};
+	// 	const fullPcktId = args.splice(1,1)[0];
+	// 	const pcktId = fullPcktId.split('_')[0];
+	// 	const index = fullPcktId.split('_')[1];
 
-		// ACK for Paginated Packets will be sent later after processing
-		if (index === undefined) ack(fullPcktId);
-		// Check if packet has already been consumed by server
-		if (mySocket.pckts.indexOf(pcktId) !== -1) {
-			if (index !== undefined) ack(fullPcktId); // If this was Paginated packet, send ACK
-			return null;  // Do nothing as packet has already been consumed
-		}
-		// Normal packet - Do not apply pagination logic
-		if (index === undefined) {
-			mySocket.pckts.push(pcktId);
-			return cb();
-		}
-		/* Paginated packets processing starts */
-		const data = args[1];
-		const ev_data = mySocket.evdata[ev];
-		const comps = data.split(';');
-		const subPackId = comps.shift();
-		const payload = comps.join(';');
-		if (index == "p@gIn8" && comps.length == 3) {
-			ack(fullPcktId);
-			const d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
-			mySocket.evdata[ev] = {id: subPackId, data: d2p, jsonify: comps[2] === "True"};
-		} else if (ev_data && ev_data.id == subPackId) {
-			if (index == 'eof') {
-				const payloadlength = mySocket.evdata[ev].data.shift();
-				const fpayload = mySocket.evdata[ev].data.join('');
-				if (fpayload.length != payloadlength) {
-					ack(fullPcktId, "paginate_fail");
-					const blocks = mySocket.evdata[ev].data.length;
-					delete mySocket.evdata[ev].data;
-					mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
-				} else {
-					ack(fullPcktId);
-					mySocket.pckts.push(pcktId);
-					args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
-					delete mySocket.evdata[ev]
-					cb();
-				}
-			} else {
-				ack(fullPcktId);
-				mySocket.evdata[ev].data[parseInt(index)] = payload;
-			}
-		} else if (validator.isUUID(subPackId)) {
-			ack(fullPcktId, "paginate_fail");
-			logger.info("Unknown packet received! Restarting pagination. Event: "+args[0]+", ID: "+fullPcktId);
-		} else {
-			ack(fullPcktId);
-			cb();
-		}
-	});
+	// 	// ACK for Paginated Packets will be sent later after processing
+	// 	if (index === undefined) ack(fullPcktId);
+	// 	// Check if packet has already been consumed by server
+	// 	if (mySocket.pckts.indexOf(pcktId) !== -1) {
+	// 		if (index !== undefined) ack(fullPcktId); // If this was Paginated packet, send ACK
+	// 		return null;  // Do nothing as packet has already been consumed
+	// 	}
+	// 	// Normal packet - Do not apply pagination logic
+	// 	if (index === undefined) {
+	// 		mySocket.pckts.push(pcktId);
+	// 		return cb();
+	// 	}
+	// 	/* Paginated packets processing starts */
+	// 	const data = args[1];
+	// 	const ev_data = mySocket.evdata[ev];
+	// 	const comps = data.split(';');
+	// 	const subPackId = comps.shift();
+	// 	const payload = comps.join(';');
+	// 	if (index == "p@gIn8" && comps.length == 3) {
+	// 		ack(fullPcktId);
+	// 		const d2p = [parseInt(comps[0])].concat(Array.apply(null, Array(parseInt(comps[1]))));
+	// 		mySocket.evdata[ev] = {id: subPackId, data: d2p, jsonify: comps[2] === "True"};
+	// 	} else if (ev_data && ev_data.id == subPackId) {
+	// 		if (index == 'eof') {
+	// 			const payloadlength = mySocket.evdata[ev].data.shift();
+	// 			const fpayload = mySocket.evdata[ev].data.join('');
+	// 			if (fpayload.length != payloadlength) {
+	// 				ack(fullPcktId, "paginate_fail");
+	// 				const blocks = mySocket.evdata[ev].data.length;
+	// 				delete mySocket.evdata[ev].data;
+	// 				mySocket.evdata[ev].data = [payloadlength].concat(Array.apply(null, Array(blocks)));
+	// 			} else {
+	// 				ack(fullPcktId);
+	// 				mySocket.pckts.push(pcktId);
+	// 				args[1] = ev_data.jsonify? JSON.parse(fpayload):fpayload;
+	// 				delete mySocket.evdata[ev]
+	// 				cb();
+	// 			}
+	// 		} else {
+	// 			ack(fullPcktId);
+	// 			mySocket.evdata[ev].data[parseInt(index)] = payload;
+	// 		}
+	// 	} else if (validator.isUUID(subPackId)) {
+	// 		ack(fullPcktId, "paginate_fail");
+	// 		logger.info("Unknown packet received! Restarting pagination. Event: "+args[0]+", ID: "+fullPcktId);
+	// 	} else {
+	// 		ack(fullPcktId);
+	// 		cb();
+	// 	}
+	// });
 }
 
 module.exports.registerICE = registerICE;

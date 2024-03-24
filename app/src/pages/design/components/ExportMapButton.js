@@ -45,6 +45,8 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const gitComMsgRef = useRef()
     const [exportVer,setExportVer]=useState([])
     const toast = useRef()
+
+    const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
     const showSuccess = (Success) => {
         toast.current.show({severity:'success', summary: 'Success', detail:Success.CONTENT, life: 3000});
     }
@@ -125,10 +127,11 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
                     <Container isEndtoEnd={selectedModule.type === "endtoend"} selectedModulelist={selectedModulelist} gitconfigRef={gitconfigRef} gitBranchRef={gitBranchRef} gitVerRef={gitVerRef} gitPathRef={gitPathRef} fnameRef={fnameRef} ftypeRef={ftypeRef} modName={projectList[selectedProj]["name"]} isAssign={isAssign} projectList={projectList} expType ={expType} expTypes ={expTypes} setExpType={setExpType} setError={setError} exportFileData={exportFileData} setExportFileData={setExportFileData} selectedProj={selectedProj} currProjId={currProjId} setCurrProjId={setCurrProjId} exportProject={exportProject} setExportProject={setExportProject} exportFile={exportFile} setExportFile={setExportFile} getExportFile={getExportFile} userInfo={userInfo} showMessage={showMessage} enableExport={enableExport}  gitComMsgRef ={gitComMsgRef}
             setExportVer={setExportVer} />
             </Dialog>
-            <svg data-test="exportButton" className={"ct-exportBtn"+( enableExport || selectedModulelist.length>0?"":" disableButton")} id="ct-export" onClick={()=>setExportBox((enableExport || selectedModulelist.length>0) ? true : false)}   title= "export">
+            <svg data-test="exportButton" className={"ct-exportBtn"+( (enableExport || selectedModulelist.length>0 ) && !isQualityEngineer ?"":" disableButton")} id="ct-export" onClick={()=>setExportBox(((enableExport || selectedModulelist.length>0) && !isQualityEngineer) ? true : false)}   title= "export" style={{ cursor: isQualityEngineer && (!enableExport && selectedModulelist.length === 0) ? "not-allowed" : "pointer" }}>
                 <g id="ct-exportAction" className="ct-actionButton" title="export">
                     <rect x="0" y="0" rx="12" ry="12" width="80px" height="25px" ></rect>
-                    <title>{enableExport || selectedModulelist.length>0?"export":" Select test Suite(s) to export"}</title>
+                    <title> {enableExport || selectedModulelist.length > 0 ? "export" : (isQualityEngineer ? "You don't have permission to export." : "Select test Suite(s) to export")}</title>
+                    
                     {/* <Tooltip target=".exportButton" position="left" content="export"/> */}
                     <text x="16" y="18"  >Export</text>
                 </g>
