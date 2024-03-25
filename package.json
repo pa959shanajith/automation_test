@@ -58,7 +58,8 @@
     "xlsx": "^0.12.6",
     "xml-parser": "^1.2.1",
     "xmldom": "^0.1.27",
-    "wkhtmltopdf": "0.4.0"
+    "wkhtmltopdf": "0.4.0",
+    "swagger-parser":"10.0.3"
   },
   "optionalDependencies": {
     "node-windows": "^0.1.14"
