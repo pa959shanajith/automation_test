@@ -1259,7 +1259,7 @@ else{
           {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
         
-        {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
+        {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen)))? <div className='Header__btn'>
           <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
@@ -1275,7 +1275,7 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture|| (!assignUser && !showCaptureScreen)}>Capture Elements</Button>  :(!props.testSuiteInUse && selectedRepoName) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser }>Capture Elements</Button>  :(selectedRepoName) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser}>Capture Elements</Button>}
         {showCaptureScreen ? "" : !selectedRepoName && <span class="choose__repo__txt">Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
@@ -2117,7 +2117,7 @@ const handleAddAccordion = () => {
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
-          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          typesOfAppType != "Webservice" ? 
           
             <div className="capture_card_modal">
               {/* Select From Repository */}
@@ -2287,10 +2287,10 @@ const handleAddAccordion = () => {
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse && (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
-              editor={ !props.testSuiteInUse && (showCaptureScreen || (assignUser && !showCaptureScreen))?(options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUser?onCellEditComplete:null}
+              editor={(showCaptureScreen || (assignUser && !showCaptureScreen))?(options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
               bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
@@ -2298,7 +2298,7 @@ const handleAddAccordion = () => {
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse &&  (showCaptureScreen || (assignUser && !showCaptureScreen)) ?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen)) ?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2322,7 +2322,7 @@ const handleAddAccordion = () => {
       :
       <div>
       {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
-      {typesOfAppType != "Webservice" && !props.testSuiteInUse? <div className="capture_card_modal">
+      {typesOfAppType != "Webservice" ? <div className="capture_card_modal">
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
@@ -2505,10 +2505,10 @@ const handleAddAccordion = () => {
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse  &&  (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            { (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
-             editor={ !props.testSuiteInUse &&  (showCaptureScreen || (assignUser && !showCaptureScreen)) ? (options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
+             editor={(showCaptureScreen || (assignUser && !showCaptureScreen)) ? (options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
               bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
@@ -2516,7 +2516,7 @@ const handleAddAccordion = () => {
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse &&  (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2548,7 +2548,7 @@ const handleAddAccordion = () => {
             <div style={{ position:'fixed', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', right: '68rem', background: '#D9342B', border: 'none' }} onClick={()=>setShowDailogForOnDelete(true)} ></Button> : null}
-                {(captureData.length > 0 && !props.testSuiteInUse && (showCaptureScreen || (assignUser && !showCaptureScreen))) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen))) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
                     <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>

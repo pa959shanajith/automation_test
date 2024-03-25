@@ -947,7 +947,7 @@ const DesignModal = (props) => {
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(rowData && !props.testSuiteInUse && !advanceDebug)?<div>
+            {(rowData &&!advanceDebug)?<div>
                 {(rowData.name === rowExpandedName.name)?<div className='btn__grp' style={{ cursor: assignUser ? 'pointer' : 'not-allowed' }}>
                     <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => addRow() : null} disabled={!assignUser}/>
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>

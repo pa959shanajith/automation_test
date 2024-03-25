@@ -633,7 +633,7 @@ const CanvasNew = (props) => {
       { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
       { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} },
     ];
-    const menuItemsScreen = !testSuiteInUse?[
+    const menuItemsScreen = [
         { label: 'Add Test Steps',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }, disabled:!assignUser},
         { label: 'Add Multiple Test Steps',icon:<img src="static/imgs/addmultiple-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{setAddTestStep([]);setVisibleTestStep(true);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser},
         {separator: true},
@@ -642,9 +642,6 @@ const CanvasNew = (props) => {
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser },
-      ]:[
-        { label: 'Element Repository',icon:<img src="static/imgs/capture-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>handleCapture() },
-  
       ];
     const menuItemTestStepGroups = !testSuiteInUse? [
         { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
@@ -661,16 +658,13 @@ const CanvasNew = (props) => {
         { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
       ]
 
-      const menuItemsTestSteps = !testSuiteInUse?[
+      const menuItemsTestSteps =[
         { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
         {separator: true},
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} /> ,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}, disabled:!assignUser }
 
-      ]:[
-          { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
-    
-        ]
+      ];
     const nodeClick=(e)=>{
       d3.select('#'+box).classed('node-highlight',false)
     }
@@ -1554,10 +1548,10 @@ const CanvasNew = (props) => {
         toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
         return
       }
-      if(type==="scenarios"){
-        toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
-        return
-      }
+      // if(type==="scenarios"){
+      //   toastWarnMsg(`This test suite is in read only mode and currently in use by ${props.module.currentlyInUse}`)
+      //   return
+      // }
     }
     if(type=="scenarios" && node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){
       toastWarnMsg(`This Test Case is assigned to ${node[1].assignedUser}`);
@@ -2990,8 +2984,8 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
               </div>
             </div>:null}
             {props.GeniusDialog?null:<SearchBox  setCtScale={setCtScale} zoom={zoom}/>}
-          {((props.GeniusDialog|| testSuiteInUse) ) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
-            {(props.GeniusDialog|| testSuiteInUse) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
+          {((props.GeniusDialog) ) ? null :<SaveMapButton createnew={createnew} verticalLayout={verticalLayout} dNodes={[...dNodes]} setBlockui={setBlockui} setDelSnrWarnPop ={setDelSnrWarnPop} toast={props.toast}/>}
+            {(props.GeniusDialog) ? null: <ExportMapButton setBlockui={setBlockui} displayError={displayError}/>}
             {props.gen?<svg id="mp__canvas_svg_genius" className='mp__canvas_svg_genius' ref={CanvasRef}>
                 <g className='ct-container-genius'>
                 {Object.entries(links).map((link)=>{
