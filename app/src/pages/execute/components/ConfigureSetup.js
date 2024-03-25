@@ -77,7 +77,11 @@ const ConfigureSetup = ({
     execution.scenarios.map(scenario => scenario.tag)
   );
   const flattenedTags = tags?.flat();
-
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+  else projectInfo = projectInfo
+  let currentprojectdetails=getProjectData?.projects?.filter(project=>project._id===projectInfo?.projectId)[0]
   
   const searchOptions = [
     { label: 'Search by name', value: 'option1' },
@@ -353,8 +357,15 @@ const profileChildNameTooltip = (name) => {
       dataId: e?.node?.id,
       dataParams: [
         {
-          releaseid: getProjectData?.projects[0].releases[0].name,
-          cycleid: getProjectData?.projects[0].releases[0].cycles[0]._id,
+          releaseid: currentprojectdetails.releases[0].name,
+          cycleid: currentprojectdetails.releases[0].cycles[0]._id,
+          testsuiteid: e?.node?.id,
+          testsuitename: e?.node?.data?.name,
+          projectidts: currentprojectdetails._id,
+        },
+      ],
+    };
+
           testsuiteid: e?.node?.id,
           testsuitename: e?.node?.data?.name,
           projectidts: getProjectData?.projects[0]._id,
