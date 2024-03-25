@@ -75,9 +75,9 @@ const GenAi = () => {
                 //    },
                 // })
                 if (uploadFilesData) {
-                    const filteredData = uploadFilesData.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
-                    setFileDetails(filteredData);
-                    setBadgeValue(Object.keys(filteredData).length);
+                    // const filteredData = uploadFilesData?.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
+                    setFileDetails(uploadFilesData?.data);
+                    setBadgeValue(Object.keys(uploadFilesData?.data).length);
                 }
             } catch (error) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
@@ -169,13 +169,14 @@ const GenAi = () => {
             } else {
                 try {
                     refreshFileUpload()
-                    const uploadFilesData = await getall_uploadfiles(querystrg)
+                    const uploadFilesData = await getall_uploadfiles(querystrg);
+                    // const filteredData = uploadFilesData?.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
+                    setFileDetails(uploadFilesData?.data);
                     // axios.get('/getall_uploadfiles', {
                     //    params: {
                     //       email: email,
                     //    },
                     // })
-                    setFileDetails(uploadFilesData.data);
                     toast.current.show({ severity: 'success', summary: 'Success', detail: 'get uploaded file', life: 3000 });
                     setBadgeValue(Object.keys(uploadFilesData.data).length);
                 } catch (uploadFilesError) {
