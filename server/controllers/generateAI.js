@@ -30,8 +30,8 @@ exports.generateTestcase = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
-        res.status(200).send({status:true, success: true, data: result[0].rows ? result[0].rows: [], message: 'testcases generated' });
+        logger.info("test cases generated successfully");
+        res.status(200).send({ success: true, data: result[0].rows ? result[0].rows: [], message: 'test cases generated' });
         // res.status(200).send(result);
 
     } catch (error) {
@@ -60,7 +60,7 @@ exports.getJSON_UserStories = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases generated successfully");
+        logger.info("test cases generated successfully");
         
         res.status(200).send({status:true, success: true, data: result[0].rows && result[0].rows.length ? result[0].rows: [], message: 'fetched userstories' });
         // res.status(200).send(result);
@@ -94,7 +94,7 @@ exports.save_GenTestcases = async (req, res) => {
                 error: result[1].statusMessage || 'Unknown error',
             });
         }
-        logger.info("testcases saved successfully");
+        logger.info("test cases saved successfully");
         
         res.status(200).send({status:true, success: true,  message: 'saved successfully' });
         // res.status(200).send(result);

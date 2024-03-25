@@ -68,11 +68,11 @@ const Settings =() =>{
         <div>
           <Card className="proj-card" title="Manage project"  >
             <div className="card_container">
-              <div className="flex flex-column" style={{ alignItems: "start" }}>
+              <div className="flex flex-column enggrole" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
                   <p className="sentence-cls" style={{ fontSize: '14px' }}> Can manage roles of the people, can add or remove users from the project</p>
                 </span>
-                <Button className="manageProj_btn" size="small" label='Manage Project' disabled={!isQualityManager} onClick={ManageProj} ></Button>
+                <Button className={!isQualityEngineer?"manageProj_btn":"manageprojEnngrole"} size="small" label='Manage Project' disabled={!isQualityManager} onClick={ManageProj} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }></Button>
               </div>
               <div className='image-settings'>
                 <img src="static/imgs/manage_project_icon.svg" alt="project" style={{ width: '50px', height: '50px' }} />
@@ -83,11 +83,11 @@ const Settings =() =>{
 
           <Card className="proj-card" title="Manage Integrations" >
             <div className="card_container">
-              <div className="flex flex-column" style={{ alignItems: "start" }}>
+              <div className="flex flex-column enggrole" style={{ alignItems: "start" }}>
                 <span style={{ marginBottom: '0.5rem' }}>
                   <p className="sentence-cls" style={{ flex: '1', fontSize: '14px' }}>  jira, Zephyr,Azure DevOps, ALM, Qtest integration can be done</p>
                 </span>
-                <Button className="manageProj_btn" size="small" label='Manage Integrations' disabled={isQualityEngineer} onClick={handleOpenDialog} ></Button>
+                <Button className={!isQualityEngineer?"manageProj_btn":"manageprojEnngrole"} size="small" label='Manage Integrations' disabled={isQualityEngineer} onClick={handleOpenDialog} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } ></Button>
                 {Integrations}
               </div>
               <div className='image-settings'>

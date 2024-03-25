@@ -1,6 +1,7 @@
+@import "../../global/styles/ColorVariables.scss";
 .captureDesign_dialog_box {
     .p-dialog-header {
-        background: #E2E2ED !important;
+        background: #ffffff !important;
         border-top-right-radius: 4px;
         padding: 0.3rem 0 !important;
         height: 3rem !important;
@@ -20,10 +21,9 @@
             .header_Groups {
                 color: rgba(3, 2, 41, .6);
                 font-family: Open Sans;
-                font-weight: 500;
+                font: $f6_semibold;
                 left: 4rem !important;
                 position: absolute;
-                top: 0.5rem;
             }
 
             .dailog_headerGroups1 {
@@ -47,7 +47,7 @@
     left: calc(100% - 676px);
 }
 .captureDesignGroups{
-    padding: 1rem;
+    padding: 0rem 0rem;
 }
 .tabView_captureDesign{
     left: 50%;
@@ -76,3 +76,6 @@
     background: transparent;
 }
 
+.elem_repo_tab_heading{
+    font: $f7_semibold;
+}

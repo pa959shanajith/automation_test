@@ -14,8 +14,8 @@ const Footer = () => {
         fetch("/getClientConfig").then(data=>data.json()).then(response=>setVersion(response.version))
     },[])
     return (
-        <div className="main-footer">
-            <div className="main-footer-content">
+        <div className="main-footer surface-100">
+            <div className="main-footer-content surface-100">
             <span className="right-text">
                 <img src='static/imgs/Copyright.svg' className='copyImg' alt='copyright'/> Copyright {new Date().getFullYear()} Avo Automation - <span className='terms'>Terms of Use</span>
             </span>

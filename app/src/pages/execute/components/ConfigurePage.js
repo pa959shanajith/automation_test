@@ -187,7 +187,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [mobileDetailsBrowserStack,setMobileDetailsBrowserStack] = useState([]);
   const [browserstackValues,setBrowserstackValues] = useState({});
   const [platforms, setPlatforms] = useState([]);
-  const [runningStatusTimer, setRunningStatusTimer] = useState("");
+  const [runningStatusTimer, setRunningStatusTimer] = useState("5");
   const [dryRun, setDryRun] = useState(false);
   const [browserlist, setBrowserlist] = useState([
     {
@@ -227,6 +227,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   if (!projectInfo) projectInfo = projectInfoFromRedux;
   else projectInfo = projectInfo;
 
+  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
+
   const [radioButton_grid, setRadioButton_grid] = useState(
     projectInfo?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
@@ -248,6 +251,8 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const typesOfAppType = NameOfAppType.appType;
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
   const [selectBuildType, setSelectBuildType] = useState("HTTP");
+  const [proxyEnabled, setProxyEnabled] = useState("Disable");
+  const [proxyURL, setProxyURL] = useState("");
   const languages = [
     { label: "cURL", value: "curl" },
     { label: "Javascript", value: "javascript" },
@@ -418,11 +423,22 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
       setSelectedLanguage("curl");
       setSelectBuildType("HTTP");
       setExecutionTypeInRequest("asynchronous");
+      setRunningStatusTimer("5");
+      setProxyEnabled("Disable");
+      setProxyURL("");
     }
   };
 
   var myJsObj = { key: currentKey, executionType: executionTypeInRequest };
   var str = JSON.stringify(myJsObj, null, 4);
+
+  const isProxyEnabled = proxyURL ? `$proxyUri = [Uri]$null
+$proxy = [System.Net.WebRequest]::GetSystemWebProxy()
+if ($proxy) {
+  $proxyUri = $proxy.GetProxy("${proxyURL}")
+}` : "";
+
+  const isProxyURI = proxyURL ? `-Proxy $proxyUri -ProxyUseDefaultCredentials` : "";
 
   const codeSnippets = {
     curl: `curl --location "${url}" \n
@@ -506,7 +522,27 @@ except Exception as e:
 `,
 
     powershell: `# Disable SSL/TLS validation (for testing purposes only)
+if (-not ([System.Management.Automation.PSTypeName]'ServerCertificateValidationCallback').Type) {
+  $certCallback = @"
+      using System; using System.Net; using System.Net.Security; using System.Security.Cryptography.X509Certificates;
+      public class ServerCertificateValidationCallback {
+          public static void Ignore() {
+              if(ServicePointManager.ServerCertificateValidationCallback == null) {
+                  ServicePointManager.ServerCertificateValidationCallback += 
+                      delegate(Object obj, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors) {
+                          return true;  
+                      }
+              }
+          }
+      }
+  "@
+  Add-Type $certCallback
+}
+[ServerCertificateValidationCallback]::Ignore()
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+
+${isProxyEnabled}
         
 # Define headers and body
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -520,7 +556,7 @@ $body = @"
 "@
     
 try {
-    $response = Invoke-RestMethod '${url}' -Method 'POST' -Headers $headers -Body $body
+    $response = Invoke-RestMethod '${url}' ${isProxyURI} -Method 'POST' -Headers $headers -Body $body
     $status = $response.status
     
     # Check if status is pass or fail
@@ -529,14 +565,14 @@ try {
         Write-Host "ReportLink        :" $response.reportLink
         Write-Host "RunningStatusLink :" $response.runningStatusLink
         $runningStatusLink = $response.runningStatusLink
-        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+        $statusResponse = Invoke-RestMethod -Uri $runningStatusLink ${isProxyURI} -Method 'GET' -Headers $headers
         $runningStatus = $statusResponse.status
         $complete = $statusResponse.Completed
         
         while ($runningStatus -eq "Inprogress") {
             Write-Host "Executing... $complete"
     
-            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink -Method 'GET' -Headers $headers
+            $statusResponse = Invoke-RestMethod -Uri $runningStatusLink ${isProxyURI} -Method 'GET' -Headers $headers
             $runningStatus = $statusResponse.status
             if ($statusResponse.PSObject.Properties["Completed"]) {
                 $complete = $statusResponse.Completed
@@ -557,7 +593,7 @@ try {
     }
 }
 catch {
-    Write-Host "Some error occurred"
+    Write-Host -f red "Encountered Error:"$_.Exception.Message
 }`,
 
     shell: `#!/bin/bash
@@ -1326,8 +1362,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >  
               Execute Now
             </Button>
+            <div className={isQualityEngineer ? 'schedule_Disable_tooltip' : 'schedule'}></div>
             <Button
-              className="schedule"
+              className={!isQualityEngineer?"schedule":"Schedule_enggRole"}
               onClick={() => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
@@ -1355,6 +1392,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 handleTestSuite(item);
               }}
               size="small"
+              disabled={isQualityEngineer}
+              title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
             >
               Schedule
             </Button>
@@ -1366,7 +1405,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 setVisible_CICD(true);
                 setCurrentKey(item.configurekey);
                 setConfigItem(idx);
-                setRunningStatusTimer("")
+                setRunningStatusTimer("5")
               }}
                 disabled={!(projectInfo.appType === "Web" || projectInfo.appType === "Desktop") || cicdLicense.value}
             >  
@@ -1389,14 +1428,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
             />
             <img src="static/imgs/ic-edit.png"
               style={{ height: "20px", width: "20px" }}
-              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              className={!isQualityEngineer?"pencil_button p-button-edit":"pencil_enggRole"} onClick={!isQualityEngineer?() => configModal("CancelUpdate", item):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
               />
               <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
                <img
               
               src="static/imgs/ic-delete-bin.png"
               style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              className={isQualityEngineer?"trash_disable":" trash_button p-button-edit"}onClick={!isQualityEngineer?(event) => confirm_delete(event, item):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } />
               <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
           </div>
         ),
@@ -2558,6 +2597,22 @@ Learn More '/>
                     options={languages} optionLabel="label" optionValue="value"  className="w-full md:w-10rem" 
                     style={{'margin': '0.5rem 0px 1rem 9.1rem', 'width': "10rem"}}
                     />
+                    <div className="flex flex-wrap gap-3">
+                      <label className="proxy_label">Proxy:</label>
+                      <div className="flex align-items-center proxy-rad-enable">
+                        <RadioButton data-test="Enable" className="ss__proxy_type_rad" type="radio" name="Enable" value="Enable" onChange={(event) => { setProxyEnabled(event.value) }} checked={ proxyEnabled === "Enable" } />
+                        <label htmlFor="enable" className="ml-2 ss__proxy_type_label">Enable</label>
+                      </div>
+                      <div className="flex align-items-center proxy-rad-disable">
+                        <RadioButton data-test="Disable" className="ss__proxy_type_rad" type="radio" name="Disable" value="Disable" onChange={(event) => { setProxyEnabled(event.value); setProxyURL("") }} checked={ proxyEnabled === "Disable"} />
+                        <label htmlFor="disable" className="ml-2 ss__proxy_type_label">Disable</label>
+                      </div>
+                    </div>
+
+                    <div className="proxy-fields">
+                      <label className="proxy_url_label">Proxy URL:</label>
+                      <InputText className="w-full md:w-24rem p-inputtext-sm proxy-input" value={proxyURL} disabled={ proxyEnabled !== "Enable" } onChange={(event) => { setProxyURL(event.target.value) }} />
+                    </div>
 
                     <div>
                       <div className="key">
@@ -2635,9 +2690,11 @@ Learn More '/>
             </div>
           </div>
           <Button
-            className="configure_button"
+            className={!isQualityEngineer?"configure_button":"configureEngRole"}
             onClick={() => configModal("CancelSave")}
-            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}
+            title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
+            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'none'}}
+            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)|| isQualityEngineer)}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2686,7 +2743,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-              <div className="flex flex-row justify-content-between align-items-center">
+              <div className="flex flex-row justify-content-between align-items-center addconfig">
                 <AvoInput
                   icon="pi pi-search"
                   placeholder="Search"
@@ -2696,7 +2753,7 @@ Learn More '/>
                   inputType="searchIcon"
                 />
               {(!!configList.length  && activeIndex1 === 0)?  (
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
+                <Button className={!isQualityEngineer?"addConfig_button":"addconfig_enggRole"} onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole) || isQualityEngineer)} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } >
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

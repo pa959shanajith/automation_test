@@ -123,6 +123,8 @@ const ModuleListDrop = (props) =>{
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
 
+  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
     let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
     const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject)
     if(!projectInfo) projectInfo = projectInfoFromRedux;
@@ -905,14 +907,14 @@ setPreventDefaultModule(true);
                   </div>
                   <div className="centralTwinBox">
                     <div className="leftBox">
-                      <Card title="Select Testcases" className="leftCard">
+                      <Card title="Select Test Cases" className="leftCard">
                      <div className="DrpoDown_search_Tree">
                           <div className='searchAndDropDown'>
                             <div className="headlineSearchInput">
                               <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
                                 <InputText type="text"
-                                  placeholder="Search Testcases"
+                                  placeholder="Search Test Cases"
                                   value={valueSearchLeftBox}
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
                                   className="inputContainer" onChange={(e)=>{setValueSearchLeftBox(e.target.value);handleSearchScenarioLeftBox(e.target.value)}}
@@ -942,12 +944,12 @@ setPreventDefaultModule(true);
                         <div>
                           {/* {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and Testcases in this project ...</h5>:  */}
                           <>
-                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Testcases...</h5>:
+                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Test Cases...</h5>:
                             <Tree
                               value={
                                 filterModSceList[0] === "" ?[{
                                   key:0,
-                                  label: (<div className='labelOfArrayText'> No Test Suites and Testcases in this project ... </div>),
+                                  label: (<div className='labelOfArrayText'> No Test Suites and Test Cases in this project ... </div>),
                                   children:(<></>)
                                 }]:
                                 filterModSceList[0].mindmapList.map((module, modIndx) => ({
@@ -994,7 +996,7 @@ setPreventDefaultModule(true);
                       </div>
                     </div>
                     <div className="rightBox">
-                      <Card title="Selected Testcases" className="rightCard">
+                      <Card title="Selected Test Cases" className="rightCard">
                         {!initialText?
                           <>
                           <div className="headlineSearchInputOfRightBox">
@@ -1004,7 +1006,7 @@ setPreventDefaultModule(true);
                             <span className="p-input-icon-left">
                               <i className="pi pi-search" />
                               <InputText
-                                placeholder="Search Testcases by name"
+                                placeholder="Search Test cases by name"
                                 className="inputContainer"
                                 onChange={(e)=>handleSearchScenarioRightBox(e.target.value)}
                               />
@@ -1020,12 +1022,12 @@ setPreventDefaultModule(true);
                             :
                          <div className="initialText">
                            <div className="initial1StText">
-                             <h3 className="textClass"> No Testcases Yet</h3>
+                             <h3 className="textClass"> No Test Cases Yet</h3>
                            </div>
                            <div className="initial2NdText">
                              <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                             <h3 >Select Testcases</h3>
+                             <h3 >Select Test Cases</h3>
                             </div>
                           </div> 
                           }
@@ -1080,11 +1082,11 @@ setPreventDefaultModule(true);
                         <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
                         {WSimportPop ? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true} importPop={WSimportPop} /> : null}</>
                         : null}
-                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
+                      <img className={!isQualityEngineer?"importimg pi pi-file-import mindmapImport":"import_quaEng"} src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={!isQualityEngineer?() => setImportPop(true):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }></img>
                       <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                       {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} projectName={projectInfo.projectName} projectID={projectInfo.projectId}/> : null}
                       <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
-                      <img className={`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
+                      <img className={isQualityEngineer?"disable_create_btn":`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={!isQualityEngineer ? () => { CreateNew() } : null}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }/>
                     </>
                   }
                    
@@ -1161,7 +1163,7 @@ setPreventDefaultModule(true);
                   {
                     (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? null :
                       <>
-                        <img src="static/imgs/plusNew.png" onClick={() => { setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} alt="PlusButtonOfE2E" className='E2E' />
+                        <img src="static/imgs/plusNew.png" onClick={() => {if(!isQualityEngineer){ setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }}} alt="PlusButtonOfE2E" className={!isQualityEngineer?'E2E':"disable_E2Ecreate_btn"}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } />
                         <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                       </>
                   }
