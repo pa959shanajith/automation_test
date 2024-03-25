@@ -1687,6 +1687,20 @@ export const createModel = async(payload) => {
       return { error: 'Error in API call' };
     }
   };
+
+  export const deleteTemp = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/deleteTemp/${id}`);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
 export const createTemp = (data) => {
     return new Promise((resolve, reject)=> {
         axios(url+'/genAI/createTemp', {
@@ -1758,3 +1772,17 @@ export const readTemp = (data) => {
         })
     })
 }
+
+export const editTemp = async (id, payload) => {
+    try {
+        const res = await axios.put(url + `/genAI/editTemp/${id}`, payload);
+        if (res.status === 200) {
+            return res.data;
+        }
+        console.error(res.data);
+        return { error: 'Error in API call' };
+    } catch (err) {
+        console.error(err);
+        return { error: 'Error in API call' };
+    }
+};

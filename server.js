@@ -299,8 +299,8 @@ if (cluster.isMaster) {
 		app.delete("/genAI/delete/:id",generateAI.deleteModel);
 		app.post("/genAI/createTemp",generateAI.createTemp);
 		app.get("/genAI/readTemp",generateAI.readTemp);
-		// app.put("/genAI/editTemp/:id",generateAI.editTemp);
-		// app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
+		app.put("/genAI/editTemp/:id",generateAI.editTemp);
+		app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
 
 		app.use(csrf({
 		cookie: true
