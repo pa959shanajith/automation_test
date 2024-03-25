@@ -491,16 +491,16 @@ const CanvasNew = (props) => {
     const menuItemsModule = [
         { label: <div className='block'>{`Add ${appType !== "Webservice" ?'Testcase': 'API'}`}</div>,icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/> , command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
           cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
-          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'auto',
         }},
         { label: <div className='block'>{`Add Multiple ${appType !== "Webservice" ?'Testcases': 'APIs'}`}</div>,icon:<img src="static/imgs/addmultiple-icon.png" alt='addmultiple icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>,command: () =>{setAddScenario([{ id: 1, value: inputValue, isEditing: false }]);setShowInput(true);setVisibleScenario(true);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
           cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
-          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'auto',
         }},
         {separator: true},
         { label: <span className='block'>Rename</span>,icon:<img src="static/imgs/edit-icon.png" alt="rename" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}}/>,command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)},disabled:(isQualityEngineer),style: { 
           cursor: ( isQualityEngineer) ? 'not-allowed' : 'pointer',
-          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'none',
+          pointerEvents: ( isQualityEngineer) ? 'all !important' : 'auto',
         }},
         // { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt="delete" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command:()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} }
 
@@ -532,7 +532,7 @@ const CanvasNew = (props) => {
         title: (appType !== "Web" || isQualityEngineer) ? 'Disabled for Quality Engineer' : "Impact Analysis", 
         style: { 
           cursor: (appType !== "Web" || isQualityEngineer) ? 'not-allowed' : 'pointer',
-          pointerEvents: (appType !== "Web" || isQualityEngineer) ? 'all !important' : 'none',
+          pointerEvents: (appType !== "Web" || isQualityEngineer) ? 'all !important' : 'auto',
         
         }
       },
