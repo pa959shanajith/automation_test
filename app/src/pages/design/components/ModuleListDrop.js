@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import WSImportMindmap from'../components/WSImportMindmap.js';
-import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId, setTestCaseAssign} from '../designSlice';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId, setTestCaseAssign, SetModuleNewNodeAdd} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -163,6 +163,7 @@ const ModuleListDrop = (props) =>{
             dispatch(dontShowFirstModule(false))
             dispatch(setUpdateScreenModuleId(""))
             dispatch(setTestCaseAssign({}))
+            dispatch(SetModuleNewNodeAdd(false))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
@@ -392,6 +393,7 @@ const ModuleListDrop = (props) =>{
         dispatch(selectedModuleReducer(res))
         dispatch(SetCurrentModuleId(modID))
         setBlockui({show:false})
+        dispatch(SetModuleNewNodeAdd(false))
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
 

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import * as d3 from 'd3';
-import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId } from '../designSlice';
+import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId, SetModuleNewNodeAdd } from '../designSlice';
 import '../styles/SaveMapButton.scss'
 import {restructureData} from '../containers/MindmapUtilsForOthersView';
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
@@ -228,6 +228,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     dispatch(saveMindMap({screendata,moduledata,moduleselected}))
     // if(!savedList){ dispatch({type:actionTypes.SELECT_MODULE,payload:moduleselected})}
     setBlockui({show:false});
+    dispatch(SetModuleNewNodeAdd(false))
     // if(createnew!=='autosave'){isAssign?toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_TASK_SAVE.CONTENT, life:2000}):toast.current.show({severity:'success', summary:"Success", detail:MSG.MINDMAP.SUCC_DATA_SAVE.CONTENT,life:2000})}
     if(result.scenarioInfo){
         dispatch(toDeleteScenarios(result.scenarioInfo))
