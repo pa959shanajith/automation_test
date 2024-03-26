@@ -7,14 +7,31 @@ import { InputText } from 'primereact/inputtext';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { InputTextarea } from "primereact/inputtextarea";
 import { useSelector } from 'react-redux';
+import GenerateTestCaseList from "./GenerateTestCaseList";
+import { RadioButton } from 'primereact/radiobutton';
 
 const SystemLevelTestcase = () => {
     const [apiResponse, setApiResponse] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(false);
+    const [testStepSelection, setTestStepSelection] = useState("1")
+    const [selectedTestStep, SetSelectedTestStep] = useState(false);
+    const [selectedGenAiTc, setSelectedGenAiTc] = useState([]); 
+    const [textAreaData, setTextAreaData] = useState("");
+    const [readOnly, setReadOnly] = useState(false);
+    const [readOnlyData, setReadOnlyData] = useState("");
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
     const editParameters = useSelector((state) => state.setting.editParameters);
+
+    const testStepOptions = (event) =>{
+        setTestStepSelection(event.value);
+        if(event.value === "1"){
+            SetSelectedTestStep(true)
+        }else{
+            SetSelectedTestStep(false)
+        }
+    }
 
     const generateTestcase = async () => {
         try {
@@ -25,31 +42,25 @@ const SystemLevelTestcase = () => {
             const projectname = localStorageDefaultProject.projectName;
             const type = {
                 "typename": "system",
-                "summary": ""
+                "summary": "",
+                "teststep":selectedTestStep
             };
             const formData = { name, email, projectname, organization, type, template_id };
             Object.assign(formData, editParameters);
-            setApiResponse("");
+            // comment the below line when you call api
+            // setApiResponse("");
             const response = await generate_testcase(formData);
-            if (response.error) {
-                toast.current.show({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Failed generating test cases!',
-                    life: 3000
-                });
-                setIsLoading(false);
-            }
-            if (response.data) {
-                setApiResponse(response?.data?.response);
-                toast.current.show({
-                    severity: 'success',
-                    summary: 'Success',
-                    detail: 'System level test cases generated successfully!',
-                    life: 3000
-                });
-                setIsLoading(false);
-            }
+            // if (response.error) {
+            //     toast.current.show({
+            //         severity: 'error',
+            //         summary: 'Error',
+            //         detail: 'Failed generating test cases!',
+            //         life: 3000
+            //     });
+            //     setIsLoading(false);
+            // }
+            setApiResponse(response);
+
             setButtonDisabled(false);
             setIsLoading(false);
         } catch (err) {
@@ -81,13 +92,68 @@ const SystemLevelTestcase = () => {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
         }
     };
-
+    const updateTextAreaData = (e) => {
+        setTextAreaData(e.target.value);
+        const getSelectedTcIndex = apiResponse?.findIndex((item)=>item.Id == selectedGenAiTc[0]["Id"]);
+        const updateApiResponse = apiResponse;
+        updateApiResponse[getSelectedTcIndex] = {...updateApiResponse[getSelectedTcIndex], "TestCase":e.target.value};
+        // setApiResponse(updateApiResponse)
+    }
     return (
-        <div className='flexColumn parentDiv'>
+        <div className='flexColumn parentDiv border-top-1'>
+            {
+                apiResponse &&
+                <div className="flex flex-row" style={{ gap: "3rem" }}>
+                    <div className="p-2">
+                        <RadioButton
+                            inputId="testCasewithTs"
+                            name="option"
+                            value="1"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "1"}
+                        />
+                        <label htmlFor="testCasewithTs" className="pb-2 label-genai2">Test case with Teststep</label>
+                    </div>
+                    <div className="p-2" >
+                        <RadioButton
+                            inputId="testCasewithoutTs"
+                            name="option"
+                            value="2"
+                            onChange={testStepOptions}
+
+                            checked={testStepSelection === "2"}
+                        />
+                        <label htmlFor="testCasewithoutTs" className="pb-2 label-genai2">Test case without Teststep</label>
+                    </div>
+                </div>
+            }
             {!apiResponse &&
                 <>
                     <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
                     <label className='labelText'>Generate test cases for whole system</label>
+                    <div className="flex flex-row" style={{ gap: "3rem" }}>
+                        <div className="p-field-radiobutton">
+                        <RadioButton
+                            inputId="testCasewithTs"
+                            name="option"
+                            value="1"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "1"}
+                        />
+                            <label htmlFor="testCasewithTs" className="pb-2 label-genai2">Test case with Teststep</label>
+                        </div>
+                        <div className="p-field-radiobutton" >
+                        <RadioButton
+                            inputId="testCasewithoutTs"
+                            name="option"
+                            value="2"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "2"}
+
+                        />
+                            <label htmlFor="testCasewithoutTs" className="pb-2 label-genai2">Test case without Teststep</label>
+                        </div>
+                    </div>
                     <Button loading={isLoading} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
                         if (template_id.length > 0) {
                             generateTestcase();
@@ -112,23 +178,60 @@ const SystemLevelTestcase = () => {
                 )
             }
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
-            {apiResponse && <InputTextarea
-                className='inputTestcaseSystem'
-                autoResize={true}
-                value={apiResponse}
-                onChange={(e) => setApiResponse(e.target.value)}
-            />}
-            {
-                apiResponse &&
-                <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
-                    <div className="gen-btn2">
-                        <Button label="Generate" onClick={generateTestcase} disabled={buttonDisabled}></Button>
+            <div className='flex flex-row w-full'>
+                {apiResponse && <GenerateTestCaseList 
+                apiResponse={apiResponse} 
+                setSelectedGenAiTc={setSelectedGenAiTc} 
+                setTextAreaData={setTextAreaData}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+                readOnlyData={readOnlyData}
+                setReadOnlyData={setReadOnlyData}
+                />}
+                {apiResponse && !readOnly && <div className='flex flex-column'>
+                    {apiResponse &&
+                        <div className='flex flex-column'>
+                            <InputTextarea
+                                style={{ width: "40vw", height: "70vh" }}
+                                autoResize={false}
+                                value={textAreaData}
+                                onChange={(e) => updateTextAreaData(e)}
+                            />
+                        </div>
+                    }
+                </div>}
+                {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
+                        return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Info',
+                                detail: 'Select One TestCase to Edit!',
+                                life: 3000
+                            });
+                        }}>
+                            <InputTextarea
+                                style={{ width: "45vw", height: "70vh" }}
+                                autoResize={false}
+                                value={item?.TestCase}
+                                onChange={(e) => updateTextAreaData(e)}
+                                disabled={true}
+                            />
+                        </div>
+                    })}</div>
+                }
+                {
+                    apiResponse &&
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
+                        <div className="gen-btn2">
+                            <Button label="Generate" onClick={generateTestcase} disabled={buttonDisabled}></Button>
+                        </div>
+                        <div className="gen-btn2">
+                            <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                        </div>
                     </div>
-                    <div className="gen-btn2">
-                        <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
-                    </div>
-                </div>
-            }
+                }
+            </div>
         </div>
     )
 };

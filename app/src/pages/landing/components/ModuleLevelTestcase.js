@@ -16,6 +16,7 @@ import axios from 'axios';
 import { Messages as MSG } from '../../global';
 import { v4 as uuid } from 'uuid';
 import {ScreenOverlay} from '../../global';
+import GenerateTestCaseList from "./GenerateTestCaseList";
 
 
 const ModuleLevelTestcase = () => {
@@ -563,6 +564,7 @@ const ModuleLevelTestcase = () => {
                             {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
                                 <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
                             </div>}
+                            {apiResponse && <GenerateTestCaseList />}
                             <InputTextarea className='inputTestcaseModule' autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} />
                         </div>
                     )
