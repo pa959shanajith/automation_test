@@ -14,6 +14,7 @@ import { dontShowFirstModule, setUpdateScreenModuleId ,SetAdvanceDebug,SetDebugg
 
 
 function NavigatetoCaptureDesign(params) {
+    const {assignUser} =params
     const dispatch = useDispatch();
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
@@ -44,8 +45,8 @@ function NavigatetoCaptureDesign(params) {
     };
     const headerTemplate = (
         <>
-            <div className="flex flex-row justify-content-center align-items-center">
-            <h5 className='header_Groups'>{params.fetchingDetails['name'] && params.fetchingDetails['name'].length>20?params.fetchingDetails['name'].trim().substring(0,20)+'...' : params.fetchingDetails['name']}</h5>
+            <div>
+            <h5 className='header_Groups repo_group_header'>{params.fetchingDetails['name'] && params.fetchingDetails['name'].length>20?params.fetchingDetails['name'].trim().substring(0,20)+'...' : params.fetchingDetails['name']} <img style={{ height: '24px', width: '24px', opacity: 1, }} src="static/imgs/eye_view_icon.svg" className=""></img></h5>
                 <TabView className="tabView_captureDesign" activeIndex={activeIndex} onTabChange={(e)=>tabChnage(e)} >
                     {
                         tabsPanelInfo?.map(({name, iconpath})=>{
@@ -67,11 +68,11 @@ function NavigatetoCaptureDesign(params) {
                 <div className='captureDesignGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:Object.keys(moduleData).length>0?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}/>
+                    <CaptureModal visibleCaptureElement={params.visibleCaptureAndDesign} setVisibleCaptureElement={params.setVisibleCaptureAndDesign} fetchingDetails={!params.designClick?params.fetchingDetails:Object.keys(moduleData).length>0?params.fetchingDetails:params.fetchingDetails['parent']} testSuiteInUse={params.testSuiteInUse} designClick={params.designClick} setDesignClick={params.setDesignClick} setFetchingDetails={params.setFetchingDetails} setModuleData={setModuleData}  assignUser={assignUser}/>
                     </div>  
                     :
                     <div>
-                        <DesignModal  fetchingDetails={!params.designClick?params.fetchingDetails['children'][0]:Object.keys(moduleData).length>0?params.fetchingDetails['children'][0]:params.fetchingDetails} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>
+                        <DesignModal  fetchingDetails={!params.designClick?params.fetchingDetails['children'][0]:Object.keys(moduleData).length>0?params.fetchingDetails['children'][0]:params.fetchingDetails} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}  assignUser={assignUser}/>
                     </div>  }   
                 </div>
             </Dialog>

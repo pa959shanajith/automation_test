@@ -79,3 +79,8 @@
 .elem_repo_tab_heading{
     font: $f7_semibold;
 }
+.repo_group_header{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}   

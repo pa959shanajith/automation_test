@@ -17,6 +17,7 @@ module.exports.setReq = async (req) =>
 exports.saveMindmap = function(req,res) {
 	logger.info("Inside UI service: saveMindmap");
 	var RequestedJSON = req;
+	console.log(re)
 	if (RequestedJSON.from_version != undefined && RequestedJSON.new_version !=undefined) {
 		versionnumber = RequestedJSON.from_version;
 		newversionnumber = RequestedJSON.new_version;

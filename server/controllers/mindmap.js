@@ -254,7 +254,7 @@ exports.saveData = async (req, res) => {
 		if (flag == 10) 
 		{
 			qpush=[]
-			var uidx = 0, rIndex, tag;
+			var uidx = 0, rIndex, tag,currentlyInUse,assigneduser ;
 			// var idn_v_idc = {};
 			var cycId=inputs.cycId;
 
@@ -263,7 +263,9 @@ exports.saveData = async (req, res) => {
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
+				if (e.type == "modules") currentlyInUse = e.currentlyInUse;
 				if (e.type == "scenairos" ) tag = e.tag;
+				if (e.type == "scenairos" ) assigneduser = e.assigneduser;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
 				if(e.type == "scenarios" ) {
@@ -1920,4 +1922,24 @@ exports.saveTag = async (req, res) => {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
 	}
+};
+exports.assignedUserMM = async (req, res) => {
+    const fnName = "assignedUserMM";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var userid = req.session.userid;
+        const inputs={
+            "query": "assignedUserMM",
+            data : req.body
+         };
+        const result = await utils.fetchData(inputs, "mindmap/assignedUserMM", fnName);
+        if (result == "fail") {
+            return res.send("fail");
+        } else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
+    }
 };

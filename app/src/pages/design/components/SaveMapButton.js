@@ -272,6 +272,8 @@ const treeIterator = (c, d, e) =>{
             cidxch: (d.cidxch) ? d.cidxch : null // childindex changed
         };
         if (d.type === "scenarios") obj.tag = d.tag;
+        if (d.type === "scenarios") obj.assigneduser = d.assigneduser?d.assigneduser:"";
+        if (d.type === "modules") obj.currentlyInUse= d.currentlyInUse ? d.currentlyInUse : "";
         if (d.type === 'testcases') obj.screenname = d?.parent?.name; // **Impact check**
         c.push(obj);
     }
