@@ -15,7 +15,7 @@ const SystemLevelTestcase = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(false);
     const [testStepSelection, setTestStepSelection] = useState("1")
-    const [selectedTestStep, SetSelectedTestStep] = useState(false);
+    const [selectedTestStep, SetSelectedTestStep] = useState(true);
     const [selectedGenAiTc, setSelectedGenAiTc] = useState([]); 
     const [textAreaData, setTextAreaData] = useState("");
     const [readOnly, setReadOnly] = useState(false);
@@ -59,7 +59,7 @@ const SystemLevelTestcase = () => {
             //     });
             //     setIsLoading(false);
             // }
-            setApiResponse(response);
+            setApiResponse(response?.data?.response);
 
             setButtonDisabled(false);
             setIsLoading(false);
