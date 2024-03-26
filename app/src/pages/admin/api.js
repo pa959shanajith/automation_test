@@ -1564,7 +1564,7 @@ export const save_testcase = async(props) => {
     }
 }
 
-export const fetch_git_exp_details = async(projectId) => { 
+export const fetch_git_exp_details = async(projectId, param) => { 
     try{
         const res = await axios(url+'/fetch_git_exp_details', {
             method: 'POST',
@@ -1572,7 +1572,9 @@ export const fetch_git_exp_details = async(projectId) => {
             'Content-type': 'application/json',
             },
             data: {
-				projectId: projectId},
+				projectId: projectId,
+                param:param
+            },
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){

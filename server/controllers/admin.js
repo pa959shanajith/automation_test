@@ -2552,7 +2552,7 @@ exports.gitSaveConfig = async (req, res) => {
 			inputs["bitAccToken"]=  bitAccToken;
 			inputs["bitUrl"]= bitUrl;
 			inputs["bitUsername"]= bitUsername;
-			// "bitEmail"]= bitEmail;
+			inputs["workspace"]= data.bitWorkSpace;
 			inputs["bitbranch"]= bitbranch;
 			inputs["param"]= param
 		}
@@ -2583,9 +2583,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else if (param =="bit"){
 			let data = [];
-			data.push(result['name'], result['bitaccesstoken'], result['biturl'], result['bitusername'], 
-			// result['bituseremail'],
-			 result['bitbranch']);
+			data.push(result['name'], result['bitaccesstoken'], result['biturl'], result['bitusername'], result['workspace'], result['bitbranch']);
 			return res.send(data);
 		}
 		else{

@@ -56,13 +56,13 @@ const GitDropdown = (props) => {
   const [projectlistRefresher, setProjectlistRefresher] = useState(false);
   const [versionNameError, setversionNameError] = useState(false);
   const [commentError, setCommentError] = useState(false);
-  if(CreateProjectVisible) {projectName.current = ''}
+  if (CreateProjectVisible) { projectName.current = '' }
 
- let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-  if(!userInfo) userInfo = userInfoFromRedux;
-  else userInfo = userInfo ;
-  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+  if (!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo;
+  const isQualityEngineer = userInfo && userInfo?.rolename === 'Quality Engineer';
 
 
   useEffect(() => {
@@ -125,10 +125,10 @@ const GitDropdown = (props) => {
 
   const editConfig = async () => {
     const apiPayload = {
-      param: props.screenName === "Bitbucket" ? "bit" : props.screenName === 'Git' ? 'git' : '',
+      param: props.configurationName, // "git" for git and "bit" for Bitbucket
       projectId: props.projectId,
       userId: props.userId
-  }
+    }
     const data = await gitEditConfig(apiPayload);
     if (data.error) { props.toastError(data.error); return; }
     else if (data == "empty") {
@@ -189,20 +189,50 @@ const GitDropdown = (props) => {
 
   const gitConfigAction = async (action) => {
     try {
-      if (!gitValidate(action, userRef, domainRef, ProjectRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef)) return;
-      setLoading("Loading...");
-      const data = await gitSaveConfig(action, props.userId, visibleGitconfFormAfterCreatePrj ? createdProjectDetails._id : props.projectId, gitconfigRef.current.value.trim(), tokenRef.current.value.trim(), urlRef.current.value.trim(), gituserRef.current.value.trim(), gitemailRef.current.value.trim(), gitbranchRef.current.value.trim());
-      if (data.error) { props.toastError(data.error); return; }
-      else if (data === 'GitConfig exists') props.toastWarn(MSG.ADMIN.WARN_GITCONFIG_EXIST);
-      else if (data === 'GitUser exists') props.toastWarn(MSG.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
-      else {
-        props.toastSuccess(MSG.CUSTOM("Git configuration " + action + "d successfully", VARIANT.SUCCESS));
-      }
-      visibleGitconfFormAfterCreatePrj ? setVisibleGitconfFormAfterCreatePrj(false) : setDialogVisible(false);
-      setDropdownVisible(true);
+      const apiPayloadData = {}
+      if (["update", "create"].includes(action)) {
+        if (!gitValidate(action, userRef, domainRef, ProjectRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef)) return;
+        setLoading("Loading...");
 
+        if (props.configurationName === "git") {
+          apiPayloadData.param = "git";
+          apiPayloadData.action = action;
+          apiPayloadData.userId = props.userId;
+          apiPayloadData.projectId = visibleGitconfFormAfterCreatePrj ? createdProjectDetails._id : props.projectId;
+          apiPayloadData.gitConfigName = gitconfigRef.current.value.trim();
+          apiPayloadData.gitAccToken = tokenRef.current.value.trim();
+          apiPayloadData.gitUrl = urlRef.current.value.trim();
+          apiPayloadData.gitUsername = gituserRef.current.value.trim();
+          apiPayloadData.gitEmail = gitemailRef.current.value.trim();
+          apiPayloadData.gitBranch = gitbranchRef.current.value.trim();
+        } else if (props.configurationName === "bit") {
+          apiPayloadData.param = "bit";
+          apiPayloadData.action = action;
+          apiPayloadData.userId = props.userId;
+          apiPayloadData.projectId = visibleGitconfFormAfterCreatePrj ? createdProjectDetails._id : props.projectId;
+          apiPayloadData.bitConfigName = gitconfigRef.current.value.trim();
+          apiPayloadData.bitAccToken = tokenRef.current.value.trim();
+          apiPayloadData.bitUrl = urlRef.current.value.trim();
+          apiPayloadData.bitUsername = gituserRef.current.value.trim();
+          apiPayloadData.bitWorkSpace = gitemailRef.current.value.trim();
+          apiPayloadData.bitBranch = gitbranchRef.current.value.trim();
+        }
+      }
+      const data = await gitSaveConfig(apiPayloadData);
+
+      if (data.error) { props.toastError(data.error); return; }
+
+      if (["update", "create"].includes(action)) {
+        if (data === 'GitConfig exists') props.toastWarn(MSG.ADMIN.WARN_GITCONFIG_EXIST);
+        else if (data === 'GitUser exists') props.toastWarn(MSG.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
+        else {
+          props.toastSuccess(MSG.CUSTOM("Git configuration " + action + "d successfully", VARIANT.SUCCESS));
+        }
+        visibleGitconfFormAfterCreatePrj ? setVisibleGitconfFormAfterCreatePrj(false) : setDialogVisible(false);
+        setDropdownVisible(true);
+      } 
     } catch (error) {
-      showToast('error', 'Error', `Error in integration with Git. Error: ${error.message}`);
+      showToast('error', 'Error', `Error in integration with ${props.configurationName}. Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -233,13 +263,20 @@ const GitDropdown = (props) => {
   const commitAndPushOnClick = async () => {
     setLoading(true);
     try {
-      const exportVer = await checkExportVer({ "exportname": "exportname", "query": "exportgit", "projectId": props.projectId })
+      let exportValue = {
+        "param": props.configurationName,
+        "exportname": "exportname",
+        "query": "exportgit",
+        "projectId": props.projectId
+      }
+      const exportVer = await checkExportVer(exportValue)
       if (exportVer.includes(versionName)) {
         toast.current.show({ severity: 'error', summary: 'Error', detail: "Version is already used, Please provide a unique version", life: 3000 }); return;
       }
       else {
         ResetSession.start();
         var res = await exportToGit({
+          param: props.configurationName,
           gitVersion: versionName,
           mindmapId: commitModuleList,
           "exportProjAppType": props.appType,
@@ -282,7 +319,7 @@ const GitDropdown = (props) => {
 
   const createProjectCloseDialogHandler = () => {
     dispatch(isCreateProjectVisible(false));
-    if(projectName.current !== '')  setVisibleGitconfFormAfterCreatePrj(true);
+    if (projectName.current !== '') setVisibleGitconfFormAfterCreatePrj(true);
     setIsData(false);
     setProjectlistRefresher(true);
   }
@@ -317,12 +354,18 @@ const GitDropdown = (props) => {
               />
             </div>
 
-            : <div onClick={!isQualityEngineer?clickhandler:null} style={{ width: "6rem" }} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }> <span className={!isQualityEngineer?'git_icon_and_icon':"git_icon_and_icon_engg"}><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
+            : props.configurationName !== "noconfig" ? <div onClick={!isQualityEngineer ? clickhandler : null} style={{ width: props.configurationName === "git" ? "6rem" : "8rem" }} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null}> 
+                <span className={!isQualityEngineer ? 'git_icon_and_text' : "git_icon_and_text_engg"}>
+                  <img src={props.configurationName === "git" ? "static/imgs/GitIcon.svg" : "static/imgs/bitbucket_icon.svg"} style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" />
+                  {props.configurationName === "git" ? "Git" : "Bitbucket" }
+                </span>
+              </div> : null
+            } </> : null
       }
 
       <Toast ref={toast} position="bottom-center" />
       <Dialog
-        header={selectedImage === 'commit' ? 'Git Commit Configuration' : selectedImage === 'version_history' ? 'Version History' : 'Git Configuration'}
+        header={selectedImage === 'commit' ? `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "BitBucket"} Commit Configuration` : selectedImage === 'version_history' ? 'Version History' : `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "BitBucket"} Configuration`}
         visible={dialogVisible}
         style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={DialogCloseHandle}
@@ -350,7 +393,7 @@ const GitDropdown = (props) => {
             versionNameError={versionNameError}
           />
         ) : selectedImage === 'version_history' ? (
-          <GitVersionHistory {...props} commitId={commitID} setSelectedImage={setSelectedImage} allProjectlist={allProjectlist} projectListDropdown={projectListDropdown} />
+          <GitVersionHistory {...props} configName={props.configurationName} commitId={commitID} setSelectedImage={setSelectedImage} allProjectlist={allProjectlist} projectListDropdown={projectListDropdown} />
         ) : null}
       </Dialog>
 
@@ -358,7 +401,7 @@ const GitDropdown = (props) => {
         <CreateProject setProjectName={setProjectNamehandler} visible={CreateProjectVisible} onHide={() => createProjectCloseDialogHandler()} projectsDetails={projectListForCreateProject} toastSuccess={props.toastSuccess} toastError={props.toastError} />
       </div>}
       <Dialog
-        header={'Git Configuration'}
+        header={props.configurationName === "git" ? 'Git Configuration' : props.configurationName === "bit" ? "BitBucket Configuration" : ''}
         visible={visibleGitconfFormAfterCreatePrj}
         style={{ width: "58vw", height: '85vh' }}
         onHide={() => { setVisibleGitconfFormAfterCreatePrj(false); setCreatedProjectDetails({}); }}

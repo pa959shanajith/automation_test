@@ -30,7 +30,7 @@ const GitVersionHistory = (props) => {
 useEffect(() => {
   const fetchData = async () => {
     try {
-      const jsonData = await fetch_git_exp_details(props.projectId);
+      const jsonData = await fetch_git_exp_details(props.projectId, props.configName);
       const mappedData = jsonData.map((item, index) => ({
         "key": index,
         "sno": index + 1,
@@ -74,7 +74,7 @@ const handleRestore = (rowdata) => {
   (async () => {
     try {
       var reqForNewModule = {
-        "tab": "tabCreate", "projectid": rowdata.selectedProject.id, "moduleid": null, "query": "modLength"
+        "param":props.configName, "tab": "tabCreate", "projectid": rowdata.selectedProject.id, "moduleid": null, "query": "modLength"
       }
       var firstModld = await getModules(reqForNewModule)
       if (firstModld.length > 0) {
@@ -93,6 +93,7 @@ const handleRestore = (rowdata) => {
         })
         ResetSession.start();
         let data = await importGitMindmap({
+          "param":props.configName,
           "appType": rowSelectedProject.appType,
           "expProj": sourceProjectId,
           "gitVersion": rowdata.version,
