@@ -37,6 +37,7 @@ const CreateNew = ({ importRedirect }) => {
     const tagtestcase = useSelector(state => state.design.tagtestcase);
     const prjList = useSelector(state => state.design.projectList)
     const initEnEProj = useSelector(state => state.design.initEnEProj)
+    const moduleNewNode = useSelector(state=>state.design.moduleNewNodeAdd)
     const [delSnrWarnPop, setDelSnrWarnPop] = useState(false)
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate ? true : false)
     const isEnELoad = useSelector(state => state.design.isEnELoad);
@@ -230,7 +231,15 @@ const CreateNew = ({ importRedirect }) => {
         setLoading(false)
         toast.current.show({ severity: 'error', summary: 'Error', detail: error, life: 2000 })
     }
-
+    const handleViews = (data) =>{
+        if(moduleNewNode !== false){
+            toast.current.show({severity:'warn', summary:'Warn', detail:"Save the flow to change the view or remove newly added nodes."})
+        }
+        else{
+            setSelectedView(data.value)
+            handleViewsDropDown(data)
+        }
+    }
     const TopDropdowns = () => {
         return (
             <div className={`${handleTypeOfViewMap ==='folderView' ? "canvas_topbar_in_folderview": "canvas_topbar"}`}>
@@ -241,7 +250,7 @@ const CreateNew = ({ importRedirect }) => {
                                         id="views"
                                         className={'w-full md:w-12rem p-inputtext-sm'} 
                                         value={selectedView}
-                                        onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
+                                        onChange={(e) => handleViews(e) }
                                         options={views} 
                                         optionLabel="name"
                                         style={{height:'2rem'}}

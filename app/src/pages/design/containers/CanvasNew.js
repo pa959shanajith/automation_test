@@ -35,7 +35,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { highlightScrapElement_ICE,saveTag,getModules } from '../../design/api'
 import MapElement from '../components/MapElement';
 import { ContextMenu } from 'primereact/contextmenu'
-import { AnalyzeScenario, deletedNodes } from '../designSlice';
+import { AnalyzeScenario, deletedNodes,SetModuleNewNodeAdd } from '../designSlice';
 import { showGenuis } from '../../global/globalSlice';
 import { deleteScenario } from '../api';
 import { TabView, TabPanel } from 'primereact/tabview';
@@ -248,8 +248,7 @@ const CanvasNew = (props) => {
                       testcaseIds.push(deletedNoded[i][0]);                    
                   }
                   if(deletedNoded[i][1]==="teststepsgroups"){  
-                    testcaseIds.push(deletedNoded[i][0]); 
-                    screenIds.push(deletedNoded[i][2]);                     
+                    testcaseIds.push(deletedNoded[i][0]);                     
                 }
               }
               
@@ -857,6 +856,7 @@ const CanvasNew = (props) => {
           count= {...count,...resJourneyView.count}
         }
         // setCreateNew('autosave')
+        dispatch(SetModuleNewNodeAdd(true))
     }
 
     const checkTestStepGroup = (teststep, dNode, sids, types, ids) => {
