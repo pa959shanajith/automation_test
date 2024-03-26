@@ -277,12 +277,13 @@ if (cluster.isMaster) {
 		app.get('/viewReport', report.viewReport);
 		app.post('/downloadVideo', report.downloadVideo);
 		app.post('/getUserRoles', admin.getUserRoles);
-		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
+		app.get('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getReportsData_ICE', report.getReportsData_ICE);
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
         app.get('/devopsReports/viewReport', report.viewReport);
+		app.get('/fetchDefectExecutionDetail',report.fetchDefectExecutionDetail);
 		// Gen AI API'S List
 		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
 		app.get('/getall_uploadfiles',report.getall_uploadfiles);
@@ -549,6 +550,7 @@ if (cluster.isMaster) {
 		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
 		app.post('/deleteElementRepo', auth.protect, mindmap.deleteElementRepo);
 		app.post('/generateToken', auth.protect, mindmap.generateToken);
+		app.post('/assignedUserMM', auth.protect, mindmap.assignedUserMM);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);

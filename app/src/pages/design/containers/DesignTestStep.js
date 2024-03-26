@@ -44,7 +44,7 @@ import ReactAce from "react-ace/lib/ace";
 import { Icon } from "@mui/material";
 
 const DesignModal = (props) => {
-
+    const {assignUser} = props
     const pgmLang = useRef();
     const toast = useRef();
     const headerCheckRef = useRef();
@@ -947,40 +947,40 @@ const DesignModal = (props) => {
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(rowData && !props.testSuiteInUse && !advanceDebug)?<div>
-                {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
+            {(rowData &&!advanceDebug)?<div>
+                {(rowData.name === rowExpandedName.name)?<div className='btn__grp' style={{ cursor: assignUser ? 'pointer' : 'not-allowed' }}>
+                    <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => addRow() : null} disabled={!assignUser}/>
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
-                    <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
+                    <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit'style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => editRow() : null} disabled={!assignUser}/>
                     <Tooltip target=".edit " position="bottom" content="  Edit Test Step"/>
-                    <img className='trash' src='static/imgs/ic-jq-deletesteps.png' alt='delete' style={{marginTop:'0.5rem', width:'26px', height:'26px'}} title='Delete' onClick={deleteTestcase} />
+                    <img className='trash' src='static/imgs/ic-jq-deletesteps.png' alt='delete'  style={{marginTop:'0.5rem', width:'26px', height:'26px',opacity:assignUser?'1':'0.5'}} title='Delete' onClick={assignUser ? () => deleteTestcase() : null} disabled={!assignUser}/>
                     <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <i className='pi pi-check-square' style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black'}} onClick={()=>selectMultiple()}/>
+                    <i className='pi pi-check-square'  style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => selectMultiple() : null} disabled={!assignUser}/>
                     <Tooltip target='.pi-check-square' position='bottom' content='  Select Test Step(s)'/>
-                    <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
+                    <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => toggleDrag() : null} disabled={!assignUser}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
-                    <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
+                    <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => copySteps() : null} disabled={!assignUser}/>
                     <Tooltip target='.copy' position='bottom'content='  Copy Test Step'/>
-                    <img src='static/imgs/ic-jq-pastesteps.png' alt='Paste steps' className='paste' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>onPasteSteps()}/>
+                    <img src='static/imgs/ic-jq-pastesteps.png' alt='Paste steps' className='paste'  style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => onPasteSteps() : null} disabled={!assignUser}/>
                     <Tooltip target=".paste" position='bottom' content='  Paste Test Step'/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <img src='static/imgs/skip-test-steps.png' alt='comment steps'className='comment' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>commentRows()}/>
+                    <img src='static/imgs/skip-test-steps.png' alt='comment steps'className='comment'  style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => commentRows() : null} disabled={!assignUser}/>
                     <Tooltip target=".comment " position="bottom" content="  Skip Test Step"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
+                    <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => importTestCase() : null} disabled={!assignUser} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px',cursor:'pointer'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
-                    <Button label="Debug" size='small'  disabled={rowData.testCases.length === 0 || debugEnable || changed} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={rowData.testCases.length === 0 || debugEnable || changed|| !assignUser} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
-                    <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
+                    <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed|| !assignUser} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
             </div>:null}
             </div>:null}
@@ -1472,7 +1472,7 @@ const DesignModal = (props) => {
                         <div className="con" id="d__tcListId">
                         <div style={{overflowY:'auto'}}>
                             <ClickAwayListener  mouseEvent="false" touchEvent="false" onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setnewtestcase} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable|| !assignUser} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setnewtestcase} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
                                     key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
@@ -1492,6 +1492,7 @@ const DesignModal = (props) => {
                                     setCustomEdit={setCustomEdit}
                                     fetchData={props.fetchingDetails}
                                     typesOfAppType={props.appType}
+                                    assignUser={assignUser}
                                     />)
                                 } 
                             </ReactSortable>

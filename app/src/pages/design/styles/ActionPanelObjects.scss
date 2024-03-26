@@ -1037,3 +1037,25 @@ margin-left: 3rem;
   align-items: center;
   justify-content: center;
 }
+.assigmentbox{
+    width:100%;
+    padding: 1rem 3rem ;
+    justify-content: space-around;
+    border-bottom: 1px solid #E2E2ED;
+    font-weight: 500;
+}
+.assigmentbox_2{
+    width:100%;
+    align-items: center;
+    display: flex;
+    padding: 4px 3rem;
+}
+.assigmentSubbox_2{
+    width: 50%;
+}
+.no-padding-dialog .p-dialog-content{
+    padding:0px !important;
+}
+.no-padding-dialog .p-dialog-footer{
+    padding: 0.5rem !important;
+}

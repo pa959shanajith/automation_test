@@ -1946,3 +1946,29 @@ export const deleteElementRepo = arg => {
         .catch(error=>reject(error));
     });
 }
+export const assignedUserMM = async(testCaseData) => {
+    try{
+        const res = await axios(url+'/assignedUserMM', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:testCaseData,
+            credentials: 'include',
+        });
+ 
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+}

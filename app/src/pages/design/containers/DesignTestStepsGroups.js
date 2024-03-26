@@ -18,13 +18,25 @@ function DesignTestStepsGroups(params) {
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
     const [activeIndex, setActiveIndex] = useState(0);
     const [moduleData, setModuleData] = useState({});
+    const tabsPanelInfo = [{ name: "Element Repository", "iconpath": ["static/imgs/elem_repo_tab_one_blue.svg", "static/imgs/elem_repo_tab_one_black.svg"] }, { name: "Design Test Steps", "iconpath": ["static/imgs/elem_repo_tab_two_black.svg", "static/imgs/elem_repo_tab_two_blue.svg"] }]
+    const TabTemplate = (name, iconpath) => {
+        return <div className="flex flex-row">
+            <div className="mr-2">
+                <img className="w-full" src={iconpath[activeIndex]} />
+            </div>
+            <div>{name}</div>
+        </div>
+    };
     const headerTemplate = (
         <>
             <div>
                 <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
-                    <TabPanel className="tabPanelforHeader" header="Element Repository"/>
-                    <TabPanel className="tabPanelforHeader" header="Design Test Steps"/>
+                    {
+                        tabsPanelInfo?.map(({name, iconpath})=>{
+                            return <TabPanel className="elem_repo_tab_heading" header={TabTemplate(name, iconpath)}></TabPanel>
+                        })
+                    }
                 </TabView>
             </div>
         </>

@@ -39,7 +39,7 @@ const UnlockTestSuites = () => {
     const showUnLockName = (rowData) =>{
         return(
             <>
-            <span title={rowData.name}>{rowData.name.length>30?rowData.name.trim().substring(0,30)+'...':rowData.name }</span>
+            <span title={rowData?.name}>{rowData?.name?.length>30?rowData?.name?.trim().substring(0,30)+'...':rowData?.name }</span>
             </>
         )
 
