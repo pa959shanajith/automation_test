@@ -2693,7 +2693,7 @@ Learn More '/>
             className={!isQualityEngineer?"configure_button":"configureEngRole"}
             onClick={() => configModal("CancelSave")}
             title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
-            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'none'}}
+            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'auto'}}
             disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)|| isQualityEngineer)}
           >
             configure

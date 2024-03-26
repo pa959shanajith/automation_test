@@ -39,7 +39,11 @@ const ExportMapButton = ({setBlockui,displayError,isAssign=true,releaseRef,cycle
     const [exportProject,setExportProject] = useState(true)
     const [exportFile,setExportFile] = useState(false);
     const [exportFileData, setExportFileData] = useState(true)
-    const userInfo = useSelector(state=>state.landing.userinfo);   
+    // const userInfo = useSelector(state=>state.landing.userinfo);   
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if(!userInfo) userInfo = userInfoFromRedux; 
+    else userInfo = userInfo ;
     const [showMessage, setShowMessage] = useState(false);    
     const dispatchAction=useDispatch()
     const gitComMsgRef = useRef()
