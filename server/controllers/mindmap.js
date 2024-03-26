@@ -269,7 +269,7 @@ exports.saveData = async (req, res) => {
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
 				if(e.type == "scenarios" ) {
-					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex ,tag:e.tag||[]});
+					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex ,tag:e.tag||[],assigneduser:e.assigneduser || ""});
 				}
 				else{
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
@@ -308,7 +308,7 @@ exports.saveData = async (req, res) => {
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"tag":ts.tag, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"tag":ts.tag,"assigneduser": ts.assigneduser, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
 				
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
