@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData}) => {
+const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData,isLoading}) => {
     const [selectedElement, setSelectedElement] = useState([]);
     console.log("selectedElement",selectedElement)
+    console.log(apiResponse,' apiResponse from API`');
     const onRowClick = (e) => {
         console.log("rowclick",e)
         if(e?.type == "all"){
@@ -31,12 +32,18 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
 
     };
     const renderTableRowData = (rowData)=>{
-        return <div className='flex flex-row justify-content-between align-items-center'>
+        if(isLoading){
+            return <div className='flex flex-row justify-content-between align-items-center'></div>
+        }
+        else{
+            return <div className='flex flex-row justify-content-between align-items-center'>
             {/* <div className='w-1 mr-2'>
                 <img src='static/imgs/genai_tc_icon.svg' className='w-100'/>
             </div> */}
             <div className=''>{rowData?.Name}</div>
         </div>
+        }
+       
     }
     return <div className="w-6 pr-2">
         <div className='generateTests_header'>Generated Tests</div>

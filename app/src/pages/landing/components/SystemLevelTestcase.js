@@ -36,6 +36,8 @@ const SystemLevelTestcase = () => {
     const generateTestcase = async () => {
         try {
             setIsLoading(true);
+            setApiResponse([]);
+            setTextAreaData([]);
             const { username: name, email_id: email } = JSON.parse(localStorage.getItem('userInfo'));
             const organization = "Avo Assure";
             const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -187,6 +189,7 @@ const SystemLevelTestcase = () => {
                 setReadOnly={setReadOnly}
                 readOnlyData={readOnlyData}
                 setReadOnlyData={setReadOnlyData}
+                isLoading={isLoading}
                 />}
                 {apiResponse && !readOnly && <div className='flex flex-column'>
                     {apiResponse &&
@@ -224,7 +227,7 @@ const SystemLevelTestcase = () => {
                     apiResponse &&
                     <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
                         <div className="gen-btn2">
-                            <Button label="Generate" onClick={generateTestcase} disabled={buttonDisabled}></Button>
+                            <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} onClick={generateTestcase} disabled={buttonDisabled}></Button>
                         </div>
                         <div className="gen-btn2">
                             <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
