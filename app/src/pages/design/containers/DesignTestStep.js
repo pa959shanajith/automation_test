@@ -1627,13 +1627,15 @@ const DesignModal = (props) => {
 
         if (inputKeywordName === '') {
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 ,style: { zIndex:999999999 }  })
-        }
-
-        else if (inputEditor === '') {
-            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
+            return;
         }
         else if (customTooltip === '') {
-            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
+            return;
+        }
+        else if (inputEditor === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
+            return;
         }
         else {
             try {
@@ -1719,7 +1721,7 @@ const DesignModal = (props) => {
 const createCustomeKeywordFooter = () => (
     <>
       <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>
-        <p>*mandatory field</p>
+        <p>*Mandatory Fields</p>
       </div>
       <div style={{ paddingTop: '10px', float: 'right' }}>
         <Button
@@ -1809,7 +1811,7 @@ const createCustomeKeywordFooter = () => (
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
                                 style={{ width: '150%' }}
-                                placeholder="Enter custom key"
+                                placeholder="Enter Name"
                                 inputTxt={inputKeywordName} 
                                 setInputTxt={setInputKeywordName} 
                                 isNameValid={isNameValid}
