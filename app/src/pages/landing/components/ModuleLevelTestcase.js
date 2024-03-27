@@ -19,7 +19,7 @@ import {ScreenOverlay} from '../../global';
 import GenerateTestCaseList from "./GenerateTestCaseList";
 
 
-const ModuleLevelTestcase = ({selectedOption}) => {
+const ModuleLevelTestcase = (props) => {
     const history = useNavigate();
     const [apiResponse, setApiResponse] = useState("");
     const [overlay, setOverlay] = useState(null);
@@ -71,6 +71,7 @@ const ModuleLevelTestcase = ({selectedOption}) => {
     const generateTestcase = async () => {
         try {
             setIsLoading(true);
+            props.setDisableOption(true);
             const { username: name, email_id: email } = JSON.parse(localStorage.getItem('userInfo'));
             const organization = "Avo Assure";
             const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -103,7 +104,7 @@ const ModuleLevelTestcase = ({selectedOption}) => {
             }
             setButtonDisabled(false);
             setIsLoading(false);
-            console.log(apiResponse,' apiResponse');
+            props.setDisableOption(false);
         } catch (err) {
             setIsLoading(false);
             toast.current.show({
@@ -704,7 +705,7 @@ const ModuleLevelTestcase = ({selectedOption}) => {
                                         life: 3000
                                     });
                                 }   
-                            }} disabled={buttonDisabled}></Button>
+                            }} disabled={isLoading}></Button>
                         </div>
                         <div className="gen-btn2">
                             <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
