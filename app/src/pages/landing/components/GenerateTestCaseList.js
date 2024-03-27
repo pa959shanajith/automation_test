@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData,isLoading, selectedOption}) => {
+const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData,isLoading , selectedOption}) => {
     const [selectedElement, setSelectedElement] = useState([]);
-    console.log("selectedElement",selectedElement)
+    console.log("selectedOption",selectedOption)
     console.log(apiResponse,' apiResponse from API`');
     useEffect(() => {
         setTextAreaData("");

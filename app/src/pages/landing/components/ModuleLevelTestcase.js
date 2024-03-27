@@ -649,7 +649,7 @@ const ModuleLevelTestcase = (props) => {
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
             <div className='flex flex-row w-full'>
                 {apiResponse && <GenerateTestCaseList 
-                selectedOption={selectedOption}
+                selectedOption={props.selectedOption}
                 apiResponse={apiResponse} 
                 setSelectedGenAiTc={setSelectedGenAiTc} 
                 setTextAreaData={setTextAreaData}
