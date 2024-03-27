@@ -1690,7 +1690,7 @@ export const createModel = async(payload) => {
 
   export const deleteTemp = async (id) => {
     try {
-      const res = await axios.delete(url + `/genAI/deleteTemp/${id}`);  
+      const res = await axios.delete(url + `/genAI/deleteTemp/${id}`);
       if (res.status === 200) {
         return res.data;
       }
@@ -1701,6 +1701,22 @@ export const createModel = async(payload) => {
       return { error: 'Error in API call' };
     }
   };
+  
+
+  export const deleteUplaodFile = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/deletefile/${id}`);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+  
 export const createTemp = (data) => {
     return new Promise((resolve, reject)=> {
         axios(url+'/genAI/createTemp', {

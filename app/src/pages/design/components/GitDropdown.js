@@ -58,6 +58,12 @@ const GitDropdown = (props) => {
   const [commentError, setCommentError] = useState(false);
   if(CreateProjectVisible) {projectName.current = ''}
 
+ let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+  if(!userInfo) userInfo = userInfoFromRedux;
+  else userInfo = userInfo ;
+  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
 
   useEffect(() => {
     (async () => {
@@ -306,7 +312,7 @@ const GitDropdown = (props) => {
               />
             </div>
 
-            : <div onClick={clickhandler} style={{ width: "6rem" }}> <span className='git_icon_and_icon'><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
+            : <div onClick={!isQualityEngineer?clickhandler:null} style={{ width: "6rem" }} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }> <span className={!isQualityEngineer?'git_icon_and_icon':"git_icon_and_icon_engg"}><img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" /> Git </span></div>} </> : null
       }
 
       <Toast ref={toast} position="bottom-center" />
@@ -347,11 +353,12 @@ const GitDropdown = (props) => {
         <CreateProject setProjectName={setProjectNamehandler} visible={CreateProjectVisible} onHide={() => createProjectCloseDialogHandler()} projectsDetails={projectListForCreateProject} toastSuccess={props.toastSuccess} toastError={props.toastError} />
       </div>}
       <Dialog
-        header={'Git Configurations'}
+        header={'Git Configuration'}
         visible={visibleGitconfFormAfterCreatePrj}
         style={{ width: "58vw", height: '85vh' }}
         onHide={() => { setVisibleGitconfFormAfterCreatePrj(false); setCreatedProjectDetails({}); }}
         footer={dialogFooter}
+        className='git_config_after_create_project'
       >
         <div className='createProject_GitConfig'>
           <GitConfigurationForm

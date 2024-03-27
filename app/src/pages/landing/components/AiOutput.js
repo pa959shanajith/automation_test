@@ -128,7 +128,7 @@ export default function Output() {
         "type": type
       };
       const response = await generate_testcase(formData1)
-      toast.current.show({ severity: 'success', summary: 'Success', detail: 'system level testcases genarate sucessfully', life: 3000 });
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'system level test cases genarate sucessfully', life: 3000 });
       setApiResponse(response.data.response);
       setButtonDisabled(false);
       setApiDataReceived(true);
@@ -245,7 +245,7 @@ export default function Output() {
         "type": generateType
       };
       const response = await generate_testcase(formData3)
-      toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level testcases genarate sucessfully', life: 3000 });
+      toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level test cases genarate sucessfully', life: 3000 });
       setUserTestcase(response.data.response);
       setButtonDisabled(false);
       setUserlevel(true);
@@ -274,7 +274,7 @@ export default function Output() {
         "type": type
       };
       const response = await save_testcase(formData);
-      toast.current.show({ severity: 'success', summary: 'Success', detail: 'generated testcases saved successfully', life: 3000 });
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'generated test cases saved successfully', life: 3000 });
     } catch (error) {
       toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
     }

@@ -48,7 +48,7 @@ const CaptureModal = (props) => {
     const [visible, setVisible] = useState(false);
     const [visibleOtherApp, setVisibleOtherApp] = useState(false);
     const [showCaptureData, setShowCaptureData] = useState([]);
-    const [showPanel, setShowPanel] = useState(true);
+    const [showPanel, setShowPanel] = useState(false);
     const [overlay, setOverlay] = useState(null);
     const [isInsprintHovered, setIsInsprintHovered] = useState(false);
     const [isUpgradeHovered, setIsUpgradeHovered] = useState(false);
@@ -1195,8 +1195,8 @@ const CaptureModal = (props) => {
             <div className='empty_msg flex flex-column align-items-center justify-content-center'>
                 <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
                 <p className="not_captured_message">Elements not captured</p>
-                {showCaptureScreen ? <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button> :(!props.testSuiteInUse && selectedScreen) && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
-                {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span>Select a repository or add new repository to capture elements</span>}
+                {showCaptureScreen ? <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button> :(!props.testSuiteInUse && selectedRepoName) && <Button className="btn-capture-single" onClick={() => { handleAddMore('add more'); setVisibleOtherApp(true); setSaveDisable(false) }} disabled={masterCapture} >Capture Elements</Button>}
+                {showCaptureScreen ? "" :!selectedRepoName && <span>Select a repository or add new repository to capture elements</span>}
                 <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
             </div>
         </div>
@@ -1822,6 +1822,8 @@ const CaptureModal = (props) => {
                   toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
                 else setScreenData(screens.screenList);
                 let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+                newAddedRepo[0].label=newAddedRepo[0].name
+                newAddedRepo[0].title = newAddedRepo[0].name
                 handleScreenChange(newAddedRepo[0])
             } catch (error) {
                 console.error('Error fetching User list:', error);
@@ -2030,7 +2032,8 @@ const CaptureModal = (props) => {
         id:folder["_id"],
         related_dataobjects: folder.related_dataobjects,
         orderlist:folder.orderlist,
-        parent:folder.parent
+        parent:folder.parent,
+        title:folder.name,
       }));
 
       const renderOption = (option) => {
@@ -2131,8 +2134,11 @@ const CaptureModal = (props) => {
               <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                {showCaptureScreen ? "" :(screenData.length === 0 || !selectedScreen ) && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>}
-                  <h4 className="capture_card_header">Select Repository</h4>
+                {/* {!selectedRepoName && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>} */}
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/element_repository_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
+                  <h4 className="capture_card_header">Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
@@ -2149,6 +2155,9 @@ const CaptureModal = (props) => {
                 {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
                 {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/in_sprint_automation.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">In Sprint Automation</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img insprintToolTip" src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
@@ -2175,6 +2184,9 @@ const CaptureModal = (props) => {
                 {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
                 {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/upgrade_analyzer_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">Upgrade Analyzer</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
@@ -2196,7 +2208,7 @@ const CaptureModal = (props) => {
                 </div>}
               </div>
               {/* Capture From Pdf */}
-              <div className="capture_card disabled">
+              {/* <div className="capture_card disabled">
                 <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
                 {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
                 <div className="capture_card_top_section">
@@ -2213,11 +2225,14 @@ const CaptureModal = (props) => {
                     <p className="capture_bottom_heading">PDF <br/>Utility</p>
                   </div>
                 </div>}
-              </div>
+              </div> */}
               {/* Create Manually */}
               <div className="capture_card">
                 <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/create_manually_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">Create Manually</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
@@ -2228,7 +2243,7 @@ const CaptureModal = (props) => {
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
                     </div>
-                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                    <p className="capture_bottom_heading">Create Element</p>
                   </div>
                 </div>}
               </div>
@@ -2238,6 +2253,9 @@ const CaptureModal = (props) => {
                 {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
                 {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/file_handing_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">File Handling</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
@@ -2284,7 +2302,7 @@ const CaptureModal = (props) => {
                         headerCheckboxToggleAllDisabled={false}
                         emptyMessage={showEmptyMessage ? emptyMessage : null}
                         scrollable
-                        scrollHeight={typeOfView === 'journeyView'?"350px":"265px"}
+                        scrollHeight={typeOfView === 'journeyView' ? (showPanel ? "60vh" : "68vh") : "265px"}
                         columnResizeMode="expand"
                         virtualScrollerOptions={{ itemSize: 20 }}
                     >
@@ -2332,8 +2350,9 @@ const CaptureModal = (props) => {
         accept={confirmScreenChange} />
         
 
-            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
+            <div style={{ position:'fixed', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', right: '74rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
                 {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
                     <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
@@ -2341,8 +2360,7 @@ const CaptureModal = (props) => {
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
                 </div> : null
                 }
-                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
-                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
+                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button className='mr-4' label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
                 <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
                 <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
                 {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />

@@ -69,7 +69,7 @@ const ConfigureSetup = ({
   
   const dispatch = useDispatch();
   const getProjectData = useSelector((store) => store.configsetup);
-
+  
   const isModuleRequired = modules === "e2eExecution";
   const isTestsuiteRequired = modules === "normalExecution";
 
@@ -78,7 +78,11 @@ const ConfigureSetup = ({
   );
   const flattenedTags = tags?.flat();
 
-  
+  let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
+  const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
+  if (!projectInfo) projectInfo = projectInfoFromRedux;
+  else projectInfo = projectInfo
+  let currentprojectdetails=getProjectData?.projects?.filter(project=>project._id===projectInfo?.projectId)[0]
   const searchOptions = [
     { label: 'Search by name', value: 'option1' },
     { label: 'Search by tag', value: 'option2', className:"tagSearch" }
@@ -351,13 +355,14 @@ const profileChildNameTooltip = (name) => {
     const dataObj = {
       dataKey: e?.node?.key,
       dataId: e?.node?.id,
+
       dataParams: [
         {
-          releaseid: getProjectData?.projects[0].releases[0].name,
-          cycleid: getProjectData?.projects[0].releases[0].cycles[0]._id,
+          releaseid: currentprojectdetails.releases[0].name,
+          cycleid: currentprojectdetails.releases[0].cycles[0]._id,
           testsuiteid: e?.node?.id,
           testsuitename: e?.node?.data?.name,
-          projectidts: getProjectData?.projects[0]._id,
+          projectidts: currentprojectdetails._id,
         },
       ],
     };

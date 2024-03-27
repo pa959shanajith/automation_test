@@ -11,7 +11,7 @@ import { Chart } from 'primereact/chart';
 */
 
 const ExecutionSummaryLabels = {
-    scenarioName: "Testcase Name : ",
+    scenarioName: "Test case Name : ",
     StartTime: "StartDate Time : ",
     projectName: "Project : ",
     EndTime: "EndDate Time : ",
@@ -180,7 +180,7 @@ const SummaryBar = ({ summaryValues , type }) => {
         <>
             <div className="summary-bar-container">
                 <div className="data-bar">
-                    <DataHeading>{type === "Execution" ? "Testcase Status" : "Result Status of Elements"}</DataHeading>
+                    <DataHeading>{type === "Execution" ? "Test case Status" : "Result Status of Elements"}</DataHeading>
                     <div className="chart-bar">
                         <div className="report-chart-bar">
                             <div className="chart-bar__inner">
