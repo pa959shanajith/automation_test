@@ -41,17 +41,7 @@ const AiTemplate = () => {
     const [filters, setFilters] = useState({});
   const [globalFilterValue, setGlobalFilterValue] = useState('');
 
-  const onGlobalFilterChange = (e) => {
-    const value = e.target.value;
-    setFilters(prevFilters => ({
-        ...prevFilters,
-        global: {
-            ...prevFilters.global,
-            value: value
-        }
-    }));
-    setGlobalFilterValue(value);
-};
+
 
 
     const toast = useRef(null);
@@ -352,7 +342,7 @@ console.log("tempData", tempData);
         {tempData.length ? (<>
           <label className="pb-2 temp-list-label">List of Templates</label>
           <div className='search_newGrid'>
-                        <InputText placeholder="Search" className='search_grid' value={globalFilterValue} onChange={onGlobalFilterChange}  />
+                        <InputText placeholder="Search" className='search_grid' value={globalFilterValue} onChange={(e)=>setGlobalFilterValue(e.target.value)}  />
                  
                     <Button className="grid_btn_list" label="Add new template" onClick={showTemplate}  ></Button>
                     </div>
@@ -365,11 +355,12 @@ console.log("tempData", tempData);
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleTemplateDelete(currentId)}
                     />
-         <DataTable value={tempData} paginator rows={5} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
-         <Column
+         <DataTable value={tempData} paginator rows={5} globalFilter={globalFilterValue} showGridlines
+         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
+         {/* <Column
     header="Sl No"
-    body={() => ++serialNumber}
-  />
+    body={() => ++serialNumber} */}
+  {/* /> */}
         <Column field="name" header="Name" />
         <Column field="description" header="Description" />
         <Column field="createdAt" header="Created On" />

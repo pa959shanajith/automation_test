@@ -157,15 +157,15 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         });
     };
 
-    const onGlobalFilterChange = (e) => {
-        const value = e.target.value;
-        let _filters = { ...filters };
+    // const onGlobalFilterChange = (e) => {
+    //     const value = e.target.value;
+    //     let _filters = { ...filters };
 
-        _filters['global'].value = value;
+    //     _filters['global'].value = value;
 
-        setFilters(_filters);
-        setGlobalFilterValue(value);
-    };
+    //     setFilters(_filters);
+    //     setGlobalFilterValue(value);
+    // };
 
     const renderHeader = () => {
         return (
@@ -173,7 +173,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 <span>LLM model list</span>
                 <span className="p-input-icon-left">
                     <i className="pi pi-search" />
-                    <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Keyword Search" />
+                    <InputText value={globalFilterValue} onChange={(e)=>setGlobalFilterValue(e.target.value)} placeholder="Search" />
                 </span>
                 <Button label="Add New" onClick={() => setLlmModel(true)} autoFocus />
             </div>
@@ -477,7 +477,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
       };
     const actionTemplate=(rowData)=>{
         return( <div>
-            {/* <span className='pi pi-pencil' onClick={()=>handleEdit(rowData)} ></span> */}
+            <span className='pi pi-pencil' onClick={()=>handleEdit(rowData)} ></span>
             <span className='pi pi-trash' onClick={()=> {setDeleteRow(true);setCurrentId(rowData?._id)} }  style={{marginLeft:'1rem'}} ></span>
         </div>)   
     }
@@ -512,7 +512,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleDelete(currentId)}
                     />
-                <DataTable value={tableData} paginator rows={6} dataKey="id"
+                <DataTable value={tableData} paginator rows={6} dataKey="id" globalFilter={globalFilterValue} showGridlines
                     header={header} emptyMessage="No customers found." tableStyle={{ minWidth: '50rem' }}>
                     <Column field="name" header="Name" style={{ minWidth: '12rem' }} />
                     <Column field="modeltype" header="LLM Model" style={{ minWidth: '12rem' }} />
