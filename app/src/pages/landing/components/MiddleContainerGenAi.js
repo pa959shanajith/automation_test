@@ -58,6 +58,7 @@ const MiddleContainerGenAi = () =>{
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
     const [swaggerResponseData, setSwaggerResponseData] = useState("");
+    const [disableOption,setDisableOption] = useState(false);
 
     console.log(template_id)
 
@@ -619,6 +620,7 @@ const MiddleContainerGenAi = () =>{
                             value="a"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'a'}
+                            disabled={disableOption}
                         />
                         <label htmlFor="systemLevelTc" className="">
                           <span>System level test cases</span>
@@ -635,6 +637,7 @@ const MiddleContainerGenAi = () =>{
                             value="b"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'b'}
+                            disabled={disableOption}
                         />
                         <label htmlFor="moduleLevelTc" className="">
                           <span>Module level test case</span> 
@@ -651,6 +654,7 @@ const MiddleContainerGenAi = () =>{
                             value="c"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'c'}
+                            disabled={disableOption}
                         />
                         <label htmlFor="userStoryLevelTc" className="">
                           <span>User story level test case</span>
@@ -665,8 +669,8 @@ const MiddleContainerGenAi = () =>{
 
         </div>
         {selectedOption == null && <BlankScreenGenAI />}
-        {selectedOption === 'a' && <SystemLevelTestcase />} 
-        {selectedOption === 'b' && <ModuleLevelTestcase />} 
+        {selectedOption === 'a' && <SystemLevelTestcase setDisableOption={setDisableOption} />} 
+        {selectedOption === 'b' && <ModuleLevelTestcase setDisableOption={setDisableOption} />} 
        {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container justify-content-center align-items-center'>
                    <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
                    <label> Select any one of the three methods mentioned above</label>

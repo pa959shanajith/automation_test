@@ -10,7 +10,7 @@ import { useSelector } from 'react-redux';
 import GenerateTestCaseList from "./GenerateTestCaseList";
 import { RadioButton } from 'primereact/radiobutton';
 
-const SystemLevelTestcase = () => {
+const SystemLevelTestcase = (props) => {
     const [apiResponse, setApiResponse] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(false);
@@ -38,6 +38,7 @@ const SystemLevelTestcase = () => {
             setIsLoading(true);
             setApiResponse([]);
             setTextAreaData([]);
+            props.setDisableOption(true);
             const { username: name, email_id: email } = JSON.parse(localStorage.getItem('userInfo'));
             const organization = "Avo Assure";
             const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -65,6 +66,7 @@ const SystemLevelTestcase = () => {
 
             setButtonDisabled(false);
             setIsLoading(false);
+            props.setDisableOption(false);
         } catch (err) {
             setIsLoading(false);
             toast.current.show({
@@ -113,6 +115,7 @@ const SystemLevelTestcase = () => {
                             value="1"
                             onChange={testStepOptions}
                             checked={testStepSelection === "1"}
+                            disabled={isLoading}
                         />
                         <label htmlFor="testCasewithTs" className="pb-2 label-genai2">Test case with Teststep</label>
                     </div>
@@ -122,8 +125,8 @@ const SystemLevelTestcase = () => {
                             name="option"
                             value="2"
                             onChange={testStepOptions}
-
                             checked={testStepSelection === "2"}
+                            disabled={isLoading}
                         />
                         <label htmlFor="testCasewithoutTs" className="pb-2 label-genai2">Test case without Teststep</label>
                     </div>
@@ -189,7 +192,6 @@ const SystemLevelTestcase = () => {
                 setReadOnly={setReadOnly}
                 readOnlyData={readOnlyData}
                 setReadOnlyData={setReadOnlyData}
-                isLoading={isLoading}
                 />}
                 {apiResponse && !readOnly && <div className='flex flex-column'>
                     {apiResponse &&
@@ -227,7 +229,7 @@ const SystemLevelTestcase = () => {
                     apiResponse &&
                     <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
                         <div className="gen-btn2">
-                            <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} onClick={generateTestcase} disabled={buttonDisabled}></Button>
+                            <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} onClick={generateTestcase} disabled={isLoading}></Button>
                         </div>
                         <div className="gen-btn2">
                             <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
