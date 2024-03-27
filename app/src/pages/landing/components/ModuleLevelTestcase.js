@@ -19,7 +19,7 @@ import {ScreenOverlay} from '../../global';
 import GenerateTestCaseList from "./GenerateTestCaseList";
 
 
-const ModuleLevelTestcase = () => {
+const ModuleLevelTestcase = ({selectedOption}) => {
     const history = useNavigate();
     const [apiResponse, setApiResponse] = useState("");
     const [overlay, setOverlay] = useState(null);
@@ -648,6 +648,7 @@ const ModuleLevelTestcase = () => {
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
             <div className='flex flex-row w-full'>
                 {apiResponse && <GenerateTestCaseList 
+                selectedOption={selectedOption}
                 apiResponse={apiResponse} 
                 setSelectedGenAiTc={setSelectedGenAiTc} 
                 setTextAreaData={setTextAreaData}
@@ -660,7 +661,7 @@ const ModuleLevelTestcase = () => {
                     {apiResponse &&
                         <div className='flex flex-column'>
                             <InputTextarea
-                                style={{ width: "40vw", height: "70vh" }}
+                                style={{ width: "40vw", height: "61vh" }}
                                 autoResize={false}
                                 value={textAreaData}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -669,7 +670,7 @@ const ModuleLevelTestcase = () => {
                     }
                 </div>}
                 {
-                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "61vh" }}>{readOnlyData.map(item => {
                         return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
                             toast.current.show({
                                 severity: 'info',
@@ -679,7 +680,7 @@ const ModuleLevelTestcase = () => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "45vw", height: "70vh" }}
+                                style={{ width: "40vw", height: "61vh" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -690,7 +691,7 @@ const ModuleLevelTestcase = () => {
                 }
                {
                     apiResponse &&
-                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%" }}>
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%", marginBottom:"0.3rem" }}>
                         <div className="gen-btn2">
                             <Button loading={isLoading} label="Generate" onClick={() => {
                                 if (template_id.length > 0) {

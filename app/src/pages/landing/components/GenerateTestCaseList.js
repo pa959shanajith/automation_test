@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
-const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData,isLoading}) => {
+const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData,isLoading, selectedOption}) => {
     const [selectedElement, setSelectedElement] = useState([]);
     console.log("selectedElement",selectedElement)
     console.log(apiResponse,' apiResponse from API`');
@@ -31,6 +31,7 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
         setSelectedElement(e?.value);
 
     };
+   
     const renderTableRowData = (rowData)=>{
         if(isLoading){
             return <div className='flex flex-row justify-content-between align-items-center'></div>
@@ -48,7 +49,7 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
     return <div className="w-6 pr-2">
         <div className='generateTests_header'>Generated Tests</div>
         <DataTable
-            className='generateTests_dataTable'
+            className={selectedOption == 'b' ? "generateTests_dataTable" : "generateTests_systemlevel"}
             headerCheckboxToggleAllDisabled={false}
             selection={selectedElement}
             onSelectionChange={onRowClick}

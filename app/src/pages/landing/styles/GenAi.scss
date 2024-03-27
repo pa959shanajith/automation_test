@@ -199,6 +199,16 @@
 }
 
 .generateTests_dataTable{
+    height: 60vh;
+    overflow: auto;
+}
+.generateTests_systemlevel{
     height: 70vh;
-    overflow-y: scroll;
+    overflow: auto;
+}
+.generateTests_dataTable> .p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+.generateTests_systemlevel>.p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
 }

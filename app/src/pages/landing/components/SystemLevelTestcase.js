@@ -204,7 +204,7 @@ const SystemLevelTestcase = () => {
                     }
                 </div>}
                 {
-                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-y-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
                         return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
                             toast.current.show({
                                 severity: 'info',
@@ -214,7 +214,7 @@ const SystemLevelTestcase = () => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "45vw", height: "70vh" }}
+                                style={{ width: "40vw", height: "70vh" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}

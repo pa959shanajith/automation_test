@@ -666,7 +666,7 @@ const MiddleContainerGenAi = () =>{
         </div>
         {selectedOption == null && <BlankScreenGenAI />}
         {selectedOption === 'a' && <SystemLevelTestcase />} 
-        {selectedOption === 'b' && <ModuleLevelTestcase />} 
+        {selectedOption === 'b' && <ModuleLevelTestcase selectedOption={selectedOption} />} 
        {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container justify-content-center align-items-center'>
                    <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
                    <label> Select any one of the three methods mentioned above</label>
