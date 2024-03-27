@@ -249,6 +249,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
 
     const header = renderHeader();
 
+    const CryptoJS = require('crypto-js');
+ 
     const saveModel = async () => {
         try {
           setLoading('Saving...');
@@ -318,7 +320,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
             let payload = {
                 name: modalName,
                 modeltype: modalType,
-                api_key: modalToken,
+                api_key: encryptAES(modalToken),
                 model: version
               };
           
@@ -366,6 +368,16 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         } catch (error) {
           console.error('Error:', error);
         }
+      };
+    
+      const encryptAES = (text, key) => {
+        key = CryptoJS.enc.Utf8.parse('thisIsASecretKey');
+        var encrypted = CryptoJS.AES.encrypt(text, key, {
+            mode: CryptoJS.mode.ECB, 
+            padding: CryptoJS.pad.Pkcs7 
+        });
+        var ciphertext = encrypted.toString()
+        return ciphertext
       };
 
       useEffect(() => {
