@@ -168,7 +168,7 @@ const Messages={
         WARN_SELECT_STEP: {"CONTENT":"Select steps to delete.", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_STEP_DEL: {"CONTENT":"Select step to edit.", "VARIANT": VARIANT.WARNING},
         WARN_DROPDOWN_SELECTED_NOT_ENTERED:{"CONTENT":"Select the type", "VARIANT": VARIANT.WARNING},
-        WARN_CUSTOMKEY_NOT_ENTERED:{"CONTENT":"Keyword cannot be empty", "VARIANT": VARIANT.WARNING},
+        WARN_CUSTOMKEY_NOT_ENTERED:{"CONTENT":"Please fill mandatory fields", "VARIANT": VARIANT.WARNING},
         WARN_ACE_EDITOR_NOT_ENTERED:{"CONTENT":"Editor cannot be empty", "VARIANT": VARIANT.WARNING},
         WARN_SELECT_STEP_COPY: {"CONTENT":"Select step to copy.", "VARIANT": VARIANT.WARNING},
         WARN_NO_TC_PASTE: {"CONTENT":"No Test Steps to Paste. Please Copy Test Step(s) before Pasting.", "VARIANT": VARIANT.WARNING},
