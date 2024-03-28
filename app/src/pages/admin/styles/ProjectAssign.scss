@@ -35,12 +35,6 @@
     flex: 1 1 100%;
 }
 .labelStyle1 {
-    float: left;
-    line-height: 1;
-    margin-bottom: 12px;
-    font-weight: 300;
-    cursor: default;
-    margin-left: 0rem;
     font: $f6_semibold;
 }
 .seprator {
@@ -52,15 +46,12 @@
     font-family: "Open Sans";
 }
  #allProjectAP,#assignedProjectAP {
-    width: 100%;
-    height: calc(100% - 25px)!important;
     outline: none;
     background-image: none;
     -webkit-appearance: select;
     margin-bottom: 0;
     // font-size: 13px;
     // font-family: "OPen Sans";
-    height: 30%;
     padding: 8px;
     border: 1px solid $borderFour;
     border-radius: 3px;
@@ -74,8 +65,9 @@
     -o-box-shadow: inset 0px 1px 6px $borderFour;
     -ms-box-shadow: inset 0px 1px 6px $borderFour;
     margin-inline-start: 0%;
-    max-height: 19rem;
     font: $f6_regular;
+    width:30vw;
+    height: 40vh;
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
@@ -180,19 +172,9 @@ select[size] {
 }  
 
 .adminSelect-project-assign {
-	padding: 0px;
-	height: 25px;
-	margin-bottom: 0;
-	width: 100%;
-	margin-left: 4%;
-	margin-top: 3px;
-	line-height: 2;
     border: 1px solid $borderOne !important;
     -webkit-text-stroke: thin;
     .p-dropdown-label.p-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: start;
         font: $f7_regular !important;
         color: var(--surface-500) !important;
     }
@@ -278,16 +260,13 @@ color: red;
 }
 
 .save_btn {
-    margin-top: 1rem; /* Add top margin for spacing */
+    bottom: 40px;
+    right: 40px;
 }
 
 @media screen and (max-width: 768px) {
     .adminActionBtn {
-        text-align: center; /* Center align the button on smaller screens */
-    }
-
-    .save_btn {
-        margin-top: 0.5rem; /* Adjust top margin for smaller screens */
+        text-align: center;
     }
 }
 
@@ -302,5 +281,9 @@ color: red;
     font-size: 0.8rem;
     height: 1.8rem;
     min-width: 1.8rem;
-    font-weight: bold; /* Ensure a minimum width for the chip */
+    font-weight: bold;
 }
+// uncomment the below line if dropdown values needs to be in compressed view
+// .p-dropdown-panel .p-dropdown-items .p-dropdown-item{
+//     padding: 0.1rem 0.5rem !important;
+// }
