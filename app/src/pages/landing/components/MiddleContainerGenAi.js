@@ -58,6 +58,7 @@ const MiddleContainerGenAi = () =>{
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
     const [swaggerResponseData, setSwaggerResponseData] = useState("");
+    const [disableOption,setDisableOption] = useState(false);
 
     console.log(template_id)
 
@@ -603,40 +604,64 @@ const MiddleContainerGenAi = () =>{
          {overlay ? <ScreenOverlay content={overlay} /> : null}
          {/* <ToastMessage message={toastMessage} /> */}
           <Toast ref={toast} ></Toast>
-
             <div className='flex flex-column pl-2 pb-2' style={{ gap: "0.5rem" }} >
-
-                <span> <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /> <label className="pb-2 label-genai3">Generate Test Case</label></span>
+                <div className="flex flex-row align-items-center">
+                  <div className="w-1rem mr-1 flex flex-row align-items-center justify-content-center">
+                    <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{width:"100%" }} />
+                  </div>
+                  <label className="label-genai3">Generate Test Case</label>
+                </div>
                 <div className="flex flex-row" style={{ gap: "3rem" }}>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionA"
-                            name="option"
+                            className="mr-2"
+                            inputId="systemLevelTc"
+                            name="systemLevelTc"
                             value="a"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'a'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionA" className="pb-2 label-genai2">System level test cases  <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="systemLevelTc" className="">
+                          <span>System level test cases</span>
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionB"
-                            name="option"
+                            className="mr-2"
+                            inputId="moduleLevelTc"
+                            name="moduleLevelTc"
                             value="b"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'b'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionB" className="pb-2 label-genai2">Module level test case <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="moduleLevelTc" className="">
+                          <span>Module level test case</span> 
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionC"
-                            name="option"
+                            className="mr-2"
+                            inputId="userStoryLevelTc"
+                            name="userStoryLevelTc"
                             value="c"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'c'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionC" className="pb-2 label-genai2">User story level test case <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="userStoryLevelTc" className="">
+                          <span>User story level test case</span>
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
 
                  
@@ -644,9 +669,9 @@ const MiddleContainerGenAi = () =>{
 
         </div>
         {selectedOption == null && <BlankScreenGenAI />}
-        {selectedOption === 'a' && <SystemLevelTestcase />} 
-        {selectedOption === 'b' && <ModuleLevelTestcase />} 
-       {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container'>
+        {selectedOption === 'a' && <SystemLevelTestcase setDisableOption={setDisableOption} />} 
+        {selectedOption === 'b' && <ModuleLevelTestcase setDisableOption={setDisableOption} selectedOption={selectedOption}/>} 
+       {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container justify-content-center align-items-center'>
                    <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
                    <label> Select any one of the three methods mentioned above</label>
                     </div>) : ""}
@@ -684,7 +709,6 @@ const MiddleContainerGenAi = () =>{
           {isLoading && <div className="spinner" style={{ position: 'absolute', top: '29rem', left: '32rem' }}>
             <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
           </div>}
-              
               {userlevel ? (<>
                 <div style={{ textAlign: 'left', padding: '5px' }}>
                 <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => userStoryTestCase(e.target.value)} className="text-area-user-story" style={{width:'30rem'}}/>                 

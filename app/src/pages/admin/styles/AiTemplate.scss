@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .active-class{
     gap: 22.5rem;
     margin-top: 1rem;
@@ -21,4 +22,11 @@
 }
 .accuracy_div{
     margin-top: 0.5rem;
+}
+.temp-list-label{
+    padding:1rem;
+    font: $f6_semibold ;
+    position: relative;
+    top: 1rem;
+
 }
