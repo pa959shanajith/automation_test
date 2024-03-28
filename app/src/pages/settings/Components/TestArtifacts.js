@@ -67,19 +67,6 @@ const TestArtifacts = (props) => {
       <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
 
       <div className=" test_artifact_container_navbar">
-        {/* <div>
-                    <div className={`integration-card ${selectedscreen === 'Git' ? 'selected' : ''}`} onClick={() => handleScreenChange('Git')}>
-                        <img src="static/imgs/git_configuration_icon.svg" className="img__alm" alt="Git Icon" />
-                        <span className="text_git">Git<br />Configuration</span>
-                    </div>
-                </div>
-                <div>
-                    <div className={`integration-card ${selectedscreen === 'Bit' ? 'selected' : ''}`} onClick={() => handleScreenChange('Bit')}>
-                        <img src="static/imgs/git_configuration_icon.svg" className="img__alm" alt="Git Icon" />
-                        <span className="text_git">Bit<br />Configuration</span>
-                    </div>
-                </div> */}
-
         <Dropdown
           value={selectConfiguration}
           options={configOptions}
@@ -90,14 +77,12 @@ const TestArtifacts = (props) => {
           optionLabel="name"
           style={{ height: '2rem', display: "flex", alignItems: "center", width: '10rem' }}
           placeholder={"Select"}
-          // defaultValue={configOptions[0]}
         />
 
       </div>
 
       <div className="test_artifact_container_content">
         {selectConfiguration?.name !== '' && <GitConfig toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn} screenName={selectConfiguration?.name} />}
-        {/* <GitConfig toastError={props.toastError} toastSuccess={props.toastSuccess} toastWarn={props.toastWarn} /> */}
       </div>
     </div >
   )
