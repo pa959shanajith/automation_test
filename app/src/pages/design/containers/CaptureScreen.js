@@ -39,6 +39,7 @@ import { BlockUI } from 'primereact/blockui';
 import { insertScreen } from '../../design/api';
 
 const CaptureModal = (props) => {
+  const {assignUser = true} = props;
   const dispatch = useDispatch();
   const history=useNavigate()
   const toast = useRef();
@@ -1258,7 +1259,7 @@ else{
           {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
         
-        {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
+        {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen)))? <div className='Header__btn'>
           <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
@@ -1274,7 +1275,7 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>  :(!props.testSuiteInUse && selectedRepoName) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser }>Capture Elements</Button>  :(selectedRepoName) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser}>Capture Elements</Button>}
         {showCaptureScreen ? "" : !selectedRepoName && <span class="choose__repo__txt">Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
@@ -2103,7 +2104,6 @@ const handleAddAccordion = () => {
 };
 
 
-
   return (
     <>
       {overlay && <ScreenOverlay content={overlay} />}
@@ -2117,7 +2117,7 @@ const handleAddAccordion = () => {
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
-          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          typesOfAppType != "Webservice" ? 
           
             <div className="capture_card_modal">
               {/* Select From Repository */}
@@ -2130,7 +2130,7 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select Repository" className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select Repository" className={`w-full md:w-10vw ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} disabled={showCaptureScreen} optionTemplate={(option) => (
                     <div title={option.label}>{option.label}</div>
                   )}/></div>
                 </div>}
@@ -2147,13 +2147,13 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen) && !showCaptureScreen) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog("addObject")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Add Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
                     </div>
@@ -2173,13 +2173,13 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                  <div  className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleCompareClick}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Compare Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleReplaceClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
                     </div>
@@ -2198,7 +2198,7 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn">
+                  <div className={`capture_bottom_btn ${(!assignUser && !showCaptureScreen)? "disabled" : ""}`}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
                     </div>
@@ -2216,7 +2216,7 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                  <div className={`capture_bottom_btn ${!isWebApp || (!assignUser && !showCaptureScreen)? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
                     </div>
@@ -2229,20 +2229,20 @@ const handleAddAccordion = () => {
                 <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
                 {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
                 {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
-                <div className="capture_card_top_section">
+                <div className={`capture_card_top_section ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`}>
                   <h4 className="capture_card_header">File Handling</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => setShowObjModal("importModal")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className="capture_bottom_btn" onClick={handleExportClick}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2287,18 +2287,18 @@ const handleAddAccordion = () => {
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
-              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+              editor={(showCaptureScreen || (assignUser && !showCaptureScreen))?(options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
+              bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen)) ?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2322,7 +2322,7 @@ const handleAddAccordion = () => {
       :
       <div>
       {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
-      {typesOfAppType != "Webservice" && !props.testSuiteInUse? <div className="capture_card_modal">
+      {typesOfAppType != "Webservice" ? <div className="capture_card_modal">
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
@@ -2338,7 +2338,7 @@ const handleAddAccordion = () => {
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
                   <div className="dropdown_container">
-                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName ? selectedRepoName : "Select Repository"}</span>} className="w-full md:w-10vw" optionLabel='label' itemTemplate={renderOption} />
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName ? selectedRepoName : "Select Repository"}</span>} className={`w-full md:w-10vw ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} optionLabel='label' itemTemplate={renderOption} />
                     </div>
                 </div>}
               </div>
@@ -2357,13 +2357,13 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog("addObject")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Add Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
                     </div>
@@ -2386,13 +2386,13 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${(AddElement) ? "disabled" : ""}`} onClick={handleCompareClick}>
+                  <div className={`capture_bottom_btn ${(AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleCompareClick}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Compare Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleReplaceClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
                     </div>
@@ -2432,7 +2432,7 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                  <div className={`capture_bottom_btn ${(!isWebApp|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
                     </div>
@@ -2455,13 +2455,13 @@ const handleAddAccordion = () => {
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                  <div className={`capture_bottom_btn ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => setShowObjModal("importModal")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className="capture_bottom_btn"  onClick={handleExportClick}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`}  onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2505,18 +2505,18 @@ const handleAddAccordion = () => {
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            { (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
             <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
-              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+             editor={(showCaptureScreen || (assignUser && !showCaptureScreen)) ? (options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
+              bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2548,7 +2548,7 @@ const handleAddAccordion = () => {
             <div style={{ position:'fixed', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', right: '68rem', background: '#D9342B', border: 'none' }} onClick={()=>setShowDailogForOnDelete(true)} ></Button> : null}
-                {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen))) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
                     <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
@@ -2917,7 +2917,7 @@ function getProcessedBody(body, type) {
   if (body.indexOf("{") === 0 || body.indexOf("[") === 0)
     processedBody = JSON.stringify(JSON.parse(body), null, '\t');
   else
-    // processedBody = formatXml(body.replace(/>\s+</g, '><'));
+    processedBody = formatXml(body.replace(/>\s+</g, '><'));
 
     if (type === 'scrape')
       processedBody = processedBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');
