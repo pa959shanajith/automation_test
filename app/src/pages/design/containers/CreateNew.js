@@ -283,7 +283,6 @@ const CreateNew = ({ importRedirect }) => {
                                             userId={userInfo.user_id}
                                             toast={toast}
                                             configurationName={configurationName}
-                                            setConfigurationName={setConfigurationName}
                                     />
                                 </div>
                                 {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}

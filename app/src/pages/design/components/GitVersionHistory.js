@@ -92,14 +92,16 @@ const handleRestore = (rowdata) => {
           }
         })
         ResetSession.start();
-        let data = await importGitMindmap({
+        let apiData = {
           "param":props.configName,
           "appType": rowSelectedProject.appType,
           "expProj": sourceProjectId,
-          "gitVersion": rowdata.version,
           "projectId": rowdata.selectedProject.id,
           "projectName": rowdata.selectedProject.name
-        });
+        }
+        props.configName === "git" ? apiData.gitVersion = rowdata.version  : apiData.bitVersion =  rowdata.version;
+
+        let data = await importGitMindmap(apiData);
         if (data.error) {
           // toast.current.show({ severity: 'error', summary: 'Error', detail: data.error, life: 3000 });
           if (data.error === "No entries") {

@@ -1082,10 +1082,10 @@ export const gitSaveConfig = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:"Error while Git "+data.action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }catch(err){
         console.error(err)
-        return {error:"Error while Git "+data.action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }
 }
 
@@ -1564,32 +1564,7 @@ export const save_testcase = async(props) => {
     }
 }
 
-export const fetch_git_exp_details = async(projectId, param) => { 
-    try{
-        const res = await axios(url+'/fetch_git_exp_details', {
-            method: 'POST',
-            headers: {
-            'Content-type': 'application/json',
-            },
-            data: {
-				projectId: projectId,
-                param:param
-            },
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }else if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.ADMIN.ERR_FETCH_GIT}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.ADMIN.ERR_FETCH_GIT}
-    }
-}
+
 // All Test suites Data
 export const unlockTestSuites = async(inputs) => {
     try {

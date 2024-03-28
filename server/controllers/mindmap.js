@@ -1390,11 +1390,11 @@ exports.importGitMindmap = async (req, res) => {
 			"expProj":expProj
 		}
 		if (param=="git"){
-			const gitVersion = data.gitVersion;			
+			const gitVersion = req.body.gitVersion;			
 			inputs["gitVersion"]= gitVersion			
 		}
 		else if (param=="bit"){
-			const bitVersion = data.bitVersion;			
+			const bitVersion = req.body.bitVersion;			
 			inputs["bitVersion"]= bitVersion			
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);

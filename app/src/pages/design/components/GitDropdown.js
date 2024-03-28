@@ -43,6 +43,7 @@ const GitDropdown = (props) => {
   const gituserRef = useRef();
   const gitemailRef = useRef();
   const gitbranchRef = useRef();
+  const bitProjectKey = useRef();
   const dispatch = useDispatch();
   const [isData, setIsData] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -144,6 +145,7 @@ const GitDropdown = (props) => {
       gitemailRef.current.value = data[4];
       gitbranchRef.current.value = data[5];
       gitconfigRef.current.disabled = true;
+      bitProjectKey.current.value = data[6];
     }
   }
 
@@ -185,6 +187,7 @@ const GitDropdown = (props) => {
     gitbranchRef.current.value = "";
     gitconfigRef.current.readOnly = false;
     gitconfigRef.current.disabled = false;
+    bitProjectKey.current.value = ""
   }
 
   const gitConfigAction = async (action) => {
@@ -216,6 +219,7 @@ const GitDropdown = (props) => {
           apiPayloadData.bitUsername = gituserRef.current.value.trim();
           apiPayloadData.bitWorkSpace = gitemailRef.current.value.trim();
           apiPayloadData.bitBranch = gitbranchRef.current.value.trim();
+          apiPayloadData.bitProjectKey = bitProjectKey.current.value.trim()
         }
       }
       const data = await gitSaveConfig(apiPayloadData);
@@ -223,10 +227,10 @@ const GitDropdown = (props) => {
       if (data.error) { props.toastError(data.error); return; }
 
       if (["update", "create"].includes(action)) {
-        if (data === 'GitConfig exists') props.toastWarn(MSG.ADMIN.WARN_GITCONFIG_EXIST);
-        else if (data === 'GitUser exists') props.toastWarn(MSG.ADMIN.WARN_GIT_PROJECT_CONFIGURED);
+        if (data === `${apiPayloadData.param}Config exists`) props.toastWarn(`${props.configurationName} configration name already exists.`);
+        else if (data === `${apiPayloadData.param}User exists`) props.toastWarn(`${props.configurationName} configuration already exists for this user and project combination.`);
         else {
-          props.toastSuccess(MSG.CUSTOM("Git configuration " + action + "d successfully", VARIANT.SUCCESS));
+          props.toastSuccess(MSG.CUSTOM(`${props.configurationName} configuration ${action}d successfully`, VARIANT.SUCCESS));
         }
         visibleGitconfFormAfterCreatePrj ? setVisibleGitconfFormAfterCreatePrj(false) : setDialogVisible(false);
         setDropdownVisible(true);
@@ -275,7 +279,7 @@ const GitDropdown = (props) => {
       }
       else {
         ResetSession.start();
-        var res = await exportToGit({
+        const apiData = props.configurationName === "git" ? {
           param: props.configurationName,
           gitVersion: versionName,
           mindmapId: commitModuleList,
@@ -283,10 +287,19 @@ const GitDropdown = (props) => {
           "projectId": props.projectId,
           "projectName": props.projectName,
           gitComMsgRef: commitMsg.trim()
-        });
+        } : {
+              param: props.configurationName,
+              bitVersion: versionName,
+              mindmapId: commitModuleList,
+              "exportProjAppType": props.appType,
+              "projectId": props.projectId,
+              "projectName": props.projectName,
+              bitComMsgRef: commitMsg.trim()
+            }
+        var res = await exportToGit(apiData);
         if (res.error) { props.toastError(res.error); return; }
         else {
-          toast.current.show({ severity: 'success', summary: 'Success Message', detail: 'Test suite(s) pushed to Git' });
+          toast.current.show({ severity: 'success', summary: 'Success Message', detail: `Test suite(s) pushed to ${props.configurationName}` });
           setDialogVisible(false);
           setSelectedImage("")
           setCommitModuleList([]);
@@ -380,6 +393,8 @@ const GitDropdown = (props) => {
             gituserRef={gituserRef}
             gitemailRef={gitemailRef}
             gitbranchRef={gitbranchRef}
+            configName={props.configurationName }
+            bitProjectKey={bitProjectKey}
           />}
         {selectedImage === 'commit' ? (
           <GitCommit

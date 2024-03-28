@@ -2554,7 +2554,8 @@ exports.gitSaveConfig = async (req, res) => {
 			inputs["bitUsername"]= bitUsername;
 			inputs["workspace"]= data.bitWorkSpace;
 			inputs["bitbranch"]= bitbranch;
-			inputs["param"]= param
+			inputs["param"]= param;
+			inputs["projectkey"] = data.bitProjectKey;
 		}
 		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
 		return res.send(result);
@@ -2583,7 +2584,7 @@ exports.gitEditConfig = async (req, res) => {
 		else if (result == "empty") res.send("empty");
 		else if (param =="bit"){
 			let data = [];
-			data.push(result['name'], result['bitaccesstoken'], result['biturl'], result['bitusername'], result['workspace'], result['bitbranch']);
+			data.push(result['name'], result['bitaccesstoken'], result['biturl'], result['bitusername'], result['workspace'], result['bitbranch'], result['projectkey']);
 			return res.send(data);
 		}
 		else{

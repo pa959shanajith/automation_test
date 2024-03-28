@@ -49,7 +49,7 @@ const FormInputGit = (props) => {
     }
     return (
         <>
-            <div className='flex w-full justify-content-between'>
+            <div className='flex w-full justify-content-between align-items-center'>
                 <label>{name}</label>
                 <InputText value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className="w-full md:w-25rem"  placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></InputText>
                 {/* <input value={textValue} type={type} ref={inpRef} onChange={() => { upateInput() }} className={'middle__input__border form-control__conv-project form-control-custom left-opt'} placeholder={placeholder} maxLength={validExp === "poolName" || validExp === "emailServerName" ? "100" : ""}></input> */}

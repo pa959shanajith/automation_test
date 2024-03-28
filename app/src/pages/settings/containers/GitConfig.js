@@ -24,6 +24,7 @@ const GitConfig = (props) => {
     const gituserRef = useRef();
     const gitemailRef = useRef();
     const gitbranchRef = useRef();
+    const bitProjectKey = useRef();
     const [domainList, setDomainList] = useState([])
     const [projectList, setProjectList] = useState([])
     const [userData, setUserData] = useState({})
@@ -46,11 +47,12 @@ const GitConfig = (props) => {
     useEffect(() => {
         setShowEdit(false);
         // if (!isUsrSetting) {
-        refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
+        refreshFields(bitProjectKey, domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
         ProjectRef.current.value = '';
         userRef.current.value = '';
         setSelectProject('');
         setProjectList('');
+        
         // eslint-disable-next-line
         // } else {
         //     fetchDomainList(resetSelectList, setDomainList, displayError, setLoading);
@@ -66,6 +68,7 @@ const GitConfig = (props) => {
         gitemailRef.current.style.outline = "";
         gitbranchRef.current.style.outline = "";
         setSelectProject(ProjectRef.current?.value);
+        if(bitProjectKey.current) bitProjectKey.current.value = '';
 
         (async () => {
             if (showEdit) {
@@ -89,6 +92,7 @@ const GitConfig = (props) => {
                     gituserRef.current.value = data[3];
                     gitemailRef.current.value = data[4];
                     gitbranchRef.current.value = data[5];
+                    bitProjectKey.current.value = data[6];
                 }
                 setLoading(false);
             }
@@ -98,7 +102,7 @@ const GitConfig = (props) => {
         // return ProjectRef;
     }
 
-    const refreshFields = (domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, urlRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading) => {
+    const refreshFields = (bitProjectKey,domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, urlRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading) => {
         fetchUsers(setUserList, setUserData, displayError, setLoading);
         setDomainList([])
         // setProjectList([])
@@ -111,6 +115,7 @@ const GitConfig = (props) => {
         gituserRef.current.value = "";
         gitemailRef.current.value = "";
         gitbranchRef.current.value = "";
+        // bitProjectKey.current.value = '';
         // if (document.getElementById("userGit") !== null) document.getElementById("userGit").selectedIndex = "0";
         // if (document.getElementById("domainGit") !== null) document.getElementById("domainGit").selectedIndex = "0";
         // if (document.getElementById("projectGit") !== null) document.getElementById("projectGit").selectedIndex = "1";
@@ -123,6 +128,10 @@ const GitConfig = (props) => {
         gituserRef.current.style.outline = "";
         gitemailRef.current.style.outline = "";
         gitbranchRef.current.style.outline = "";
+        if (bitProjectKey.current) {
+            bitProjectKey.current.value ="";
+        }
+        
     }
 
     const fetchDomainList = async (resetSelectList, setDomainList, displayError, setLoading) => {
@@ -180,7 +189,7 @@ const GitConfig = (props) => {
     const onClickEdit = () => {
         setShowEdit(true);
         // if (!isUsrSetting) {
-            refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
+            refreshFields(bitProjectKey, domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
             ProjectRef.current.value = '';
             userRef.current.value = '';
             setSelectProject('');
@@ -220,10 +229,11 @@ const GitConfig = (props) => {
             gitemailRef.current.value = "";
             gitbranchRef.current.value = "";
         }
+        if(bitProjectKey.current ) bitProjectKey.current.value ="";
     }
 
     const resetFields = () => {
-        refreshFields(domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
+        refreshFields(bitProjectKey, domainRef, ProjectRef, userRef, gitconfigRef, tokenRef, urlRef, gituserRef, gitemailRef, gitbranchRef, setDomainList, setProjectList, setProjectData, setUserList, setUserData, displayError, setLoading);
         // if (isUsrSetting) {
         //     fetchDomainList(resetSelectList, setDomainList, displayError, setLoading);
         // }
@@ -241,10 +251,9 @@ const GitConfig = (props) => {
         <div className="git_container">
             {loading ? <ScreenOverlay content={loading} /> : null}
 
-            <div className='flex flex-row w-full align-items-center justify-content-between'>
+            <div className='flex flex-row w-full align-items-center justify-content-between ' >
                 <span className="label_git" >User</span>
                 <Dropdown data-test="user_git" value={userRef?.current?.value} className='w-full md:w-25rem' inputId={'userGit'} inputRef={userRef}
-                    // onChangeFn={() => fetchDomainList(resetSelectList, setDomainList, displayError, setLoading)} 
                     onChange={() => fetchProjectList(resetSelectList, userData, userRef, setProjectList, setProjectData, displayError, setLoading, ProjectRef)}
                     placeholder={"Select User"} options={userList} />
             </div>
@@ -266,7 +275,9 @@ const GitConfig = (props) => {
             
             <FormInputGit label={`${props.screenName} Branch`} data-test="branch" inpRef={gitbranchRef} placeholder={'Enter Branch'} />
             
-            <GitButtonActions screenName={props.screenName} resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} setSelectProject={setSelectProject}
+            {props.screenName === "Bitbucket" && <FormInputGit label={`${props.screenName} Project Key`} data-test="project_key" inpRef={bitProjectKey} placeholder={'Enter key'} />}
+
+            <GitButtonActions bitProjectKey={bitProjectKey} screenName={props.screenName} resetFields={resetFields} showEdit={showEdit} onClickEdit={onClickEdit} domain={domainRef} user={userRef} Project={ProjectRef} gitname={gitconfigRef} token={tokenRef} setSelectProject={setSelectProject}
                 url={urlRef} gituser={gituserRef} gitemail={gitemailRef} gitbranch={gitbranchRef} userData={userData} projectData={projectData} setLoading={setLoading} displayError={displayError} refreshFields={refreshFields} toastError={props.toastError} toastSuccess={props.toastSuccess} toastWarn={props.toastWarn} />
         </div>
     );
