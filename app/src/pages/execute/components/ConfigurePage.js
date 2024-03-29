@@ -227,6 +227,9 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   if (!projectInfo) projectInfo = projectInfoFromRedux;
   else projectInfo = projectInfo;
 
+  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
+
   const [radioButton_grid, setRadioButton_grid] = useState(
     projectInfo?.appType==="Web"? "Execute with Avo Assure Client" : "Execute with Avo Assure Agent/ Grid"
   );
@@ -1359,8 +1362,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
             >  
               Execute Now
             </Button>
+            <div className={isQualityEngineer ? 'schedule_Disable_tooltip' : 'schedule'}></div>
             <Button
-              className="schedule"
+              className={!isQualityEngineer?"schedule":"Schedule_enggRole"}
               onClick={() => {
                 setSelectedSchedule(item);
                 setConfigItem(idx);
@@ -1388,6 +1392,8 @@ const handleSubmit1 = async (SauceLabPayload) => {
                 handleTestSuite(item);
               }}
               size="small"
+              disabled={isQualityEngineer}
+              title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
             >
               Schedule
             </Button>
@@ -1422,14 +1428,14 @@ const handleSubmit1 = async (SauceLabPayload) => {
             />
             <img src="static/imgs/ic-edit.png"
               style={{ height: "20px", width: "20px" }}
-              className=" pencil_button p-button-edit"  onClick={() => configModal("CancelUpdate", item)}
+              className={!isQualityEngineer?"pencil_button p-button-edit":"pencil_enggRole"} onClick={!isQualityEngineer?() => configModal("CancelUpdate", item):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
               />
               <Tooltip target=".trash_button" position="bottom" content=" Delete the Execution Configuration."  className="small-tooltip" style={{fontFamily:"Open Sans"}}/>
                <img
               
               src="static/imgs/ic-delete-bin.png"
               style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-              className="trash_button p-button-edit"onClick={(event) => confirm_delete(event, item)} />
+              className={isQualityEngineer?"trash_disable":" trash_button p-button-edit"}onClick={!isQualityEngineer?(event) => confirm_delete(event, item):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } />
               <Tooltip target=".pencil_button" position="left" content="Edit the Execution Configuration."/>
           </div>
         ),
@@ -2684,9 +2690,11 @@ Learn More '/>
             </div>
           </div>
           <Button
-            className="configure_button"
+            className={!isQualityEngineer?"configure_button":"configureEngRole"}
             onClick={() => configModal("CancelSave")}
-            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}
+            title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
+            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'auto'}}
+            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)|| isQualityEngineer)}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
@@ -2735,7 +2743,7 @@ Learn More '/>
             />
           </div>
           <div className="col-12 lg:col-4 xl:col-4 md:col-6 sm:col-12">
-              <div className="flex flex-row justify-content-between align-items-center">
+              <div className="flex flex-row justify-content-between align-items-center addconfig">
                 <AvoInput
                   icon="pi pi-search"
                   placeholder="Search"
@@ -2745,7 +2753,7 @@ Learn More '/>
                   inputType="searchIcon"
                 />
               {(!!configList.length  && activeIndex1 === 0)?  (
-                <Button className="addConfig_button" onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole))}>
+                <Button className={!isQualityEngineer?"addConfig_button":"addconfig_enggRole"} onClick={() => {configModal("CancelSave");setTypeOfExecution("");}} size="small"  disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole) || isQualityEngineer)} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } >
                Add Configuration
                <Tooltip target=".addConfig_button" position="bottom" content="Select Test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
                 </Button>

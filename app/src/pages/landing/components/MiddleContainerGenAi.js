@@ -58,6 +58,7 @@ const MiddleContainerGenAi = () =>{
     const [showSearchBox, setShowSearchBox] = useState(false);
     const template_id = useSelector((state) => state.setting.template_id);
     const [swaggerResponseData, setSwaggerResponseData] = useState("");
+    const [disableOption,setDisableOption] = useState(false);
 
     console.log(template_id)
 
@@ -153,7 +154,7 @@ const MiddleContainerGenAi = () =>{
           const instancename = "Avo Assure";
           const generateType = {
             typename: 'userstories',
-            summary: selectedSummaries+ ". One step should have only one action, actionable object and a value. The name of all actionable objects should be in double quotes and their values in single quotes. Show only one test case."
+            summary: selectedSummaries//+ ". One step should have only one action, actionable object and a value. The name of all actionable objects should be in double quotes and their values in single quotes. Show only one test case."
           };
           const formData3 = {
             "name": username,
@@ -202,178 +203,9 @@ const MiddleContainerGenAi = () =>{
       };
 
       const fetchData = async (code) => {
-        if (code === "function") {
-          try{
-            setOverlay("Mind Map generation in progress...")
-            const data = userTestcase;
-            const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                data: data
-                })
-                if(testData.status === 401 || testData.data === "Invalid Session"){
-                RedirectPage(history)
-                return {error:MSG.GENERIC.INVALID_SESSION};
-            }
-            else if(testData.status === "fail" ){
-                return {error:MSG.ADMIN.ERR_FETCH_OPENID}
-            }
-            const testSteps = testData.data[1]
-            const dataObjects = testData.data[0]
-            let random_suffix = (Math.random() + 1).toString(36).substring(7)
-            const mindmap_data = {
-                "action": "/saveData",
-                "createdthrough": "Web",
-                "cycId":undefined,
-                "write": 10,
-                "map": [
-                {
-                    "id": 0,
-                    "childIndex": 0,
-                    "_id": null,
-                    "oid": null,
-                    "name": "AI_testsuite-"+random_suffix,
-                    "type": "modules",
-                    "pid": null,
-                    "pid_c": null,
-                    "task": null,
-                    "renamed": false,
-                    "orig_name": null,
-                    "taskexists": null,
-                    "state": "created",
-                    "cidxch": null
-                },
-                {
-                    "id": 1,
-                    "childIndex": 1,
-                    "_id": null,
-                    "oid": null,
-                    "name": "AI_testcase-"+random_suffix,
-                    "type": "scenarios",
-                    "pid": 0,
-                    "pid_c": null,
-                    "task": null,
-                    "renamed": false,
-                    "orig_name": null,
-                    "taskexists": null,
-                    "state": "created",
-                    "cidxch": null
-                },
-                {
-                    "id": 2,
-                    "childIndex": 2,
-                    "_id": null,
-                    "oid": null,
-                    "name": "AI_screen-"+random_suffix,
-                    "type": "screens",
-                    "pid": 1,
-                    "pid_c": null,
-                    "task": null,
-                    "renamed": false,
-                    "orig_name": null,
-                    "taskexists": null,
-                    "state": "generated",
-                    "cidxch": null
-                },
-                {
-                    "id": 3,
-                    "childIndex": 3,
-                    "_id": null,
-                    "oid": null,
-                    "name": "AI_teststeps-"+random_suffix,
-                    "type": "testcases",
-                    "pid": 2,
-                    "pid_c": null,
-                    "task": null,
-                    "renamed": false,
-                    "orig_name": null,
-                    "taskexists": null,
-                    "state": "generated",
-                    "cidxch": null
-                }
-                ],
-                "deletednode": [],
-                "unassignTask": [],
-                "prjId": JSON.parse(localStorage.getItem('DefaultProject')).projectId,
-                "createdthrough": "Web",
-                "relId": null
-            }
-        
-        
-            var moduleRes = await saveMindmap(mindmap_data);
-            if (moduleRes === "Invalid Session") return RedirectPage(history);
-            if (moduleRes.error) { displayError(moduleRes.error); return }
-                var moduledata = await getModules({ "tab": "tabCreate", "projectid": JSON.parse(localStorage.getItem('DefaultProject')).projectId , "moduleid": [moduleRes], cycId: null })
-                if (moduledata === "Invalid Session") return RedirectPage(history);
-                if (moduledata.error) { displayError(moduledata.error); return; }
-        
-                var screenId = moduledata.children[0].children[0]._id;
-                var testcasesId = moduledata.children[0].children[0].children[0]._id;
-                var orderList = []
-                dataObjects.map(dataObject=>{dataObject['tempOrderId']=uuid(); orderList.push(dataObject['tempOrderId'])}) 
-        
-                var addedObj = {createdthrough:"",
-                        mirror:"",
-                        name:"AI_screen-"+random_suffix,
-                        orderList:[],
-                        reuse:false,  
-                        scrapedurl:"",
-                        view:dataObjects
-                        };
-                const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-                let params = {
-                'deletedObj': [],
-                'modifiedObj': [],
-                'addedObj': addedObj,
-                'screenId': screenId,
-                'userId': userInfo.user_id,
-                'roleId': userInfo.role,
-                'param': 'saveScrapeData',
-                'orderList': orderList
-            }
-            await scrapeApi.updateScreen_ICE(params)
-            .then(response =>  {
-                if (response == "Success") {
-                toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements Captured Successfully.', life: 5000 });
-            }
-            else {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Something went wrong', life: 5000 });
-                }
-            })
-            .catch(error => {
-                setOverlay("");
-                console.error("ERROR::::", error)
-            });
-            await DesignApi.updateTestCase_ICE(testcasesId,"AI_teststeps-"+random_suffix,testSteps,userInfo,0,false,[])
-            .then(data => {
-                setOverlay("");
-                if (data === "Invalid Session") RedirectPage(history);
-                if (data === "success") toast.current.show({ severity: 'success', summary: 'Success', detail: 'Mindmap Created Successfully.', life: 5000 });;
-            })
-            .catch(error => {
-                setOverlay("");
-                console.error("ERROR::::", error)
-            });
-        
-            navigate("/design");
-            // var reqForOldModule={
-            //   tab:"createTab",
-            //   projectid:JSON.parse(localStorage.getItem('DefaultProject')).projectId,
-            //   version:0,
-            //   cycId: null,
-            //   modName:"",
-            //   moduleid:null
-            // }
-            // await getModules(reqForOldModule)
-            }
-            catch (error) {
-            setOverlay("");
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Network Error.', life: 3000 });
-            }
-        } else if (code == 'api') {
-
+        if (code === "function") 
+          functionalMindMapCreation()
+         else if (code == 'api') {
           await CreationOfMindMap(swaggerResponseData)
           setOverlay("")
           navigate("/design");
@@ -603,45 +435,233 @@ const MiddleContainerGenAi = () =>{
         }
         setOverlay('')
       }
+
+      const functionalMindMapCreation = async ()=>{
+        try{
+          setOverlay("Mind Map generation in progress...")
+        const data = userTestcase;
+        const testData = await axios('http://avogenerativeai.avoautomation.com/predictionFromSteps', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            data: data
+            })
+            if(testData.status === 401 || testData.data === "Invalid Session"){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        else if(testData.status === "fail" ){
+            return {error:MSG.ADMIN.ERR_FETCH_OPENID}
+        }
+        let random_suffix = (Math.random() + 1).toString(36).substring(7)
+        const mindmap_data = {
+            "createdthrough": "Web",
+            "cycId":undefined,
+            "write": 10,
+            "map": [
+            {
+                "id": 0,
+                "childIndex": 0,
+                "_id": null,
+                "oid": null,
+                "name": "AI_testsuite-"+random_suffix,
+                "type": "modules",
+                "pid": null,
+                "pid_c": null,
+                "task": null,
+                "renamed": false,
+                "orig_name": null,
+                "taskexists": null,
+                "state": "created",
+                "cidxch": null
+            },
+            ],
+            "deletednode": [],
+            "unassignTask": [],
+            "prjId": JSON.parse(localStorage.getItem('DefaultProject')).projectId,
+            "createdthrough": "Web",
+            "relId": null
+        }
+        for (var i=1;i<=testData.data.length;i++)
+        {
+            mindmap_data.map.push(
+            {
+                "id": i,
+                "childIndex": i,
+                "_id": null,
+                "oid": null,
+                "name": "AI_testcase-"+(Math.random() + 1).toString(36).substring(7),
+                "type": "scenarios",
+                "pid": 0,
+                "pid_c": null,
+                "task": null,
+                "renamed": false,
+                "orig_name": null,
+                "taskexists": null,
+                "state": "created",
+                "cidxch": null
+            })
+        }
+        var j = testData.data.length+1
+        for (var i=1;i<=testData.data.length;i++){
+            random_suffix = (Math.random() + 1).toString(36).substring(7)
+            mindmap_data.map.push(
+            {
+                "id": i+testData.data.length,
+                "childIndex": 1,
+                "_id": null,
+                "oid": null,
+                "name": "AI_screen-"+random_suffix,
+                "type": "screens",
+                "pid": i,
+                "pid_c": null,
+                "task": null,
+                "renamed": false,
+                "orig_name": null,
+                "taskexists": null,
+                "state": "generated",
+                "cidxch": null,
+                "scrapeinfo":""
+            })
+            mindmap_data.map.push(
+            {
+                "id": i+2*testData.data.length,
+                "childIndex": 1,
+                "_id": null,
+                "oid": null,
+                "name": "AI_teststeps-"+random_suffix,
+                "type": "testcases",
+                "pid": i+testData.data.length,
+                "pid_c": null,
+                "task": null,
+                "renamed": false,
+                "orig_name": null,
+                "taskexists": null,
+                "state": "generated",
+                "cidxch": null
+            })
+            j+=2
+            random_suffix = (Math.random() + 1).toString(36).substring(7)
+        }
+        
+        var moduleRes = await saveMindmap(mindmap_data);
+        if (moduleRes === "Invalid Session") return RedirectPage(history);
+        if (moduleRes.error) { displayError(moduleRes.error); return }
+
+        var moduledata = await getModules({ "tab": "tabCreate", "projectid": JSON.parse(localStorage.getItem('DefaultProject')).projectId , "moduleid": [moduleRes], cycId: null })
+        if (moduledata === "Invalid Session") return RedirectPage(history);
+        if (moduledata.error) { displayError(moduledata.error); return; }
+
+        for (var i=0;i<testData.data.length;i++){
+            var screenData = testData.data[i];
+            var dataObjects = screenData[0];
+            var testSteps = screenData[1];
+            var screenId = moduledata.children[i].children[0]._id;
+            var testcasesId = moduledata.children[i].children[0].children[0]._id;
+            var orderList = []
+            dataObjects.map(dataObject=>{dataObject['tempOrderId']=uuid(); orderList.push(dataObject['tempOrderId'])}) 
+        
+            var addedObj = {createdthrough:"",
+                    mirror:"",
+                    name:"AI_screen-"+random_suffix,
+                    orderList:[],
+                    reuse:false,  
+                    scrapedurl:"",
+                    view:dataObjects
+                };
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            let params = {
+                'deletedObj': [],
+                'modifiedObj': [],
+                'addedObj': addedObj,
+                'screenId': screenId,
+                'userId': userInfo.user_id,
+                'roleId': userInfo.role,
+                'param': 'saveScrapeData',
+                'orderList': orderList
+            }
+
+            const screenRes = await scrapeApi.updateScreen_ICE(params)
+            if (screenRes === "Invalid Session") return RedirectPage(history);
+            if (screenRes.error) { displayError(screenRes.error); return }
+
+            const teststepRes = await DesignApi.updateTestCase_ICE(testcasesId,"AI_teststeps-"+random_suffix,testSteps,userInfo,0,false,[])
+            if (teststepRes === "Invalid Session") return RedirectPage(history);
+            if (teststepRes.error) { displayError(teststepRes.error); return }
+                    
+        }
+    
+        navigate("/design");
+      }
+        catch (error) {
+          setOverlay("");
+          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Network Error.', life: 3000 });
+        }
+    }
     return(
         <>
          {overlay ? <ScreenOverlay content={overlay} /> : null}
          {/* <ToastMessage message={toastMessage} /> */}
           <Toast ref={toast} ></Toast>
-
             <div className='flex flex-column pl-2 pb-2' style={{ gap: "0.5rem" }} >
-
-                <span> <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /> <label className="pb-2 label-genai3">Generate Test Case</label></span>
+                <div className="flex flex-row align-items-center">
+                  <div className="w-1rem mr-1 flex flex-row align-items-center justify-content-center">
+                    <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{width:"100%" }} />
+                  </div>
+                  <label className="label-genai3">Generate Test Case</label>
+                </div>
                 <div className="flex flex-row" style={{ gap: "3rem" }}>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionA"
-                            name="option"
+                            className="mr-2"
+                            inputId="systemLevelTc"
+                            name="systemLevelTc"
                             value="a"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'a'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionA" className="pb-2 label-genai2">System level test cases  <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="systemLevelTc" className="">
+                          <span>System level test cases</span>
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionB"
-                            name="option"
+                            className="mr-2"
+                            inputId="moduleLevelTc"
+                            name="moduleLevelTc"
                             value="b"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'b'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionB" className="pb-2 label-genai2">Module level test case <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="moduleLevelTc" className="">
+                          <span>Module level test case</span> 
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
-                    <div className="p-field-radiobutton">
+                    <div className="flex flex-row justify-content-center align-items-center">
                         <RadioButton
-                            inputId="optionC"
-                            name="option"
+                            className="mr-2"
+                            inputId="userStoryLevelTc"
+                            name="userStoryLevelTc"
                             value="c"
                             onChange={handleOptionChange}
                             checked={selectedOption === 'c'}
+                            disabled={disableOption}
                         />
-                        <label htmlFor="optionC" className="pb-2 label-genai2">User story level test case <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></label>
+                        <label htmlFor="userStoryLevelTc" className="">
+                          <span>User story level test case</span>
+                        </label>
+                        <div className="w-1 flex flex-row justify-content-center align-items-center">
+                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+                        </div>
                     </div>
 
                  
@@ -649,9 +669,9 @@ const MiddleContainerGenAi = () =>{
 
         </div>
         {selectedOption == null && <BlankScreenGenAI />}
-        {selectedOption === 'a' && <SystemLevelTestcase />} 
-        {selectedOption === 'b' && <ModuleLevelTestcase />} 
-       {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container'>
+        {selectedOption === 'a' && <SystemLevelTestcase setDisableOption={setDisableOption} />} 
+        {selectedOption === 'b' && <ModuleLevelTestcase setDisableOption={setDisableOption} selectedOption={selectedOption}/>} 
+       {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container justify-content-center align-items-center'>
                    <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
                    <label> Select any one of the three methods mentioned above</label>
                     </div>) : ""}
@@ -689,7 +709,6 @@ const MiddleContainerGenAi = () =>{
           {isLoading && <div className="spinner" style={{ position: 'absolute', top: '29rem', left: '32rem' }}>
             <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
           </div>}
-              
               {userlevel ? (<>
                 <div style={{ textAlign: 'left', padding: '5px' }}>
                 <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => userStoryTestCase(e.target.value)} className="text-area-user-story" style={{width:'30rem'}}/>                 

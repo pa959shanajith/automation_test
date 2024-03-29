@@ -81,7 +81,9 @@ const initialState = {
   enablePlayButton:false,
   selectedRepository:{},
   emptyDatatable:false,
-  currentplaybutton:null
+  currentplaybutton:null,
+  testCaseAssign:{},
+  moduleNewNodeAdd:false
 }
 
 export const designSlice = createSlice({
@@ -295,6 +297,12 @@ export const designSlice = createSlice({
 },
 setCurrentDebugPlayButton:(state,action)=>{
   state.currentplaybutton=action.payload
+},
+setTestCaseAssign:(state, action) =>{
+  state.testCaseAssign = action.payload
+},
+SetModuleNewNodeAdd:(state, action)=>{
+  state.moduleNewNodeAdd = action.payload
 }
 
 }
@@ -342,6 +350,6 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedScreenOfStepSlice,
   setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
   SetAdvanceDebug,
-  SetEnablePlayButton,SetSelectedRepository,SetEmptyDatatable,setCurrentDebugPlayButton} = designSlice.actions
+  SetEnablePlayButton,SetSelectedRepository,SetEmptyDatatable,setCurrentDebugPlayButton,setTestCaseAssign,SetModuleNewNodeAdd} = designSlice.actions
 
 export default designSlice.reducer

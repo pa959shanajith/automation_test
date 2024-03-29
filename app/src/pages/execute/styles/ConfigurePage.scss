@@ -234,6 +234,7 @@
   }
 }
 
+
 }
 
 .no_card_content1 {
@@ -242,6 +243,7 @@
   align-items: center;
   // margin-top: 16rem;
   width: 100%;
+  cursor: not-allowed !important;
 
   .image-container1 {
     display: flex;
@@ -286,32 +288,48 @@
 }
 
 .configure_button {
-  // top: 31rem;
-  // left: 42rem;
-  // position: absolute;
   width: 172px;
   height: 45px;
-  // left: calc(47% - 123px);
   background: #605bff;
   border-radius: 10px;
   font: $f7_semibold;
   width: 15rem;
   height: 2rem;
-
-  /* identical to box height */
-
   display: flex;
   align-items: center;
   text-align: revert;
   flex-direction: row;
   font-family: "open Sans";
-
   justify-content: center;
-
-  /* white */
-
   color: #ffffff;
   font: $f7_semibold;
+  cursor: pointer;
+  .p-disabled{
+    cursor: not-allowed !important; 
+    pointer-events: none;
+    -webkit-user-select: none;
+  }
+}
+.configureEngRole {
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+  width: 172px;
+  height: 45px;
+  background: #605bff;
+  border-radius: 10px;
+  font: $f7_semibold;
+  width: 15rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  text-align: revert;
+  flex-direction: row;
+  font-family: "open Sans";
+  justify-content: center;
+  color: #ffffff;
+  font: $f7_semibold;
+
 }
 .datatable-container {
   width: 100%;
@@ -331,12 +349,25 @@
   height: "2rem";
   justify-content: center;
 }
+.Schedule_enggRole{
+  width: "6rem";
+  font-Family: "Open Sans";
+  font-Style: "normal";
+  height: "2rem";
+  justify-content: center;
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+}
 .CICD{
   width: "4.5rem";
   font-Family: "Open Sans";
   font-Style: "normal";
   height: "2rem";
   justify-content: center;
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
 }
 
   .Buttons_config_button {
@@ -356,12 +387,12 @@
       order: 0;
       width: 122px;
     }
-    .schedule{
-      width: "6rem";
-      font-Family: "Open Sans";
-      font-Style: "normal";
-      height: "2rem"
-    }
+    // .schedule{
+    //   width: "6rem";
+    //   font-Family: "Open Sans";
+    //   font-Style: "normal";
+    //   height: "2rem"
+    // }
     .CICD{
       width: "4.5rem";
       font-Family: "Open Sans";
@@ -1858,6 +1889,39 @@ bottom: 21%;
   flex-wrap: wrap;
   align-items: center;
 }
+.trash_disable{
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+  margin-bottom: -0.3rem;
+}
+.pencil_enggRole{
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+  margin-bottom: -0.3rem;
+}
+.addconfig_enggRole{
+  opacity: 0.3;
+  cursor: not-allowed !important;
+  pointer-events: all !important;
+  width: 16rem;
+  margin: 0 0.5rem 0 0;
+  padding: .4375rem .875rem;
+  text-align: center;
+  font-family: "Open Sans";
+  font:$f7_semibold ;
+  margin-left: 6rem;
+  right: 18px;
+  justify-content: center;
   
+}
+.addconfig > .p-disabled, .p-disabled *{
+  cursor: not-allowed !important;
+}
+.Buttons_config_button > .p-disabled, .p-disabled *{
+  cursor: not-allowed !important;
+  pointer-events: all !important;
 
+}
 
