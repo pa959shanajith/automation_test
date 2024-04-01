@@ -24,6 +24,7 @@ import {ScreenOverlay} from '../../global';
 import axios from 'axios';
 import {Messages as MSG} from '../../global';
 import { v4 as uuid } from 'uuid';
+import GenerateTestCaseList from "./GenerateTestCaseList";
 
 const MiddleContainerGenAi = () =>{
     const history = useNavigate();
@@ -38,7 +39,7 @@ const MiddleContainerGenAi = () =>{
     const [showGenarateIcon, setShowGenarateIcon] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const toast = useRef(null);
-    const [apiResponse, setApiResponse] = useState(null);
+    const [apiResponse, setApiResponse] = useState("");
     const navigate = useNavigate();
     const [apiDataReceived, setApiDataReceived] = useState(false);
     const [userstoryLevel, setuserstoryLevel] = useState(true);
@@ -59,6 +60,12 @@ const MiddleContainerGenAi = () =>{
     const template_id = useSelector((state) => state.setting.template_id);
     const [swaggerResponseData, setSwaggerResponseData] = useState("");
     const [disableOption,setDisableOption] = useState(false);
+    const [testStepSelection, setTestStepSelection] = useState("1")
+    const [selectedTestStep, SetSelectedTestStep] = useState(true);
+    const [selectedGenAiTc, setSelectedGenAiTc] = useState([]); 
+    const [textAreaData, setTextAreaData] = useState("");
+    const [readOnly, setReadOnly] = useState(false);
+    const [readOnlyData, setReadOnlyData] = useState("");
 
     console.log(template_id)
 
@@ -144,6 +151,7 @@ const MiddleContainerGenAi = () =>{
             .map(selectedTestCase => selectedTestCase.summary)
             .join('.');
           setUserTestcase('');
+          setApiResponse([]);
           setButtonDisabled(true);
           setIsLoading(true);
           const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -165,17 +173,33 @@ const MiddleContainerGenAi = () =>{
             "template_id":template_id
           };
           const response = await generate_testcase(formData3)
+          // setSelectedOption('');
           toast.current.show({ severity: 'success', summary: 'Success', detail: ' user story level testcases genarate sucessfully', life: 3000 });
-          setUserTestcase(response.data.response);
+          
+
+          if( !Array.isArray(response?.data?.response )){
+            toast.current.show({
+              severity: 'info',
+              summary: 'Info',
+              detail:`${response?.data?.response}`,
+              life: 5000
+          });
+          } else{
+            setApiResponse(response?.data?.response);
+
+          }
+          
           setSwaggerResponseData(response?.data?.swagger)
           setButtonDisabled(false);
           setUserlevel(true);
+          setIsLoading(false);
         } catch (error) {
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
         } finally {
           setIsLoading(false);
         }
       };
+      console.log(apiResponse);
       const handleCheckboxChange = (id, summary) => {
         if (selectedTestCases.includes(id)) {
           setSelectedTestCases(selectedTestCases.filter((testCaseId) => testCaseId !== id));
@@ -192,7 +216,7 @@ const MiddleContainerGenAi = () =>{
             "email": "gorla.nandini@avoautomation.com",
             "organization": "Avo Assure",
             "projectname": "test2",
-            "testcase": data,
+            "testcase": apiResponse,
             "type": type
           };
           const response = await save_testcase(formData);
@@ -599,201 +623,307 @@ const MiddleContainerGenAi = () =>{
           toast.current.show({ severity: 'error', summary: 'Error', detail: 'Network Error.', life: 3000 });
         }
     }
-    return(
+
+    const updateTextAreaData = (e) => {
+      setTextAreaData(e.target.value);
+      const getSelectedTcIndex = apiResponse?.findIndex((item)=>item.Id == selectedGenAiTc[0]["Id"]);
+      const updateApiResponse = apiResponse;
+      updateApiResponse[getSelectedTcIndex] = {...updateApiResponse[getSelectedTcIndex], "TestCase":e.target.value};
+      // setApiResponse(updateApiResponse)
+  }
+    return (
         <>
-         {overlay ? <ScreenOverlay content={overlay} /> : null}
-         {/* <ToastMessage message={toastMessage} /> */}
-          <Toast ref={toast} ></Toast>
-            <div className='flex flex-column pl-2 pb-2' style={{ gap: "0.5rem" }} >
-                <div className="flex flex-row align-items-center">
-                  <div className="w-1rem mr-1 flex flex-row align-items-center justify-content-center">
-                    <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{width:"100%" }} />
-                  </div>
-                  <label className="label-genai3">Generate Test Case</label>
-                </div>
-                <div className="flex flex-row" style={{ gap: "3rem" }}>
-                    <div className="flex flex-row justify-content-center align-items-center">
-                        <RadioButton
-                            className="mr-2"
-                            inputId="systemLevelTc"
-                            name="systemLevelTc"
-                            value="a"
-                            onChange={handleOptionChange}
-                            checked={selectedOption === 'a'}
-                            disabled={disableOption}
-                        />
-                        <label htmlFor="systemLevelTc" className="">
-                          <span>System level test cases</span>
-                        </label>
-                        <div className="w-1 flex flex-row justify-content-center align-items-center">
-                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
-                        </div>
-                    </div>
-                    <div className="flex flex-row justify-content-center align-items-center">
-                        <RadioButton
-                            className="mr-2"
-                            inputId="moduleLevelTc"
-                            name="moduleLevelTc"
-                            value="b"
-                            onChange={handleOptionChange}
-                            checked={selectedOption === 'b'}
-                            disabled={disableOption}
-                        />
-                        <label htmlFor="moduleLevelTc" className="">
-                          <span>Module level test case</span> 
-                        </label>
-                        <div className="w-1 flex flex-row justify-content-center align-items-center">
-                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
-                        </div>
-                    </div>
-                    <div className="flex flex-row justify-content-center align-items-center">
-                        <RadioButton
-                            className="mr-2"
-                            inputId="userStoryLevelTc"
-                            name="userStoryLevelTc"
-                            value="c"
-                            onChange={handleOptionChange}
-                            checked={selectedOption === 'c'}
-                            disabled={disableOption}
-                        />
-                        <label htmlFor="userStoryLevelTc" className="">
-                          <span>User story level test case</span>
-                        </label>
-                        <div className="w-1 flex flex-row justify-content-center align-items-center">
-                          <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
-                        </div>
-                    </div>
-
-                 
-
-
+        {overlay ? <ScreenOverlay content={overlay} /> : null}
+        <Toast ref={toast} ></Toast>
+        <div className='flex flex-column pl-2 pb-2' style={{ gap: "0.5rem" }} >
+          <div className="flex flex-row align-items-center">
+            <div className="w-1rem mr-1 flex flex-row align-items-center justify-content-center">
+              <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{ width: "100%" }} />
+            </div>
+            <label className="label-genai3">Generate Test Case</label>
+          </div>
+          <div className="flex flex-row" style={{ gap: "3rem" }}>
+            <div className="flex flex-row justify-content-center align-items-center">
+              <RadioButton
+                className="mr-2"
+                inputId="systemLevelTc"
+                name="systemLevelTc"
+                value="a"
+                onChange={handleOptionChange}
+                checked={selectedOption === 'a'}
+                disabled={disableOption}
+              />
+              <label htmlFor="systemLevelTc" className="">
+                <span>System level test cases</span>
+              </label>
+              <div className="w-1 flex flex-row justify-content-center align-items-center">
+                <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+              </div>
+            </div>
+            <div className="flex flex-row justify-content-center align-items-center">
+              <RadioButton
+                className="mr-2"
+                inputId="moduleLevelTc"
+                name="moduleLevelTc"
+                value="b"
+                onChange={handleOptionChange}
+                checked={selectedOption === 'b'}
+                disabled={disableOption}
+              />
+              <label htmlFor="moduleLevelTc" className="">
+                <span>Module level test case</span>
+              </label>
+              <div className="w-1 flex flex-row justify-content-center align-items-center">
+                <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+              </div>
+            </div>
+            <div className="flex flex-row justify-content-center align-items-center">
+              <RadioButton
+                className="mr-2"
+                inputId="userStoryLevelTc"
+                name="userStoryLevelTc"
+                value="c"
+                onChange={handleOptionChange}
+                checked={selectedOption === 'c'}
+                disabled={disableOption}
+              />
+              <label htmlFor="userStoryLevelTc" className="">
+                <span>User story level test case</span>
+              </label>
+              <div className="w-1 flex flex-row justify-content-center align-items-center">
+                <img src="static/imgs/info-circle_icon.svg" alt="SVG Image" className="w-full" />
+              </div>
+            </div>
+          </div>
         </div>
         {selectedOption == null && <BlankScreenGenAI />}
-        {selectedOption === 'a' && <SystemLevelTestcase setDisableOption={setDisableOption} />} 
-        {selectedOption === 'b' && <ModuleLevelTestcase setDisableOption={setDisableOption} selectedOption={selectedOption}/>} 
-       {selectedOption!='c' && selectedOption != 'a' && selectedOption != 'b' ? (<div className='flex flex-column img-container justify-content-center align-items-center'>
-                   <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
-                   <label> Select any one of the three methods mentioned above</label>
-                    </div>) : ""}
-                {selectedOption === 'c' && (
-                    <>
-                    <div className="flex flex-column" >
-                    {showGenarateIcon ? (
-        <div className="card-group p-3 " style={{ border: '1px solid #ccc', margin: '5px', display: 'flex', flexDirection: 'row' }}>
-          <div className="card card-data bg-light" >
-            <div className="card-body ">
-              <div className='summary-container'>
-                {summaries.map(testCase => (
-                  <div key={testCase.id} className="checkbox-container pt-2 pb-2">
-                    <label className="tooltip">
-                      <input
-                        type="checkbox"
-                        checked={selectedTestCases.includes(testCase.id)}
-                        onChange={() => handleCheckboxChange(testCase.id, testCase.summary)}
-                      />
-                      <span className="content">
-                        <span> {testCase.id} - {testCase.summary}</span>
-                        <span className="summary"> {testCase.summary}</span>
-                      </span>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          {/* <div className="ml-2 p-2" style={{ position: 'relative', top: '125px' }} >
-            <button disabled={buttonDisabled}>
-              <img src={genarateIcon} alt="Input" className="icon-genarate mr-3  text-dark" onClick={testCaseGenaration} />
-            </button>
-          </div> */}
-          {isLoading && <div className="spinner" style={{ position: 'absolute', top: '29rem', left: '32rem' }}>
-            <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
-          </div>}
-              {userlevel ? (<>
-                <div style={{ textAlign: 'left', padding: '5px' }}>
-                <InputTextarea id="testcase" autoResize value={userTestcase} onChange={(e) => userStoryTestCase(e.target.value)} className="text-area-user-story" style={{width:'30rem'}}/>                 
-                </div>
-              </>) :
-               
-                (<>
-                   <div className="card card-data bg-light ml-2 p-2" >
-            <div className="card-body">
-                  <div style={{ marginTop: '11rem' }}>Generate test cases of selected user story</div>
-                  </div>
-          </div>
-                </>)}
-          
-        </div>
-      ) : null
-      }
-      {userstoryLevel ? (
-        apiResponse ? (
-          <div className="card flex justify-content-center" style={{ height: '300px', overflowY: 'auto' }}>
-            {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
-              <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
-            </div>}
-            <InputTextarea id="testcase" autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} rows={20} cols={1000} />
-          </div>
-        ) :
-          (
-            <div className=" card d-flex flex-column bd-highlight  mt-2 default_cls" >
-              <div className="default_inner_cls">
-                <span style={{ font: '600 1rem/1.5rem Open Sans' }}>Choose one among the three ways listed above</span>
-                {isLoading && <div className="spinner" style={{ position: 'absolute', top: '15rem', left: '20rem' }}>
-                  <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
-                </div>}
-                <div className="p-2 bd-highlight top-50 start-50m hypen_cls" >
-                  {/* <Button className="btn button1" label="Generate system level test case" onClick={systemTestCase} disabled={buttonDisabled} outlined /> */}
-                </div>
-                {/* <div className="p-2 bd-highlight py-2 mt-1 hypen_cls" >
-                  <Button className="btn button2" label="Generate module level test case" onClick={moduleTestCase} disabled={buttonDisabled} outlined />
-                </div> */}
-                <div className=" p-2 bd-highlight py-2 mt-1 hypen_cls" >
-                  <Button className="btn button3" label="Generate user story level test case" disabled={buttonDisabled} outlined />
-                </div>
-              </div>
+        {selectedOption === 'a' && <SystemLevelTestcase setDisableOption={setDisableOption} />}
+        {selectedOption === 'b' && <ModuleLevelTestcase setDisableOption={setDisableOption} selectedOption={selectedOption} />}
 
+        {selectedOption != 'c' && selectedOption != 'a' && selectedOption != 'b' ? (
+          <>
+            <div className='flex flex-column img-container justify-content-center align-items-center'>
+              <span> <img src="static/imgs/choose_illustration.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /></span>
+              <label> Select any one of the three methods mentioned above</label>
             </div>
-          )
-      ) : null
-      }
+          </>) : ""}
 
+
+        {selectedOption === 'c' && (
+          <>
+            <div className="flex flex-column" >
+              {!apiResponse ? (
+                <div className="card-group p-3 " style={{ border: '1px solid #ccc', margin: '5px', display: 'flex', flexDirection: 'row' }}>
+                  <div className="card card-data bg-light" >
+                    <div className="card-body ">
+                      <div className='summary-container'>
+                        {summaries.map(testCase => (
+                          <div key={testCase.id} className="checkbox-container pt-2 pb-2">
+                            <label className="tooltip">
+                              <input
+                                type="checkbox"
+                                checked={selectedTestCases.includes(testCase.id)}
+                                onChange={() => handleCheckboxChange(testCase.id, testCase.summary)}
+                              />
+                              <span className="content">
+                                <span> {testCase.id} - {testCase.summary}</span>
+                                <span className="summary"> {testCase.summary}</span>
+                              </span>
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+                  </div>
+                </div>
 
-                    {/* <div className="card flex justify-content-center">
-            <InputTextarea value={value} onChange={(e) => setValue(e.target.value)} rows={5} cols={30} />
-        </div> */}
-                    </>
 
-                )}
+              ) : (<>
 
-        </div>
-        {/* <FooterGenAi /> */}
-        {
-          selectedOption == 'c'
-        &&
-        (<div id="footerBar">
+                 {
+                apiResponse && (
+                    <div className="card flex justify-content-center">
+                        {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
+                            <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
+                        </div>}
+                        {/* <InputTextarea autoResize id="testcase" value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} rows={40} cols={100} /> */}
+                    </div>
+                )
+            }
+
+                <div className='flex flex-row w-full'>
+                  {apiResponse && <GenerateTestCaseList
+                    apiResponse={apiResponse}
+                    setSelectedGenAiTc={setSelectedGenAiTc}
+                    setTextAreaData={setTextAreaData}
+                    readOnly={readOnly}
+                    setReadOnly={setReadOnly}
+                    readOnlyData={readOnlyData}
+                    setReadOnlyData={setReadOnlyData}
+                  />}
+                  {apiResponse && !readOnly && <div className='flex flex-column'>
+                    {apiResponse &&
+                      <div className='flex flex-column'>
+                        <InputTextarea
+                          style={{ width: "40vw", height: "76vh",fontSize:"13px" }}
+                          autoResize={false}
+                          value={textAreaData}
+                          onChange={(e) => updateTextAreaData(e)}
+                        />
+                      </div>
+                    }
+                  </div>}
+                  {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-y-scroll' style={{ height: "76vh" }}>{readOnlyData.map(item => {
+                      return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={() => {
+                        toast.current.show({
+                          severity: 'info',
+                          summary: 'Info',
+                          detail: 'Select One TestCase to Edit!',
+                          life: 3000
+                        });
+                      }}>
+                        <InputTextarea
+                          style={{ width: "40vw", height: "76vh",fontSize:"13px" }}
+                          autoResize={false}
+                          value={item?.TestCase}
+                          onChange={(e) => updateTextAreaData(e)}
+                          disabled={true}
+                        />
+                      </div>
+                    })}</div>
+                  }
+                  {/* {
+                    apiResponse &&
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
                         <div className="gen-btn2">
-                            <Button label="Generate" onClick={testCaseGenaration}  disabled={buttonDisabled}></Button>
+                            <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} onClick={generateTestcase} disabled={isLoading}></Button>
                         </div>
                         <div className="gen-btn2">
-                            <Button label="Save"  disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                            <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
                         </div>
-                        <div className="cloud-test-provider">
-                            <Dropdown
-                              style={{ backgroundColor: "primary" }}
-                              placeholder="Automate" onChange={async(e) => {
-                                setDropDownValue(e.value);
-                                await fetchData(e.value.code)
-                              }}
-                              options={multiLevelTestcase}
-                              optionLabel="name"
-                              value={dropDownValue}
+                    </div>
+                } */}
+                </div>
+
+
+
+              </>
+
+              )
+
+
+
+
+              }
+            </div>
+
+          </>)}
+
+         {/* {apiResponse && selectedOption == "c"  && !summaries ?   (
+            <div className='flex flex-row w-full'>
+                {apiResponse && <GenerateTestCaseList 
+                apiResponse={apiResponse} 
+                setSelectedGenAiTc={setSelectedGenAiTc} 
+                setTextAreaData={setTextAreaData}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+                readOnlyData={readOnlyData}
+                setReadOnlyData={setReadOnlyData}
+                />}
+                {apiResponse && !readOnly && <div className='flex flex-column'>
+                    {apiResponse &&
+                        <div className='flex flex-column'>
+                            <InputTextarea
+                                style={{ width: "40vw", height: "70vh" }}
+                                autoResize={false}
+                                value={textAreaData}
+                                onChange={(e) => updateTextAreaData(e)}
                             />
                         </div>
-                    </div>)
-}
-        </>
+                    }
+                </div>} */}
+                {/* {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-y-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
+                        return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Info',
+                                detail: 'Select One TestCase to Edit!',
+                                life: 3000
+                            });
+                        }}>
+                            <InputTextarea
+                                style={{ width: "40vw", height: "70vh" }}
+                                autoResize={false}
+                                value={item?.TestCase}
+                                onChange={(e) => updateTextAreaData(e)}
+                                disabled={true}
+                            />
+                        </div>
+                    })}</div>
+                } */}
+                {/* {
+                    apiResponse &&
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
+                        <div className="gen-btn2">
+                            <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} onClick={generateTestcase} disabled={isLoading}></Button>
+                        </div>
+                        <div className="gen-btn2">
+                            <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
+                        </div>
+                    </div>
+                } */}
+            {/* </div>
+     ) :"" } */}
+
+        {selectedOption == 'c' && (
+            <>
+              <div id="footerBar">
+                { !apiResponse ?  (
+                      <div className="gen-btn2">
+                      <Button label={isLoading ? <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8" fill="transparent" animationDuration=".5s" /> : 'Generate'} disabled={buttonDisabled} onClick={() => {
+                            if (template_id.length > 0 && selectedTestCases.length > 0 ) {
+                              testCaseGenaration();
+                            } else {
+                                toast.current.show({
+                                    severity: 'info',
+                                    summary: 'Info',
+                                    detail: 'Please choose template! and select atleast one user story to generate testcase',
+                                    life: 3000
+                                });
+                            }
+                        }}
+                      ></Button>
+                    </div>
+                ) : <div className="gen-btn3">
+                <Button label="Back to user story"  onClick = {() => {userStoryTestCase()}} disabled={buttonDisabled}></Button>
+              </div> }
+             
+                
+                <div className="gen-btn2">
+                  <Button label="Save" disabled={!apiResponse} onClick={saveTestcases}></Button>
+                </div>
+                <div className="cloud-test-provider">
+                  <Dropdown
+                    style={{ backgroundColor: "primary" }}
+                    placeholder="Automate" onChange={async (e) => {
+                      setDropDownValue(e.value);
+                      await fetchData(e.value.code)
+                    }}
+                    options={multiLevelTestcase}
+                    optionLabel="name"
+                    value={dropDownValue}
+                    disabled={!apiResponse}
+                  />
+                </div>
+              </div>
+            </>
+
+)}
+</>
+
+
     )
     
 
