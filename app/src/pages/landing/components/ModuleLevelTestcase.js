@@ -383,7 +383,7 @@ const ModuleLevelTestcase = (props) => {
         try{
           setOverlay("Mind Map generation in progress...")
         const data = apiResponse;
-        const testData = await axios('http://avogenerativeai.avoautomation.com/predictionFromSteps', {
+        const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain'
