@@ -586,6 +586,8 @@ try {
         if ( $runningStatus -eq "Completed") {
             $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
             Write-Host $summaryReport
+            $overallstatus = $statusResponse.overallstatus
+            Write-Host $overallstatus
         }
     } 
     else {
@@ -632,6 +634,8 @@ if [ "$status" != "fail" ]; then
     if [ "$runningStatus" == "Completed" ]; then
       summaryReport=$(echo "$statusResponse" | jq -c '.')
       echo "$summaryReport"
+      overallstatus= $(echo "$statusResponse" | jq -c -r ".Modules[] .Scenarios[] .Report.overallstatus.overallstatus")
+      echo "$overallstatus"
       break
     fi
     sleep ${runningStatusTimer}
