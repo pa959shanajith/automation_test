@@ -218,6 +218,8 @@ const TableActionButtons = props => {
 
 const CreateScreenActionButtons = props => {
     const toast= useRef();
+    const [createTable,setCreateTable] = useState(false);
+
     const toastError = (erroMessage) => {
         if (erroMessage && erroMessage.CONTENT) {
           toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
@@ -266,7 +268,11 @@ const CreateScreenActionButtons = props => {
                     switch (resp) {
                         case "exists": toastError(MSG.UTILITY.ERR_TABLE_EXIST); break;
                         case "fail": toastError(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
-                        case "success": toastSuccess(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
+                        case "success": {
+                            toastSuccess(MSG.UTILITY.SUCC_SAVE_DATATABLE);
+                            setCreateTable(true);
+                            break;
+                        }
                         default: toastError(resp.error); break;
                     }   
                     props.setErrors({}); 
@@ -287,7 +293,7 @@ const CreateScreenActionButtons = props => {
         <div className="dt__taskBtns_create">
             {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Import" label='Import' onClick={() => setImportPopup(true)} ></Button> */}
             {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Edit" label='Edit' onClick={goToEditScreen}></Button> */}
-            <Button className="dt__taskBtn dt__btn"  data-test="dt__tblActionBtns" title="Create"  label='Create' onClick={saveDataTable}></Button>
+            <Button className="dt__taskBtn dt__btn"  data-test="dt__tblActionBtns" title="Create"  label='Create' onClick={saveDataTable} disabled={createTable}></Button>
         </div>
         </>
     );

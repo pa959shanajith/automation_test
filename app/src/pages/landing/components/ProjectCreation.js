@@ -123,32 +123,21 @@ const ProjectCreation = (props) => {
         <div className='VerticalStepBox'>
           <VerticalSteps />
         </div>
-        {userInfo && userInfo.rolename === "Quality Manager" ? (
+        {/* {userInfo && userInfo.rolename === "Quality Manager" ? ( */}
           <>
-            <Card
-              className="CreateProj-card"
-              id="Createproj-title"
-              title="Create new element repository"
-            >
-              <Button
-                className="CreateProj_btn"
-                size="small"
-                onClick={handleRepository}
-              >
-                Create 
-              </Button>
-              {/* <CreateProject
-                visible={visible}
-                onHide={handleCloseDialog}
-                setHandleManageProject={setHandleManageProject}
-                handleManageProject={handleManageProject}
-                toastSuccess={props.toastSuccess}
-                toastError={props.toastError}
-              /> */}
-              
-            </Card>
+            <div className="flex flex-row ">
+              <Card className="CreateProj-card " id="Createproj-title">
+                <div className="CreateProj-header flex flex-row justify-between items-center">
+                <h2 className="CreateProj-title">Create new element repository</h2>
+                  <Button className="CreateProj_btn" size="small" onClick={handleRepository}>
+                    Create
+                  </Button>
+                 
+                </div>
+              </Card>
+            </div>
           </>
-        ) : null}
+        {/* ) : null} */}
 
         {/* Commented for future use of custom keyword */}
         {/* {userInfo && userInfo.rolename !== "Test Engineer" ? (
@@ -219,9 +208,20 @@ const ProjectCreation = (props) => {
             <Button className="CreateProj_btn m-3" size="small" onClick={handleMigration} label='Migrate' disabled={props.validateProjectLicense.status === 'fail'} />
           </Card>
         } */}
-        <Card title="Create TestCase using AI" className="CreateProj-card" id="Createproj-title">
+        {/* <Card title="Create TestCase using AI" className="CreateProj-card" id="Createproj-title">
           <div><Button size='small' className="CreateProj_btn" onClick={CreateGenAi}>Create</Button></div>
-        </Card>
+        </Card> */}
+         <div className="flex flex-row ">
+              <Card className="CreateProj-card " id="Createproj-title">
+                <div className="CreateProj-header flex flex-row justify-between items-center">
+                <h2 className="CreateProj-title">Create TestCase using AI</h2>
+                  <Button className="CreateProj_btn" size="small" onClick={CreateGenAi}>
+                    Create
+                  </Button>
+                 
+                </div>
+              </Card>
+            </div>
       </div>
     </>
 

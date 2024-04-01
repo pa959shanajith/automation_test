@@ -315,6 +315,35 @@ exports.deleteModel = async (req, res) => {
     }
 }
 
+// delete file
+exports.deleteUploadFile = async (req, res) => {
+    logger.info("Inside Generate AI service: deleteModel");
+    try {
+         if (!req.params.id) {
+            return res.status(400).json({status:false, error: 'Bad request: Missing required data' });
+        }
+        let deleteInput = {
+            "id":req.params.id
+        }
+        const result = await utils.fetchData(deleteInput, "genAI/deleteUploadFile", "deleteUploadFile", true);
+
+        if (result &&  result[1].statusCode !== 200) {
+            logger.error(`request error :` ,result[1].statusMessage || 'Unknown error');
+            return res.status(result[1].statusCode).json({status:false,
+                error: result[1].statusMessage || 'Unknown error',
+            });
+        }
+        const sendRes = result[0] && result[0].rows ? result[0].rows : []
+        logger.info("file deleted successfully : ",sendRes);
+        return res.status(200).send({ status: true, message:"file deleted" });
+
+    } catch (error) {
+        logger.error('Error:', error.message);
+        return res.status(500).json({status:false, error: 'Internal server error' });
+    }
+}
+
+
 // create template
 exports.createTemp = async (req, res) => {
     logger.info("Inside Generate AI service: createTemp");
