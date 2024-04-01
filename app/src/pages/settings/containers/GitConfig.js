@@ -92,7 +92,7 @@ const GitConfig = (props) => {
                     gituserRef.current.value = data[3];
                     gitemailRef.current.value = data[4];
                     gitbranchRef.current.value = data[5];
-                    bitProjectKey.current.value = data[6];
+                    if(apiPayload.param === "bit" ) bitProjectKey.current.value = data[6];
                 }
                 setLoading(false);
             }

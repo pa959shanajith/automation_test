@@ -38,7 +38,7 @@ useEffect(() => {
         "datetime": item.modifiedon,
         "comments": item.commitmessage,
         "selectedProject": {},
-        "status": item.gittask === "pull" ? "Pull" : item.gittask === "push" ? "Push" : '' 
+        "status": (item?.gittask || item?.bittask) === "pull" ? "Pull" : (item.gittask || item?.bittask) === "push" ? "Push" : '' 
        
       }));
       setData(mappedData);

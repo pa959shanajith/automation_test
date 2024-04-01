@@ -145,7 +145,7 @@ const GitDropdown = (props) => {
       gitemailRef.current.value = data[4];
       gitbranchRef.current.value = data[5];
       gitconfigRef.current.disabled = true;
-      bitProjectKey.current.value = data[6];
+      if(apiPayload.param === 'bit') bitProjectKey.current.value = data[6];
     }
   }
 
