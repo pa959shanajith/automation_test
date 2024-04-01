@@ -278,7 +278,7 @@ const WebserviceScrape = (props) => {
             try {
                 let viewArray = [];
                 if (method && rReqHeader && rReqBody) {
-                    if (method === 'POST') {
+                    if (method === 'POST' || method == 'PUT') {
                         if (rReqBody) {
                             if (rReqHeader.indexOf('json') === -1) {
                                 if (rReqBody.indexOf('Envelope') !== -1) {
