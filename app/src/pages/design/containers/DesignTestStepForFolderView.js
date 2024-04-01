@@ -1459,7 +1459,7 @@ const DesignModal = (props) => {
     }
     
     const approvalOnClick = async () => {
-
+let keywordAction=customEdit?'edited':'created'
         if (inputKeywordName === '') {
             customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000,style: { zIndex:999999999 } })
         }
@@ -1482,7 +1482,8 @@ const DesignModal = (props) => {
                     'code': inputEditor,
                     'elementtype': selectedType,
                     'language': langSelect,
-                    'tooltip': customTooltip
+                    'tooltip': customTooltip,
+                    'action':keywordAction
 
                 })
                 setOverlay('Updating the list ')
@@ -1560,7 +1561,7 @@ const DesignModal = (props) => {
             <Button
               data-test="createButton"
               label={customEdit ? "Save Keyword" : "Create Keyword"}
-              onClick={approvalOnClick}
+              onClick={()=>{approvalOnClick();saveTestCases()}}
               style={{ padding: '0.5rem 1rem' }}
               disabled={isNameValid && !customEdit}
             />
