@@ -3114,7 +3114,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
                 <div className='flex flex-col assigmentbox_2'>
                   <div className='assigmentSubbox_2'>{data.name}</div>
                   <div className='assigmentSubbox_2'>
-                    <Dropdown style={{ border: '1px solid #605BFF' }} value={selectedTestAction[index]} options={optionElement_02} optionLabel="name" filter onChange={(e) => handleTestActionChange(e, data, index)} placeholder="Choose Action"  className="w-full md:w-9.5rem p-0" />
+                    <Dropdown style={{ border: '1px solid #605BFF' }} value={selectedTestAction[index]} options={optionElement_02} optionLabel="name" filter onChange={(e) => handleTestActionChange(e, index)} placeholder="Choose Action"  className="w-full md:w-9.5rem p-0" />
                   </div>
                 </div>)
             })}
