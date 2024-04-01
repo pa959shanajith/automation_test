@@ -354,7 +354,7 @@ const GitDropdown = (props) => {
           {dropdownVisible ?
             <div className="p-inputgroup">
               <span className="p-inputgroup-addon">
-                <img src="static/imgs/GitIcon.svg" style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" />
+                <img src={props.configurationName === "git" ? "static/imgs/GitIcon.svg" : "static/imgs/bitbucket_icon.svg"} style={{ height: "1.2rem", width: "2rem" }} alt="Icon" className="dropdown-image" />
               </span>
               <Dropdown
                 value={selectedImage}
@@ -369,7 +369,7 @@ const GitDropdown = (props) => {
 
             : props.configurationName !== "noconfig" ? <div onClick={!isQualityEngineer ? clickhandler : null} style={{ width: props.configurationName === "git" ? "6rem" : "8rem" }} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null}> 
                 <span className={!isQualityEngineer ? 'git_icon_and_text' : "git_icon_and_text_engg"}>
-                  <img src={props.configurationName === "git" ? "static/imgs/GitIcon.svg" : "static/imgs/bitbucket_icon.svg"} style={{ height: "1.2rem", width: "2rem" }} alt="Git Icon" className="dropdown-image" />
+                  <img src={props.configurationName === "git" ? "static/imgs/GitIcon.svg" : "static/imgs/bitbucket_icon.svg"} style={{ height: "1.2rem", width: "2rem" }} alt="Icon" className="dropdown-image" />
                   {props.configurationName === "git" ? "Git" : "Bitbucket" }
                 </span>
               </div> : null
