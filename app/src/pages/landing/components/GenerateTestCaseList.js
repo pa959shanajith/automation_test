@@ -46,7 +46,7 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
         </div>
        
     }
-    return <div className="w-6 pr-2">
+    return <div className="w-5">
         <div className='generateTests_header'>Generated Tests</div>
         <DataTable
             className={selectedOption == 'b' ? "generateTests_dataTable" : "generateTests_systemlevel"}
@@ -56,8 +56,8 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
             value={apiResponse}
             emptyMessage=""
             selectionMode={"single"}>
-            <Column selectionMode="multiple"/>
-            <Column field="Name" header="All test cases" body={renderTableRowData}/>
+            <Column selectionMode="multiple" style={{width:"2rem"}}/>
+            <Column field="Name" header="All test cases"  body={renderTableRowData}style={{paddingLeft:'0',fontSize:"13px"}}/>
         </DataTable>
     </div>
 }

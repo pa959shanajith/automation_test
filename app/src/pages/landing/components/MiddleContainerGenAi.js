@@ -765,7 +765,7 @@ const MiddleContainerGenAi = () =>{
                     {apiResponse &&
                       <div className='flex flex-column'>
                         <InputTextarea
-                          style={{ width: "40vw", height: "76vh" }}
+                          style={{ width: "40vw", height: "76vh",fontSize:"13px" }}
                           autoResize={false}
                           value={textAreaData}
                           onChange={(e) => updateTextAreaData(e)}
@@ -784,7 +784,7 @@ const MiddleContainerGenAi = () =>{
                         });
                       }}>
                         <InputTextarea
-                          style={{ width: "40vw", height: "76vh" }}
+                          style={{ width: "40vw", height: "76vh",fontSize:"13px" }}
                           autoResize={false}
                           value={item?.TestCase}
                           onChange={(e) => updateTextAreaData(e)}

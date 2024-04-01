@@ -95,7 +95,17 @@ const ModuleLevelTestcase = (props) => {
                 setIsLoading(false);
             }
             if (response.data) {
-                setApiResponse(response?.data?.response);
+                if( !Array.isArray(response?.data?.response )){
+                    toast.current.show({
+                      severity: 'info',
+                      summary: 'Info',
+                      detail:`${response?.data?.response}`,
+                      life: 5000
+                  });
+                  } else{
+                    setApiResponse(response?.data?.response);
+         
+                  }
                 setSwaggerResponseData(response?.data?.swagger)
                 toast.current.show({
                     severity: 'success', summary: 'Success', detail: 'Module level test cases generated successfully!', life: 3000
@@ -581,7 +591,7 @@ const ModuleLevelTestcase = (props) => {
                 <p><strong>Module</strong></p>
                 <div className={`${!apiResponse ? "flexColumn" : "flexRow loginBox"}`}>
                     {/* <div className="flexColumn"> */}
-                    <InputText placeholder='enter module' style={{ width: `${apiResponse ? '50vw' : ""} ` }} value={query} onChange={handleInputChange} />
+                    <InputText placeholder="Enter module name: Eg.login, Fund transfer" style={{ width: `${apiResponse ? '45vw' : "20vw"} `,marginTop:`${apiResponse ? "1rem": "" }` }} value={query} onChange={handleInputChange} />
                     {!apiResponse && <Button loading={isLoading} disabled={query?.length == 0} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
                         if (template_id.length > 0) {
                             generateTestcase();
@@ -595,7 +605,7 @@ const ModuleLevelTestcase = (props) => {
                         }
                     }}></Button>}
                 </div>
-                <label className='labelText'>Eg. of module name: login, sign up</label>
+                <label className='labelText'>{apiResponse?"":"Eg. of module name: login, sign up"}</label>
             {/* {!apiResponse &&
                 <>
                     <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
@@ -662,7 +672,7 @@ const ModuleLevelTestcase = (props) => {
                     {apiResponse &&
                         <div className='flex flex-column'>
                             <InputTextarea
-                                style={{ width: "40vw", height: "61vh" }}
+                                style={{ width: "42vw", height: "61vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={textAreaData}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -681,7 +691,7 @@ const ModuleLevelTestcase = (props) => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "40vw", height: "61vh" }}
+                                style={{ width: "42vw", height: "61vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}
