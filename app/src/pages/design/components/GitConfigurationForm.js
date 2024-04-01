@@ -6,15 +6,15 @@ const GitConfigurationForm = (props) => {
     return (
         <div className="flex flex-column align-items-center" style={{width:'75%',marginLeft:'17%', marginTop:'2rem',gap:"1rem",alignItems:'center'}}>
 
-                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'} Configuration `} data-test="name_git" inpRef={props.gitconfigRef} placeholder={'Enter Git Configuration Name'} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'} Configuration `} data-test="name_git" inpRef={props.gitconfigRef} placeholder={'Enter Configuration Name'} />
                 
-                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  Access Token`} data-test="token_git" inpRef={props.tokenRef} placeholder={'Enter Git Access Token'} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  Access Token`} data-test="token_git" inpRef={props.tokenRef} placeholder={'Enter Access Token'} />
               
-                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  URL`} data-test="url_git" inpRef={props.urlRef} placeholder={'Enter Git URL'} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  URL`} data-test="url_git" inpRef={props.urlRef} placeholder={'Enter URL'} />
              
-                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  User Name`} data-test="username_git" inpRef={props.gituserRef} placeholder={'Enter Git Username'} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  User Name`} data-test="username_git" inpRef={props.gituserRef} placeholder={'Enter Username'} />
           
-                <FormInputGit label={`${props.configName === 'git' ? 'Git User Email' : 'Bitbucket Work space'}  `} data-test="email_git" inpRef={props.gitemailRef} placeholder={'Enter Git Email Id'} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git User Email' : 'Bitbucket Work space'}`} data-test="email_git" inpRef={props.gitemailRef} placeholder={'Enter ' `${props.configName === 'git' ? 'Email Id' : 'Work space'}  `} />
               
                 <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  Branch`} data-test="email_git" inpRef={props.gitbranchRef} placeholder={'Enter Branch'} />
 
