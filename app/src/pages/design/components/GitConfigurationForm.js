@@ -14,11 +14,11 @@ const GitConfigurationForm = (props) => {
              
                 <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  User Name`} data-test="username_git" inpRef={props.gituserRef} placeholder={'Enter Username'} />
           
-                <FormInputGit label={`${props.configName === 'git' ? 'Git User Email' : 'Bitbucket Work space'}`} data-test="email_git" inpRef={props.gitemailRef} placeholder={'Enter ' `${props.configName === 'git' ? 'Email Id' : 'Work space'}  `} />
+                <FormInputGit label={`${props.configName === 'git' ? 'Git User Email' : 'Bitbucket Work space'}`} data-test="email_git" inpRef={props.gitemailRef} placeholder={`Enter ${props.configName === 'git' ? 'Email Id' : 'Work space'} `} />
               
                 <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'}  Branch`} data-test="email_git" inpRef={props.gitbranchRef} placeholder={'Enter Branch'} />
 
-                {props.configName === "bit" && <FormInputGit label={`${props.configName === 'git' ? 'Git' : 'Bitbucket'} Project Key`} data-test="project_key" inpRef={props.bitProjectKey} placeholder={'Enter key'} />}
+                {props.configName === "bit" && <FormInputGit label={`Bitbucket Project Key`} data-test="project_key" inpRef={props.bitProjectKey} placeholder={'Enter key'} />}
              
           </div>
     )
