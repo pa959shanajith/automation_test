@@ -161,6 +161,14 @@ const CaptureModal = (props) => {
   useEffect(() => {
     fetchScrapeData()
   }, [parentData,parentId,emptyDatatable])
+
+  useEffect(() => {
+    if (captureData.length === 0 || !selectedRepoName) {
+      setShowPanel(true);
+    } else {
+      setShowPanel(false);
+    }
+  }, [captureData, selectedRepoName]);
   useEffect(()=>{
     let browserName = (function (agent) {        
 
@@ -2545,7 +2553,7 @@ const handleAddAccordion = () => {
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
 
-            <div style={{ position:'fixed', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
+            {!showCaptureScreen && <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
                 {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', right: '68rem', background: '#D9342B', border: 'none' }} onClick={()=>setShowDailogForOnDelete(true)} ></Button> : null}
                 {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen))) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
@@ -2562,7 +2570,7 @@ const handleAddAccordion = () => {
                 </> }
                 {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
                 <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
-            </div>
+            </div>}
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         

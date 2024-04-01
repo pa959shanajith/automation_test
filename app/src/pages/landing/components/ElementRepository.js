@@ -359,6 +359,7 @@ const handleChangeScreenName=(index,e)=>{
     contextMenuRef.current.show(event.originalEvent);
 
     const selectedRowData = event.data;
+    const isSelected = selectedCapturedElement.includes(selectedRowData);
 
     if (!selectedRowData || Object.keys(selectedRowData).length === 0) {
       // If rowData is empty, show only the 'Paste' option
@@ -379,6 +380,7 @@ const handleChangeScreenName=(index,e)=>{
           label: 'Copy',
           icon: 'pi pi-copy',
           command: () => copyRow(selectedCapturedElement),
+          disabled:(!isSelected)
         },
         {
           label: 'Paste',
@@ -579,6 +581,7 @@ const handleChangeScreenName=(index,e)=>{
 
   const renderActionsCell = (screenDetails,rowData) => {
     if (Object.keys(rowData).length > 0) {
+      const isSelected = selectedCapturedElement.includes(rowData);
       let selectedElement = [];
       selectedElement.push(rowData);
       setScrapeDataForIris(rowData);
@@ -612,7 +615,7 @@ const handleChangeScreenName=(index,e)=>{
           {defaultselectedProject.appType === "Web" ? (
             <div>
               <Tooltip target=".pencil-edit" position='bottom' content='Edit'/>
-              <i className="pi pi-pencil pencil-edit"
+              <i className={`pi pi-pencil pencil-edit ${isSelected ? 'disabled-icon' : ''}`}
                 onClick={() => {
                   setSelectedCapturedElement(selectedElement);
                   openElementProperties(rowData);
@@ -621,7 +624,8 @@ const handleChangeScreenName=(index,e)=>{
           <div>
           <Tooltip target=".trash-icon" position='bottom' content='Delete'/>
           <i
-            className='pi pi-trash trash-icon'
+            className={`pi pi-trash trash-icon ${isSelected ? 'disabled-icon' : ''}`}
+            disabled={isSelected}
             onClick={() => {
               if (result.length>0) {
                 setResusedDeleteElement(true);
@@ -985,7 +989,7 @@ const handleRepositoryName =(e)=>{
                         event.target &&
                         handleSearchChange(event.target.value)} />
         </span>
-        <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>
+        {screenData.length && <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>}
           <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
         {/* </span>
         <Button label='Design Studio'>
@@ -1058,10 +1062,10 @@ const handleRepositoryName =(e)=>{
               emptyMessage="No data found"
               selection={selectedCapturedElement}
               selectionMode='multiple' 
-              
+              className='repo__datatable'
               onSelectionChange={(e)=>onRowClick(e)} 
             >
-              <Column selectionMode={screenDetails.related_dataobjects.length === 0?'none':"multiple" } headerStyle={{ width: '3rem' }}></Column>
+              <Column selectionMode={screenDetails.related_dataobjects.length === 0?'none':"multiple" } headerStyle={{ width: '1rem' }}></Column>
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
               editor={(options) => {
                 if (!options.rowData || Object.keys(options.rowData).length === 0) {
