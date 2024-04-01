@@ -425,11 +425,11 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:`${param} configuration does not exist. Please verify your inputs.`}
+            return {error:{"CONTENT":`${param} configuration does not exist. Please verify your inputs.`, "VARIANT": VARIANT.ERROR}}
         }
         if(res.data === "Invalid inputs"){
             console.error(res.data)
-            return {error:`Module does not exist in ${param} repository. Please verify your inputs.`}
+           return {error:{"CONTENT":`Module does not exist in ${param} repository. Please verify your inputs.`, "VARIANT": VARIANT.ERROR}}
         }
 		if(res.data === "No entries"){
             console.error(res.data)
@@ -437,7 +437,7 @@ export const importGitMindmap = async(data) => {
         }
         if(res.data === "Unable to find the given commit in "+ data.param +"repository."){
             console.error(res.data)
-            return {error:`Unable to find the given commit in ${param} repository, please verify.`}
+            return {error:{"CONTENT":`Unable to find the given commit in ${param} repository, please verify.`, "VARIANT": VARIANT.ERROR}}
         }
         // if (!('testscenarios' in res.data)){
         //     console.error(res.data)
@@ -450,10 +450,10 @@ export const importGitMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:`There is no Projects in ${param} repository to import.`}
+        return {error:{"CONTENT":`There is no Projects in ${param} repository to import.`, "VARIANT": VARIANT.ERROR}}
     }catch(err){
         console.error(err)
-        return {error:`There is no Projects in ${data.param === 'bit' ? 'bitbucket' : data.param} repository to import.`}
+        return {error:{"CONTENT":`There is no Projects in ${data.param === 'bit' ? 'bitbucket' : data.param} repository to import.`, "VARIANT": VARIANT.ERROR}}
     }
 }
 
