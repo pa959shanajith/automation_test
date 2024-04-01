@@ -12,6 +12,7 @@ import ExportDataTable from './ExportDataTable';
 import "../styles/Table.scss";
 import DtPasteStepDialog from './DtPasteStepDialog';
 import { Toast } from 'primereact/toast';
+import { Dropdown } from 'primereact/dropdown';
 import { Tooltip } from 'primereact/tooltip';
 import * as utilApi from '../api';
 
@@ -22,14 +23,35 @@ const Table = (props) => {
     const [selectedColumns, setSelectedColumns] = useState([]);
     const [selectedItem, setSelectedItem] = useState(null);
     const [refreshTable, setRefreshTable] = useState(false);
+    const [columnVisibilities, setColumnVisibilities] = useState({});
     const dispatch = useDispatch();
     const copiedCells = useSelector(state=>state.utility.copiedCells)
     const [showPS, setShowPS] = useState(false);
     const toast = useRef();
     const [importPopup, setImportPopup] = useState(false);
     const [showExportPopup, setShowExportPopup] = useState(false);
-    const [editingHeader, setEditingHeader] = useState(null);
+    const [editingHeader, setEditingHeader] = useState('');
 
+    useEffect(() => {
+        if (props.headers) {
+            const initialColumnVisibilities = {};
+            props.headers.forEach(header => {
+                initialColumnVisibilities[header.__CELL_ID__] = true; // Initially, all columns are visible
+            });
+            setColumnVisibilities(initialColumnVisibilities);
+        }
+    }, [props.headers]);
+
+    const handleDropdownChange = (columnId) => {
+        const newHeaders = props.headers.filter(header => header.__CELL_ID__ !== columnId);
+        const newData = props.data.map(row => {
+            const newRow = { ...row };
+            delete newRow[columnId];
+            return newRow;
+        });
+        props.setData(newData);
+        props.setHeaders(newHeaders);
+    };
 
         const data = Array.isArray(props.data) ? props.data : [];
 
@@ -123,7 +145,7 @@ const Table = (props) => {
         const dynamicColumns = props.headers.map((header) => (
             <Column
                 key={`header-${header.__CELL_ID__}`}
-                header={editingHeader === header.name ? <InputText value={header.name} onChange={(e) => updateHeaderName(e.target.value, header.__CELL_ID__)} /> : <span onClick={() => handleHeaderClick(header.name)}>{header.name}</span>}
+                header={(editingHeader === header.name || editingHeader === '') ? <InputText value={header.name} onChange={(e) => updateHeaderName(e.target.value, header.__CELL_ID__)} /> : <span onClick={() => handleHeaderClick(header.name)}>{header.name}</span>}
                 field={header.__CELL_ID__}
                 columnKey={header.__CELL_ID__}
                 // initialValue={header.__CELL_ID__ || ''}
@@ -131,6 +153,7 @@ const Table = (props) => {
                 bodyStyle={{ textAlign: 'center',width: '21rem' }}
                 editor={(props) => rowEditor(props.rowData, props,header.__CELL_ID__)}
                 bodyClassName={"ellipsis_column"}
+                style={{ display: columnVisibilities[header.__CELL_ID__] ? 'table-cell' : 'none' }}
             />
         ));
     
@@ -332,6 +355,11 @@ const Table = (props) => {
                 });    
         }
 
+        const dropdownOptions = props.headers.map(header => ({
+            label: header.name,
+            value: header.__CELL_ID__
+        }));
+
     const header = (
         <div className="flex align-items-center justify-content-between">
             <div className='flex gap-5'>
@@ -341,10 +369,10 @@ const Table = (props) => {
                 </span>
                 <Tooltip target=".import-img" position="bottom" content="Import" />
                 <span className="import-img" data-pr-tooltip='Import' onClick={() => setImportPopup(true)}>
-                    <img src="static/imgs/import.svg" alt="import" />
+                    <img src="static/imgs/Import.svg" alt="import" />
                 </span>
                 <Tooltip target=".export-img" position="bottom" content="Export" />
-                <span className={props.tableName ? "export-img dt_separation" : "disabled_export"} data-pr-tooltip="Export" onClick={props.tableName ? () => setShowExportPopup(true) : null}>
+                <span className={props.tableName ? "export-img dt_separation" : "disabled_export dt_separation"} data-pr-tooltip="Export" onClick={props.tableName ? () => setShowExportPopup(true) : null}>
                     <img src="static/imgs/export_icon 1.svg" alt="export" />
                 </span>
                 <Tooltip target=".copy-img" position="bottom" content="Copy Row" />
@@ -371,6 +399,15 @@ const Table = (props) => {
                 <span title="Remove Selected Row" className='delete_img' data-pr-tooltip="Remove Selected Row" onClick={onDelete}>
                     <img src="static/imgs/trash.svg" alt="Delete" />
                 </span>
+            </div>
+            <div className='ml-2'>
+                <Dropdown
+                    className='columnDelete'
+                    options={dropdownOptions}
+                    value={null} // Set the default value or leave it as null
+                    onChange={(e) => handleDropdownChange(e.value)}
+                    placeholder="Select a column to delete"
+                />
             </div>
             <div>
                 <button className="btn_add" onClick={() => onAdd('col')} >+ Add column</button>
