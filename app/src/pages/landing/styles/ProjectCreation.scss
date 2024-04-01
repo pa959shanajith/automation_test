@@ -27,8 +27,12 @@
         margin-left: 0.1rem;
         top: 1rem;
         width: 100%;
-        margin-top: -0.5rem;
+        // margin-top: -0.5rem;
         // height: 16vh;
+        .CreateProj-header {
+            width: 100%;
+            padding: 1% 1% !important;
+          }
         .p-card-body{
             // padding: 0.5rem !important;
             padding: 0% 1% !important;
@@ -36,7 +40,7 @@
             overflow: auto;
             .p-card-title{
                 font-size: 1.2rem !important;
-                position: relative !important;
+                // position: relative !important;
                 margin-bottom: 0rem !important;
                 text-align: center !important;
                 font: $f5_semibold !important;
@@ -46,9 +50,19 @@
                 padding: 0.5rem;
                 justify-content: center;
                 display: flex;
-                .CreateProj_btn{
-                    font:$f7_semibold;
-                }
+                .CreateProj-title {
+                    flex-grow: 1;
+                    font: $f5_semibold !important;
+                    padding: 0.5rem 0.5rem !important;
+                  }
+                  
+                  .CreateProj_btn {
+                    flex-shrink: 0; 
+                    width: 10.2rem; 
+                    font: $f7_semibold;
+                    margin-right: 0.6rem;
+                    justify-content: center;
+                  }
             }
         }
         .CreateDisable_Title{

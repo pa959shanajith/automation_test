@@ -2691,10 +2691,9 @@ Learn More '/>
           </div>
           <Button
             className={!isQualityEngineer?"configure_button":"configureEngRole"}
-            onClick={() => configModal("CancelSave")}
+            onClick={!isQualityEngineer?() => configModal("CancelSave"):null}
             title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
-            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'auto'}}
-            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)|| isQualityEngineer)}
+            style={isQualityEngineer?{cursor:'not-allowed',opacity:'0.3'}:null}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />

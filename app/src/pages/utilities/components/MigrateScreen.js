@@ -12,6 +12,13 @@ import { convertIdIntoNameOfAppType, DateTimeFormat } from "../../design/compone
 const MigrateScreen = props => {
     const dispatch=useDispatch();
     const migrateProjectValue = useSelector((state) => state.progressbar.migrateProject);
+    
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
+    if (!userInfo) userInfo = userInfoFromRedux;
+    else userInfo = userInfo;
+    const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
     useEffect(() => {
         (async () => {
             const projectList = await fetchProjects({ readme: "projects" });
@@ -51,7 +58,7 @@ const MigrateScreen = props => {
             </div>
             <div className='my-4'>Convert non-Avo automation scripts to Avo Automation</div>
             <div className='flex flex-column'>
-                <Button onClick={handleMigration} size='small' className='migratebtn'> Migrate</Button>
+                <Button  onClick={!isQualityEngineer?handleMigration:null} style={isQualityEngineer?{cursor:'not-allowed',opacity:'0.3'}:null}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : "migrate" } size='small' className='migratebtn'> Migrate</Button>
             </div>
         </div>
     )
