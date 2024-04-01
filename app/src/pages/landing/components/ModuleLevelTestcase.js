@@ -16,9 +16,10 @@ import axios from 'axios';
 import { Messages as MSG } from '../../global';
 import { v4 as uuid } from 'uuid';
 import {ScreenOverlay} from '../../global';
+import GenerateTestCaseList from "./GenerateTestCaseList";
 
 
-const ModuleLevelTestcase = () => {
+const ModuleLevelTestcase = (props) => {
     const history = useNavigate();
     const [apiResponse, setApiResponse] = useState("");
     const [overlay, setOverlay] = useState(null);
@@ -33,6 +34,14 @@ const ModuleLevelTestcase = () => {
     const toast = useRef(null);
     const template_id = useSelector((state) => state.setting.template_id);
     const editParameters = useSelector((state) => state.setting.editParameters);
+    const [testStepSelection, setTestStepSelection] = useState("1")
+    const [selectedTestStep, SetSelectedTestStep] = useState(true);
+    const [selectedGenAiTc, setSelectedGenAiTc] = useState([]); 
+    const [textAreaData, setTextAreaData] = useState("");
+    const [readOnly, setReadOnly] = useState(false);
+    const [readOnlyData, setReadOnlyData] = useState("");
+
+    
 
     const handleInputChange = (e) => {
         setQuery(e.target.value);
@@ -62,6 +71,7 @@ const ModuleLevelTestcase = () => {
     const generateTestcase = async () => {
         try {
             setIsLoading(true);
+            props.setDisableOption(true);
             const { username: name, email_id: email } = JSON.parse(localStorage.getItem('userInfo'));
             const organization = "Avo Assure";
             const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
@@ -94,6 +104,7 @@ const ModuleLevelTestcase = () => {
             }
             setButtonDisabled(false);
             setIsLoading(false);
+            props.setDisableOption(false);
         } catch (err) {
             setIsLoading(false);
             toast.current.show({
@@ -360,11 +371,19 @@ const ModuleLevelTestcase = () => {
         setOverlay('')
     }
 
+    const updateTextAreaData = (e) => {
+        setTextAreaData(e.target.value);
+        const getSelectedTcIndex = apiResponse?.findIndex((item)=>item.Id == selectedGenAiTc[0]["Id"]);
+        const updateApiResponse = apiResponse;
+        updateApiResponse[getSelectedTcIndex] = {...updateApiResponse[getSelectedTcIndex], "TestCase":e.target.value};
+        // setApiResponse(updateApiResponse)
+    }
+
     const functionalMindMapCreation = async ()=>{
         try{
           setOverlay("Mind Map generation in progress...")
         const data = apiResponse;
-        const testData = await axios('http://avogenerativeai.avoautomation.com/predictionFromSteps', {
+        const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
             method: 'POST',
             headers: {
                 'Content-Type': 'text/plain'
@@ -527,9 +546,34 @@ const ModuleLevelTestcase = () => {
     return (
         <>
             {overlay ? <ScreenOverlay content={overlay} /> : null}
-            <div className='flexColumn parentDiv'>
-            {/* {overlay ? <ScreenOverlay content={overlay} /> : null} */}
-                {!apiResponse &&
+            <div className='flexColumn parentDiv border-top-1'>
+            {/* {
+                apiResponse &&
+                <div className="flex flex-row" style={{ gap: "3rem" }}>
+                    <div className="p-2">
+                        <RadioButton
+                            inputId="testCasewithTs"
+                            name="option"
+                            value="1"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "1"}
+                        />
+                        <label htmlFor="testCasewithTs" className="pb-2 label-genai2">Test case with Teststep</label>
+                    </div>
+                    <div className="p-2" >
+                        <RadioButton
+                            inputId="testCasewithoutTs"
+                            name="option"
+                            value="2"
+                            onChange={testStepOptions}
+
+                            checked={testStepSelection === "2"}
+                        />
+                        <label htmlFor="testCasewithoutTs" className="pb-2 label-genai2">Test case without Teststep</label>
+                    </div>
+                </div>
+            } */}
+            {!apiResponse &&
                     <>
                         <img className='imgDiv' src={'static/imgs/moduleLevelTestcaseEmpty.svg'} width='200px' />
                         <p>Generate test cases for a module of your system</p>
@@ -552,22 +596,103 @@ const ModuleLevelTestcase = () => {
                     }}></Button>}
                 </div>
                 <label className='labelText'>Eg. of module name: login, sign up</label>
-                {
-                    apiResponse && (
-                        <div className="card flex justify-content-center">
-                            {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
-                                <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
-                            </div>}
-                            <InputTextarea className='inputTestcaseModule' autoResize value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} />
+            {/* {!apiResponse &&
+                <>
+                    <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
+                    <label className='labelText'>Generate test cases for whole system</label>
+                    <div className="flex flex-row" style={{ gap: "3rem" }}>
+                        <div className="p-field-radiobutton">
+                        <RadioButton
+                            inputId="testCasewithTs"
+                            name="option"
+                            value="1"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "1"}
+                        />
+                            <label htmlFor="testCasewithTs" className="pb-2 label-genai2">Test case with Teststep</label>
                         </div>
-                    )
-                }
-                <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
+                        <div className="p-field-radiobutton" >
+                        <RadioButton
+                            inputId="testCasewithoutTs"
+                            name="option"
+                            value="2"
+                            onChange={testStepOptions}
+                            checked={testStepSelection === "2"}
 
-                {/* Generate, Save, Automate Button */}
+                        />
+                            <label htmlFor="testCasewithoutTs" className="pb-2 label-genai2">Test case without Teststep</label>
+                        </div>
+                    </div>
+                    <Button loading={isLoading} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
+                        if (template_id.length > 0) {
+                            generateTestcase();
+                        } else {
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Info',
+                                detail: 'Please choose template!',
+                                life: 3000
+                            });
+                        }
+                    }}></Button>
+                </>} */}
+            {
+                apiResponse && (
+                    <div className="card flex justify-content-center">
+                        {isLoading && <div className="spinner" style={{ position: 'absolute', top: '26rem', left: '32rem' }}>
+                            <ProgressSpinner style={{ width: '40px', height: '40px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
+                        </div>}
+                        {/* <InputTextarea autoResize id="testcase" value={apiResponse} onChange={(e) => setApiResponse(e.target.value)} rows={40} cols={100} /> */}
+                    </div>
+                )
+            }
+            <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
+            <div className='flex flex-row w-full'>
+                {apiResponse && <GenerateTestCaseList 
+                selectedOption={props.selectedOption}
+                apiResponse={apiResponse} 
+                setSelectedGenAiTc={setSelectedGenAiTc} 
+                setTextAreaData={setTextAreaData}
+                readOnly={readOnly}
+                setReadOnly={setReadOnly}
+                readOnlyData={readOnlyData}
+                setReadOnlyData={setReadOnlyData}
+                />}
+                {apiResponse && !readOnly && <div className='flex flex-column'>
+                    {apiResponse &&
+                        <div className='flex flex-column'>
+                            <InputTextarea
+                                style={{ width: "40vw", height: "61vh" }}
+                                autoResize={false}
+                                value={textAreaData}
+                                onChange={(e) => updateTextAreaData(e)}
+                            />
+                        </div>
+                    }
+                </div>}
                 {
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "61vh" }}>{readOnlyData.map(item => {
+                        return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
+                            toast.current.show({
+                                severity: 'info',
+                                summary: 'Info',
+                                detail: 'Select One TestCase to Edit!',
+                                life: 3000
+                            });
+                        }}>
+                            <InputTextarea
+                                style={{ width: "40vw", height: "61vh" }}
+                                autoResize={false}
+                                value={item?.TestCase}
+                                onChange={(e) => updateTextAreaData(e)}
+                                disabled={true}
+                            />
+                        </div>
+                    })}</div>
+                }
+               {
                     apiResponse &&
-                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%" }}>
+                    <div className='flex flex-row' id="footerBar" style={{ justifyContent: 'flex-end', gap: '1rem', width: "100%", marginBottom:"0.3rem" }}>
                         <div className="gen-btn2">
                             <Button loading={isLoading} label="Generate" onClick={() => {
                                 if (template_id.length > 0) {
@@ -579,8 +704,8 @@ const ModuleLevelTestcase = () => {
                                         detail: 'Please choose template!',
                                         life: 3000
                                     });
-                                }
-                            }} disabled={buttonDisabled}></Button>
+                                }   
+                            }} disabled={isLoading}></Button>
                         </div>
                         <div className="gen-btn2">
                             <Button label="Save" disabled={buttonDisabled} onClick={saveTestcases}></Button>
@@ -598,6 +723,7 @@ const ModuleLevelTestcase = () => {
                     </div>
                 }
             </div>
+        </div>
         </>
     )
 };

@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { getProjectList, getModules, getScreens } from '../api';
+import { gitSaveConfig } from '../../admin/api';
 import { useDispatch, useSelector } from 'react-redux';
 import SaveMapButton from '../components/SaveMapButton';
 import Toolbarmenu from '../components/ToolbarMenu';
@@ -41,12 +42,17 @@ const CreateNew = ({ importRedirect }) => {
     const [delSnrWarnPop, setDelSnrWarnPop] = useState(false)
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate ? true : false)
     const isEnELoad = useSelector(state => state.design.isEnELoad);
-    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
-    let Proj = reduxDefaultselectedProject;
+    // const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    // let Proj = reduxDefaultselectedProject;
+    const Proj = JSON.parse(localStorage.getItem('DefaultProject'));
+    // if (localStorageDefaultProject) {
+    //     Proj = JSON.parse(localStorageDefaultProject);
+    // }
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     const handleTypeOfViewMap = useSelector(state=>state.design.typeOfViewMap)
 
+    const [configurationName, setConfigurationName] = useState('');
 
     const [selectedView, setSelectedView] = useState({ code: 'mindMapView', name: <div><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div> });
     const handleViewsDropDown = (view) => {
@@ -90,6 +96,27 @@ const CreateNew = ({ importRedirect }) => {
         })()}
     },[handleTypeOfViewMap])
 
+    useEffect(() => {
+            try{
+                (async() => {
+                    const apiPayloadData = {
+                        param : "verify",
+                        action : '',
+                        userId : userInfo.user_id,
+                        projectId : Proj.projectId
+                    }
+                    const data = await gitSaveConfig(apiPayloadData);
+            
+                    if (data?.error) { toastError(data.error); return; }
+                    if (data === "bit") setConfigurationName(data)
+                    else if (data === "git") setConfigurationName(data)
+                    else setConfigurationName(data)
+                    })()
+            } catch(error){
+                toastError("Something went wrong")
+            }
+    },[Proj.projectId])
+
     const views = [
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
@@ -99,10 +126,7 @@ const CreateNew = ({ importRedirect }) => {
 
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
-    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    if (localStorageDefaultProject) {
-        Proj = JSON.parse(localStorageDefaultProject);
-    }
+    
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
             toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
@@ -267,6 +291,7 @@ const CreateNew = ({ importRedirect }) => {
                                             projectId={Proj.projectId}
                                             userId={userInfo.user_id}
                                             toast={toast}
+                                            configurationName={configurationName}
                                     />
                                 </div>
                                 {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}

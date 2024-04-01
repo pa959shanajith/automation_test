@@ -3,7 +3,7 @@
     width:100%;
 }
 .genai_left_container{
-    width:23%;
+    width:20%;
     overflow-y: auto;
     height: 95vh;
     overflow-x: hidden;
@@ -112,9 +112,7 @@
     display: block;
 }
   .img-container{
-    align-items: center;
-    margin-top: 10rem;
-    margin-left: 10rem;
+    height: 80vh;
   }
 
 .blockCard {
@@ -144,11 +142,12 @@
 .parentDiv {
     // height: 80vh;
     // min-height: 80vh;
-    width: 125vh;
+    width: 100%;
     flex-direction: center;
     align-items:center;
     // align-content: center;
-    justify-content: center 
+    justify-content: center;
+    border-color: #DEE2E6;
 }
 
 .imgDiv {
@@ -157,11 +156,15 @@
     margin-top: 15%;
 }
 
+.p-datatable .p-datatable-emptymessage {
+    display: none;
+}
+
 .inputTestcaseSystem {
     max-height: 70vh !important;
     overflow: auto !important;
     height: 70vh !important;
-    margin-bottom: 25px;
+    // margin-bottom: 25px;
     width: 100% !important;
 }
 
@@ -184,4 +187,32 @@
   .p-datatable .p-datatable-thead > tr > th {
     display: none !important;
 }
+}
+.generateTests_header{
+    font: $f5_semibold;
+    color: #616161;
+}
+
+.generateTests_dataTable > .p-datatable-wrapper > .p-datatable-table > .p-datatable-thead > tr > th >.p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+
+.input_text_disabled > .p-disabled{
+    background-color: initial;
+    border-color: initial;
+}
+
+.generateTests_dataTable{
+    height: 60vh;
+    overflow: auto;
+}
+.generateTests_systemlevel{
+    height: 70vh;
+    overflow: auto;
+}
+.generateTests_dataTable> .p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+.generateTests_systemlevel>.p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
 }

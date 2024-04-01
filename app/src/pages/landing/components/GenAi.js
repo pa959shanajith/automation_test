@@ -9,12 +9,13 @@ import { Fieldset } from 'primereact/fieldset';
 import { Dropdown } from 'primereact/dropdown';
 import RightPanelGenAi from "./RightPanelGenAi";
 import MiddleContainerGenAi from "./MiddleContainerGenAi";
-import { uploadgeneratefile, getall_uploadfiles,readTemp} from '../../admin/api';
+import { uploadgeneratefile, getall_uploadfiles,readTemp,deleteUplaodFile} from '../../admin/api';
 import { useDispatch } from 'react-redux';
 import { screenType,setGenAiParameters,setTemplateInfo,updateTemplateId } from './../../settings/settingSlice';
 import { useSelector } from 'react-redux';
 import JiraTestcase from './JiraTestcase';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
 
 
 const GenAi = () => {
@@ -36,11 +37,18 @@ const GenAi = () => {
     const [isUploadSuccess, setUploadSuccess] = useState(false);
     const [fileUploading, setFileUploading] = useState(false);
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    const [currentId,setCurrentId] = useState('');
+    const [deleteRow, setDeleteRow] = useState(false);
+    const [tableData, setTableData] = useState([]);
+
+
+
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     const template_id = useSelector((state) => state.setting.template_id);
+    const email = userInfo.email_id;
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
     // const [requirementTool, setRequirementTool] = useState({})
@@ -48,15 +56,52 @@ const GenAi = () => {
     console.log("etnering")
         toast.current.show({ severity: 'info', summary: 'Success', detail: 'File Uploaded' });
     };
+    const toastError = (erroMessage) => {
+        if (erroMessage.CONTENT) {
+          toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+      }
+
+      const toastSuccess = (successMessage) => {
+        if (successMessage.CONTENT) {
+          toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+      }
+
     const header = (
         <div className="flex flex-wrap align-items-center justify-content-between gap-2">
             <span className="left_table_header">Recently uploaded files</span>
             {/* <span className="left_table_view">View All</span> */}
         </div>
     );
-    const actionTemplate = () => {
-        return <div><span className="pi pi-trash"></span></div>
+    const actionTemplate = (rowData) => {
+        return <div><span  onClick={()=>{setDeleteRow(true);setCurrentId(rowData?._id)}} className="pi pi-trash"></span></div>
     }
+
+    const handleDelete = async (currId) => {
+        try {
+            const result = await deleteUplaodFile(currId);
+
+            if (result.error) {
+                // Handle the error, e.g., show an error message
+                console.error(result.error);
+            } else {
+                toastSuccess('Model deleted successfully');
+                const result = await getall_uploadfiles({email});
+                if (result.data) {
+                setFileDetails(result.data);
+                console.log(result);
+                } else {
+                console.error(result.error);
+                }
+            }
+        } catch (error) {
+            // Handle any unexpected errors
+            toastError('Unexpected error');
+        }
+    };
 
     const handleJiraIconClick = (value) => {
         dispatchAction(screenType(value));
@@ -83,8 +128,6 @@ const GenAi = () => {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
             }
         };
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        const email = userInfo.email_id;
         fetchData(email);
 
     }, []);
@@ -213,7 +256,7 @@ const GenAi = () => {
     <div className="genai_container flex" >
         
         {isJiraComponentVisible && <JiraTestcase/>}
-        <div className="genai_left_container p-3">
+        <div className="genai_left_container p-2">
         <Toast ref={toast}></Toast>
             <div className="context_container flex align-items-center border-bottom-1 pb-2 mb-1">
                 <div className="w-1 context_logo_container flex justify-content-center align-items-center mr-2">
@@ -224,6 +267,7 @@ const GenAi = () => {
             <div className="context_doc my-2">Document</div>
             <div className="doc_container flex flex-row border-round my-2">
                 <FileUpload
+                    className='genai_fileupload'
                     ref={fileUploadRef}
                     disabled={fileUploading}
                     mode="basic"
@@ -247,9 +291,17 @@ const GenAi = () => {
                 {fileUploading && <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)"/>}
             </div>
             <div className="datatable_files">
+            <AvoConfirmDialog
+                        visible={deleteRow}
+                        onHide={() => setDeleteRow(false)}
+                        showHeader={false}
+                        message="Are you sure you want to delete ?"
+                        icon="pi pi-exclamation-triangle"
+                        accept={() => handleDelete(currentId)}
+                    />
                 <DataTable value={fileDetails} header={header} tableStyle={{}}>
                     <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} />
-                    {/* <Column field="action" header="Action" body={actionTemplate}></Column> */}
+                    <Column field="actions" header="Actions" body={actionTemplate}/>
                 </DataTable>
             </div>
             <div className="flex justify-content-center align-items-center my-1 leftandor">AND / OR</div>
@@ -259,24 +311,24 @@ const GenAi = () => {
                     value={sortedData} 
                     onChange={(e) => handleJiraIconClick(e.value)}
                     options={requirementTool} optionLabel="name"
-                    placeholder={<span className="left_btm_placeholder">Select a Tool</span>} className="w-full md:w-14rem" />
+                    placeholder={<span className="left_btm_placeholder">Select a Tool</span>} className="w-full" />
                 {/* <Dropdown
                     // value={sortedData} 
                     // onChange={(e) => handleJiraIconClick(e.value)}
                     // options={requirementTool} optionLabel="name"
-                    placeholder={<span className="left_btm_placeholder">Jira Project</span>} className="w-full md:w-14rem" />
+                    placeholder={<span className="left_btm_placeholder">Jira Project</span>} className="w-full" />
                 <Dropdown
                     // value={sortedData} 
                     // onChange={(e) => handleJiraIconClick(e.value)}
                     // options={requirementTool} optionLabel="name"
-                    placeholder={<span className="left_btm_placeholder">Jira WorkItem</span>} className="w-full md:w-14rem" />     */}
+                    placeholder={<span className="left_btm_placeholder">Jira WorkItem</span>} className="w-full" />     */}
             </div>
             <div className="left_btm_container pb-1">
                 <div className="left_btm_header my-1">Template</div>
                 <Dropdown
                     value={selectedTemp}
                     options={readTempData} optionLabel='name' onChange={(e) => {templateHandler(e);submitPayload(e.value)}}
-                    placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full md:w-14rem" />
+                    placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full" />
             </div>
             {/* <div>
                 <Button className="w-full" label="Submit" onClick={() =>{ submitPayload(); onSubmitClick()}} />

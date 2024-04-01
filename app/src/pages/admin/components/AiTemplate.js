@@ -7,10 +7,12 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Slider } from 'primereact/slider';
 import { InputSwitch } from 'primereact/inputswitch';
-import {createTemp, readModel , readTemp} from "../api";
+import {createTemp, readModel , readTemp , deleteTemp , editTemp} from "../api";
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
+import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
+
 
 
 const AiTemplate = () => {
@@ -30,6 +32,17 @@ const AiTemplate = () => {
     const [gridList, setGridList] = useState([]);
     const [tempData , setTempData] = useState([]);
     const [refreshTable, setRefreshTable] = useState(true);
+    const [tableData, setTableData] = useState([]);
+    const [tempId, setTempId] = useState([]);
+    const [currentId,setCurrentId] = useState('');
+    const [deleteRow, setDeleteRow] = useState(false);
+    const [isEdit,setIsEdit] = useState(false);
+
+    const [filters, setFilters] = useState({});
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+
+
+
 
     const toast = useRef(null);
     let serialNumber = 0;
@@ -39,9 +52,9 @@ const AiTemplate = () => {
     else userInfo = userInfo;
 
     const LLMModel = [
-        {name: 'Positive', code: 'NY'},
-        {name: 'Negative', code: 'RM'},
-        {name: 'Edge Case', code: 'LDN'},
+        {name: 'Positive'},
+        {name: 'Negative'},
+        {name: 'Edge Case'},
      
     ];
 
@@ -57,11 +70,21 @@ const AiTemplate = () => {
         resetForm();
       };
     
-      const hideTemplate = () => {
+      const createAndEditTemplate = () => {
+        if (isEdit){
+          onEditTemplate();
+        }
+        else{
         onCreateTemplate();
+        }
         setDisplayTemplate(false);
         resetForm();
       };
+
+      const hideTemplate = ()=>{
+        setDisplayTemplate(false);
+        resetForm();
+      }
 
       const resetForm = () => {
         setDomain('');
@@ -74,19 +97,24 @@ const AiTemplate = () => {
         setDescription('');
       };
 
+  const generateTemplatePayload = (domain,model_id, test_type, temperature, active , defaultCheck, name, description) => {
+    return {
+      "domain": domain,
+      "model_id": model_id,
+      "test_type": test_type,
+      "temperature": temperature,
+      "active": active,
+      "default": defaultChcek,
+      "name": name,
+      "description": description
+    }
+  }
+
+
       const onCreateTemplate = async () => {
         const scaledAccuracy = accuracy / 100;
         try {
-            const templateData = await createTemp({
-              "domain": domain,
-              "model_id": llmModel,
-              "test_type": testType.name,
-              "temperature":scaledAccuracy ,
-                "active": activeCheck,
-                "default": defaultChcek,
-                "name": name,
-                "description":description
-            });
+          const templateData = await createTemp(generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
             setRefreshTable(true);
 
             console.log(templateData);
@@ -95,13 +123,39 @@ const AiTemplate = () => {
                 resetForm();
                 // templateDataforTable();
               } else {
-                toast.current.show({ severity: 'error', summary: 'Error', detail: templateData.error || 'Unknown error', life: 3000 });
+                toast.current.show({ severity: 'error', summary: 'Error', detail:"Error while creating template", life: 3000 });
               }
 
         } catch (error) {
-            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Failed to craete template', life: 3000 });
          }
       };
+
+      const onEditTemplate = async () => {
+        const scaledAccuracy = accuracy / 100;
+        try {
+          const result = await editTemp(currentId, generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
+    
+          if (result.error) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: result.error || 'Unknown error', life: 3000 });
+              console.error(result.error);
+          } else {
+            toast.current.show({ severity: 'success', summary: 'Success', detail: 'Template updated successfully', life: 3000 });
+              const newResult = await readTemp({
+                "userid": userInfo.user_id
+              });
+              if (newResult.data.data) {
+                setTempData((prev) => newResult.data.data);
+              } else {
+              console.error(newResult.error);
+              }
+          }
+      } catch (error) {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+          // toastError('Unexpected error');
+      }
+       
+      }
 
       const llmData = async () => {
         try {
@@ -110,17 +164,18 @@ const AiTemplate = () => {
             
             });
             const data = modalData.data.data || [];
-            setModelData(data);
+            const modalOptions = data.map(item => ({
+              name: item.name,
+              code: item._id
+            }));
+            setModelData(modalOptions);
 
         } catch (error) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
          }
       };
 
-      const modalOptions = modelData.map(item => ({
-        name: item.name,
-        value: item._id
-      }));
+      
 
    
 
@@ -133,8 +188,8 @@ const AiTemplate = () => {
       
   const customFooter = (
     <div>
-      <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={() => setDisplayTemplate(false)}/>
-      <Button label="Save" icon="pi pi-check" className="p-button-text" onClick = {hideTemplate}/>
+      <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideTemplate}/>
+      <Button label="Save" icon="pi pi-check" className="p-button-text" onClick = {createAndEditTemplate}/>
     </div>
   );
 
@@ -144,13 +199,27 @@ const AiTemplate = () => {
           "userid": userInfo.user_id,
         
         });
+
+        if (readData && readData.data.data && readData.data.data.length > 0) {
+          const firstItem = readData.data.data[0]; 
+          const templateId = firstItem._id; 
+          setTempId(templateId); 
+        }
+        console.log(tempId);
+
         const data = readData.data.data || [];
         setTempData(data);
+
         setRefreshTable(false);
     } catch (error) {
         toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
      }
   };
+
+//  const templateId = tempData[0]._id;
+//  setTempId(templateId);
+
+  
 
   useEffect(() => {
     templateDataforTable();
@@ -173,23 +242,55 @@ const AiTemplate = () => {
   const renderActions = (rowData) => {
     return (
       <div>
-        <Button icon="pi pi-pencil" className="p-button-rounded p-button-warning" onClick={() => handleEdit(rowData)} />
-        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => handleDelete(rowData)} />
+        <span className='pi pi-pencil' onClick={()=>handleEdit(rowData)} > </span>
+        <span className='pi pi-trash' onClick={()=> {setDeleteRow(true);setCurrentId(rowData?._id)} }   style={{marginLeft:'1rem'}} > </span>
       </div>
     );
   };
 
-  const handleEdit = (rowData) => {
-    // Handle edit action
-    // You can access the rowData for the selected record
+  const handleEdit = async (rowData) => {
+    showTemplate(true);
+    setIsEdit(true);
+    setCurrentId(rowData?._id);
+    setDomain(rowData?.domain);
+    setLlmModel({name: rowData?.model_details?.name, code: rowData?.model_details?._id});
+    setAccuracy(rowData?.temperature);
+    setActiveCheck(rowData?.active);
+    setDefaultCheck(rowData?.default);
+    setName(rowData?.name);
+    setTestType({name: rowData?.test_type});
+    setDescription(rowData?.description);
+  
   };
 
-  const handleDelete = (rowData) => {
-    // Handle delete action
-    // You can access the rowData for the selected record
-  };
+
+  const handleTemplateDelete = async () => {
+    try {
+        const result = await deleteTemp(currentId);
+
+        if (result.error) {
+          toast.current.show({ severity: 'error', summary: 'Error', detail: result.error || 'Unknown error', life: 3000 });
+            console.error(result.error);
+        } else {
+          toast.current.show({ severity: 'success', summary: 'Success', detail: 'Template Deleted successfully', life: 3000 });
+            // toastSuccess('Model deleted successfully');
+            const newResult = await readTemp({
+              "userid": userInfo.user_id
+            });
+            if (newResult.data.data) {
+              setTempData((prev) => newResult.data.data);
+            } else {
+            console.error(newResult.error);
+            }
+        }
+    } catch (error) {
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
+        // toastError('Unexpected error');
+    }
+};
 
 
+console.log("tempData", tempData);
 
     return(
         <>
@@ -198,23 +299,23 @@ const AiTemplate = () => {
         <Dialog header="Add Template" visible={displayTemplate} style={{ width: '33vw', height: '40vw' }} onHide={hideTemplate} footer={customFooter}>
           <div className='flex flex-row justify-content-between pl-2 pb-2'>
             <div className="flex flex-column">
-              <label className="pb-2 font-medium"> Name </label>
+              <label className="pb-2 font-medium"> Name <span style={{ color: "#d50000" }}>*</span></label>
               <InputText value={name} onChange={(e) => setName(e.target.value)} style={{ width: '28rem' }} />
 
-              <label className="pb-2 font-medium"> Description </label>
+              <label className="pb-2 font-medium"> Description<span style={{ color: "#d50000" }}>*</span> </label>
               <InputText value={description} onChange={(e) => setDescription(e.target.value)} style={{ width: '28rem' }} />
 
-              <label className="pb-2 font-medium"> Industry Domain </label>
+              <label className="pb-2 font-medium"> Industry Domain <span style={{ color: "#d50000" }}>*</span></label>
               <InputText value={domain} onChange={(e) => setDomain(e.target.value)} style={{ width: '28rem' }} />
 
-              <label className="pb-2 font-medium">LLM Model</label>
-              <Dropdown value={llmModel} options={modalOptions} onChange={onModelChange} optionLabel="name" placeholder="Select a LLM Model" style={{ width: '28rem' }} />
+              <label className="pb-2 font-medium">LLM Model<span style={{ color: "#d50000" }}>*</span></label>
+              <Dropdown value={llmModel} options={modelData} onChange={onModelChange} optionLabel="name" placeholder="Select a LLM Model" style={{ width: '28rem' }} />
 
-              <label className="pb-2 font-medium">Test Type</label>
+              <label className="pb-2 font-medium">Test Type <span style={{ color: "#d50000" }}>*</span></label>
               <Dropdown value={testType} options={LLMModel} onChange={onTestTypeChange} optionLabel="name" placeholder="Select a Test Type" style={{ width: '28rem' }} />
 
               <div className='accuracy_div'>
-                <label className="pb-4 font-medium">Accuracy</label>
+                <label className="pb-4 font-medium">Accuracy </label>
                 <div className="flex flex-row  temp-div">
                   <label className="pb-2 font-medium">Low</label>
                   <div className="accuracy_sub_div">
@@ -239,18 +340,27 @@ const AiTemplate = () => {
 
         </Dialog>
         {tempData.length ? (<>
-          <label className="pb-2 font-medium">List of Templates</label>
+          <label className="pb-2 temp-list-label">List of Templates</label>
           <div className='search_newGrid'>
-                        <InputText placeholder="Search" className='search_grid' value={searchText}  />
+                        <InputText placeholder="Search" className='search_grid' value={globalFilterValue} onChange={(e)=>setGlobalFilterValue(e.target.value)}  />
                  
                     <Button className="grid_btn_list" label="Add new template" onClick={showTemplate}  ></Button>
                     </div>
          <div style={{ position: 'absolute', width: '74%', height: '-webkit-fill-available', top: '13rem' }}>
-         <DataTable value={tempData} paginator rows={5} paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
-         <Column
+         <AvoConfirmDialog
+                        visible={deleteRow}
+                        onHide={() => setDeleteRow(false)}
+                        showHeader={false}
+                        message="Are you sure you want to delete ?"
+                        icon="pi pi-exclamation-triangle"
+                        accept={() => handleTemplateDelete(currentId)}
+                    />
+         <DataTable value={tempData} paginator rows={5} globalFilter={globalFilterValue} showGridlines
+         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
+         {/* <Column
     header="Sl No"
-    body={() => ++serialNumber}
-  />
+    body={() => ++serialNumber} */}
+  {/* /> */}
         <Column field="name" header="Name" />
         <Column field="description" header="Description" />
         <Column field="createdAt" header="Created On" />
