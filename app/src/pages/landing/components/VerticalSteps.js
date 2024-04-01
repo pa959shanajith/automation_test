@@ -46,7 +46,7 @@ const VerticalSteps = (props) => {
       background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"10rem",marginTop:"2rem"
     };
     const buttonStyle_genius_disabled = {
-      background:"rgb(160, 200, 255)" ,color:"white" , marginTop: "0.5rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+      background:"rgb(160, 200, 255)" ,color:"white" , marginTop: "2rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
     };
 
     const buttonStyle_execute = {
