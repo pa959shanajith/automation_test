@@ -29,7 +29,7 @@ const GitButtonActions = (props) => {
     const bitProjectKey = props.bitProjectKey
     const domain = props.domain
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [isConfigExists, setIsConfigExists] = useState({value:'', exist:false});
+    const [isConfigExists, setIsConfigExists] = useState(false);
 
     useEffect(() => {
         if (updateBtnRef !== undefined && updateBtnRef.current !== undefined)
@@ -67,7 +67,7 @@ const GitButtonActions = (props) => {
                 apiPayloadData.bitProjectKey = bitProjectKey.current.value.trim();
             }
         } else if(action === "delete"){
-            apiPayloadData.param = props.screenName === "Git" ? 'bit' : props.screenName === "Bitbucket" ? 'bit' : ''; // if the project has git config and trying to do bitbucket config send "param" as earlier configured ,---> here Param=git
+            apiPayloadData.param = isConfigExists ? ( props.screenName === "Git" ? 'bit' : props.screenName === "Bitbucket" ? 'git' : '') : props.screenName === "Git" ? 'git' : 'bit'; // if the project has git config and trying to do bitbucket config send "param" as earlier configured ,---> here Param=git
             apiPayloadData.action = action;
             apiPayloadData.userId = userData[user.current.value];
             apiPayloadData.projectId = projectData[Project.current.value];
@@ -87,26 +87,25 @@ const GitButtonActions = (props) => {
                 // props.toastWarn(`${props.screenName} configration name already exists.`);
                 if(apiPayloadData.param === "bit"  && data === 'gitConfig exists') {
                     setShowDeleteModal(true); 
-                    setIsConfigExists({value:data, exist: true});
+                    setIsConfigExists( true);
                 }
                 if(apiPayloadData.param === "git"  && data === 'bitConfig exists') {
                     setShowDeleteModal(true); 
-                    setIsConfigExists({value:data, exist: true});
+                    setIsConfigExists( true);
                 }
             } 
-            // else if (action === "verify") {setShowDeleteModal(true); setIsConfigExists({value:data, exist: true});}
         }
         else if (data === `${apiPayloadData.param}User exists`) {
             if (['update', 'create'].includes(action)) {
                 props.toastWarn(`${props.screenName} configuration already exists for this user and project combination.`);
-                // if(props.screenName === "Git" ) {
-                //     setShowDeleteModal(true); 
-                //     setIsConfigExists({value:data, exist: true});
-                // }
             } 
             // else if (action === "verify") {setShowDeleteModal(true); setIsConfigExists({value:data, exist: true});}
         }
-        else props.toastSuccess(Messages.CUSTOM(`${props.screenName} configuration ${action}d successfully`, VARIANT.SUCCESS));
+        else { 
+            props.toastSuccess(Messages.CUSTOM(`Configuration ${action}d successfully`, VARIANT.SUCCESS));
+            resetFields();
+            setIsConfigExists(false);
+        }
         setLoading(false);
         if (!['create'].includes(action)) {resetFields();}
         if (action === "update") {
@@ -133,12 +132,12 @@ const GitButtonActions = (props) => {
                 <ModalContainer
                     show={showDeleteModal}
                     title={"Delete configuration"}
-                    content={isConfigExists.exist ? `This project is configured with "${props.screenName === 'Git'? 'Bitbucket' : 'Git'} Configuration" if u want to change the configuration, then all data will be deleted. Are u sure want to delete/change the Configuration?`:"Are you sure you want to delete ? Users depending on this configuration will not be able to perform Git operation."}
+                    content={isConfigExists? `This project is configured with "${props.screenName === 'Git'? 'Bitbucket' : 'Git'}" if u want to change the configuration, then all data will be deleted. Are u sure want to delete/change the Configuration?`:`Are you sure you want to delete ? Users depending on this configuration will not be able to perform ${props.screenName === 'Git'? 'Git' : 'Bitbucket'} operation.`}
                     close={() => setShowDeleteModal(false)}
                     footer={
                         <>
                             <Button outlined label="No" size='small' onClick={() => setShowDeleteModal(false)} />
-                            <Button label="Yes" size='small' onClick={() => { gitConfigAction('delete'); setShowDeleteModal(false); }} />
+                            <Button label="Yes" size='small' onClick={() => { gitConfigAction('delete', props.screenName === "Git" ? 'bit' : props.screenName === "Bitbucket" ? 'git' : '' ); setShowDeleteModal(false); }} />
                         </>
                     }
                     width='28rem'

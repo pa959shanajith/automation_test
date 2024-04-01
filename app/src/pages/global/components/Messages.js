@@ -292,6 +292,7 @@ const Messages={
         WARN_ALREADY_SYNCED: {"CONTENT":"Already Synced.", "VARIANT": VARIANT.WARNING},
     },
     MINDMAP:{
+        ERR_BIT_PROJECTKEY:{"CONTENT":"The projectkey might not exist, or you don't have permission, Please verify the projectKey", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_PROJECT: {"CONTENT":"Failed to fetch project list.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_MODULES: {"CONTENT":"Failed to fetch Module list.", "VARIANT": VARIANT.ERROR},
         ERR_FETCH_SCREEN: {"CONTENT":"Failed to fetch screens.", "VARIANT": VARIANT.ERROR},
