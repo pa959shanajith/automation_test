@@ -472,12 +472,6 @@ const LoginModal = ({ isSpin = false, showCard2, handleIntegration, setShowLogin
                             <span className="text__alm">ALM</span>
                         </div>
                     }
-                    <div>
-                        <div className={`integration-card ${selectedscreen?.name === 'Git' ? 'selected' : ''}`} onClick={() => handleScreenType({ name: 'Git', code: 'GIT' })}>
-                            <img src="static/imgs/git_configuration_icon.svg" className="img__alm" alt="Git Icon" />
-                            <span className="text_git">Git<br />Configuration</span>
-                        </div>
-                    </div>
                 </div>
             </div>
             {/* <div>

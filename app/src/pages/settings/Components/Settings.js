@@ -34,8 +34,6 @@ const Settings =() =>{
   const ManageProj = () => {
     setHandleManageProject(!handleManageProject);
   }
-  const Integrations = useMemo(() => <ManageIntegrations visible={manageIntegrationsvisible} onHide={handleCloseDialog} />, [manageIntegrationsvisible, handleCloseDialog])
-
   const toastError = (erroMessage) => {
     if (erroMessage.CONTENT) {
       toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
@@ -56,6 +54,10 @@ const Settings =() =>{
     }
     else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
   }
+  
+  const Integrations = useMemo(() => <ManageIntegrations visible={manageIntegrationsvisible} onHide={handleCloseDialog} toastWarn={toastWarn} toastError={toastError} toastSuccess={toastSuccess} />, [manageIntegrationsvisible, handleCloseDialog])
+
+
 
   return (
     <>

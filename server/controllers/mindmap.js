@@ -1039,16 +1039,15 @@ exports.exportToGit = async (req, res) => {
 	const actionName = "exportToGit";
 	logger.info("Inside UI service: " + actionName);
 	try {
-		const data = req.body;
-		// const gitname = data.gitconfig;
-		const gitVersion = data.gitVersion;
-		// var gitFolderPath = data.gitFolderPath;
-		// const gitBranch = data.gitBranch;
+		const data = req.body;		
 		const moduleId = data.mindmapId;
 		const exportProjAppType=data.exportProjAppType;
 		const projectId =data.projectId;
-		const gitComMsgRef = data.gitComMsgRef;
 		const projectName =data.projectName;
+		const param=data.param;
+		// const gitname = data.gitconfig;		
+		// var gitFolderPath = data.gitFolderPath;
+		// const gitBranch = data.gitBranch;		
 		// if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
 		// 	gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
 		// }
@@ -1056,15 +1055,26 @@ exports.exportToGit = async (req, res) => {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
 			"action":actionName,
+			"param":param,
 			// "gitname":gitname,
-			// "gitBranch":gitBranch,
-			"gitVersion": gitVersion,
+			// "gitBranch":gitBranch,			
 			// "gitFolderPath": gitFolderPath,
 			"exportProjAppType":exportProjAppType,
-			"projectId":projectId,
-			"gitComMsgRef":gitComMsgRef,
+			"projectId":projectId,			
 			"projectName":projectName
 		};
+		if (param=="git"){
+			const gitVersion = data.gitVersion;
+			const gitComMsgRef = data.gitComMsgRef;
+			inputs["gitVersion"]= gitVersion,
+			inputs["gitComMsgRef"]=gitComMsgRef
+		}
+		else if (param=="bit"){
+			const bitVersion = data.bitVersion;
+			const bitComMsgRef = data.bitComMsgRef;
+			inputs["bitVersion"]= bitVersion,
+			inputs["bitComMsgRef"]=bitComMsgRef
+		}
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
 	} catch (ex) {
@@ -1359,25 +1369,33 @@ exports.importGitMindmap = async (req, res) => {
 		const expProj = req.body.expProj;
 		const projectid = req.body.projectId;
 		// const gitname = req.body.gitname;
-		// const gitbranch = req.body.gitbranch;
-		const gitversion = req.body.gitVersion;
+		// const gitbranch = req.body.gitbranch;		
 		// var gitfolderpath = req.body.gitfolderpath;
 		var appType= req.body.appType;		
 		var projectName = req.body.projectName;
+		var param = req.body.param;
 		// if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
 		// 	gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		// }
 		const inputs= {
+			"param":param,
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
 			"projectId": projectid,
 			// "gitname": gitname,
-			// "gitbranch": gitbranch,
-			 "gitVersion": gitversion,
+			// "gitbranch": gitbranch,			
 			// "gitfolderpath": gitfolderpath,
 			"appType":appType,			
 			"projectName":projectName,
 			"expProj":expProj
+		}
+		if (param=="git"){
+			const gitVersion = req.body.gitVersion;			
+			inputs["gitVersion"]= gitVersion			
+		}
+		else if (param=="bit"){
+			const bitVersion = req.body.bitVersion;			
+			inputs["bitVersion"]= bitVersion			
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		return res.send(result)
@@ -1668,7 +1686,8 @@ exports.checkExportVer = async (req, res) => {
         const exportname= req.body.exportname;
         const query = req.body.query;
         const projectId = req.body.projectId || "default"
-        const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
+		const param=req.body.param;
+        const inputs= { "exportname":exportname,"query": query,"projectId":projectId,"param":param}
         const result = await utils.fetchData(inputs, "/git/checkExportVer", fnName);
         if (result == "fail") {
             return res.send('fail');}
@@ -1890,7 +1909,8 @@ exports.fetch_git_exp_details = async (req, res) => {
     try {
 		
         const projectId = req.body.projectId
-        const inputs= {"projectId":projectId}
+		const param=req.body.param
+        const inputs= {"projectId":projectId,"param":param}		
         const result = await utils.fetchData(inputs, "/git/fetch_git_exp_details", fnName);
         if (result == "fail") {
             return res.send('fail');}
