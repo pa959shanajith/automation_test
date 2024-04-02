@@ -1065,23 +1065,14 @@ export const unlockUser = async(user) => {
   api returns
 */
 
-export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAccToken,gitUrl,gitUsername,gitEmail,gitBranch) => { 
+export const gitSaveConfig = async(data) => { 
     try{
         const res = await axios(url+'/gitSaveConfig', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {action: action,
-                    userId: userId,
-                    projectId: projectId,
-                    gitConfigName: gitConfigName,
-                    gitAccToken: gitAccToken,
-                    gitUrl: gitUrl,
-                    gitUsername:gitUsername,
-                    gitEmail:gitEmail,
-                    gitBranch:gitBranch
-                },
+            data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1091,10 +1082,10 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
             return res.data;
         }
         console.error(res.data)
-        return {error:"Error while Git "+action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }catch(err){
         console.error(err)
-        return {error:"Error while Git "+action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }
 }
 
@@ -1103,15 +1094,14 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
   api returns
 */
 
-export const gitEditConfig = async(userId, projectId) => { 
+export const gitEditConfig = async(data) => { 
     try{
         const res = await axios(url+'/gitEditConfig', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {userId: userId,
-				projectId: projectId},
+            data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1574,30 +1564,7 @@ export const save_testcase = async(props) => {
     }
 }
 
-export const fetch_git_exp_details = async(projectId) => { 
-    try{
-        const res = await axios(url+'/fetch_git_exp_details', {
-            method: 'POST',
-            headers: {
-            'Content-type': 'application/json',
-            },
-            data: {
-				projectId: projectId},
-            credentials: 'include'
-        });
-        if(res.status === 401 || res.data === "Invalid Session" ){
-            RedirectPage(history)
-            return {error:MSG.GENERIC.INVALID_SESSION};
-        }else if(res.status===200 && res.data !== "fail"){            
-            return res.data;
-        }
-        console.error(res.data)
-        return {error:MSG.ADMIN.ERR_FETCH_GIT}
-    }catch(err){
-        console.error(err)
-        return {error:MSG.ADMIN.ERR_FETCH_GIT}
-    }
-}
+
 // All Test suites Data
 export const unlockTestSuites = async(inputs) => {
     try {

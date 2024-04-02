@@ -2,6 +2,12 @@
 .repository__table{
     top: 2rem;
 }
+.repo__datatable{
+    .p-column-header-content {
+    display: grid !important;
+    align-items: center !important;
+    }
+}
 
 .add_more_btn{
     position: relative;
@@ -238,4 +244,9 @@
 .create__btn{
     position:relative;
     right: 1rem;
+}
+
+.disabled-icon {
+    opacity: 0.5;
+    cursor: not-allowed; 
 }

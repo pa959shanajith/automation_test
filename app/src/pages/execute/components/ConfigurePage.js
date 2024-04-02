@@ -586,6 +586,8 @@ try {
         if ( $runningStatus -eq "Completed") {
             $summaryReport = $statusResponse | ConvertTo-Json -Depth 10
             Write-Host $summaryReport
+            $overallstatus = $statusResponse.overallstatus
+            Write-Host $overallstatus
         }
     } 
     else {
@@ -632,6 +634,8 @@ if [ "$status" != "fail" ]; then
     if [ "$runningStatus" == "Completed" ]; then
       summaryReport=$(echo "$statusResponse" | jq -c '.')
       echo "$summaryReport"
+      overallstatus= $(echo "$statusResponse" | jq -c -r ".Modules[] .Scenarios[] .Report.overallstatus.overallstatus")
+      echo "$overallstatus"
       break
     fi
     sleep ${runningStatusTimer}
@@ -2691,10 +2695,9 @@ Learn More '/>
           </div>
           <Button
             className={!isQualityEngineer?"configure_button":"configureEngRole"}
-            onClick={() => configModal("CancelSave")}
+            onClick={!isQualityEngineer?() => configModal("CancelSave"):null}
             title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }
-            style={{ cursor: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'not-allowed' : 'pointer' , pointerEvents: ((projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) || isQualityEngineer) ? 'all' : 'auto'}}
-            disabled={(projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)|| isQualityEngineer)}
+            style={isQualityEngineer?{cursor:'not-allowed',opacity:'0.3'}:null}
           >
             configure
             <Tooltip target=".configure_button" position="bottom" content="Select test Suite, browser(s) and execution parameters. Use this configuration to create a one-click automation." />
