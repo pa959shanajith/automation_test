@@ -753,7 +753,6 @@ fi`,
 }
   const handleOptionChange = async (selected,type,fetechConfig,index,idx) => {
     // setDropdownSelected(selected);
-    console.log("@@@selected",selected)
     setDropdownSelected(prevValues => {
         const newValues = [...prevValues];
         newValues[index] = selected;
@@ -1095,14 +1094,13 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
-            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
-            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
-        />,
-            [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
-
+    // const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+    //         displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+    //         changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+    //         availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
+    //     />,
+    //         [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+    //         availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
@@ -2660,7 +2658,12 @@ Learn More '/>
       <div>
       {sauceLabLogin}
       {sauceLabExecute}
-      {browserstackExecute}
+      {/* {browserstackExecute} */}
+      <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
+        />
       {browserstackLogin}
         <Breadcrumbs />
         <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>
