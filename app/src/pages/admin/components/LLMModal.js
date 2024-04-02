@@ -266,7 +266,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
               // Additional fields for OpenAi
               if (modalType === 'openAi') {
                 payload.openai_api_base = openAiExtras.api_base;
-                payload.openai_api_key = modalToken;
+                payload.openai_api_key = encryptAES(modalToken);
                 payload.openai_api_type = openAiExtras.api_type;
                 payload.openai_api_version = openAiExtras.api_version;
                 payload.openai_deployment_name = openAiExtras.deployment_name;
@@ -274,12 +274,12 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 // payload = { ...payload, ...openAiExtras };
               } else if (modalType === 'cohere' || modalType === 'anthropic') {
                 if(modalType === 'cohere'){
-                    payload.cohere_api_key = modalToken;
+                    payload.cohere_api_key = encryptAES(modalToken);
                     payload.cohere_model = version;
 
                 }
                 else if(modalType === 'anthropic'){
-                    payload.anthropic_api_key = modalToken;
+                    payload.anthropic_api_key = encryptAES(modalToken);
                     payload.anthropic_model = version;
                 }
                 // payload = { ...payload, /* add Cohere/Anthropic specific fields here */ };
@@ -301,8 +301,28 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 setVersion('');
                 setCurrentId('');
                 const result = await readModel();
-                if (result.data.data) {
-                  setTableData(result.data.data);
+                if (result.data.data.length) {
+                setTableData((prev) => result.data.data.map((object) => {
+                    if(object.anthropic_api_key) {
+                        const decrypted = decryptAES(object.anthropic_api_key);
+                        return {
+                            ...object,
+                            anthropic_api_key: decrypted
+                        };
+                    } else if(object.cohere_api_key) {
+                        const decrypted = decryptAES(object.cohere_api_key);
+                        return {
+                            ...object,
+                            cohere_api_key: decrypted
+                        };
+                    } else if(object.openai_api_key) {
+                        const decrypted = decryptAES(object.openai_api_key);
+                        return {
+                            ...object,
+                            openai_api_key: decrypted
+                        };
+                    }
+                }));
                 } else {
                   console.error(result.error);
                 }
@@ -380,13 +400,45 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
         return ciphertext
       };
 
+      const decryptAES = (ciphertext, key = CryptoJS.enc.Utf8.parse('thisIsASecretKey')) => {
+        var decrypted = CryptoJS.AES.decrypt({
+            ciphertext: CryptoJS.enc.Base64.parse(ciphertext)
+        }, key, {
+            mode: CryptoJS.mode.ECB,
+            padding: CryptoJS.pad.Pkcs7
+        });
+        var plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+        return plaintext;
+    };
+
       useEffect(() => {
         const fetchData = async () => {
           try {
             const result = await readModel();
-    
-            if (result.data.data) {
-              setTableData((prev) => result.data.data);
+            let finalData=[];
+            if (result.data.data.length) {
+                finalData = result.data.data.map((object) => {
+                    if(object.anthropic_api_key) {
+                        const decrypted = decryptAES(object.anthropic_api_key);
+                        return {
+                            ...object,
+                            anthropic_api_key: decrypted
+                        };
+                    } else if(object.cohere_api_key) {
+                        const decrypted = decryptAES(object.cohere_api_key);
+                        return {
+                            ...object,
+                            cohere_api_key: decrypted
+                        };
+                    } else if(object.openai_api_key) {
+                        const decrypted = decryptAES(object.openai_api_key);
+                        return {
+                            ...object,
+                            openai_api_key: decrypted
+                        };
+                    }
+                });
+              setTableData((prev) => finalData);
             } else {
               console.error(result.error);
             }
