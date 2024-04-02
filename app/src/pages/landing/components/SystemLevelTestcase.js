@@ -113,17 +113,17 @@ const SystemLevelTestcase = (props) => {
         updateApiResponse[getSelectedTcIndex] = {...updateApiResponse[getSelectedTcIndex], "TestCase":e.target.value};
         // setApiResponse(updateApiResponse)
     }
-    const generateTestCaseListFunc = useMemo(() => {
-        <GenerateTestCaseList
-            apiResponse={apiResponse}
-            setSelectedGenAiTc={setSelectedGenAiTc}
-            setTextAreaData={setTextAreaData}
-            readOnly={readOnly}
-            setReadOnly={setReadOnly}
-            readOnlyData={readOnlyData}
-            setReadOnlyData={setReadOnlyData}
-        />
-    },[apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData])
+    // const generateTestCaseListFunc = useMemo(() => {
+    //     <GenerateTestCaseList
+    //         apiResponse={apiResponse}
+    //         setSelectedGenAiTc={setSelectedGenAiTc}
+    //         setTextAreaData={setTextAreaData}
+    //         readOnly={readOnly}
+    //         setReadOnly={setReadOnly}
+    //         readOnlyData={readOnlyData}
+    //         setReadOnlyData={setReadOnlyData}
+    //     />
+    // },[apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData])
     return (
         <div className='flexColumn parentDiv border-top-1'>
             {
@@ -205,7 +205,15 @@ const SystemLevelTestcase = (props) => {
             }
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
             <div className='flex flex-row w-full'>
-                {apiResponse && generateTestCaseListFunc}
+                {apiResponse && <GenerateTestCaseList
+            apiResponse={apiResponse}
+            setSelectedGenAiTc={setSelectedGenAiTc}
+            setTextAreaData={setTextAreaData}
+            readOnly={readOnly}
+            setReadOnly={setReadOnly}
+            readOnlyData={readOnlyData}
+            setReadOnlyData={setReadOnlyData}
+        />}
                 {apiResponse && !readOnly && <div className='flex flex-column'>
                     {apiResponse &&
                         <div className='flex flex-column'>
