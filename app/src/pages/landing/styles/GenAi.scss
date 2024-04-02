@@ -88,6 +88,11 @@
         width: 7rem;
     }
   }
+  .gen-btn3{
+    .p-button{
+        width: 12rem;
+    }
+  }
   .label-genai{
     font: $f7_semibold;
   }
@@ -107,7 +112,7 @@
         padding: 5px;
     }
     overflow-y: auto;
-    height: 20vh;
+    height: 22vh;
     overflow-x: hidden;
     display: block;
 }
@@ -156,9 +161,9 @@
     margin-top: 15%;
 }
 
-.p-datatable .p-datatable-emptymessage {
-    display: none;
-}
+// .p-datatable .p-datatable-emptymessage {
+//     display: none;
+// }
 
 .inputTestcaseSystem {
     max-height: 70vh !important;
@@ -205,6 +210,7 @@
 .generateTests_dataTable{
     height: 60vh;
     overflow: auto;
+    width: 19rem;
 }
 .generateTests_systemlevel{
     height: 70vh;
@@ -215,4 +221,23 @@
 }
 .generateTests_systemlevel>.p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
     margin-left: 0rem;
+}
+.file_name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5rem;
+    font-size: 13px;
+}
+
+.datatable_files > .p-datatable > .p-datatable-wrapper{
+    border: 1px solid #DEE2E6;
+}
+.datatable_files > .p-datatable > .p-datatable-header{
+    border: 1px solid #DEE2E6;
+    padding: 0.5rem !important;
+}
+.with-response-div{
+    display: flex;
+    flex-direction: column;
 }

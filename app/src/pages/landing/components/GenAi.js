@@ -220,7 +220,7 @@ const GenAi = () => {
                     //       email: email,
                     //    },
                     // })
-                    toast.current.show({ severity: 'success', summary: 'Success', detail: 'get uploaded file', life: 3000 });
+                    // toast.current.show({ severity: 'success', summary: 'Success', detail: 'get uploaded file', life: 3000 });
                     setBadgeValue(Object.keys(uploadFilesData.data).length);
                 } catch (uploadFilesError) {
                     toast.current.show({ severity: 'error', summary: 'Error', detail: 'errorMessage', life: 3000 });
@@ -300,11 +300,12 @@ const GenAi = () => {
                         accept={() => handleDelete(currentId)}
                     />
                 <DataTable value={fileDetails} header={header} tableStyle={{}}>
-                    <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} />
-                    <Column field="actions" header="Actions" body={actionTemplate}/>
+                    <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} bodyClassName={"file_name"}/>
+                    <Column field="actions" header="Actions" body={actionTemplate} style={{width:"1.5rem"}}/>
                 </DataTable>
             </div>
-            <div className="flex justify-content-center align-items-center my-1 leftandor">AND / OR</div>
+            <div className="flex justify-content-center align-items-center mt-4 leftandor ">AND / OR</div>
+            <div className='mt-5'>
             <div className="left_btm_container pb-1">
                 <div className="left_btm_header my-1">Requirement Management Tool</div>
                 <Dropdown
@@ -329,6 +330,7 @@ const GenAi = () => {
                     value={selectedTemp}
                     options={readTempData} optionLabel='name' onChange={(e) => {templateHandler(e);submitPayload(e.value)}}
                     placeholder={<span className="left_btm_placeholder">Select a Template</span>} className="w-full" />
+            </div>
             </div>
             {/* <div>
                 <Button className="w-full" label="Submit" onClick={() =>{ submitPayload(); onSubmitClick()}} />

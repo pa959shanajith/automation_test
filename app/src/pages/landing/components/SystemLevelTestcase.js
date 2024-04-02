@@ -62,7 +62,17 @@ const SystemLevelTestcase = (props) => {
             //     });
             //     setIsLoading(false);
             // }
-            setApiResponse(response?.data?.response);
+            if( !Array.isArray(response?.data?.response )){
+                toast.current.show({
+                  severity: 'info',
+                  summary: 'Info',
+                  detail:`${response?.data?.response}`,
+                  life: 5000
+              });
+              } else{
+                setApiResponse(response?.data?.response);
+     
+              }
 
             setButtonDisabled(false);
             setIsLoading(false);
@@ -197,7 +207,7 @@ const SystemLevelTestcase = (props) => {
                     {apiResponse &&
                         <div className='flex flex-column'>
                             <InputTextarea
-                                style={{ width: "40vw", height: "70vh" }}
+                                style={{ width: "42vw", height: "70vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={textAreaData}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -216,7 +226,7 @@ const SystemLevelTestcase = (props) => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "40vw", height: "70vh" }}
+                                style={{ width: "40vw", height: "70vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}

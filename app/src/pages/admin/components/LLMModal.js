@@ -450,7 +450,7 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
     );
 
     const NoDataFound = () => {
-        return <div className="grid_img"> <img src="static/imgs/grid_page_image.svg" alt="Empty List Image" height="255" width='204' />
+        return <div className="grid_img"> <img src="static/imgs/template.svg" alt="Empty List Image" height="255" width='204' />
             <span>No LLM Model yet</span>
             <Button className="grid_btn" label="Create" onClick={() => { setLlmModel(true); }} ></Button>
         </div>
