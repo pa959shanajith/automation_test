@@ -20,7 +20,7 @@ import * as utilApi from '../api';
 const Table = (props) => {
     
     const [selectedRows, setSelectedRows] = useState([]);
-    const [selectedColumns, setSelectedColumns] = useState([]);
+    const [currScreen, setCurrScreen] = useState(props.currScreen);
     const [selectedItem, setSelectedItem] = useState(null);
     const [refreshTable, setRefreshTable] = useState(false);
     const [columnVisibilities, setColumnVisibilities] = useState({});
@@ -51,6 +51,7 @@ const Table = (props) => {
         });
         props.setData(newData);
         props.setHeaders(newHeaders);
+        return {newData, newHeaders}
     };
 
         const data = Array.isArray(props.data) ? props.data : [];
@@ -360,6 +361,52 @@ const Table = (props) => {
             value: header.__CELL_ID__
         }));
 
+        const updateTable = async(newData="", newHeaders="") => {
+            try{
+                let arg = prepareSaveData(props.tableName, newHeaders,newData);
+    
+                let validation = validateData(arg.tableName, arg.data);
+    
+                switch (validation) {
+                    case "tableName": props.setErrors({tableName: true}); break;
+                    case "emptyData": toastError(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                    case "duplicateHeaders": toastError(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
+                    case "saveData": 
+                        props.setOverlay("Updating Data Table");
+                        const resp = await utilApi.editDataTable(arg);
+                        props.setOverlay("");
+                        if (resp === "success") 
+                        toastSuccess(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
+                        else 
+                        toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+                        break;
+                    default: toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE); break;
+                }
+            }
+            catch(error) {
+                toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+                console.error(error);
+            }
+        }
+    
+
+        const deleteColumn = (selectedOption) => {
+            props.setModal({
+                title: "Confirm Deletion", 
+                content: "Are you sure you want to delete the selected column?", 
+                onClick: () => handleConfirmation(selectedOption)
+            });
+        }
+        
+        const handleConfirmation = (selectedOption) => {
+                const {newData, newHeaders} = handleDropdownChange(selectedOption.value);
+                if(currScreen === "Edit"){
+                    updateTable(newData, newHeaders);
+                }
+                // {(currScreen === 'Create') ? '' : updateTable(newData, newHeaders)}
+                props.setModal(false);
+        }
+
     const header = (
         <div className="flex align-items-center justify-content-between">
             <div className='flex gap-5'>
@@ -400,12 +447,12 @@ const Table = (props) => {
                     <img src="static/imgs/trash.svg" alt="Delete" />
                 </span>
             </div>
-            <div className='ml-2'>
+            <div className='ml-2 columnDelete'>
                 <Dropdown
-                    className='columnDelete'
+                    // className='columnDelete'
                     options={dropdownOptions}
                     value={null} // Set the default value or leave it as null
-                    onChange={(e) => handleDropdownChange(e.value)}
+                    onChange={(selectedOption) => deleteColumn(selectedOption)}
                     placeholder="Select a column to delete"
                 />
             </div>

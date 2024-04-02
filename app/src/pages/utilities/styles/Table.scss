@@ -268,8 +268,10 @@
     .p-inputtext{
         color: none !important;
         border: none !important;
-        // width: 100%;
         background-color: #f8f9fa;
+        max-width: 12rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .btn_add{
         margin: 0.5rem ;

@@ -30,11 +30,11 @@ const DataTable = props => {
             close={()=>setModal(false)}
             footer={
                 <>
+                <Button outlined onClick={()=>setModal(false)}>
+                    {showModal.rejectText ? showModal.rejectText : "No"}
+                </Button>
                 <Button onClick={showModal.onClick}>
                     {showModal.continueText ? showModal.continueText : "Yes"}
-                </Button>
-                <Button onClick={()=>setModal(false)}>
-                    {showModal.rejectText ? showModal.rejectText : "No"}
                 </Button>
                 </>
             }
@@ -55,7 +55,7 @@ const DataTable = props => {
         { 
             currScreen === "Create" 
             ? <CreateScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} currScreen={props.currScreen}/>
-            : <EditScreen setModal={setModal} setDataValue={setDataValue} dataValue={dataValue} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            : <EditScreen setModal={setModal} setDataValue={setDataValue} dataValue={dataValue} setOverlay={setOverlay} setScreenType={props.setScreenType} currScreen={props.currScreen}/>
         }
     </>;
 }
@@ -87,7 +87,7 @@ const CreateScreen = props => {
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
                         setCheckList={setCheckList} dnd={dnd} checkList={checkList} setDnd={setDnd}
-                        focus={focus} setFocus={setFocus} tableName={tableName}
+                        focus={focus} setFocus={setFocus} tableName={tableName} currScreen={props.currScreen}
                     /> 
                 }
             </div>
@@ -149,7 +149,7 @@ const EditScreen = props => {
                     <Table 
                         { ...props } data={data} setData={setData} dataValue={props.dataValue} setDataValue={props.setDataValue} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
                         setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter} setDnd={setDnd} tableName={tableName}
-                        focus={focus} setFocus={setFocus} dataTables={dataTables} setTableName={setTableName}
+                        focus={focus} setFocus={setFocus} dataTables={dataTables} setTableName={setTableName} currScreen={props.currScreen}
                     /> 
                 }
             </div>
