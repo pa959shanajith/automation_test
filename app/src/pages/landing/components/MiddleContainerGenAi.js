@@ -713,7 +713,7 @@ const MiddleContainerGenAi = () =>{
           <>
             <div className="flex flex-column" >
               {!apiResponse ? (
-                <div className="card-group p-3 " style={{ border: '1px solid #ccc', margin: '5px', display: 'flex', flexDirection: 'row' }}>
+                <div className="card-group p-3 " style={{ display: 'flex', flexDirection: 'row' }}>
                   <div className="card card-data bg-light" >
                     <div className="card-body ">
                       <div className='summary-container'>
@@ -725,7 +725,7 @@ const MiddleContainerGenAi = () =>{
                                 checked={selectedTestCases.includes(testCase.id)}
                                 onChange={() => handleCheckboxChange(testCase.id, testCase.summary)}
                               />
-                              <span className="content">
+                              <span className="content" style={{fontSize:"14px"}}>
                                 <span> {testCase.id} - {testCase.summary}</span>
                                 <span className="summary"> {testCase.summary}</span>
                               </span>
@@ -735,7 +735,7 @@ const MiddleContainerGenAi = () =>{
                       </div>
                     </div>
                   </div>
-                </div>
+                 </div>
 
 
               ) : (<>
