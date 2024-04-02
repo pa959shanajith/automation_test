@@ -112,9 +112,9 @@ const AiTemplate = () => {
 
 
       const onCreateTemplate = async () => {
-        const scaledAccuracy = accuracy / 100;
+        // const scaledAccuracy = accuracy / 100;
         try {
-          const templateData = await createTemp(generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
+          const templateData = await createTemp(generateTemplatePayload(domain, llmModel.code, testType.name, accuracy, activeCheck, defaultChcek, name, description));
             setRefreshTable(true);
 
             console.log(templateData);
@@ -132,9 +132,9 @@ const AiTemplate = () => {
       };
 
       const onEditTemplate = async () => {
-        const scaledAccuracy = accuracy / 100;
+        // const scaledAccuracy = accuracy / 100;
         try {
-          const result = await editTemp(currentId, generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
+          const result = await editTemp(currentId, generateTemplatePayload(domain, llmModel.code, testType.name, accuracy, activeCheck, defaultChcek, name, description));
     
           if (result.error) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: result.error || 'Unknown error', life: 3000 });
@@ -319,8 +319,10 @@ console.log("tempData", tempData);
                 <div className="flex flex-row  temp-div">
                   <label className="pb-2 font-medium">Low</label>
                   <div className="accuracy_sub_div">
-                    <InputText value={accuracy} onChange={(e) => setAccuracy(e.target.value)} style={{ width: '24rem' }} />
-                    <Slider value={accuracy} onChange={(e) => setAccuracy(e.value)} style={{ width: '24rem' }} />
+                    <InputText value={accuracy > 1 ? `0.${accuracy}` : accuracy} onChange={(e) => setAccuracy(e.target.value)} style={{ width: '24rem' }} />
+                    <Slider  value={accuracy*100} onChange={(e) => {
+                      console.log("eeee",e);
+                      setAccuracy(e.value/100)}} style={{ width: '24rem' }} />
                   </div>
                   <label className="pb-2 font-medium">High</label>
                 </div>

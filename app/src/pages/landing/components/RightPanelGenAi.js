@@ -51,9 +51,7 @@ const RightPanelGenAi = () => {
 
                         <InputText value={range > 1 ? `0.${range}` : range} onChange={(e) => {setRange(e.target.value);dispatchAction(setEditParameters({"temperature":e.target.value}));}} className="w-full" />
                         <Slider value={range*100} onChange={(e) => {
-                            console.log("slider", e);
-                            console.log("slider divide", e/100);
-                            setRange(e.value)}} className="w-full" />
+                            setRange(e.value/100)}} className="w-full" />
                     </div>
                     <div className="flex flex-row lable-div-temp">
                     <label style={{color:'green'}}> Low</label>
