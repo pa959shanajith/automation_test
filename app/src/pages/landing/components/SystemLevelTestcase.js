@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import "../styles/GenAi.scss";
 import { generate_testcase, save_testcase } from '../../admin/api';
 import { Button } from 'primereact/button';
@@ -113,6 +113,17 @@ const SystemLevelTestcase = (props) => {
         updateApiResponse[getSelectedTcIndex] = {...updateApiResponse[getSelectedTcIndex], "TestCase":e.target.value};
         // setApiResponse(updateApiResponse)
     }
+    const generateTestCaseListFunc = useMemo(() => {
+        <GenerateTestCaseList
+            apiResponse={apiResponse}
+            setSelectedGenAiTc={setSelectedGenAiTc}
+            setTextAreaData={setTextAreaData}
+            readOnly={readOnly}
+            setReadOnly={setReadOnly}
+            readOnlyData={readOnlyData}
+            setReadOnlyData={setReadOnlyData}
+        />
+    },[apiResponse, setSelectedGenAiTc, setTextAreaData, readOnly, setReadOnly, readOnlyData, setReadOnlyData])
     return (
         <div className='flexColumn parentDiv border-top-1'>
             {
@@ -144,7 +155,7 @@ const SystemLevelTestcase = (props) => {
             }
             {!apiResponse &&
                 <>
-                    <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
+                    <img className='imgDiv'  width='200px' />
                     <label className='labelText'>Generate test cases for whole system</label>
                     <div className="flex flex-row" style={{ gap: "3rem" }}>
                         <div className="p-field-radiobutton">
@@ -194,15 +205,7 @@ const SystemLevelTestcase = (props) => {
             }
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
             <div className='flex flex-row w-full'>
-                {apiResponse && <GenerateTestCaseList 
-                apiResponse={apiResponse} 
-                setSelectedGenAiTc={setSelectedGenAiTc} 
-                setTextAreaData={setTextAreaData}
-                readOnly={readOnly}
-                setReadOnly={setReadOnly}
-                readOnlyData={readOnlyData}
-                setReadOnlyData={setReadOnlyData}
-                />}
+                {apiResponse && generateTestCaseListFunc}
                 {apiResponse && !readOnly && <div className='flex flex-column'>
                     {apiResponse &&
                         <div className='flex flex-column'>

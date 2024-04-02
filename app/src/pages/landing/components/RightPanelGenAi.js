@@ -32,41 +32,41 @@ const RightPanelGenAi = () => {
         { name: 'negative' }
     ];
     return (
-        <> 
-        <Card>
-            <div className='flex flex-row pl-2 pb-2' style={{ gap: "4.5rem" }} >
-                <div className="flex flex-column">
-                <span><img src="static/imgs/variables_icon.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /><label className="pb-2 label-genai3">Parameters</label></span>
-                    <label htmlFor="username" className="pb-2 font-medium">Industry Domain <span style={{ color: "#d50000" }}>*</span></label>
-                    <InputText value={value} onChange={(e) =>{ setValue(e.target.value);dispatchAction(setEditParameters({"domain":e.target.value}))}} />
-                    <label className="pb-2 font-medium">Test Case Type <span style={{ color: "#d50000" }}>*</span></label>
+        <>
+                    <div className="flex flex-column w-full" style={{minHeight:"50%"}}>
+                        <div className="parameter_container pb-2"><img src="static/imgs/parameters_icon 1.svg" alt="SVG Image" style={{ marginRight: '0.5rem' }} /><label className="pb-2 label-genai3">Parameters</label></div>
+                        <div className="flex flex-column gap-4 mt-2">
+                            <div className="w-full">
+                                <label htmlFor="username" className="pb-2 font-medium">Industry Domain <span style={{ color: "#d50000" }}>*</span></label>
+                                <InputText className="w-full" value={value} onChange={(e) => { setValue(e.target.value); dispatchAction(setEditParameters({ "domain": e.target.value })) }} />
+                            </div>
+                            <div className="w-full">
+                                <label className="pb-2 font-medium">Test Case Type <span style={{ color: "#d50000" }}>*</span></label>
+                                <Dropdown value={testType} onChange={(e) => { setTestType(e.value); dispatchAction(setEditParameters({ "test_type": e.value.name })) }} options={testTypes} optionLabel="name"
+                                    placeholder="Select a Test Type" className="w-full" />
+                            </div>
+                            <div className="w-full">
+                                <label className="pb-2 font-medium">Accuracy <span style={{ color: "#d50000" }}>*</span></label>
+                                <InputText value={range > 1 ? `0.${range}` : range} onChange={(e) => { setRange(e.target.value); dispatchAction(setEditParameters({ "temperature": e.target.value })); }} className="w-full" />
+                                <Slider value={range * 100} onChange={(e) => {
+                                    setRange(e.value/100)
+                                }} className="w-full" />
+                            </div>
+                        </div>
 
-                    <Dropdown value={testType} onChange={(e) => {setTestType(e.value);dispatchAction(setEditParameters({"test_type":e.value.name}))}} options={testTypes} optionLabel="name"
-                        placeholder="Select a Test Type" className="w-full md:w-14rem" />
+                        <div className="w-14rem ">
 
-
-                    <div className="w-14rem ">
-
-                        <label className="pb-2 font-medium">Temperature <span style={{ color: "#d50000" }}>*</span></label>
-
-                        <InputText value={range > 1 ? `0.${range}` : range} onChange={(e) => {setRange(e.target.value);dispatchAction(setEditParameters({"temperature":e.target.value}));}} className="w-full" />
-                        <Slider value={range*100} onChange={(e) => {
-                            setRange(e.value/100)}} className="w-full" />
-                    </div>
-                    <div className="flex flex-row lable-div-temp">
-                    <label style={{color:'green'}}> Low</label>
-                    <label style={{color:'red'}}> High</label>
-                    </div>
-                    {/* <div className="gen-btn">
+                        </div>
+                        <div className="flex flex-row w-full justify-content-between">
+                            <label style={{ color: 'green' }}> Low</label>
+                            <label style={{ color: 'red' }}> High</label>
+                        </div>
+                        {/* <div className="gen-btn">
                     <Button label="Generate" ></Button>
                     </div> */}
-                    
-
-                </div>
-            </div>
-            </Card>
 
 
+                    </div>
         </>
     )
 }

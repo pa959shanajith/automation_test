@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import JiraTestcase from './JiraTestcase';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
-
+import { Divider } from "primereact/divider";
 
 const GenAi = () => {
     const toast = useRef(null);
@@ -72,7 +72,7 @@ const GenAi = () => {
 
     const header = (
         <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-            <span className="left_table_header">Recently uploaded files</span>
+            <span className="left_table_header font-medium">Recently uploaded files</span>
             {/* <span className="left_table_view">View All</span> */}
         </div>
     );
@@ -264,7 +264,7 @@ const GenAi = () => {
                 </div>
                 <div className="context_heading">Context Setting</div>
             </div>
-            <div className="context_doc my-2">Document</div>
+            <div className="context_doc my-2 font-medium">Document</div>
             <div className="doc_container flex flex-row border-round my-2">
                 <FileUpload
                     className='genai_fileupload'
@@ -304,15 +304,19 @@ const GenAi = () => {
                     <Column field="actions" header="Actions" body={actionTemplate} style={{width:"1.5rem"}}/>
                 </DataTable>
             </div>
-            <div className="flex justify-content-center align-items-center mt-4 leftandor ">AND / OR</div>
+            <div className="flex flex-row justify-content-center align-items-center mt-4 leftandor ">
+                <Divider style={{width:"120px"}}/>
+                <strong>AND / OR</strong>
+                <Divider style={{width:"120px"}}/>
+            </div>
             <div className='mt-5'>
             <div className="left_btm_container pb-1">
-                <div className="left_btm_header my-1">Requirement Management Tool</div>
+                <div className="left_btm_header my-1 font-medium">Requirement Management Tool</div>
                 <Dropdown
                     value={sortedData} 
                     onChange={(e) => handleJiraIconClick(e.value)}
                     options={requirementTool} optionLabel="name"
-                    placeholder={<span className="left_btm_placeholder">Select a Tool</span>} className="w-full" />
+                    placeholder={<span className="left_btm_placeholder">Select a Tool</span>} className="w-full jira_dropdown" />
                 {/* <Dropdown
                     // value={sortedData} 
                     // onChange={(e) => handleJiraIconClick(e.value)}
@@ -325,7 +329,7 @@ const GenAi = () => {
                     placeholder={<span className="left_btm_placeholder">Jira WorkItem</span>} className="w-full" />     */}
             </div>
             <div className="left_btm_container pb-1">
-                <div className="left_btm_header my-1">Template</div>
+                <div className="left_btm_header my-1 font-medium">Template <span style={{ color: "#d50000" }}>*</span></div>
                 <Dropdown
                     value={selectedTemp}
                     options={readTempData} optionLabel='name' onChange={(e) => {templateHandler(e);submitPayload(e.value)}}
@@ -337,7 +341,7 @@ const GenAi = () => {
             </div> */}
         </div>
         <div className="genai_right_container"><MiddleContainerGenAi/></div>
-        <div className="genai_right_content"><RightPanelGenAi/></div>
+        <div className="genai_right_content p-2"><RightPanelGenAi/></div>
 
     </div>
    )
