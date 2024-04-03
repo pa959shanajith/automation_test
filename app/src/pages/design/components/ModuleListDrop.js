@@ -1145,7 +1145,7 @@ console.log(moduleLists,'moduleListsmoduleLists');
                             <div style={{ width: '13rem', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                               <h4 className="moduleName" onClick={(e) => selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{ textOverflow: 'ellipsis', textAlign: 'left', fontWeight: '300' }}>{e.name}</h4>
                             </div>
-                            {e?.currentlyinuse != '' && e?.currentlyinuse!==userInfo?.username && <img src="static/imgs/eye_view_icon.svg" style={{ width: '20px', height: '20px', marginLeft: '0.5rem' }} alt="modules" title={`This test suite is in read only mode and currently in use by ${e.currentlyinuse}`}/>}
+                            {e?.currentlyinuse != '' && e?.currentlyinuse!==userInfo?.username && <img src="static/imgs/eye_new_gray_icon.svg" style={{ width: '20px', height: '20px', marginLeft: '0.5rem' }} alt="modules" title={`This test suite is in read only mode and currently in use by ${e.currentlyinuse}`}/>}
                           </div>
                         </div>
                       </>
