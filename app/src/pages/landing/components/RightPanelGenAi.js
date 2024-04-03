@@ -29,7 +29,8 @@ const RightPanelGenAi = () => {
     const [testType, setTestType] = useState(null);
     const testTypes = [
         { name: 'positive' },
-        { name: 'negative' }
+        { name: 'negative' },
+         {name: 'Edge Case'},
     ];
     return (
         <>

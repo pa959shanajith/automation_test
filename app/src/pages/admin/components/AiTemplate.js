@@ -12,6 +12,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
+import useDebounce from '../../../customHooks/useDebounce';
 
 
 
@@ -40,7 +41,8 @@ const AiTemplate = () => {
 
     const [filters, setFilters] = useState({});
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-
+  const debouncedSearchValue = useDebounce(globalFilterValue, 500);
+  
 
 
 
@@ -225,14 +227,14 @@ const AiTemplate = () => {
     templateDataforTable();
   }, [refreshTable == true]);
 
-  const renderInputSwitch = (rowData, property) => {
-    return (
-      <InputSwitch
-        checked={rowData[property]}
-        onChange={(e) => handleSwitchChange(e, rowData, property)}
-      />
-    );
-  };
+  // const renderInputSwitch = (rowData, property) => {
+  //   return (
+  //     <InputSwitch
+  //       checked={rowData[property]}
+  //       onChange={(e) => handleSwitchChange(e, rowData, property)}
+  //     />
+  //   );
+  // };
   
   const handleSwitchChange = (e, rowData, property) => {
     // Handle switch change
@@ -357,7 +359,7 @@ console.log("tempData", tempData);
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleTemplateDelete(currentId)}
                     />
-         <DataTable value={tempData} paginator rows={5} globalFilter={globalFilterValue} showGridlines
+         <DataTable value={tempData} paginator rows={5} globalFilter={debouncedSearchValue} showGridlines
          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
          {/* <Column
     header="Sl No"
@@ -366,8 +368,8 @@ console.log("tempData", tempData);
         <Column field="name" header="Name" />
         <Column field="description" header="Description" />
         <Column field="createdAt" header="Created On" />
-        <Column header="Default" body={(rowData) => renderInputSwitch(rowData, 'default')} />
-        <Column header="Status" body={(rowData) => renderInputSwitch(rowData, 'active')} />
+        <Column  field="default"header="Default" />
+        <Column  field="active"header="Status"  />
         <Column header="Actions" body={renderActions} />
       </DataTable>
                     </div>
