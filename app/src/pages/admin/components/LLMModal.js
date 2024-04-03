@@ -301,28 +301,8 @@ const LLMList = ({ setShowConfirmPop, showMessageBar, setLoading, toastError, to
                 setVersion('');
                 setCurrentId('');
                 const result = await readModel();
-                if (result.data.data.length) {
-                setTableData((prev) => result.data.data.map((object) => {
-                    if(object.anthropic_api_key) {
-                        const decrypted = decryptAES(object.anthropic_api_key);
-                        return {
-                            ...object,
-                            anthropic_api_key: decrypted
-                        };
-                    } else if(object.cohere_api_key) {
-                        const decrypted = decryptAES(object.cohere_api_key);
-                        return {
-                            ...object,
-                            cohere_api_key: decrypted
-                        };
-                    } else if(object.openai_api_key) {
-                        const decrypted = decryptAES(object.openai_api_key);
-                        return {
-                            ...object,
-                            openai_api_key: decrypted
-                        };
-                    }
-                }));
+                if (result.data.data) {
+                  setTableData(result.data.data);
                 } else {
                   console.error(result.error);
                 }
