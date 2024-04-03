@@ -35,6 +35,7 @@ const MapElement = (props) => {
     const [dialogVisible, setDialogVisible] = useState(impactAnalysisScreenLevel);
     const[hightlightcustname,setHighlightedCustname]=useState("")
     const [activeEye, setActiveEye] = useState(false);
+    const [mapElement,setMapElement] = useState(true);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -133,6 +134,7 @@ const MapElement = (props) => {
                     [draggedObject.xpath]: null
                 }
                 setMap(mapping);
+                setMapElement(false);
             }
         }
         else {
@@ -145,6 +147,7 @@ const MapElement = (props) => {
                     [draggedObject.val]: null
                 }
                 setMap(mapping);
+                setMapElement(false);
             }
         }
     }
@@ -327,7 +330,7 @@ scrapeApi.updateScenarioComparisionStatus("web", props.fetchingDetails["_id"], s
     const mapElementFooter = () => (<>
         <Button data-test="showAll" size="small" onClick={mapOnShowAllObjects}>Show All Elements</Button>
         <Button data-test="unLink" size="small" onClick={mapOnUnlink} disabled={!mapSelectedItems.length}>Un-Link</Button>
-        <Button data-test="submit" size="small" onClick={submitMap}>Submit</Button>
+        <Button data-test="submit" size="small" onClick={submitMap} disabled={mapElement}>Submit</Button>
     </>
     )
 
