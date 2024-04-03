@@ -1065,23 +1065,14 @@ export const unlockUser = async(user) => {
   api returns
 */
 
-export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAccToken,gitUrl,gitUsername,gitEmail,gitBranch) => { 
+export const gitSaveConfig = async(data) => { 
     try{
         const res = await axios(url+'/gitSaveConfig', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {action: action,
-                    userId: userId,
-                    projectId: projectId,
-                    gitConfigName: gitConfigName,
-                    gitAccToken: gitAccToken,
-                    gitUrl: gitUrl,
-                    gitUsername:gitUsername,
-                    gitEmail:gitEmail,
-                    gitBranch:gitBranch
-                },
+            data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1091,10 +1082,10 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
             return res.data;
         }
         console.error(res.data)
-        return {error:"Error while Git "+action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }catch(err){
         console.error(err)
-        return {error:"Error while Git "+action+ " Configuration"}
+        return {error:"Error while "+data.action+ " Configuration"}
     }
 }
 
@@ -1103,15 +1094,14 @@ export const gitSaveConfig = async(action, userId,projectId,gitConfigName,gitAcc
   api returns
 */
 
-export const gitEditConfig = async(userId, projectId) => { 
+export const gitEditConfig = async(data) => { 
     try{
         const res = await axios(url+'/gitEditConfig', {
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {userId: userId,
-				projectId: projectId},
+            data: data,
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1574,15 +1564,16 @@ export const save_testcase = async(props) => {
     }
 }
 
-export const fetch_git_exp_details = async(projectId) => { 
-    try{
-        const res = await axios(url+'/fetch_git_exp_details', {
+
+// All Test suites Data
+export const unlockTestSuites = async(inputs) => {
+    try {
+        const res = await axios(url+'/unLock_TestSuites',{
             method: 'POST',
             headers: {
             'Content-type': 'application/json',
             },
-            data: {
-				projectId: projectId},
+            data:{inputs:inputs},
             credentials: 'include'
         });
         if(res.status === 401 || res.data === "Invalid Session" ){
@@ -1592,9 +1583,189 @@ export const fetch_git_exp_details = async(projectId) => {
             return res.data;
         }
         console.error(res.data)
+        return {error:"Enable to fetch test suites details"}
+    } catch (error) {
+        console.error(error)
+        return {error:"Enable to fetch test suites details"}
+    }
+}
+export const createModel = async(payload) => {
+    try{
+        const res = await axios(url+'/genAI/create', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: payload ,
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(history)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===201 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }catch(err){
         console.error(err)
         return {error:MSG.ADMIN.ERR_FETCH_GIT}
     }
 }
+
+// export const readModel = async () => {
+//     try {
+//       const res = await axios.get(url + '/genAI/read');  
+//       if (res.status === 200) {
+//         return res.data;
+//       }
+//       console.error(res.data);
+//       return { error: 'Error in API call' };
+//     } catch (err) {
+//       console.error(err);
+//       return { error: 'Error in API call' };
+//     }
+//   };
+
+  export const editModel = async (id,payload) => {
+    try {
+      const res = await axios.put(url + `/genAI/edit/${id}`,payload);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+
+  export const deleteModel = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/delete/${id}`);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+
+  export const deleteTemp = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/deleteTemp/${id}`);
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+  
+
+  export const deleteUplaodFile = async (id) => {
+    try {
+      const res = await axios.delete(url + `/genAI/deletefile/${id}`);  
+      if (res.status === 200) {
+        return res.data;
+      }
+      console.error(res.data);
+      return { error: 'Error in API call' };
+    } catch (err) {
+      console.error(err);
+      return { error: 'Error in API call' };
+    }
+  };
+  
+export const createTemp = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/createTemp', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'createTemp', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200 || res.status === 201){
+                resolve(res.data);
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+
+export const readModel = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/read', {
+            method: 'GET',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'readModel', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+export const readTemp = (data) => {
+    return new Promise((resolve, reject)=> {
+        axios(url+'/genAI/readTemp', {
+            method: 'GET',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'action': 'readTemp', ...data},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200){
+                resolve({data:res.data});
+            }
+            else{
+                reject(res.status)
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export const editTemp = async (id, payload) => {
+    try {
+        const res = await axios.put(url + `/genAI/editTemp/${id}`, payload);
+        if (res.status === 200) {
+            return res.data;
+        }
+        console.error(res.data);
+        return { error: 'Error in API call' };
+    } catch (err) {
+        console.error(err);
+        return { error: 'Error in API call' };
+    }
+};

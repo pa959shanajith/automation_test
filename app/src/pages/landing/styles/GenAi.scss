@@ -1,0 +1,243 @@
+@import "../../global/styles/ColorVariables.scss";
+.genai_container{
+    width:100%;
+}
+.genai_left_container{
+    width:20%;
+    overflow-y: auto;
+    height: 95vh;
+    overflow-x: hidden;
+    // border-color: #DEE2E6;
+    border: 1px solid #DEE2E6 ;
+}
+.genai_right_container{
+    width: 65%;
+}
+.context_container{
+    border-color: #DEE2E6;
+}
+.context_heading{
+    font : $f6_semibold;
+}
+.context_doc{
+    font : $f6_semibold
+}
+.doc_fileupload > span{
+    background-color: white;
+    color: #605BFF;
+    border: 1px solid #605BFF;
+}
+.doc_container{
+    // border: 1px solid #DEE2E6;
+    // width: 33%;
+}
+.doc_top {
+    background-color: #DEE2E6;
+}
+.doc_btm_para{
+    font: $f6_regular;
+    color: #DEE2E6;
+}
+.left_table_header{
+    font: $f6_semibold;
+}
+.left_table_view{
+    color: #605BFF;
+    font: $f7_semibold;
+}
+.leftandor{
+    color: #9E9E9E;
+    font: $f7_regular;
+}
+.left_btm_container{
+    // border-bottom: 1px solid #DEE2E6;
+}
+.left_btm_header{
+    font: $f6_semibold;
+}
+.left_btm_placeholder{
+    color: #6C757D;
+    font: $f7_regular;
+}
+.genai_right_container {
+    // display: flex;
+  }
+  .genai_right_content{
+    .p-card{
+        height: 45rem;
+        margin-top: 0.5rem;
+    }
+ }
+  
+  
+  .genai_main_content {
+    flex: 1;
+    /* Adjust other styles as needed */
+  }
+  .lable-div-temp{
+    gap:10rem;
+  }
+  .gen-btn{
+    .p-button{
+        width: 7rem;
+        margin-top: 1rem;
+    }
+  }
+  .gen-btn2{
+    .p-button{
+        width: 7rem;
+    }
+  }
+  .gen-btn3{
+    .p-button{
+        width: 12rem;
+    }
+  }
+  .label-genai{
+    font: $f7_semibold;
+  }
+  .label-genai2{
+    font: $f6_regular;
+    padding-left: 0.5rem;
+  }
+  .label-genai3{
+    font: $f6_semibold;
+  }
+.datatable_files > .p-datatable > .p-datatable-wrapper > .p-datatable-table > .p-datatable-tbody{
+    tr{
+        display: table;
+        width: 100%;
+    }
+    td{
+        padding: 5px;
+    }
+    overflow-y: auto;
+    height: 22vh;
+    overflow-x: hidden;
+    display: block;
+}
+  .img-container{
+    height: 80vh;
+  }
+
+.blockCard {
+    box-shadow: rgba(0, 0, 0, 0.14) 0px 3px 8px;
+    width: 360px;
+    height: 118px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.flexRow {
+    display: flex;
+}
+
+.flexColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.centerContent {
+    align-items:center;
+}
+
+.parentDiv {
+    // height: 80vh;
+    // min-height: 80vh;
+    width: 100%;
+    flex-direction: center;
+    align-items:center;
+    // align-content: center;
+    justify-content: center;
+    border-color: #DEE2E6;
+}
+
+.imgDiv {
+    margin-bottom: 20px;
+    margin: auto;
+    margin-top: 15%;
+}
+
+// .p-datatable .p-datatable-emptymessage {
+//     display: none;
+// }
+
+.inputTestcaseSystem {
+    max-height: 70vh !important;
+    overflow: auto !important;
+    height: 70vh !important;
+    // margin-bottom: 25px;
+    width: 100% !important;
+}
+
+.labelText {
+    margin: 5px 0 5px 0;
+}
+
+.inputTestcaseModule {
+    max-height: 70vh !important;
+    overflow: auto !important;
+    height: 55vh !important;
+    margin-bottom: 15px;
+    width: 120vh !important;
+}
+.text-area-user-story{
+    height: 30rem !important;
+    overflow: auto !important;
+}
+.datatable_files{
+  .p-datatable .p-datatable-thead > tr > th {
+    display: none !important;
+}
+}
+.generateTests_header{
+    font: $f5_semibold;
+    color: #616161;
+}
+
+.generateTests_dataTable > .p-datatable-wrapper > .p-datatable-table > .p-datatable-thead > tr > th >.p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+
+.input_text_disabled > .p-disabled{
+    background-color: initial;
+    border-color: initial;
+}
+
+.generateTests_dataTable{
+    height: 60vh;
+    overflow: auto;
+    width: 19rem;
+}
+.generateTests_systemlevel{
+    height: 70vh;
+    overflow: auto;
+}
+.generateTests_dataTable> .p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+.generateTests_systemlevel>.p-datatable-wrapper > .p-datatable-table> .p-datatable-thead > tr > th > .p-column-header-content > .p-column-title{
+    margin-left: 0rem;
+}
+.file_name{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 5rem;
+    font-size: 13px;
+}
+
+.datatable_files > .p-datatable > .p-datatable-wrapper{
+    border: 1px solid #DEE2E6;
+}
+.datatable_files > .p-datatable > .p-datatable-header{
+    border: 1px solid #DEE2E6;
+    padding: 0.5rem !important;
+}
+.with-response-div{
+    display: flex;
+    flex-direction: column;
+}

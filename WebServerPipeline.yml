@@ -1,11 +1,11 @@
-name: Test-WebServerPipeline
+name: WebServerPipeline
 
 trigger: none
 
 resources:
   pipelines:
-  - pipeline: Test-WebServerPipeline
-    source: Test-Parent-Pipeline
+  - pipeline: WebServerPipeline
+    source: Build-AvoAssure
     trigger: true
 
 steps:
@@ -94,6 +94,8 @@ steps:
    echo $PATCH_VERSION
    echo $REACT_APP_VERSION
    echo $artifact_name > artifact_name.txt
+   echo $new_version > version.txt
+   cp version.txt ../
    cp artifact_name.txt ../
    ./npm run buildlinux --scripts-prepend-node-path
    echo "node modules and npm created"
@@ -104,7 +106,7 @@ steps:
    echo "-------------------"
    ls
    mkdir webserver
-   cp -r assets .env logger.js logs nginx.conf node nodejs node_modules package.json package-lock.json public server server.js templates wkhtmltox artifact_name.txt webserver
+   cp -r assets .env logger.js logs nginx.conf node nodejs node_modules package.json package-lock.json public server server.js templates wkhtmltox version.txt artifact_name.txt webserver
    echo "files in webserver folder"
    ls webserver
    echo "inside wkhtmltox folder"

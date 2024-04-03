@@ -18,6 +18,10 @@ const Leftbar=(props)=>{
                         <img className="util__execution_ic" src='static/imgs/Datatable_icon.svg' alt="EncryptIcon" id={(focus==="datatable")? "selected":""}/>
                         <div className='util_header_Encryption'>Data Table</div>
                     </span>
+                    <span onClick={()=>{props.setScreenType("migration"); setFocus("migration")}} title="migration"  className={focus==="migration" ? "active_tab_migrate" : "not_active_tab_migrate"}>
+                        <img className="util__execution_migration" src='static/imgs/migrate_btn.svg' alt="migration" id={(focus==="migration")? "selected":""}/>
+                        <div className='util_header_migration'>Migrate scripts</div>
+                    </span>
                 </div>
             </div>
 

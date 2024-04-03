@@ -2,6 +2,12 @@
 .repository__table{
     top: 2rem;
 }
+.repo__datatable{
+    .p-column-header-content {
+    display: grid !important;
+    align-items: center !important;
+    }
+}
 
 .add_more_btn{
     position: relative;
@@ -82,11 +88,12 @@
     // top: 0.2rem;
     width: 12vw;
     position: sticky;
-    left: 60vw;
+    // left: 60vw;
     height: 3rem;
     top: 0.3rem;
     min-height: 3rem;
     min-width: 12vw;
+    right: 1rem;
 }
 
 .not_captured_ele {
@@ -142,6 +149,26 @@
     cursor: pointer;
 }
 
+.element_used_testcase{
+    cursor: pointer;
+}
+
+// .overlay_panel{
+//     max-height: 8rem;
+//     // width: 8rem;
+//     overflow-y: auto;
+// }
+
+.testcase__name{
+    font: $f6_semibold;
+    margin-bottom: 0.5rem;
+}
+
+.testcase_name_list{
+    font: $f6_regular;
+    margin-bottom: 0.4rem;
+}
+
 // .relative{
 //     white-space: nowrap;
 //     overflow: hidden;
@@ -173,4 +200,53 @@
 
 .reused-msg{
     color: black;
+}
+
+.search__button{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.search__class{
+    margin-top: 0.35rem;
+    margin-left: 0.4rem;
+}
+
+.RepositoryDailog{
+    width: 25rem;
+    left: 13vw;
+    .p-dialog-header{
+        padding: 0.8rem !important;
+        .p-dialog-title{
+            font: $f6_semibold;
+        }
+    }
+    .p-dialog-footer{
+        padding: 0 1.5rem 0.5rem !important;
+    }
+}
+
+.repository__input{
+    width: 22rem;
+    margin-top: 1.2rem !important;
+}
+
+.repository__save__btn{
+    margin-top: 0.5rem !important;
+}
+
+.highlighted{
+    background-color: #ffffcc; /* Example background color */
+    border: 2px solid #ffcc00; /* Example border color */
+}
+
+.create__btn{
+    position:relative;
+    right: 1rem;
+}
+
+.disabled-icon {
+    opacity: 0.5;
+    cursor: not-allowed; 
 }

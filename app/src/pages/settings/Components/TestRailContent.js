@@ -15,6 +15,7 @@ import { selectedProject, mappedTree } from '../settingSlice';
 import { getProjectsMMTS } from '../../design/api';
 import { enableSaveButton, mappedPair, updateTestrailMapping } from "../settingSlice";
 import { Messages as MSG } from '../../global';
+import Papa from 'papaparse';
 
 const TestRailContent = ({ domainDetails, ref, setToast }) => {
     // use states, refs
@@ -29,7 +30,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     const [selectedTestRailNodeFirstTree, setSelectedTestRailNodeFirstTree] = useState({});
     const [selectedTestRailNodesSecondTree, setSelectedTestRailNodesSecondTree] = useState([]);
     const [checked, setChecked] = useState(false);
-    const toast = useRef();
+    const [jsonData, setJsonData] = useState([]);
 
     // constants, variables
     const projectDetails = JSON.parse(localStorage.getItem("DefaultProject"));
@@ -49,6 +50,8 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
 
     const onDropdownChange = async (e) => {
         e.preventDefault();
+        setProjectSuites([]);
+        setTestrailData([]);
         setLoading(true);
         dispatch(selectedProject(e.value));
         setSelectedTestRailNodeFirstTree({});
@@ -66,7 +69,9 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
         if (testrailTestSuites.length > 0) {
             const _testrailTestSuites = testrailTestSuites.map((suite, index) => ({
                 ...suite,
-                key: `${index}`
+                order: "top",
+                key: `${index}`,
+                children: [{}]
             }));
 
             setProjectSuites(_testrailTestSuites);
@@ -74,164 +79,6 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
             setLoading(false);
         };
     };
-
-    // Fetching AVO testcases
-    useEffect(() => {
-        const fetchAvoModules = async () => {
-            const getModulesData = await getProjectsMMTS(projectDetails.projectId);
-            const testCasesList = getModulesData[0].mindmapList?.flatMap(({ scenarioList, ...rest }) => (
-                scenarioList.map(scenario => ({
-                    ...scenario,
-                    children: [],
-                    checked: false,
-                    testcaseType: "parent",
-                    testSuite: {
-                        ...rest
-                    }
-                }))
-            )).map((obj, index) => {
-                return { ...obj, key: index }
-            });
-
-            setUpdatedTreeData(() => testCasesList);
-        };
-
-        fetchAvoModules();
-    }, []);
-
-    // Fetching Testrail test suites, test  sections & test  cases
-    useEffect(() => {
-        const fetchSections = async () => {
-            setLoading(true);
-            try {
-                const testSection = [];
-
-                for (let i = 0; i < projectSuites.length; i++) {
-                    const suite = projectSuites[i];
-                    const sections = await api.getSectionsTestrail_ICE({
-                        "projectId": currentProject.id,
-                        "suiteId": suite.id,
-                        "testrailAction": "getSections"
-                    });
-
-                    // Fetching test cases of each section
-                    const fetchTestCases = async (projectId, suiteId, sectionId, outerIndex) => {
-                        try {
-                            const response = await api.getTestcasesTestrail_ICE({
-                                projectId,
-                                suiteId,
-                                sectionId,
-                                TestRailAction: "getTestCases"
-                            });
-
-                            const testCaseDetails = [];
-
-                            if (response.length > 0) {
-                                for (let i = 0; i < response.length; i++) {
-                                    const testCase = response[i];
-                                    const testCaseWithType = {
-                                        ...testCase,
-                                        type: "testcase",
-                                        name: testCase.title,
-                                        key: `${outerIndex}-${i}`
-                                    };
-                                    testCaseDetails.push(testCaseWithType);
-                                }
-                            }
-                            setLoading(false);
-                            return testCaseDetails;
-                        } catch (error) {
-                            console.error("Error fetching test cases:", error);
-                            return [];
-                        }
-                    };
-
-                    if (sections.length > 0) {
-                        const sectionsWithTestcases = await Promise.all(sections.map(async (section, index) => {
-                            const testcaseData = await fetchTestCases(currentProject.id, section.suite_id, section.id, index) || [];
-                            return {
-                                ...section,
-                                key: `${i}-${index + 1}`,
-                                children: testcaseData.map((data, i) => {
-                                    return {
-                                        ...data,
-                                        key: `${i}-${i + 1}-${i + 2}`
-                                    }
-                                })
-                            };
-                        }));
-
-                        if (sectionsWithTestcases.length > 0) {
-                            let testData = []
-                            let childrens = [];
-                            sectionsWithTestcases.map((element) => {
-                                if (element.parent_id === null) {
-                                    testData.push(element);
-                                }
-                                else {
-                                    childrens.push(element)
-                                }
-                            });
-
-                            let newArr = [];
-                            for (let i = 0; i < childrens.length; i = i + 1) {
-                                for (let j = i + 1; j < childrens.length; j = j + 1) {
-                                    if (childrens[i].id === childrens[j].parent_id) {
-                                        let indexValue = -1;
-                                        newArr.find((element, index) => { if (element.id === childrens[i].id) indexValue = index })
-                                        if (indexValue >= 0) newArr[indexValue] = { ...newArr[indexValue], "children": [...newArr[indexValue].children, childrens[j]] }
-                                        else newArr.push({ ...childrens[i], "children": [...childrens[i].children, childrens[j]] })
-                                    }
-                                }
-                            }
-
-                            const newData = [];
-                            newArr.map(e_child => {
-                                testData.find(e_parent => {
-                                    if (e_parent.id === e_child.parent_id) {
-                                        if (e_parent.children.length > 0) {
-                                            var childrenData = [...e_parent.children, e_child]
-                                        }
-                                        else childrenData = [e_child]
-                                        let indexValue = -1;
-
-                                        newData.map((r, index) => {
-                                            if (r.id === e_child.parent_id)
-                                                indexValue = index
-                                        })
-
-                                        if (indexValue >= 0) {
-                                            let existedObjectData = newData[indexValue];
-                                            newData[indexValue] = { ...newData[indexValue], "children": [...existedObjectData.children, e_child] }
-                                        }
-                                        else newData.push({ ...e_parent, "children": [...childrenData] })
-                                    }
-                                })
-                            });
-
-                            testSection.push({
-                                ...suite,
-                                children: childrens.length ? newData : testData
-                            });
-                        }
-                    } else {
-                        testSection.push({
-                            ...suite
-                        });
-                    }
-
-                    setLoading(false);
-                }
-                setTestrailData([...testSection]);
-                setLoading(false);
-            }
-            catch (error) {
-                console.log(error);
-            }
-        };
-
-        fetchSections();
-    }, [projectSuites]);
 
     const treeCheckboxTemplateFirstTree = (node) => {
         if (node?.type === "testcase") {
@@ -326,6 +173,7 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     const fetchMappedTestcases = async () => {
         const data = await api.viewTestrailMappedList();
         setRows(data);
+        setJsonData(data);
         dispatch(updateTestrailMapping(false));
     };
 
@@ -385,6 +233,190 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
         }
     }
 
+    const fetchTestCases = async (projectId, suiteId, sectionId, outerIndex) => {
+        try {
+            const response = await api.getTestcasesTestrail_ICE({
+                projectId,
+                suiteId,
+                sectionId,
+                TestRailAction: "getTestCases"
+            });
+
+            const testCaseDetails = [];
+
+            if (response.length > 0) {
+                for (let i = 0; i < response.length; i++) {
+                    const { id, title, section_id, suite_id, ...rest } = response[i];
+                    testCaseDetails.push({
+                        id,
+                        title,
+                        section_id,
+                        suite_id,
+                        type: "testcase",
+                        name: title,
+                        key: `${outerIndex}-${i}`
+                    });
+                }
+            }
+            setLoading(false);
+            return testCaseDetails;
+        } catch (error) {
+            console.error("Error fetching test cases:", error);
+            return [];
+        }
+    };
+
+    // Fetching AVO testcases
+    useEffect(() => {
+        const fetchAvoModules = async () => {
+            const getModulesData = await getProjectsMMTS(projectDetails.projectId);
+            const testCasesList = getModulesData[0].mindmapList?.flatMap(({ scenarioList, ...rest }) => (
+                scenarioList.map(scenario => ({
+                    ...scenario,
+                    children: [],
+                    checked: false,
+                    testcaseType: "parent",
+                    testSuite: {
+                        ...rest
+                    }
+                }))
+            )).map((obj, index) => {
+                return { ...obj, key: index }
+            });
+
+            setUpdatedTreeData(() => testCasesList);
+        };
+
+        fetchAvoModules();
+    }, []);
+
+    // Fetching Testrail test suites, test  sections & test cases
+    const fetchSectionTestcases = async (node) => {
+        if (node?.order === "top") {
+            setLoading(true);
+
+            try {
+                const sections = await api.getSectionsTestrail_ICE({
+                    "projectId": currentProject.id,
+                    "suiteId": node.id,
+                    "testrailAction": "getSections"
+                });
+
+                const updateSections = async (sections, nodeKey) => {
+                    const updatedSections = await Promise.all(sections.map(async (section, index) => {
+                        if (section.suite_id && section.id) {
+                            const testcasesData = await api.getTestcasesTestrail_ICE({
+                                projectId: currentProject.id,
+                                suiteId: section.suite_id,
+                                sectionId: section.id,
+                                TestRailAction: "getTestCases",
+                            });
+
+                            const typedTestcase = testcasesData?.map((testcase, i) => {
+                                const { id, title, section_id, suite_id, ...rest } = testcase;
+                                return {
+                                    id,
+                                    section_id,
+                                    suite_id,
+                                    type: "testcase",
+                                    name: title,
+                                    key: `${section.id}`,
+                                    // key: `${section.key}-${i}`,
+                                };
+                            }) || [{}];
+
+                            const updatedSection = {
+                                ...section,
+                                key: section.id,
+                                // key: `${nodeKey}-${index}`,
+                                children: section.children.length === 0 ? typedTestcase : [...typedTestcase, ...await updateSections(section.children, nodeKey)],
+                            };
+
+                            return updatedSection;
+                        }
+                    }));
+
+                    setLoading(false);
+                    return updatedSections;
+                };
+
+                const _sections = sections?.map((section, i) => {
+                    return {
+                        ...section,
+                        order: "top",
+                        key: section.id
+                        // key: `${node.key}-${i}`
+                    }
+                });
+
+                const updatedSections = await updateSections(_sections, node.key);
+
+                const sectionsData = testrailData?.map((data) => {
+                    if (data.id == node.id) {
+                        return {
+                            ...data,
+                            children: [...updatedSections],
+                        };
+                    } else return data;
+                });
+
+                setTestrailData(() => sectionsData);
+                setLoading(false);
+            } catch (err) {
+                console.log("err", err);
+            }
+        }
+    };
+
+    const handleDownload = () => {
+        const getProjectName = (projectId) => {
+            const project = testRailProjectsName.find(proj => proj.id === projectId);
+            return project ? project.name : 'Unknown Project';
+        };
+
+        const modifiedData = jsonData.map(entry => {
+            const projectNames = entry["projectid"].map(projectId => getProjectName(projectId));
+
+            return {
+                "TestRail Project Name": projectNames[0],
+                "TestRail Test Case Name": entry["testname"][0],
+                "AVO Project Name": reduxDefaultselectedProject.projectName,
+                "AVO Test Scenario Name": entry["testscenarioname"].join(',  '),
+            }
+        });
+
+        const csv = Papa.unparse(modifiedData, { header: true });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+
+        const getCurrentDateTime = () => {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${day}${month}${year}${hours}${minutes}${seconds}`;
+        };
+
+        const formattedDateTime = getCurrentDateTime();
+
+        if (navigator.msSaveBlob) {
+            // For Internet Explorer
+            navigator.msSaveBlob(blob, `TestRail_AVO_MappingList_${formattedDateTime}.csv`);
+        } else {
+            // For other browsers
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `TestRail_AVO_MappingList_${formattedDateTime}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    };
+
     useEffect(() => {
         setTestRailProjectsName(domainDetails?.projects);
     }, [domainDetails?.projects]);
@@ -396,6 +428,12 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
     return (
         <div className="tab__cls">
             <div className="tab__cls">
+                {activeIndex === 1 && (
+                    <>
+                        <Tooltip target=".download_mapping" position="left" content="Click here to download mapping details." />
+                        <img className='download_mapping' src="static/imgs/download_icon_blue.svg" alt="Download Mapping Icon" height="30" onClick={handleDownload} />
+                    </>
+                )}
                 <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                     <TabPanel header="Mapping">
                         <div className="data__mapping">
@@ -409,22 +447,21 @@ const TestRailContent = ({ domainDetails, ref, setToast }) => {
                                             <Dropdown style={dropDownStyle} className="dropdown_project" placeholder="Select Project" optionLabel="name" options={testRailProjectsName} value={currentProject} onChange={(e) => onDropdownChange(e)} />
                                         </div>
                                     </div>
+                                    {loading && <div className="bouncing-loader">
+                                        <div></div>
+                                        <div></div>
+                                        <div></div>
+                                    </div>}
                                     <div className='zephyrdata-card1'>
-
                                         {
-                                            testrailData.length > 0 ?
-                                                <Tree
-                                                    value={testrailData}
-                                                    selectionMode="single"
-                                                    selectionKeys={selectedTestRailNodeFirstTree}
-                                                    nodeTemplate={treeCheckboxTemplateFirstTree}
-                                                />
-                                                :
-                                                (loading && <div className="bouncing-loader">
-                                                    <div></div>
-                                                    <div></div>
-                                                    <div></div>
-                                                </div>)
+                                            testrailData?.length > 0 &&
+                                            <Tree
+                                                value={testrailData}
+                                                onExpand={(e) => fetchSectionTestcases(e.node)}
+                                                selectionMode="single"
+                                                selectionKeys={selectedTestRailNodeFirstTree}
+                                                nodeTemplate={treeCheckboxTemplateFirstTree}
+                                            />
                                         }
                                         {/* <div className="jira__paginator">
                                                 <Paginator

@@ -420,8 +420,8 @@ exports.debugTestCase_ICE = function (req, res) {
 												};
 												responsedata.endPointURL.push(wsdlurl.split('?')[0]);
 												responsedata.operations.push(operations);
-												if (data.value != "fail" && data.value != undefined && data.value != "") {
-													response = data.value.split('rEsPONseBOdY:');
+												if (data != "fail" && data != undefined && data != "") {
+													response = data.split('rEsPONseBOdY:');
 													if (response.length == 2) {
 														responsedata.header.push(response[0]);
 														responsedata.body.push(response[1]);
@@ -552,7 +552,7 @@ exports.getTestcasesByScenarioId_ICE = async (req, res) => {
 			testcasesObj.testcaseName = testcasenames[index];
 			testcasesArr.push(testcasesObj);
 		}
-		logger.info("Sending testcase details from design/"+fnName+" service");
+		logger.info("Sending test case details from design/"+fnName+" service");
 		res.send(testcasesArr);
 	} catch (exception) {
 		logger.error("Error occurred in design/"+fnName+":", exception);

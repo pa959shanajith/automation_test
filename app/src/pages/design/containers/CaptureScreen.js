@@ -1,4 +1,4 @@
-import { React, useState, useRef, useEffect } from 'react';
+import  React, {useState, useRef, useEffect}  from 'react';
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from 'primereact/dialog';
@@ -9,7 +9,7 @@ import { Column } from 'primereact/column';
 import {Tag} from 'primereact/tag'
 import { Card } from 'primereact/card';
 import ActionPanel from '../components/ActionPanelObjects';
-import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful} from '../designSlice';
+import { ScrapeData, disableAction, disableAppend, actionError, WsData, wsdlError, objValue ,CompareData,CompareFlag,CompareObj, CompareElementSuccessful, SetSelectedRepository,SetEmptyDatatable} from '../designSlice';
 import * as scrapeApi from '../api';
 import { Messages as MSG } from '../../global/components/Messages';
 import { v4 as uuid } from 'uuid';
@@ -36,8 +36,10 @@ import { Dropdown } from 'primereact/dropdown';
 import { getScreens } from '../../landing/api';
 import { loadUserInfoActions } from '../../landing/LandingSlice';
 import { BlockUI } from 'primereact/blockui';
+import { insertScreen } from '../../design/api';
 
 const CaptureModal = (props) => {
+  const {assignUser = true} = props;
   const dispatch = useDispatch();
   const history=useNavigate()
   const toast = useRef();
@@ -47,7 +49,7 @@ const CaptureModal = (props) => {
   const [visible, setVisible] = useState(false);
   const [visibleOtherApp, setVisibleOtherApp] = useState(false);
   const [showCaptureData, setShowCaptureData] = useState([]);
-  const [showPanel, setShowPanel] = useState(true);
+  const [showPanel, setShowPanel] = useState(false);
   const [overlay, setOverlay] = useState(null);
   const [blocked, setBlocked] = useState(false);
   const [isInsprintHovered, setIsInsprintHovered] = useState(false);
@@ -111,7 +113,7 @@ const CaptureModal = (props) => {
   const imageRef2 = useRef(null);
   const imageRef3 = useRef(null);
   const imageRef4 = useRef(null);
-const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelector(state=>state.design.WsData);
+  const {endPointURL, method, opInput, reqHeader, reqBody,reqAuthKeyword,reqAuthInput,paramHeader, basicAuthPassword, basicAuthUsername} = useSelector(state=>state.design.WsData);
   const [cardPosition, setCardPosition] = useState({ left: 0, right: 0, top: 0 });
   const [selectedCapturedElement, setSelectedCapturedElement] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
@@ -132,8 +134,18 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   const [elementRepo, setElementRepo] = useState(false);
   const [parentId, setParentId] = useState(null);
   const [screenChange, setScreenChange] = useState(false);
-  const [selectedFolderValue,setSelectedFolderValue] = useState([]);
-  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID)
+  const [selectedFolderValue,setSelectedFolderValue] = useState({});
+  const elemenetModuleId = useSelector(state=>state.design.elementRepoModuleID);
+  const selectedRepositoryInCapture = useSelector(state => state.design.selectedRepository);
+  // const [emptyDatatable, setEmptyDatatable] =useState(false);
+  const emptyDatatbleRepository = useSelector(state => state.design.emptyDatatable);
+  const [dialogForRepo, setDialogForRepo] = useState(false);
+  const [repositoryNewName, setRepositoryNewName] = useState("");
+  const [repoNameAdded, setRepoNameAdded] = useState(false);
+  const [emptyDatatable, setEmptyDatatable] = useState(false);
+  const [selectedRepoName,setSelectedRepoName] = useState("");
+  const [showDailogForOnDelete,setShowDailogForOnDelete] = useState(false);
+  const [showDailogForDelete,setShowDailogForDelete] = useState(false)
 
   if(!userInfo) userInfo = userInfoFromRedux; 
   else userInfo = userInfo ;
@@ -142,12 +154,21 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
   if (localStorageDefaultProject) {
     NameOfAppType = JSON.parse(localStorageDefaultProject);
     AppTypeElementIdentifier=JSON.parse(localStorageDefaultProject).appType
+    
 }
 
 
   useEffect(() => {
     fetchScrapeData()
-  }, [parentData,parentId])
+  }, [parentData,parentId,emptyDatatable])
+
+  useEffect(() => {
+    if (captureData.length === 0 || !selectedRepoName) {
+      setShowPanel(true);
+    } else {
+      setShowPanel(false);
+    }
+  }, [captureData, selectedRepoName]);
   useEffect(()=>{
     let browserName = (function (agent) {        
 
@@ -250,10 +271,12 @@ const {endPointURL, method, opInput, reqHeader, reqBody,paramHeader} = useSelect
     if (id === 'add more') {
       setVisible(id);
       setParentId(null)
+      dispatch(SetEmptyDatatable(false))
     }
     else if (id === 'capture') {
       setVisible(id);
       setParentId(null)
+      dispatch(SetEmptyDatatable(false))
     }
   }
 
@@ -519,14 +542,16 @@ const elementTypeProp =(elementProperty) =>{
     return new Promise((resolve, reject) => {
       setOverlay("Loading...");
       setBlocked(true)
-      let viewString = capturedDataToSave;
+      let viewString = emptyDatatable ?[]:capturedDataToSave;
       let haveItems = viewString.length !== 0;
       let newlyScrapeList = [];
       let Id = parentData.id
 
+      let param = showCaptureScreen ? "elementRepo" : "getScrapeDataScreenLevel_ICE"
+
       // setCapturedDataToSave(viewString);
       // (type, screenId, projectId, testCaseId:optional)
-      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "")
+      scrapeApi.getScrapeDataScreenLevel_ICE(typesOfAppType, Id, parentData.projectId, "",param)
         .then(data => {
           // current_task.subTask === "Scrape" (not sure !!)
           if (data.scrapedurl) setScrapedURL(data.scrapedurl);
@@ -558,7 +583,7 @@ const elementTypeProp =(elementProperty) =>{
             setOverlay("");
             setBlocked(false)
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(false));
             const irisObjectdata = []; for (let i = 0; i < data.view.length; i++) {   if (data.view[i].xpath === "iris") {     irisObjectdata.push('iris');   } else {     irisObjectdata.push('');   } } ;
            
 
@@ -573,7 +598,20 @@ const elementTypeProp =(elementProperty) =>{
 
               let localRespBody = "";
               if (data.responseBody) localRespBody = getProcessedBody(data.responseBody, 'fetch');
+              let basicAuthUsername ='', basicAuthPassword ='', oAuthUrl='', oAuthClientId='', oAuthClientSecret='', oAuthScope='', oAuthGrantTypechange='', bearerTokenValue ='';
+              if (data.authKeyword === "setBearerToken") {
+                bearerTokenValue = data.authInput.split(';');
+              }
+              else if (data.authKeyword === "setOAuth2.0") {
+                [oAuthUrl, oAuthClientId, oAuthClientSecret, oAuthScope, oAuthGrantTypechange] = data.authInput.split(';');
+              }
+              else if (data.authKeyword === 'setBasicAuth'){
+                [basicAuthUsername, basicAuthPassword] = data.authInput.split(';');
+              }
 
+              // if(data?.authKeyword){
+              //   [basicAuthUsername='', basicAuthPassword] = data?.authInput.split(';') 
+              // }
               dispatch(WsData({
                 endPointURL: data.endPointURL,
                 method: data.method,
@@ -582,28 +620,39 @@ const elementTypeProp =(elementProperty) =>{
                 reqBody: localReqBody,
                 paramHeader: data.param ? data.param.split("##").join("\n") : "",
                 respHeader: data.responseHeader ? data.responseHeader.split("##").join("\n") : "",
-                respBody: localRespBody
+                respBody: localRespBody,
+                reqAuthKeyword: data.authKeyword,
+                basicAuthUsername: basicAuthUsername,
+                basicAuthPassword: basicAuthPassword,
+                oAuthClientSecret: oAuthClientSecret,
+                oAuthScope: oAuthScope,
+                oAuthGrantTypechange: oAuthGrantTypechange,
+                oAuthClientId: oAuthClientId,
+                oAuthUrl: oAuthUrl,
+                bearerTokenValue: bearerTokenValue
               }));
+              dispatch(disableAppend(false));
               setSaved({ flag: true });
               // setHideSubmit(false);
             } else {
               setSaved({ flag: false });
               // setHideSubmit(true);
               dispatch(WsData({
-                endPointURL: "", method: "0", opInput: "", reqHeader: "",
-                reqBody: "", respHeader: "", respBody: "", paramHeader: "",
+                endPointURL: "", method: "", opInput: "", reqHeader: "", reqAuthKeyword:'',
+                reqBody: "", respHeader: "", respBody: "", paramHeader: "", basicAuthUsername:'', basicAuthPassword: '',
               }));
+              dispatch(disableAppend(true));
             }
             setOverlay("");
             setBlocked(false)
-            dispatch(disableAppend(!haveItems));
+            // dispatch(disableAppend(!haveItems));
             dispatch(disableAction(haveItems));
             dispatch(actionError([]));
             dispatch(wsdlError([]));
           }
           else {
             dispatch(disableAction(haveItems));
-            dispatch(disableAppend(!haveItems));
+            dispatch(disableAppend(true));
             setOverlay("");
             setBlocked(false)
             // screenshot
@@ -651,9 +700,11 @@ const elementTypeProp =(elementProperty) =>{
               }
             )
           })
+          setSelectedRepoName(data.elementrepoused.name);
           setCaptureData(newData);
           setMirror({ scrape: data.mirror? data.mirror: mirror.scrape, compare: null })
           addMore.current=false;
+          setEmptyDatatable(false);
         })
         .catch(error => {
           dispatch(disableAction(haveItems));
@@ -732,7 +783,7 @@ const elementTypeProp =(elementProperty) =>{
           if(parentId !== null){
             const foundItem = mainScrapedData.view.find((item) => item.custname === scrapeItem.custname);
             if (foundItem) {
-              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid(), parent:[...foundItem.parent,parentData.id]});
+              views.push({...foundItem, custname: scrapeItem.custname, tempOrderId: scrapeItem.tempOrderId?scrapeItem.tempOrderId:uuid()});
             }
             orderList.push(scrapeItem.objId);
   
@@ -747,7 +798,7 @@ const elementTypeProp =(elementProperty) =>{
     setParentId(null);
     // const newdeleted=deleted.filter(element=>element!==undefined)
 
-    let params = {
+    let params = showCaptureScreen?{
       'deletedObj': deleted,
       'modifiedObj': modifiedObjects,
       'addedObj': { ...added, view: views },
@@ -755,8 +806,21 @@ const elementTypeProp =(elementProperty) =>{
       'userId': userInfo.user_id,
       'roleId': userInfo.role,
       'param': 'saveScrapeData',
-      'orderList': orderList
+      'orderList': orderList,
+      'elementrepo':showCaptureScreen?"elementrepo":""
+
+    }:{
+      'deletedObj': deleted,
+      'modifiedObj': modifiedObjects,
+      'addedObj': { ...added, view: views },
+      'screenId': parentData.id,
+      'userId': userInfo.user_id,
+      'roleId': userInfo.role,
+      'param': 'saveScrapeData',
+      'orderList': orderList,
+      
     }
+
 
     scrapeApi.updateScreen_ICE(params)
       .then(response => {
@@ -798,7 +862,7 @@ const elementTypeProp =(elementProperty) =>{
     if (typesOfAppType === "Webservice") {
       let arg = {}
       let testCaseWS = []
-      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeader", "setWholeBody"];
+      let keywordVal = ["setEndPointURL", "setMethods", "setOperations", "setHeaderTemplate", "setWholeBody"];
       let wsdlInputs = [ 
           endPointURL, method, opInput, getFormattedValue(reqHeader), 
           getFormattedValue(paramHeader), getFormattedValue(reqBody, true) 
@@ -811,7 +875,7 @@ const elementTypeProp =(elementProperty) =>{
 
       let [ error, auth, proceed ] = validateWebserviceInputs(wsdlInputs);
 
-      if (error) dispatch(actionError(error));
+      if (error) toastError(error)
 
       if (proceed) {
           dispatch(actionError([]));
@@ -820,6 +884,11 @@ const elementTypeProp =(elementProperty) =>{
 
           if (wsdlInputs[4]) keywordVal.splice(4, 0, 'setParamValue');
           else wsdlInputs.splice(4, 1);
+
+          if(reqAuthKeyword != '' && basicAuthUsername != "" && basicAuthPassword  != "") {
+            keywordVal.push(reqAuthKeyword)
+            wsdlInputs.push(`${basicAuthUsername};${basicAuthPassword}`);
+          }
 
           setOverlay("Fetching Response Header & Body...");
           setBlocked(true)
@@ -847,7 +916,7 @@ const elementTypeProp =(elementProperty) =>{
               } else if (data === "ExecutionOnlyAllowed" || data["responseHeader"] === "ExecutionOnlyAllowed"){
                 toastWarn(MSG.SCRAPE.WARN_EXECUTION_ONLY);
               } else if (typeof data === "object") {
-                  toastSuccess(MSG.SCRAPESUCC_WEBSERVICE_RESP);
+                  toastSuccess("Successfully fetched data"); // SCRAPESUCC_WEBSERVICE_RESP
                   dispatch(WsData({respHeader: data.responseHeader[0].split("##").join("\n")}));
                   let localRespBody = getProcessedBody(data.responseBody[0], 'scrape');
                   dispatch(WsData({respBody: localRespBody}));
@@ -1124,6 +1193,7 @@ else{
    let scrapeType = rowData?.objectDetails?.xpath?.split(';') !==undefined?rowData?.objectDetails?.xpath?.split(';'):" "
   //  setIrisObject(scrapeType[0]);
     return (
+      <>
       <div >
         
         
@@ -1148,12 +1218,13 @@ else{
 
           src="static/imgs/ic-delete-bin.png"
           style={{ height: "20px", width: "20px", marginLeft:"0.5rem"}}
-          className="delete__icon" onClick={() => handleDelete(...selectedElement)} alt='' />
+          className="delete__icon" onClick={() => {setSelectedCapturedElement(rowData);setShowDailogForDelete(true)}} alt='' />
           
 
         
 
       </div>
+      </>
     )
 
   };
@@ -1196,7 +1267,7 @@ else{
           {/* <span className='pi pi-angle-right onHoverRightIcon' onClick={onIncreaseScreen} style={(idx === parentScreen.length - 1) ? { opacity: '0.3',cursor:'not-allowed' } : { opacity: '1' }} disabled={idx === parentScreen.length - 1} tooltipOptions={{ position: 'bottom' }} tooltip="move to next capture element screen" /> */}
         </h4>
         
-        {(captureData.length > 0 && !props.testSuiteInUse)? <div className='Header__btn'>
+        {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen)))? <div className='Header__btn'>
           <Button onClick={() => { setMasterCapture(false); handleAddMore('add more');}} disabled={!saveDisable || blocked} outlined>Add more</Button>
           <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
           <Button disabled={blocked}  onClick={() => setShowNote(true)} >Capture Elements</Button>
@@ -1212,7 +1283,8 @@ else{
       <div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
         <p className="not_captured_message">Elements not captured</p>
-        {!props.testSuiteInUse && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture}>Capture Elements</Button>}
+        {showCaptureScreen ?<Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser }>Capture Elements</Button>  :(selectedRepoName) && <Button className="btn-capture-single" onClick={() => {handleAddMore('add more');setVisibleOtherApp(true); setSaveDisable(false)}} disabled={masterCapture || !assignUser}>Capture Elements</Button>}
+        {showCaptureScreen ? "" : !selectedRepoName && <span class="choose__repo__txt">Select a repository or add new repository to capture elements</span>}
         <Tooltip target=".btn-capture-single" position="bottom" content=" Capture the unique properties of element(s)." />
       </div>
     </div>
@@ -1754,7 +1826,7 @@ const footerSave = (
         <div 
         className={`tooltip__target-${rowdata.objectDetails.objId }
                   ${(rowdata.objectDetails.duplicate ? " ss__red" : "")}
-                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" :(rowdata.objectDetails.reused)?'blue-text' : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
+                  ${((!rowdata.objectDetails?.objId && !rowdata.objectDetails.duplicate) ? " ss__newObj" : (!masterCapture && addMore.current && !rowdata.objectDetails?.objId)?" ss__newObj" : '' )}`} title={rowdata.selectall}>{rowdata.selectall.length> 30 ? rowdata.selectall.slice(0, 30) + '...' : rowdata.selectall}</div>
         {rowdata.isCustomCreated && <Tag severity="info" value="Custom"></Tag>}
         {rowdata.objectDetails.isCustom && <Tag severity="primary" value="Proxy"></Tag>}
         {rowdata.objectDetails.reused && <img src='static/imgs/Reused_icon.svg' className='reused__icon' />}
@@ -1842,111 +1914,103 @@ const elementValuetitle=(rowdata)=>{
             setScreenData([]);
             toast.current.show({ severity: 'error', summary: 'Error', detail: 'No orderlist present.', life: 5000 });}
           else setScreenData(screens.screenList);
+            let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
+            newAddedRepo[0].label=newAddedRepo[0].name
+            newAddedRepo[0].title = newAddedRepo[0].name
+            handleScreenChange(newAddedRepo[0])
+            // setSelectedFolderValue({type:newAddedRepo[0],key:true})
       } catch (error) {
           console.error('Error fetching User list:', error);
       }
   })();
-}, [NameOfAppType.projectId]);
+}, [NameOfAppType.projectId,repoNameAdded]);
 
  const handleScreenChange = (e) => {
-  setSelectedFolderValue(e.value)
-  // const selectedFolderValue = e.value;
-  // setSelectedScreen(selectedFolderValue);
-  if(captureData.length >= 0){
+  // if(typeof e.value === "string"){
+  //   setSelectedFolderValue({type:e.value,key:false})
+  // }else{
+  //   setSelectedFolderValue({type:e.value,key:true})
+  // } 
+
+  const value = typeof e === 'object' && 'value' in e ? e.value : e;
+  if (typeof value === "string") {
+    setSelectedFolderValue({ type: value, key: false });
+  } else {
+    setSelectedFolderValue({ type: value, key: true });
+  }
+
+  if(captureData.length > 0){
     setScreenChange(true);
   }
-
-  // setCapturedDataToSave(selectedFolderValue.related_dataobjects);
+ else if (value === buttonOption.value){
+  setDialogForRepo(true);
+ }
   else{
-  setSelectedScreen(e.value);
+
+      let params = {
+        'screenId': parentData.id,
+        'userId': userInfo.user_id,
+        'roleId': userInfo.role,
+        'param': 'updateOrderList',
+        'orderList':value.type?value.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject):value.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject),
+        'elementrepoid':{id:value.type?value.type.id ? value.type.id : value.type._id:value.id ? value.id : value._id, name:value.type?value.type.title :value.title}
+      }
   
-  // fetchScrapeData();
-  setSaveDisable(false);
+
+      const res = scrapeApi.updateScreen_ICE(params);
+    
+      if(res === 'fail') {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+      else {
+        dispatch(SetSelectedRepository(value.type?value.type:value))
+        setSelectedScreen(value.type?value.type:value);
+        setEmptyDatatable(true);
+        // fetchScrapeData()
+        
+      }
+    }
+
+  // setSaveDisable(false);
   setElementRepo(true);
   }
-  // addMore.current = true;
-  // let newData = capturedDataToSave;
-  // newData.push(...selectedFolderValue.related_dataobjects)
-  // setCapturedDataToSave(newData);
-  // // setCaptureData(newData);
-  // setNewScrapedCapturedData({view :selectedFolderValue.related_dataobjects});
 
-};
+
+
 
 const confirmScreenChange = () => {
+  
   (async () => {
     try {
-        let params = {
-          param : "updateMindmapTestcaseScreen",
-          projectID :  NameOfAppType.projectId,
-          moduleID:props.fetchingDetails["parent"]["parent"] ?props.fetchingDetails["parent"]["parent"]["_id"]:elemenetModuleId.id,
-          parent:props.fetchingDetails["parent"]["_id"],
-          currentScreen:parentData.id,
-          updateScreen:selectedFolderValue.id
-        }
 
-        const res = await scrapeApi.updateScreen_ICE(params);
-        if(res === 'fail') {
-          toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
-        else {
+      if(selectedFolderValue.type === buttonOption.value){
+        setDialogForRepo(true);
+      }
+      else{
+        dispatch(SetSelectedRepository(selectedFolderValue.type))
+
+           let orderlist=selectedFolderValue.type.orderlist.map(dataobject=>dataobject._id?dataobject._id:dataobject)
           
-          var req={
-            tab:"createdTab",
-            projectid:NameOfAppType.projectId,
-            version:0,
-            cycId: null,
-            modName:"",
-            moduleid:res
-          }
-          const dataScreen = await scrapeApi.getModules(req)
-          if(dataScreen.error)return;
-          else {
-            const screenData_1 = getReqScreen (dataScreen)
-            function getReqScreen (data){
-              let sd = []
-              data.children.forEach((child)=>{
-                if(child._id === props.fetchingDetails["parent"]["_id"]){
-                  child.children.forEach((subChild)=>{
-                    if(subChild._id === selectedFolderValue.id){
-                      if(subChild.children.length > 0){
-                         const newData = {...subChild,parent:{...child,parent:data},children:subChild.children.map((item)=>{
-                            return {
-                              ...item,
-                              parent:{...subChild,parent:{...child,parent:data}}
-                            }
-                         })}
-                         sd.push(newData);
-                      }
-                      else{
-                        sd.push({...subChild, parent:{...child,parent:data, children:child.children.map((data)=>{
-                          return{
-                            ...data,parent:{...child,parent:data}
-                          }
-
-                        })}})
-                      }
-                    }
-                  })
-                }
-              })
-              return sd;
-            }
-            
-            // console.log(screenData_1);
-            if(screenData_1.length>0){
-              props.setFetchingDetails(screenData_1[0])
-              props.setModuleData({id:res, key:uuid()})
-              setParentId(screenData_1[0]._id);
-              toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository updated and saved', life: 3000 });
-            }else{
-              toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });
-            }
-            // props.setFetchingDetails(screenData_1[0])
-            // props.setModuleData({id:res, key:uuid()})
-            // setParentId(uuid());
-          }
+        let params={
+          'param':"updateOrderListAndRemoveParentId",
+          'screenId': parentData.id,
+          'userId': userInfo.user_id,
+          'roleId': userInfo.role,
+          'orderList': orderlist,
+          'oldOrderList':captureData.map(element=>element.objectDetails.objId),
+          'elementrepoid':{id:selectedFolderValue.type.id ? selectedFolderValue.type.id : selectedFolderValue.type._id,name:selectedFolderValue.type.title}
+      }
+      let res=scrapeApi.updateScreen_ICE(params)
+      if(res === 'fail') {
+        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to change the reposiotry, try again!!.', life: 5000 });}
+      else {
+        setSelectedScreen(selectedFolderValue.type);
+        setCaptureData([])
+        setCapturedDataToSave([])
+        setEmptyDatatable(true)
+        // fetchScrapeData()
         }
-        }
+      }
+    }
      catch (error) {
         console.error('Error fetching User list:', error);
     }
@@ -1959,8 +2023,94 @@ const screenOption = screenData?.map((folder) => ({
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,
   parent:folder.parent,
-  title:folder.name
+  title:folder.name,
+  // disabled: !folder.orderlist || folder.orderlist.length === 0 || !folder.related_dataobjects || folder.related_dataobjects.length === 0
 }));
+
+const renderOption = (option) => {
+
+  if (option.value === 'add_repository') {
+    return (
+      <div className="p-dropdown-item">
+        <Button label={option.label} />
+      </div>
+    );
+  } else {
+    return (
+      <div className="p-dropdown-item" title={option.title}>
+        {option.label}
+      </div>
+    );
+  }
+};
+
+
+const optionsWithTooltips = screenOption.map(option => ({
+  ...option,
+  title: option.title
+}));
+const buttonOption = { label: 'Add Repository', value: 'add_repository' };
+optionsWithTooltips.push(buttonOption)
+
+
+
+const footerSaveForRepo =()=>(
+  <Button label='Save' className='repository__save__btn' onClick={()=>handleAddAccordion()} disabled={!repositoryNewName}/>
+)
+
+const handleRepoNewName =(e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
+  setRepositoryNewName(e.target.value)
+}
+
+
+const handleAddAccordion = () => {
+  if(screenData?.map((item)=>item.name).includes(repositoryNewName)){
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Duplicate repository names are not allowed', life: 5000 });
+  }
+  else{
+  const newScreen = {
+    label: repositoryNewName,
+    related_dataobjects: [],
+    orderlist:[],
+    title:repositoryNewName,
+    name:repositoryNewName
+  };
+  // setNewScreenCount(newScreenCount + 1);
+
+  let params ={
+    projectid: NameOfAppType.projectId,
+    name: newScreen.label,
+    versionnumber: 0,
+    createdby: userInfo.user_id,
+    createdbyrole: userInfo.role,
+    param : 'create'
+  }
+  insertScreen(params)
+  // insertRepository(params)
+  .then(response =>  {
+    if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
+    else if(response === "invalid session") return RedirectPage(history);
+    else {
+      const addingScreen = [newScreen,...screenData];
+      setScreenData(addingScreen);
+      // setSelectedScreen(newScreen)
+      dispatch(loadUserInfoActions.updateElementRepository(true));
+      // setRepositoryNewName("")
+      setRepoNameAdded(true);
+      setDialogForRepo(false)
+      toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
+    }
+})
+  
+  .catch(error => console.log(error))
+}
+};
+
 
   return (
     <>
@@ -1975,7 +2125,7 @@ const screenOption = screenData?.map((folder) => ({
       <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => {dispatch(loadUserInfoActions.openCaptureScreen(false));props.setVisibleCaptureElement(false)}} footer={typesOfAppType === "Webservice" ? null : footerSave}>
         <BlockUI blocked={blocked} template={blocked?<div className='overlay__content'>{overlay}</div>:null}>
         {
-          typesOfAppType != "Webservice" && !props.testSuiteInUse ? 
+          typesOfAppType != "Webservice" ? 
           
             <div className="capture_card_modal">
               {/* Select From Repository */}
@@ -1988,7 +2138,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" disabled={showCaptureScreen} optionTemplate={(option) => (
+                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} optionLabel="label"  options={screenOption} placeholder="Select Repository" className={`w-full md:w-10vw ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} disabled={showCaptureScreen} optionTemplate={(option) => (
                     <div title={option.label}>{option.label}</div>
                   )}/></div>
                 </div>}
@@ -2005,13 +2155,13 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen) && !showCaptureScreen) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog("addObject")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Add Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
                     </div>
@@ -2031,13 +2181,13 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={handleCompareClick}>
+                  <div  className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleCompareClick}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Compare Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleReplaceClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
                     </div>
@@ -2046,7 +2196,7 @@ const screenOption = screenData?.map((folder) => ({
                 </div>}
               </div>
               {/* Capture From Pdf */}
-              <div className="capture_card disabled">
+              {/* <div className="capture_card disabled">
                 <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
                 {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
                 <div className="capture_card_top_section">
@@ -2056,14 +2206,14 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn">
+                  <div className={`capture_bottom_btn ${(!assignUser && !showCaptureScreen)? "disabled" : ""}`}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img pdfImgOne" src="static/imgs/pdf_icon.svg" alt="PDF Utility Image"></img>
                     </div>
                     <p className="capture_bottom_heading">PDF <br/>Utility</p>
                   </div>
                 </div>}
-              </div>
+              </div> */}
               {/* Create Manually */}
               <div className="capture_card">
                 <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
@@ -2074,7 +2224,7 @@ const screenOption = screenData?.map((folder) => ({
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                  <div className={`capture_bottom_btn ${!isWebApp || (!assignUser && !showCaptureScreen)? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
                     </div>
@@ -2087,20 +2237,20 @@ const screenOption = screenData?.map((folder) => ({
                 <Tooltip target=".fileHandleToolTip" position="bottom" content="Control the flow of information in and out of the screen" />
                 {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
                 {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
-                <div className="capture_card_top_section">
+                <div className={`capture_card_top_section ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`}>
                   <h4 className="capture_card_header">File Handling</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => setShowObjModal("importModal")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className="capture_bottom_btn" onClick={handleExportClick}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2117,7 +2267,8 @@ const screenOption = screenData?.map((folder) => ({
             : null
         }
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} 
+          toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -2138,23 +2289,24 @@ const screenOption = screenData?.map((folder) => ({
             scrollHeight="350px"
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
+            sortMode="multiple"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
-            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
-              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
+              editor={(showCaptureScreen || (assignUser && !showCaptureScreen))?(options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
+              bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen)) ?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2178,17 +2330,24 @@ const screenOption = screenData?.map((folder) => ({
       :
       <div>
       {/* <Dialog className='dailog_box' header={headerTemplate} position='right' visible={props.visibleCaptureElement} style={{ width: '73vw', color: 'grey', height: '95vh', margin: 0 }} onHide={() => props.setVisibleCaptureElement(false)} footer={typesOfAppType === "Webservice" ? null : footerSave}> */}
-      {typesOfAppType != "Webservice" && !props.testSuiteInUse? <div className="capture_card_modal">
+      {typesOfAppType != "Webservice" ? <div className="capture_card_modal">
       <div className="capture_card">
                 <Tooltip target=".selectFromRepoToolTip" position="bottom" content="Easily Select Elements from Global Repositories" />
                 <div className="capture_card_top_section">
-                  <h4 className="capture_card_header">Select Repository</h4>
+                {/* <div class="zoom-in-out-box"></div> */}
+                {/* {!selectedRepoName && <span><img src="static/imgs/animatedSelcrepo.gif" style={{width:'25px',height:'25px',transform:'rotate(90deg)'}}></img></span>} */}
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/element_repository_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
+                  <h4 className="capture_card_header">Repository</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img selectFromRepoToolTip" src="static/imgs/info.png" alt="Select From Repo Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="dropdown_container"><Dropdown value={selectedScreen} onChange={handleScreenChange} options={screenOption} placeholder={<span className="repo_dropdown">{parentData?.name}</span>} className="w-full md:w-10vw" tooltipOptions="title" /></div>
+                  <div className="dropdown_container">
+                    <Dropdown value={selectedScreen} onChange={handleScreenChange} options={optionsWithTooltips} placeholder={<span className="repo_dropdown">{selectedRepoName ? selectedRepoName : "Select Repository"}</span>} className={`w-full md:w-10vw ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} optionLabel='label' itemTemplate={renderOption} />
+                    </div>
                 </div>}
               </div>
               {/* In Sprint Automation */}
@@ -2197,19 +2356,22 @@ const screenOption = screenData?.map((folder) => ({
                 {isWebApp && <Tooltip target=".insprintImgOne" position="bottom" content="Automate test cases of inflight features well within the sprint before application ready" />}
                 {isWebApp && <Tooltip target=".insprintImgTwo" position="bottom" content="Map placeholder elements to captured elements" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/in_sprint_automation.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">In Sprint Automation</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img insprintToolTip" ref={imageRef1} onMouseEnter={() => handleMouseEnter("insprint")} onMouseLeave={() => handleMouseLeave("insprint")} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => isWebApp && handleDialog("addObject")}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog("addObject")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img insprintImgOne" src="static/imgs/Add_object_icon.svg" alt="Add Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Add Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleCaptureClickToast()}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img insprintImgTwo" src="static/imgs/Map_object_icon.svg" alt="Map Element Image" ></img>
                     </div>
@@ -2223,19 +2385,22 @@ const screenOption = screenData?.map((folder) => ({
                 {isWebApp && <Tooltip target=".upgradeImgOne" position="bottom" content="Analyze screen to compare existing and newly captured element properties" />}
                 {isWebApp && <Tooltip target=".upgradeImgTwo" position="bottom" content="Replace the existing elements with the newly captured elements" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/upgrade_analyzer_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">Upgrade Analyzer</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img upgradeToolTip" ref={imageRef2} onMouseEnter={() => handleMouseEnter("upgrade")} onMouseLeave={() => handleMouseLeave("upgrade")} src="static/imgs/info.png" alt="Upgrade Analyzer Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${(AddElement) ? "disabled" : ""}`} onClick={handleCompareClick}>
+                  <div className={`capture_bottom_btn ${(AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleCompareClick}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img upgradeImgOne" src="static/imgs/compare_object_icon.svg" alt="Compare Element Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Compare Element</p>
                   </div>
-                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement) ? "disabled" : ""}`} onClick={handleReplaceClick}>
+                  <div className={`capture_bottom_btn ${(!isWebApp || AddElement|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={handleReplaceClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img upgradeImgTwo" src="static/imgs/replace_object_icon.svg" alt="Replace Element Image" ></img>
                     </div>
@@ -2244,7 +2409,7 @@ const screenOption = screenData?.map((folder) => ({
                 </div>}
               </div>
               {/* Capture From Pdf */}
-              <div className="capture_card disabled">
+              {/* <div className="capture_card disabled">
                 <Tooltip target=".pdfToolTip" position="bottom" content="Capture the elements from a PDF" />
                 {isWebApp && <Tooltip target=".pdfImgOne" position="bottom" content="pdf utility" />}
                 <div className="capture_card_top_section">
@@ -2261,22 +2426,25 @@ const screenOption = screenData?.map((folder) => ({
                     <p className="capture_bottom_heading">PDF <br/>Utility</p>
                   </div>
                 </div>}
-              </div>
+              </div> */}
               {/* Create Manually */}
               <div className="capture_card">
                 <Tooltip target=".createManualToolTip" position="bottom" content="Create element manually by specifying properties" />
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/create_manually_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">Create Manually</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img createManualToolTip" ref={imageRef4} onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()} src="static/imgs/info.png" alt="Create Manually Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className={`capture_bottom_btn ${!isWebApp ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
+                  <div className={`capture_bottom_btn ${(!isWebApp|| (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => isWebApp && handleDialog('createObject')}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img" src="static/imgs/create_object_icon.svg" alt="Create Element Image"></img>
                     </div>
-                    <p className="capture_bottom_heading">Create <br/> Element</p>
+                    <p className="capture_bottom_heading">Create Element</p>
                   </div>
                 </div>}
               </div>
@@ -2286,19 +2454,22 @@ const screenOption = screenData?.map((folder) => ({
                 {isWebApp && <Tooltip target=".importToolTip" position="bottom" content="Import elements from json or excel file exported from same/other screens" />}
                 {isWebApp && <Tooltip target=".exportToolTip" position="bottom" content="Export captured elements as json or excel file to be reused across screens/projects" />}
                 <div className="capture_card_top_section">
+                  <div className='capture_card_info_wrapper'>
+                    <img className="capture_card_info_img" src="static/imgs/file_handing_icon.svg" alt="Select From Repo Image"></img>
+                  </div>
                   <h4 className="capture_card_header">File Handling</h4>
                   <div className='capture_card_info_wrapper'>
                     <img className="capture_card_info_img fileHandleToolTip" ref={imageRef1} src="static/imgs/info.png" alt="In Sprint Automation Image"></img>
                   </div>
                 </div>
                 {showPanel && <div className="capture_card_bottom_section">
-                  <div className="capture_bottom_btn" onClick={() => setShowObjModal("importModal")}>
+                  <div className={`capture_bottom_btn ${( (!assignUser && !showCaptureScreen)) ? "disabled" : ""}`} onClick={() => setShowObjModal("importModal")}>
                     <div className='capture_bottom_btn_img_wrapper'>
                       <img className="capture_bottom_btn_img importToolTip" src="static/imgs/Import_new_icon_grey.svg" alt="Import Screen Image"></img>
                     </div>
                     <p className="capture_bottom_heading">Import Screen</p>
                   </div>
-                  <div className="capture_bottom_btn"  onClick={handleExportClick}>
+                  <div className={`capture_bottom_btn ${((!assignUser && !showCaptureScreen)) ? "disabled" : ""}`}  onClick={handleExportClick}>
                     <div className="capture_bottom_btn_img_wrapper">
                       <img className="capture_bottom_btn_img exportToolTip" src="static/imgs/Export_new_icon_grey.svg" alt="Export Screen Image" ></img>
                     </div>
@@ -2315,7 +2486,7 @@ const screenOption = screenData?.map((folder) => ({
 
 
         <div className='card'>
-          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} /></> :
+          {typesOfAppType === "Webservice" ? <><WebserviceScrape setShowObjModal={setShowObjModal} saved={saved} setSaved={setSaved} fetchScrapeData={fetchScrapeData} setOverlay={setOverlay} startScrape={startScrape} setSaveDisable={setSaveDisable} fetchingDetails={props.fetchingDetails} toastError={toastError}  toastSuccess={toastSuccess} toastWarn={toastWarn}/></> :
           <DataTable
             size="small"
             editMode="cell"
@@ -2333,26 +2504,27 @@ const screenOption = screenData?.map((folder) => ({
             emptyMessage={showEmptyMessage ? emptyMessage : null} 
             columnResizeMode="expand"
             scrollable
-            scrollHeight="350px"
+            scrollHeight={showPanel? "60vh": "68vh"}
             virtualScrollerOptions={{ itemSize: 46 }} 
             tableStyle={{ minWidth: '50rem' }}
+            sortMode="multiple"
           >
             {/* editMode="cell"
             onCellEdit={(e) => handleCellEdit(e)} */}
             {/* <Column style={{ width: '3em' }} body={renderRowReorderIcon} /> */}
             {/* <Column rowReorder style={{ width: '3rem' }} /> */}
-            {!props.testSuiteInUse?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
-            <Column field="selectall" header="Element Name" headerStyle={{ justifyContent: "center"}} 
-              editor={ !props.testSuiteInUse?(options) => cellEditor(options):null}
-              onCellEditComplete={!props.testSuiteInUse?onCellEditComplete:null}
-              bodyStyle={{ cursor: 'url(static/imgs/Pencil24.png) 15 15,auto' }}
+            { (showCaptureScreen || (assignUser && !showCaptureScreen))?<Column headerStyle={{ width: '1rem'}} selectionMode='multiple'></Column>:null}
+            <Column field="selectall" header="Element Name" sortable headerStyle={{ justifyContent: "center"}} 
+             editor={(showCaptureScreen || (assignUser && !showCaptureScreen)) ? (options) => cellEditor(options):null}
+              onCellEditComplete={showCaptureScreen || (assignUser && !showCaptureScreen)?onCellEditComplete:null}
+              bodyStyle={{ cursor: (!assignUser && !showCaptureScreen) ? 'pointer' : 'url(static/imgs/Pencil24.png) 15 15,auto' }}
               bodyClassName={"ellipsis-column"}
               body={renderElement}
             >
             </Column>
             <Column style={{marginRight:"2rem"}}field="objectProperty" header="Element Type" sortable headerStyle={{ justifyContent: "center"}}></Column>
             <Column field="screenshots" header="Screenshot" headerStyle={{ justifyContent: "center"}}></Column>
-            {!props.testSuiteInUse?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
+            {(showCaptureScreen || (assignUser && !showCaptureScreen))?<Column field="actions" header="Actions" body={renderActionsCell} headerStyle={{ justifyContent: "center"}}/>:null}
           </DataTable>
               }
           <Dialog className='screenshot__dialog' header={headerScreenshot} visible={screenshotData && screenshotData.enable} onHide={() => { setScreenshotData({ ...screenshotData, enable: false });setHighlight(false); setActiveEye(false);setSelectedCapturedElement([]) }} style={{height: `${mirrorHeight}px`}}>
@@ -2370,6 +2542,9 @@ const screenOption = screenData?.map((folder) => ({
         </div>
         </div>}
       {/* </Dialog> */}
+      <Dialog visible={dialogForRepo} header="Add Repository" onHide={()=>{setRepositoryNewName("");setDialogForRepo(false)}} footer={footerSaveForRepo}>
+         <InputText value={repositoryNewName} className='repository__input' onChange={handleRepoNewName} placeholder='Enter repository name'/>
+      </Dialog>
       <AvoConfirmDialog
         visible={screenChange}
         onHide={() => setScreenChange(false)}
@@ -2378,22 +2553,24 @@ const screenOption = screenData?.map((folder) => ({
         icon="pi pi-exclamation-triangle"
         accept={confirmScreenChange} />
 
-            <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', marginTop:'1vh'}}>
+            {!showCaptureScreen && <div style={{ position:'sticky', display:'flex',flexWrap: 'nowrap',justifyContent: 'right', right: 25, bottom :30}}>
                 {/* <div style={{ position: 'absolute', fontStyle: 'italic' }}><span style={{ color: 'red' }}>*</span>Click on value fields to edit element properties.</div> */}
-                {(captureData.length > 0 && !props.testSuiteInUse) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
+                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', right: '68rem', background: '#D9342B', border: 'none' }} onClick={()=>setShowDailogForOnDelete(true)} ></Button> : null}
+                {(captureData.length > 0 && (showCaptureScreen || (assignUser && !showCaptureScreen))) ? <div className='Header__btn' style={{    display: 'flex',justifyContent: 'space-evenly',flexWrap: 'nowrap',width: '20rem'}}>
                     <Button className='add__more__btn' onClick={() => { setMasterCapture(false); handleAddMore('add more'); }} disabled={!saveDisable} label="Add more" size='small' />
                     <Tooltip target=".add__more__btn" position="bottom" content="  Add more elements." />
                     <Button className="btn-capture" onClick={() => setShowNote(true)} label="Capture Elements" size='small'/>
                     <Tooltip target=".btn-capture" position="bottom" content=" Capture the unique properties of element(s)." />
                 </div> : null
                 }
-                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
-                {selectedCapturedElement.length > 0 ? <Button label='Delete' size='small' style={{ position: 'absolute', left: '1rem', background: '#D9342B', border: 'none' }} onClick={onDelete} ></Button> : null}
-                <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
-                <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                {(selectedCapturedElement.length > 0 && NameOfAppType.appType == "Web") ? <Button className='mr-4' label="Element Identifier Order" onClick={elementIdentifier} size='small'></Button> : null}
+                { NameOfAppType.appType !== 'Webservice' && <> 
+                    <Button label='Cancel' outlined onClick={() => props.setVisibleCaptureElement(false)} size='small'></Button>
+                    <Button label='Save' style={{marginLeft:'0.5rem'}} onClick={onSave} disabled={saveDisable} size='small'></Button>
+                </> }
                 {/* <Button label="Cancel" onClick={() => { setElementProperties(false); setSelectedCapturedElement([]) }} className="p-button-text" style={{ borderRadius: '20px', height: '2.2rem' }} />
                 <Button label="Save" onClick={saveElementProperties} autoFocus style={{ height: '2.2rem' }} /> */}
-            </div>
+            </div>}
 
          {typesOfAppType === "MobileWeb"? <LaunchApplication visible={visible} typesOfAppType={typesOfAppType} setVisible={setVisible} setSaveDisable={setSaveDisable} saveDisable={saveDisable} setShow={()=> setVisibleOtherApp(false)} appPop={{appType: typesOfAppType, startScrape: startScrape}} />: null}
         
@@ -2455,6 +2632,20 @@ const screenOption = screenData?.map((folder) => ({
         message={confirmPopupMsg}
         icon="pi pi-exclamation-triangle"
         accept={() => { setMasterCapture(true); handleAddMore('capture'); setSaveDisable(false) }} />
+        <AvoConfirmDialog
+          visible={showDailogForDelete}
+          onHide={() => setShowDailogForDelete(false)}
+          showHeader={false}
+          message="This element is used in repository also, Are you sure you want to delete the element?"
+          icon="pi pi-exclamation-triangle"
+          accept={()=>handleDelete(...selectedCapturedElement)} />
+        <AvoConfirmDialog
+          visible={showDailogForOnDelete}
+          onHide={() => setShowDailogForOnDelete(false)}
+          showHeader={false}
+          message="This element is used in repository also, Are you sure you want to delete the element?"
+          icon="pi pi-exclamation-triangle"
+          accept={onDelete} />
         
         {typesOfAppType === "Web"? <Dialog className={"compare__object__modal"} header={`Capture : ${parentData.name}`} title={parentData.name} style={{ height: "21.06rem", width: "24.06rem" }} visible={visible === 'add more'} onHide={handleBrowserClose} footer={footerAddMore} draggable={false}>
         <div className={"compare__object"}>
@@ -2734,7 +2925,7 @@ function getProcessedBody(body, type) {
   if (body.indexOf("{") === 0 || body.indexOf("[") === 0)
     processedBody = JSON.stringify(JSON.parse(body), null, '\t');
   else
-    // processedBody = formatXml(body.replace(/>\s+</g, '><'));
+    processedBody = formatXml(body.replace(/>\s+</g, '><'));
 
     if (type === 'scrape')
       processedBody = processedBody.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<');

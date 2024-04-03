@@ -1182,7 +1182,9 @@ exports.assignProjects_ICE = function (req, res) {
 		var valid_domainId, valid_objects, valid_userId;
 		function validateAssignProjects() {
 			logger.info("Inside function validateAssignProjects");
-			var check_domainId = validator.isEmpty(assignProjectsDetails.domainname);
+			var check_domainId = assignProjectsDetails.domainname.some(function(domain) {
+				return validator.isEmpty(domain);
+			});
 			if (check_domainId == false) {
 				valid_domainId = true;
 			}
@@ -2515,23 +2517,46 @@ exports.gitSaveConfig = async (req, res) => {
 		const action = data.action;
 		const userId = data.userId;
 		const projectId = data.projectId;
+		const param = data.param;
+		let inputs = {}; 
+		if (param=="git"){
 		const gitConfigName = data.gitConfigName;
 		const gitAccToken = data.gitAccToken;
 		const gitUrl = data.gitUrl;
 		const gitUsername = data.gitUsername;
 		const gitEmail = data.gitEmail;
 		const gitbranch =data.gitBranch;
-		const inputs = {
-			"action":action,
-			"userId":userId,
-			"projectId":projectId,
-			"gitConfigName":gitConfigName,
-			"gitAccToken": gitAccToken,
-			"gitUrl":gitUrl,
-			"gitUsername":gitUsername,
-			"gitEmail":gitEmail,
-			"gitbranch":gitbranch
-		};
+		
+		inputs["action"] = action;
+		inputs["userId"]= userId;
+		inputs["projectId"]= projectId;
+		inputs["gitConfigName"]= gitConfigName;
+		inputs["gitAccToken"]= gitAccToken;
+		inputs["gitUrl"]= gitUrl;
+		inputs["gitUsername"]= gitUsername;
+		inputs["gitEmail"]= gitEmail;
+		inputs["gitbranch"]= gitbranch;
+		inputs["param"]= param;
+		}
+		else{
+		const bitConfigName = data.bitConfigName;
+		const bitAccToken = data.bitAccToken;
+		const bitUrl = data.bitUrl;
+		const bitUsername = data.bitUsername;
+		// const bitEmail = data.bitEmail;
+		const bitbranch =data.bitBranch;		
+			inputs["action"]= action;
+			inputs["userId"]= userId;
+			inputs["projectId"]= projectId;
+			inputs["bitConfigName"]= bitConfigName;
+			inputs["bitAccToken"]=  bitAccToken;
+			inputs["bitUrl"]= bitUrl;
+			inputs["bitUsername"]= bitUsername;
+			inputs["workspace"]= data.bitWorkSpace;
+			inputs["bitbranch"]= bitbranch;
+			inputs["param"]= param;
+			inputs["projectkey"] = data.bitProjectKey;
+		}
 		const result = await utils.fetchData(inputs, "admin/gitSaveConfig", actionName);
 		return res.send(result);
 	} catch (ex) {
@@ -2548,14 +2573,21 @@ exports.gitEditConfig = async (req, res) => {
 		const data = req.body;
 		const userId = data.userId;
 		const projectId = data.projectId;
+		const param =data.param;
 		let inputs = {
 			"userId":userId,
-			"projectId":projectId
+			"projectId":projectId,
+			"param":param
 		};
 		const result = await utils.fetchData(inputs, "admin/gitEditConfig", actionName);
 		if (result == "fail") res.status(500).send("fail");
 		else if (result == "empty") res.send("empty");
-		else {
+		else if (param =="bit"){
+			let data = [];
+			data.push(result['name'], result['bitaccesstoken'], result['biturl'], result['bitusername'], result['workspace'], result['bitbranch'], result['projectkey']);
+			return res.send(data);
+		}
+		else{
 			let data = [];
 			data.push(result['name'], result['gitaccesstoken'], result['giturl'], result['gitusername'], result['gituseremail'], result['gitbranch']);
 			return res.send(data);
@@ -3192,3 +3224,21 @@ exports.getDetails_BROWSERSTACK= async (req, res) => {
 		return res.status(500).send("fail");
 	}
 };
+
+exports.unlockTestSuites = async (req, res) => {
+	const actionName = "unLock_TestSuites";
+	logger.info("Inside UI service: " + actionName)
+	try {
+		const userId = req.session.userid;
+		let input = req.body.inputs
+		const resuiltData = await utils.fetchData(input, 'admin/unLock_TestSuites', actionName);
+		if (resuiltData === "fail") res.status(500).send("fail");
+		else if (resuiltData === "empty") res.send("empty");
+		else {
+			return res.status('200').send(resuiltData);
+		}
+	} catch (error) {
+		logger.error("Test Suites Details in the service unlockTestSuites: %s", error);
+		return res.status(500).send("fail");
+	}
+}

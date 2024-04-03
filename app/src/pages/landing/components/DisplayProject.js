@@ -269,14 +269,16 @@ const DisplayProject = (props) => {
         <CreateProject visible={visible} onHide={handleCloseDialog} setProjectsDetails={setProjectsDetails} projectsDetails={projectsDetails} toastSuccess={props.toastSuccess} toastError={props.toastError}/>
         {sortVisible && (<div ref={menuRef}><Menu className="sort-Menu" setsortVisible={setSortVisible} model={sortItems} icon={selectedsortItems && 'pi pi-check'} id="sort_menu_color"/>
         </div>)}
-        <div className="flex flex-row All_Project">
-          <div className="All_Project_font" >ALL PROJECTS</div>
-          <div className="add_sort_btn">
-            <button className="pi pi-sort-amount-down sort_btn" onClick={showSortMenu} ref={sortButtonRef}/>
+        <div className="flex flex-row All_Project justify-content-between align-items-center">
+          <div className="flex justify-content-between align-items-center">
+            <div>
+              <img src="static/imgs/folder_icon.svg" className="folder_icon" />
+            </div>
+            <div className="All_Project_font">ALL PROJECTS</div>
+            <img src="static/imgs/sorting_icon.svg" className="pi  sort_btn" onClick={showSortMenu} ref={sortButtonRef} />
             {userInfo && userInfo.rolename === "Quality Manager" ? (
-              <span id='CreateDisable_Title' ><button className="pi pi-plus add_btn" onClick={handleOpenDialog} disabled ={props.validateProjectLicense.status === 'fail'}/></span>
-              ) : null}
-
+              <span id='CreateDisable_Title' ><button className="pi pi-plus add_btn" onClick={handleOpenDialog} disabled={props.validateProjectLicense.status === 'fail'} /></span>
+            ) : null}
           </div>
         </div>
       </div>
@@ -299,14 +301,17 @@ const DisplayProject = (props) => {
   return (
     <>
       <Panel className="Project_Display" headerTemplate={allProjectTemplate} >
-        <div className="Project-search">
-          <form autoComplete="off">
-            <div className="p-input-icon-left project_search">
-            <i className="pi pi-search" />
-            <InputText autoComplete="off" className="Search_name p-inputtext-sm" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
-            </div>
-          </form>
+        <div className="flex flex-column">
+          <div className="Project-search">
+            <form autoComplete="off">
+              <div className="p-input-icon-left project_search">
+                <i className="pi pi-search" />
+                <InputText autoComplete="off" className="Search_name p-inputtext-sm" placeholder="Search" value={searchProjectName} onChange={handleSearchProject} title=" Search all projects." />
+              </div>
+            </form>
+          </div>
         </div>
+        
         <div className="project-list project">
           {filteredProjects.map((project) => (
             <>

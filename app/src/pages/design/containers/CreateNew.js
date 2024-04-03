@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import { getProjectList, getModules, getScreens } from '../api';
+import { gitSaveConfig } from '../../admin/api';
 import { useDispatch, useSelector } from 'react-redux';
 import SaveMapButton from '../components/SaveMapButton';
 import Toolbarmenu from '../components/ToolbarMenu';
@@ -37,15 +38,21 @@ const CreateNew = ({ importRedirect }) => {
     const tagtestcase = useSelector(state => state.design.tagtestcase);
     const prjList = useSelector(state => state.design.projectList)
     const initEnEProj = useSelector(state => state.design.initEnEProj)
+    const moduleNewNode = useSelector(state=>state.design.moduleNewNodeAdd)
     const [delSnrWarnPop, setDelSnrWarnPop] = useState(false)
     const [isCreateE2E, setIsCreateE2E] = useState(initEnEProj && initEnEProj.isE2ECreate ? true : false)
     const isEnELoad = useSelector(state => state.design.isEnELoad);
-    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
-    let Proj = reduxDefaultselectedProject;
+    // const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+    // let Proj = reduxDefaultselectedProject;
+    const Proj = JSON.parse(localStorage.getItem('DefaultProject'));
+    // if (localStorageDefaultProject) {
+    //     Proj = JSON.parse(localStorageDefaultProject);
+    // }
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
     const handleTypeOfViewMap = useSelector(state=>state.design.typeOfViewMap)
 
+    const [configurationName, setConfigurationName] = useState('');
 
     const [selectedView, setSelectedView] = useState({ code: 'mindMapView', name: <div><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div> });
     const handleViewsDropDown = (view) => {
@@ -89,6 +96,27 @@ const CreateNew = ({ importRedirect }) => {
         })()}
     },[handleTypeOfViewMap])
 
+    useEffect(() => {
+            try{
+                (async() => {
+                    const apiPayloadData = {
+                        param : "verify",
+                        action : '',
+                        userId : userInfo.user_id,
+                        projectId : Proj.projectId
+                    }
+                    const data = await gitSaveConfig(apiPayloadData);
+            
+                    if (data?.error) { toastError(data.error); return; }
+                    if (data === "bit") setConfigurationName(data)
+                    else if (data === "git") setConfigurationName(data)
+                    else setConfigurationName(data)
+                    })()
+            } catch(error){
+                toastError("Something went wrong")
+            }
+    },[Proj.projectId])
+
     const views = [
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/treeViewIcon.svg" alt="modules" /><h5>Tree View</h5></div>, code: 'mindMapView' },
         { name: <div style={{ alignItems: 'center', display: 'flex', height: "15px" }}><img src="static/imgs/journeyViewIcon.svg" alt="modules" /><h5>Journey View</h5></div>, code: 'journeyView' },
@@ -98,10 +126,7 @@ const CreateNew = ({ importRedirect }) => {
 
     if (!userInfo) userInfo = userInfoFromRedux;
     else userInfo = userInfo;
-    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    if (localStorageDefaultProject) {
-        Proj = JSON.parse(localStorageDefaultProject);
-    }
+    
     const toastError = (erroMessage) => {
         if (erroMessage.CONTENT) {
             toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
@@ -230,7 +255,15 @@ const CreateNew = ({ importRedirect }) => {
         setLoading(false)
         toast.current.show({ severity: 'error', summary: 'Error', detail: error, life: 2000 })
     }
-
+    const handleViews = (data) =>{
+        if(moduleNewNode !== false){
+            toast.current.show({severity:'warn', summary:'Warn', detail:"Save the flow to change the view or remove newly added nodes."})
+        }
+        else{
+            setSelectedView(data.value)
+            handleViewsDropDown(data)
+        }
+    }
     const TopDropdowns = () => {
         return (
             <div className={`${handleTypeOfViewMap ==='folderView' ? "canvas_topbar_in_folderview": "canvas_topbar"}`}>
@@ -241,7 +274,7 @@ const CreateNew = ({ importRedirect }) => {
                                         id="views"
                                         className={'w-full md:w-12rem p-inputtext-sm'} 
                                         value={selectedView}
-                                        onChange={(e) => { setSelectedView(e.value); handleViewsDropDown(e) }}
+                                        onChange={(e) => handleViews(e) }
                                         options={views} 
                                         optionLabel="name"
                                         style={{height:'2rem'}}
@@ -258,6 +291,7 @@ const CreateNew = ({ importRedirect }) => {
                                             projectId={Proj.projectId}
                                             userId={userInfo.user_id}
                                             toast={toast}
+                                            configurationName={configurationName}
                                     />
                                 </div>
                                 {!isEnELoad ? <Fragment><Legends /></Fragment> : <Fragment><Legends isEnE={true} /> </Fragment>}
@@ -282,26 +316,26 @@ const CreateNew = ({ importRedirect }) => {
                             <FolderView setBlockui={setBlockui}/></div>}
                         {(handleTypeOfViewMap ==='tableView') && <h1>hello i am Table view</h1>}
                         
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <><div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
-                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />
-                            
+                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <>
+                        <div style={{ display: 'flex', height: '89vh', width: 'auto' }}>
+                            <ModuleListDrop setBlockui={setBlockui} appType={Proj.appType} module={moduleSelect} />  
                         </div>
-                        <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/> </>}
-
-                        {(handleTypeOfViewMap === "mindMapView" || handleTypeOfViewMap ==='journeyView') && <div id='mp__canvas' className='mp__canvas'>
-                            {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
-                                <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
-                                : <Fragment>
-                                    <ExportMapButton />
-                                    <SaveMapButton disabled={true} />
-                                </Fragment>
-                            )
-                                : ((Object.keys(moduleSelect).length > 0) ?
-                                    <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                            <TopDropdowns handleTypeOfViewMap = {handleTypeOfViewMap}/>
+                            <div id='mp__canvas' className='mp__canvas'>
+                                {!isEnELoad ? ((Object.keys(moduleSelect).length > 0) ?
+                                    <CanvasNew setBlockui={setBlockui} module={moduleSelect} verticalLayout={handleTypeOfViewMap ==='journeyView'?false:verticalLayout} setDelSnrWarnPop={setDelSnrWarnPop} displayError={displayError} toast={toast} appType={Proj.appType} />
                                     : <Fragment>
+                                        <ExportMapButton />
                                         <SaveMapButton disabled={true} />
-                                    </Fragment>)}
-                        </div>}
+                                    </Fragment>
+                                )
+                                    : ((Object.keys(moduleSelect).length > 0) ?
+                                        <CanvasEnE setBlockui={setBlockui} module={moduleSelect} verticalLayout={verticalLayout} displayError={displayError} />
+                                        : <Fragment>
+                                            <SaveMapButton disabled={true} />
+                                        </Fragment>)}
+                            </div>
+                        </>}
             </div> : null
                 }
             </Fragment>

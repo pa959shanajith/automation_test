@@ -270,7 +270,7 @@ const SamlConf = () => {
         </div>
 
         <div className="pb-3">
-          <label htmlFor="issueDetails" className="label_text">Issue Details</label>
+          <label htmlFor="issueDetails" className="label_text">Issuer Details</label>
           <InputText
             id="issueDetails"
             placeholder="Enter Issue Details"

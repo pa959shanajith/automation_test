@@ -40,10 +40,23 @@ const initialState = {
     opInput: "",
     reqHeader: "",
     reqBody: "",
+    reqAuthKeyword: "",
+    reqAuthInput: "",
     respHeader: "",
     respBody: "",
     paramHeader: "",
+    basicAuthUsername: "",
+    basicAuthPassword: "",
+    oAuthClientSecret:'',
+    oAuthScope: '',
+    oAuthGrantTypechange: 'client_credentials',
+    oAuthClientId: '',
+    oAuthUrl: '',
+    bearerTokenValue: ''
   },
+
+
+  
   wsdlError: [],
   actionError: [],
   copiedTestCases: {},
@@ -65,7 +78,12 @@ const initialState = {
   tagtestcase:false,
   debuggerPoints:[],
   advanceDebug:false,
-  enablePlayButton:false
+  enablePlayButton:false,
+  selectedRepository:{},
+  emptyDatatable:false,
+  currentplaybutton:null,
+  testCaseAssign:{},
+  moduleNewNodeAdd:false
 }
 
 export const designSlice = createSlice({
@@ -270,7 +288,23 @@ export const designSlice = createSlice({
 
     SetEnablePlayButton:(state,action)=>{
       state.enablePlayButton=action.payload
-  }
+  },
+    SetSelectedRepository:(state,action)=>{
+      state.selectedRepository=action.payload
+  },
+  SetEmptyDatatable:(state,action)=>{
+    state.emptyDatatable=action.payload
+},
+setCurrentDebugPlayButton:(state,action)=>{
+  state.currentplaybutton=action.payload
+},
+setTestCaseAssign:(state, action) =>{
+  state.testCaseAssign = action.payload
+},
+SetModuleNewNodeAdd:(state, action)=>{
+  state.moduleNewNodeAdd = action.payload
+}
+
 }
 })
 
@@ -316,6 +350,6 @@ export const { isCreateProjectVisible,projectList, moduleList, screenData,
   selectedScreenOfStepSlice,
   setUpdateScreenModuleId,setElementRepoModuleID,SetTagTestCases,SetDebuggerPoints ,
   SetAdvanceDebug,
-  SetEnablePlayButton} = designSlice.actions
+  SetEnablePlayButton,SetSelectedRepository,SetEmptyDatatable,setCurrentDebugPlayButton,setTestCaseAssign,SetModuleNewNodeAdd} = designSlice.actions
 
 export default designSlice.reducer

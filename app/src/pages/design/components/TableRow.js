@@ -12,6 +12,8 @@ import { Dialog } from 'primereact/dialog';
 import { getScreens } from '../api';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Tooltip } from 'primereact/tooltip';
+
 /*
     Component: TableRow
     Uses: Renders Each Row of the Table
@@ -34,7 +36,7 @@ import { Column } from 'primereact/column';
 
 const TableRow = (props) => {
     const dispatch=useDispatch()
-  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit} =props;
+  const{setInputKeywordName,setCustomTooltip,setLangSelect,setInputEditor,setAlloptions,setCustomEdit,assignUser} =props;
     const rowRef = useRef(null);
     const testcaseDropdownRef = useRef(null);
     const [checked, setChecked] = useState(false);
@@ -62,6 +64,7 @@ const TableRow = (props) => {
     const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
     const advanceDebug=useSelector(state=>state.design.advanceDebug)
     const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
+    const currentplaybutton=useSelector(state=>state.design.currentplaybutton)
    
     const [elementData, setElementData] = useState([]);
     const [visible, setVisible] = useState(false);
@@ -78,7 +81,8 @@ const TableRow = (props) => {
   }
   const CustomMenu = (value) => {
     return (
-      <MenuList {...value} style={{ width: '100%' }}>
+    <div style={{ width: '100%', position: 'relative', paddingBottom: "3rem"  }}>
+      <MenuList {...value} style={{ width: '100%'}}>
         {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
           <div key={index}>
             {child.props && child.props.data && child.props.data.isCode !== "" ? (
@@ -91,13 +95,15 @@ const TableRow = (props) => {
               ) : (
                 child
               )} */}
-                <img src='static/imgs/ic-jq-editsteps.png' alt='editImg' className='optionstyle_img'
+                <img src='static/imgs/pencil-edit_old.svg' alt='editImg' className='optionstyle_img testTooltip'
                   onClick={() => {
                     props.setStepOfCustomKeyword(props.stepSelect.check[0]);
                     props.setCustomKeyWord(objType);
                     hanldlecustomClick(child, objType);
                     setCustomEdit(true);
-                  }}
+                  }
+                }
+                title={'Edit'}
                 />
               </div>
             ) : (
@@ -110,10 +116,10 @@ const TableRow = (props) => {
             )}
           </div>
         ))}
-
-        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%" }} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
-        </Button>
       </MenuList >
+        <Button type="button" label='Custom Keyword' text raised style={{ fontSize: "2vh", width: "100%", position: 'absolute', bottom: 0, left: 0,backgroundColor:'#FFFF',zIndex:'2'}} value={'custom keyword'} icon="pi pi-plus" size="small" onClick={() => { props.setStepOfCustomKeyword(props.stepSelect.check[0]); props.setCustomKeyWord(objType); }}>
+        </Button>
+      </div>
 
       // <MenuList {...value}>
       //   {value.children && Array.isArray(value.children) && value.children.map((child, index) => (
@@ -616,16 +622,16 @@ const TableRow = (props) => {
 
     return (
         <>
-        <div ref={rowRef} style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row" + (props.idx % 2 === 1 ? " d__odd_row" : "") + (commented ? " commented_row" : "") + ((props.stepSelect.highlight.includes(props.idx)) ? " highlight-step" : "") + (disableStep ? " d__row_disable": "")}>
+        <div ref={rowRef} style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton && advanceDebug)?{background:' floralwhite ',color:'gray',borderTop:'1px solid gray',borderBottom:'1px solid gray'}:null}className={"d__table_row " + ((assignUser && props.idx % 2 === 1) ? " d__odd_row" : "") + ((assignUser && commented) ? " commented_row" : "") + (assignUser && ((props.stepSelect.highlight.includes(props.idx))) ? " highlight-step" : "") + ((assignUser && disableStep)  ? " d__row_disable": "")} >
                 <span className="step_col" onMouseEnter={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(true)}:null:null} onMouseLeave={advanceDebug?!debuggerPoint?()=>{setDebugeerInLightMode(false)}:null:null} style={{cursor:'pointer',display:'flex',justifyContent:'space-evenly',alignItems:'center'}} 
                 onClick={ActivateDebuggerPoint}>
-                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && debuggerPoints[0]===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
+                  <span title={debuggerPoint?'Breakpoint':null}><i style={(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton)?{fontSize:'20px'}:{fontSize:'13px'}} className={advanceDebug?(debuggerPoints.length>=1 && currentplaybutton===props.idx+1 && enablePlayButton )?'pi pi-caret-right':debuggerPoint?'pi pi-circle-fill':debugeerInLightMode?'pi pi-circle-fill light-fill':'pi pi-circle-fill light-fill-zero':null} /></span>
                   <span>{props.idx + 1}</span>
                   </span>
-                <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck}/></span>
+                <span className="sel_col"><input className="sel_obj" type="checkbox" checked={checked} onChange={onBoxCheck} disabled={!assignUser}/></span>
             <div className="design__tc_row" onClick={!focused ? onRowClick : undefined}>
                 <span className="objname_col">
-                    { focused ? 
+                    { focused && assignUser ? 
                     // <select className="col_select" value={objName} onChange={onObjSelect} onKeyDown={submitChanges} title={objName} autoFocus>
                     //     { objName === "OBJECT_DELETED" && <option disabled>{objName}</option> }
                     //     { objList.map((object, i)=> <option key={i} value={object}>{object.length >= 50 ? object.substr(0, 44)+"..." : object}</option>) }
@@ -640,7 +646,7 @@ const TableRow = (props) => {
                     }
                 </span>
                 <span className="keyword_col" title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ?props.keywordData[objType][keyword].tooltip:""} >
-                    { focused ? 
+                    { focused && assignUser  ? 
                     <>
                         <Select className='select-option' value={selectedOptions.label !== undefined?selectedOptions.label !== ''?selectedOptions.label!==selectedOptions.value?selectedOptions:objType !== null? {label:props.keywordData[objType][selectedOptions.value]?.description!==undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword, value:props.keywordData[objType][selectedOptions.value]?.description!== undefined?!props.arrow?props.keywordData[objType][selectedOptions.value]?.description:selectedOptions.value:keyword}:selectedOptions:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}:{label:!props.arrow?props.keywordData[objType][props.getKeywords(props.testCase.custname).keywords[0]]?.description:props.getKeywords(props.testCase.custname).keywords[0], value:keyword}} id="testcaseDropdownRefID" blurInputOnSelect={false} ref={testcaseDropdownRef} isDisabled={objName==="OBJECT_DELETED"?true:optionKeyword === undefined?true:false} onChange={onKeySelect} onKeyDown={submitChanges} title={props.keywordData[objType] && keyword !== "" && props.keywordData[objType][keyword] && props.keywordData[objType][keyword].tooltip !== undefined ? props.keywordData[objType][keyword].tooltip : ""} isMulti={false} closeMenuOnSelect={false} components={{ MenuList: CustomMenu }} options={optionKeyword}  menuPortalTarget={document.body} styles={customStyles} getOptionLabel={getOptionLabel} menuPlacement="auto" placeholder='Select'/>                    
                     </> :
@@ -652,20 +658,20 @@ const TableRow = (props) => {
                         </select> */}
           </span>
           <span className="input_col" >
-            {focused ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ?
+            {focused && assignUser ? ['getBody', 'setHeader', 'setWholeBody', 'setHeaderTemplate'].includes(keyword) ?
               <textarea className="col_inp col_inp_area" value={input} onChange={onInputChange} title={inputPlaceholder} disabled={disableStep} /> :
               <input className="col_inp" value={input} placeholder={inputPlaceholder} onChange={onInputChange} onKeyDown={submitChanges} title={inputPlaceholder} disabled={disableStep} /> :
               <div className="d__row_text" title={input}>{draggable ? (input.length > 40 ? input.substr(0, 34) + "......" : input) : input}</div>}
           </span>
           <span className="output_col" >
-            {focused ? <input className="col_out" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep} /> :
+            {focused && assignUser ? <input className="col_out" value={output} placeholder={outputPlaceholder} onChange={onOutputChange} onKeyDown={submitChanges} title={outputPlaceholder} disabled={disableStep} /> :
               <div className="d__row_text" title={output}>{output}</div>}
           </span>
         </div>
         {/* <span className={"remark_col"+(disableStep? " d__disabled_step":"")}  onClick={(e)=>onRowClick(e, "noFocus")}><img src={"static/imgs/ic-remarks-" + (remarks.length > 0 ? "active.png" : "inactive.png")} alt="remarks" onClick={()=>{props.showRemarkDialog(props.idx); setFocused(false)}} /></span> */}
         <span className={"details_col" + (disableStep ? " d__disabled_step" : "")} onClick={(e) => onRowClick(e, "noFocus")}>
           <span>
-          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg' onClick={() => { props.showDetailDialog(props.idx); setFocused(false) }} />
+          <img src={"static/imgs/ic-details-" + (TCDetails !== "" ? (TCDetails.testcaseDetails || TCDetails.actualResult_pass || TCDetails.actualResult_fail) ? "active.png" : "inactive.png" : "inactive.png")} alt="details" title='Details' className='eyeIconImg'  onClick={assignUser ?() => { props.showDetailDialog(props.idx); setFocused(false) }:null} style={{cursor: assignUser ? 'pointer' : 'not-allowed'}} />
           {objName !== "" && <> {objName !== "OBJECT_DELETED" && props.typesOfAppType === 'Web' && (!list.includes(objName)) && <span onClick={()=>showCard(objName)} title='Element Properties' className='pi pi-eye eyeIcon3'></span>}</>}</span>
         </span>
       </div>

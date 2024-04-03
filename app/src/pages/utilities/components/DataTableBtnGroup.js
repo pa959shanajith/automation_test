@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 import ClickAwayListener from 'react-click-away-listener';
 import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
 import { ScrollBar, VARIANT, Messages as MSG, setMsg } from '../../global';
-import ExportDataTable from './ExportDataTable';
 import { setCopyCells } from '../UtilitySlice';
 import ImportPopUp from './ImportPopUp';
 import * as utilApi from '../api';
@@ -203,7 +202,6 @@ const TableActionButtons = props => {
         <>
         <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
         <div className="dt__table_ac_btn_grp">
-            { showPS && <DtPasteStepDialog setShow={setShowPS} show={showPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
             {
                 tableActionBtnGroup.map((btn, i) => 
                     <button data-test="dt__tblActionBtns" key={i} className={"dt__tblBtn "+(props.dnd && btn.alt && btn.alt==="Drag Row"?"selected-btn":"")} onClick={()=>btn.onClick()}>
@@ -220,6 +218,8 @@ const TableActionButtons = props => {
 
 const CreateScreenActionButtons = props => {
     const toast= useRef();
+    const [createTable,setCreateTable] = useState(false);
+
     const toastError = (erroMessage) => {
         if (erroMessage && erroMessage.CONTENT) {
           toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
@@ -234,7 +234,7 @@ const CreateScreenActionButtons = props => {
         else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
       }
 
-    const [importPopup, setImportPopup] = useState(false);
+    // const [importPopup, setImportPopup] = useState(false);
 
     const goToEditScreen = () => {
         let arg = prepareSaveData(props.tableName, props.headers, props.data);
@@ -268,7 +268,11 @@ const CreateScreenActionButtons = props => {
                     switch (resp) {
                         case "exists": toastError(MSG.UTILITY.ERR_TABLE_EXIST); break;
                         case "fail": toastError(MSG.UTILITY.ERR_CREATE_TADATABLE); break;
-                        case "success": toastSuccess(MSG.UTILITY.SUCC_SAVE_DATATABLE); break;
+                        case "success": {
+                            toastSuccess(MSG.UTILITY.SUCC_SAVE_DATATABLE);
+                            setCreateTable(true);
+                            break;
+                        }
                         default: toastError(resp.error); break;
                     }   
                     props.setErrors({}); 
@@ -285,11 +289,11 @@ const CreateScreenActionButtons = props => {
     return (
         <>
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-        { importPopup && <ImportPopUp setImportPopup={setImportPopup} importPopup={importPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />}
-        <div className="dt__taskBtns">
-            <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Import" label='Import' onClick={() => setImportPopup(true)} ></Button>
-            <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Edit" label='Edit' onClick={goToEditScreen}></Button>
-            <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Create"  label='Create' onClick={saveDataTable}></Button>
+        {/* { importPopup && <ImportPopUp setImportPopup={setImportPopup} importPopup={importPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />} */}
+        <div className="dt__taskBtns_create">
+            {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Import" label='Import' onClick={() => setImportPopup(true)} ></Button> */}
+            {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Edit" label='Edit' onClick={goToEditScreen}></Button> */}
+            <Button className="dt__taskBtn dt__btn"  data-test="dt__tblActionBtns" title="Create"  label='Create' onClick={saveDataTable} disabled={createTable}></Button>
         </div>
         </>
     );
@@ -311,7 +315,6 @@ const EditScreenActionButtons = props => {
         else toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
       }
 
-    const [showExportPopup, setShowExportPopup] = useState(false);
 
     const confirmDelete = async() => {
         try{
@@ -380,11 +383,10 @@ const EditScreenActionButtons = props => {
     return (
         <>
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} showExportPopup={showExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} /> }
         <div className="dt__taskBtns">
-            <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Export" label='Export' onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} ></Button>
-            <Button className="dt__taskBtn dt__btn" title="Delete" label='Delete' onClick={confirmDelete} disabled={!props.tableName}></Button>
-            <Button className="dt__taskBtn dt__btn" title="Update"  label='Update' onClick={updateTable} disabled={props.dataValue}></Button>
+            {/* <Button className="dt__taskBtn dt__btn" data-test="dt__tblActionBtns" title="Export" label='Export' onClick={()=>setShowExportPopup(true)} disabled={!props.tableName} ></Button> */}
+            <Button className='mr-2' outlined title="Delete" label='Delete' onClick={confirmDelete} disabled={!props.tableName}></Button>
+            <Button title="Update"  label='Update' onClick={updateTable} ></Button>
         </div>
         </>
     );
@@ -450,9 +452,9 @@ const SearchDataTable = props => {
     return(
         <>
          <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
-        {/* <div>Enter Table Name:</div> */}
         <ClickAwayListener onClickAway={()=>setDropdown(false)}>
-        <div className="dt__selectTable pb-5">Select Data Table:
+        <div className="dt__selectTable flex flex-column gap-1 pb-8 pl-3">
+        <label data-test="Data Table Name" className='dt_name' style={{ paddingLeft: '0.2rem',paddingBottom:'0.3rem' }}>Select Data Table</label>
         <div className="dt__searchDataTable">
             <input ref={searchRef} type='text' autoComplete="off" className="btn-users edit-user-dropdown-edit" onChange={inputFilter} onClick={resetField} placeholder="Search Data Table..."/>
             <div className="dt__form_dropdown" role="menu" style={{display: (dropdown?"block":"none")}}>

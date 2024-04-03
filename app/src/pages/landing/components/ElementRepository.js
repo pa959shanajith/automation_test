@@ -14,12 +14,15 @@ import { Toast } from 'primereact/toast';
 import * as scrapeApi from '../../design/api';
 import { v4 as uuid } from 'uuid';
 import { insertScreen } from '../../design/api';
+import { insertRepository } from '../../design/api';
 import { Tag } from 'primereact/tag';
 import { ScreenOverlay,RedirectPage } from '../../global';
 import { Dialog } from 'primereact/dialog';
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'primereact/tooltip';
+import { Card } from 'primereact/card';
+import { OverlayPanel } from 'primereact/overlaypanel';
 
 const ElementRepository = (props) => {
   const history = useNavigate();
@@ -64,7 +67,22 @@ const ElementRepository = (props) => {
   const [deleteScreens, setDeleteScreens] = useState(false);
   const [overlay, setOverlay] = useState(null);
   const [screenRename,setScreenRename] =  useState("");
-  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false)
+  const [elementPropertiesUpdated, setElementPropertiesUpdated] = useState(false);
+  const [pastedData, setPastedData] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchText, setSearchText] =  useState("");
+  // const [showTestCases, setShowTestCases] = useState(false);
+  const op = useRef(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [repositoryName, setRepositoryName] = useState("");
+  const [noRepository, setNoRepoSitory] = useState(false);
+
+
+  const testcasename=[
+    {label:"testcase 1"},
+    {label:"testcase 2"},
+    {label:"testcase 3"}
+  ]
 
 
     const localStorageDefaultProject = localStorage.getItem('DefaultProject');
@@ -92,7 +110,8 @@ const ElementRepository = (props) => {
             else if(screens === "invalid session") return RedirectPage(history);
             else {
               setOverlay("")
-              setScreenData(screens.screenList);
+              setScreenData(screens.screenList.reverse());
+              setFilteredData(screens.screenList)
               setScreenId(false);
             }
         } catch (error) {
@@ -109,20 +128,21 @@ const ElementRepository = (props) => {
 
 
   useEffect(() => {
+    if(copiedRow!==null){
     // Assuming copiedScreenData is a state variable
-    if(accordionIndex !== null){const updatedScreen = screenData[accordionIndex];
+    if(accordionIndex !== null && pastedData){const updatedScreen = screenData[accordionIndex];
     setCopiedScreenData(updatedScreen);
-  
+      let orderlist=copiedRow.map(element=>element._id)
     // Now, construct the params object using the updatedScreen
     let params = {
       deletedObj: [],
       modifiedObj: [],
-      addedObj: { view: [{...copiedRow, tempOrderId: copiedRow?.tempOrderId ? copiedRow?.tempOrderId :uuid()}]},
+      addedObj: { },
       screenId: updatedScreen["_id"],
       userId: userInfo.user_id,
       roleId: userInfo.role,
       param: 'screenPaste',
-      orderList: [copiedRow?._id],
+      orderList: orderlist
     };
 
     scrapeApi.updateScreen_ICE(params)
@@ -134,14 +154,17 @@ const ElementRepository = (props) => {
           setCopiedRow(null);
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Elements copied.', life: 5000 });
           setUpdatPastedData(true);
+          setPastedData(false);
+          setSelectedCapturedElement([]);
         }
         
         
   }})
    .catch(error => console.log(error))
     }
+  }
     // Use params as needed
-  }, [accordionIndex,copiedRow != null]);
+  }, [accordionIndex,pastedData]);
 
   const pasteRow = (targetAccordionIndex) => {
     setAccordionIndex(targetAccordionIndex);
@@ -154,14 +177,17 @@ const ElementRepository = (props) => {
                 // related_dataobjects: [...screen.related_dataobjects, copiedRow],
                 // orderlist: [...screen.orderlist, copiedRow["_id"]],
                 related_dataobjects: screen.related_dataobjects.length === 0
-                ? [copiedRow]
-                : [...screen.related_dataobjects, copiedRow],
-              orderlist: screen.orderlist ? [...screen.orderlist, copiedRow["_id"]] : [copiedRow["_id"]]
+                ? [...copiedRow]
+                : [...screen.related_dataobjects, ...copiedRow],
+              orderlist: screen.orderlist ? [...screen.orderlist, ...copiedRow.map(element=>element._id)] : [...copiedRow.map(element=>element._id)]
               }
             : screen
         );
+        console.log(updatedScreens)
         return updatedScreens;
+        setPastedData(true)
       });
+      setPastedData(true);
     }
     else toast.current.show({ severity: 'error', summary: 'Error', detail: 'Copy any row before pasting.', life: 5000 });
   };
@@ -172,7 +198,12 @@ const ElementRepository = (props) => {
       // Check if orderlist exists in screenItem
       if (screenItem.orderlist) {
         const matchingOrderItem = screenItem.orderlist?.find((orderItem) => {
-          return orderItem?._id === rowData?._id && orderItem?.flag === true;
+          if(typeof orderItem=="string"){
+           return orderItem === rowData?._id
+          }
+          else{
+            return orderItem?._id === rowData?._id && orderItem?.flag === true;
+          }
         });
     
         if (matchingOrderItem) {
@@ -197,17 +228,29 @@ const ElementRepository = (props) => {
     
 
     const uniqueArray = isUnique(matchingDataArray, '_id');
+    console.log(uniqueArray)
     // dispatch(loadUserInfoActions.updateElementRepository(true));
     return (
       <>
         <div className='flex justify-content-between'>
-          <div className={`flex flex-row ${uniqueArray.some(item => item.flag === true) ? ' blue-text' : ''}`} title={rowData.custname}>
+          <div className="flex flex-row" title={rowData.custname}>
           {rowData.custname && rowData.custname.length > 20 ? rowData.custname.substring(0, 20) + '...' : rowData.custname}
           </div>
-          <div>{uniqueArray.map((item)=>(
+          <div>{Array.isArray(uniqueArray) && uniqueArray.length > 0 && uniqueArray.map((item)=>(
               item.flag === true ?<img src='static/imgs/Reused_icon.svg' className='reused__icon' /> : ""
             ))}
           </div>
+          {/* <div>
+            <img src='static/imgs/elements_used_in tescases_icon.svg' className='element_used_testcase' onMouseEnter={(e) => op.current.toggle(e)} onMouseLeave={()=> op.current.hide()}/>
+          </div>
+            <OverlayPanel ref={op} className='overlay_panel'>
+              <div className='flex flex-column'>
+                <span className='testcase__name'>TestCase Name</span>
+                {testcasename.map((testcase)=>{
+                  return <span className='flex flex-column testcase_name_list'>{testcase.label}</span>
+                })}
+              </div>
+            </OverlayPanel> */}
       </div>
       </>
     );
@@ -216,8 +259,13 @@ const ElementRepository = (props) => {
 
 
   const handleAddAccordion = () => {
+
+    if(screenData?.map((item)=>item.name).includes(repositoryName)){
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Duplicate repository names are not allowed', life: 5000 });
+    }
+    else{
     const newScreen = {
-      name: `Repository_${screenData.length + 1}`,
+      name: repositoryName,
       related_dataobjects: [] // Add your initial data structure here
     };
     setNewScreenCount(newScreenCount + 1);
@@ -231,13 +279,18 @@ const ElementRepository = (props) => {
       param : 'create'
     }
     insertScreen(params)
+    // insertRepository(params)
     .then(response =>  {
       if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unable to add repository, try again!', life: 5000 });
       else if(response === "invalid session") return RedirectPage(history);
       else {
-        setScreenData([...screenData, newScreen]);
+        const addingScreen = [newScreen,...screenData];
+        setScreenData(addingScreen);
         setScreenId(true);
         dispatch(loadUserInfoActions.updateElementRepository(true));
+        setRepositoryName("")
+        setActiveAccordionIndex(0);
+        setShowDialog(false)
         toast.current.show({ severity: 'success', summary: 'Success', detail: 'Repository added.', life: 5000 });
       }
 
@@ -245,6 +298,7 @@ const ElementRepository = (props) => {
   })
     
     .catch(error => console.log(error))
+}
   };
 
 
@@ -273,6 +327,7 @@ const handleAccordionNameEdit = (index,e) => {
   }
  
   insertScreen(params)
+  // insertRepository(params)
   .then(response =>  {
     if (response == "fail") toast.current.show({ severity: 'error', summary: 'Error', detail: 'Unabel to rename, try again!', life: 5000 });
     else if(response === "invalid session") return RedirectPage(history);
@@ -304,6 +359,7 @@ const handleChangeScreenName=(index,e)=>{
     contextMenuRef.current.show(event.originalEvent);
 
     const selectedRowData = event.data;
+    const isSelected = selectedCapturedElement.includes(selectedRowData);
 
     if (!selectedRowData || Object.keys(selectedRowData).length === 0) {
       // If rowData is empty, show only the 'Paste' option
@@ -323,7 +379,8 @@ const handleChangeScreenName=(index,e)=>{
         {
           label: 'Copy',
           icon: 'pi pi-copy',
-          command: () => copyRow(selectedRowData),
+          command: () => copyRow(selectedCapturedElement),
+          disabled:(!isSelected)
         },
         {
           label: 'Paste',
@@ -379,19 +436,17 @@ const handleChangeScreenName=(index,e)=>{
           setElementProperties(false)
           setScreenId(true);
 
-          // setMsg(MSG.SCRAPE.SUCC_OBJ_PROPERTIES);
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Element properties updated successfully', life: 6000 });
 
 
-          // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+          
 
         }
       })
       .catch(error => {
         console.log(error)
 
-        // setMsg("Some Error occured while updating element properties.");
-        // setIdentifierList([{id:1,identifier:'xpath',name:'Absolute X-Path '},{id:2,identifier:'id',name:'ID Attribute'},{id:3,identifier:'rxpath',name:'Relative X-Path'},{id:4,identifier:'name',name:'Name Attribute'},{id:5,identifier:'classname',name:'Classname Attribute'}])
+     
       }
       )
       setSelectedCapturedElement([])
@@ -526,6 +581,7 @@ const handleChangeScreenName=(index,e)=>{
 
   const renderActionsCell = (screenDetails,rowData) => {
     if (Object.keys(rowData).length > 0) {
+      const isSelected = selectedCapturedElement.includes(rowData);
       let selectedElement = [];
       selectedElement.push(rowData);
       setScrapeDataForIris(rowData);
@@ -536,9 +592,15 @@ const handleChangeScreenName=(index,e)=>{
   
           const result=[];
 
+
         const matchingOrderItem = screenDetails.orderlist?.find((orderItem) => {
-          return orderItem._id === rowData._id && orderItem.flag === true;
-        });
+          // Check if orderItem is not null and if it has _id and flag properties
+          if (orderItem && orderItem._id && orderItem.flag) {
+              return orderItem._id === rowData._id && orderItem.flag === true;
+          } else {
+              return false; // Skip null or incomplete orderItem
+          }
+      });
 
         if (matchingOrderItem) {
           result.push(matchingOrderItem);
@@ -547,14 +609,13 @@ const handleChangeScreenName=(index,e)=>{
 
         
 
-          // console.log(hasFlagTrue)
-      // Move the return statement outside the forEach loop
+
       return (
         <div className='flex flex-row justify-content-evenly'>
           {defaultselectedProject.appType === "Web" ? (
             <div>
               <Tooltip target=".pencil-edit" position='bottom' content='Edit'/>
-              <i className="pi pi-pencil pencil-edit"
+              <i className={`pi pi-pencil pencil-edit ${isSelected ? 'disabled-icon' : ''}`}
                 onClick={() => {
                   setSelectedCapturedElement(selectedElement);
                   openElementProperties(rowData);
@@ -563,7 +624,8 @@ const handleChangeScreenName=(index,e)=>{
           <div>
           <Tooltip target=".trash-icon" position='bottom' content='Delete'/>
           <i
-            className='pi pi-trash trash-icon'
+            className={`pi pi-trash trash-icon ${isSelected ? 'disabled-icon' : ''}`}
+            disabled={isSelected}
             onClick={() => {
               if (result.length>0) {
                 setResusedDeleteElement(true);
@@ -583,8 +645,7 @@ const handleChangeScreenName=(index,e)=>{
         </div>
       );
     }
-  
-    // Return a default value or null outside the if condition
+
     return null;
   };
   
@@ -718,7 +779,14 @@ const saveDeletedElements = (screenDetails,deletedArr) => {
     'userId': userInfo.user_id,
     'roleId': userInfo.role,
     'param': 'delElement',
-    'orderList': screenDetails.orderlist
+    'orderList': screenDetails.orderlist.map(element=> {
+      if(typeof element == "string"){
+        return element
+    }
+    else{
+      return element._id
+    }
+  })
   }
 
   scrapeApi.updateScreen_ICE(params)
@@ -762,29 +830,30 @@ const handleDeleteRow = (selectedCapturedElement,screenDetails) => {
 
   screenData.forEach(screen => {
     // Update orderlist by removing the item
-    setOrderList(screen.orderlist?.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
-    }))
+    screen.orderlist = screen.orderlist?.filter(item => {
+      return item && (item !== selectedCapturedElement[0]["_id"]);
+    })
   
     // Update related_dataobjects by removing the item
     screen.related_dataobjects = screen.related_dataobjects.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
     });
   })
 
   screenDetails.orderlist?.filter(item=>{
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item !== selectedCapturedElement[0]["_id"]);
   })
 
   screenDetails.related_dataobjects.filter(item => {
-    return item && (item._id !== selectedCapturedElement["_id"]);
+    return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
 
-  deletedArr.push(selectedCapturedElement["_id"]);
+  deletedArr.push(selectedCapturedElement[0]["_id"]);
 
   setDeleted(deletedArr)
   saveElements(screenDetails,deletedArr);
+  setSelectedCapturedElement([])
 
 }
 
@@ -799,67 +868,50 @@ const onRowClick = (e) => {
 const deleteCurrentElement = (selectedCapturedElement,screenDetails) =>{
   let deletedArr = [...deleted];
   screenData.forEach(screen => {
-    // Update orderlist by removing the item
-    // setOrderList(screen.orderlist?.filter(item => {
-    //   return item && (item._id !== selectedCapturedElement["_id"]);
-    // }))
-    screen.orderlist = screen.orderlist?.filter(item => item && (item._id !== selectedCapturedElement["_id"]));
+    screen.orderlist = screen.orderlist?.filter(item => item && (item._id !== selectedCapturedElement[0]["_id"]));
     // Update related_dataobjects by removing the item
     screen.related_dataobjects = screen.related_dataobjects.filter(item => {
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
     });
   })
 
   screenDetails.orderlist?.filter(item=>{
-      return item && (item._id !== selectedCapturedElement["_id"]);
+      return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
   screenDetails.related_dataobjects.filter(item => {
-    return item && (item._id !== selectedCapturedElement["_id"]);
+    return item && (item._id !== selectedCapturedElement[0]["_id"]);
   })
 
 
-  deletedArr.push(selectedCapturedElement["_id"]);
+  deletedArr.push(selectedCapturedElement[0]["_id"]);
 
   setDeleted(deletedArr)
   saveDeletedElements(screenDetails,deletedArr)
+  setSelectedCapturedElement([])
 }
 
 const deleteElement = (selectedCapturedElement,screenDeatils) =>{
   let deletedArr = [...deleted];
-  // const screensToUpdate = screenData.filter(screen =>
-  //   screen.orderlist?.filter(item => item?._id === selectedCapturedElement["_id"]) ||
-  //   screen.related_dataobjects?.filter(item => item?._id === selectedCapturedElement["_id"])
-  // );
-  
-  // Step 2: Update orderlist and related_dataobjects for each screen
   screenData.forEach(screen => {
-    screen.orderlist = screen.orderlist?.filter(item => item?._id !== selectedCapturedElement["_id"]);
-    screen.related_dataobjects = screen.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement["_id"]);
+    screen.orderlist = screen.orderlist?.filter(item => item?._id !== selectedCapturedElement[0]["_id"]);
+    screen.related_dataobjects = screen.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement[0]["_id"]);
   });
 
-  
-  // Step 3: Update orderlist and related_dataobjects in screenDeatils
-  // screenDeatils.orderlist = screenDeatils.orderlist?.filter(item => item?._id !== selectedCapturedElement["_id"]);
-  // screenDeatils.related_dataobjects = screenDeatils.related_dataobjects?.filter(item => item?._id !== selectedCapturedElement["_id"]);
-  
-  // Step 4: Update deletedArr and saveDeletedElements
-  const updatedDeletedArr = [...deletedArr, selectedCapturedElement["_id"]];
+
+  const updatedDeletedArr = [...deletedArr, selectedCapturedElement[0]["_id"]];
   setDeleted(updatedDeletedArr);
-//  for(let i=0; i<screenData.length;i++){
-//   saveDeleteAllElements(screenData[i], updatedDeletedArr);
-// }
+
   saveDeleteAllElements(updatedDeletedArr);
+  setSelectedCapturedElement([]);
 }
 
 const saveScreens = (screenDetails) => {
     let params = {
-        screenIds: [screenDetails._id],
-      scenarioIds:[],
-      testcaseIds:[],
+        repoId: screenDetails._id,
     }
   
-    scrapeApi.deleteScenario(params)
+    scrapeApi.deleteElementRepo(params)
       .then(response =>  {
         if (response == "success") {
           toast.current.show({ severity: 'success', summary: 'Success', detail: 'Rpository deleted.', life: 5000 });
@@ -873,7 +925,6 @@ const saveScreens = (screenDetails) => {
   }
 
 const deleteScreen = (index, screenDetails)=>{
-    // const allScreenData = [...screenData]
     const updatedScreenData = screenData.filter(screen => screen._id !== screenDetails._id);
       setScreenData(updatedScreenData);
       saveScreens(screenDetails);
@@ -881,6 +932,37 @@ const deleteScreen = (index, screenDetails)=>{
         setActiveAccordionIndex(null); // Close the deleted accordion
     }
 
+}
+
+const handleSearchChange=(event) => {
+  const inputValue= event.toLowerCase();
+  setSearchText(inputValue);
+  if (inputValue !== "") {
+    const filterScreenName = filteredData.filter((item) =>
+      item.name.toLowerCase().includes(inputValue)
+    );
+    if(!filterScreenName.length){
+      setNoRepoSitory(true)
+    }
+    setScreenData(filterScreenName);
+  } 
+  else {
+    setScreenData(filteredData);
+    setNoRepoSitory(false);
+  }
+}
+
+const footer =()=>(
+  <Button label='Save' className='repository__save__btn' onClick={()=>handleAddAccordion()} disabled={!repositoryName}/>
+)
+
+const handleRepositoryName =(e)=>{
+  if (e.target.value.includes(' ') || e.keyCode === 32) {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Space are not allowed!', life: 5000 });
+    e.preventDefault();
+    return;
+  }
+  setRepositoryName(e.target.value)
 }
 
 
@@ -894,14 +976,45 @@ const deleteScreen = (index, screenDetails)=>{
     {overlay && <ScreenOverlay content={overlay} />}
     <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
     <div className='element-repository'>
-      {screenData?.length === 0 ? 
+      {/* <Card className='add__search__design'> */}
+        <div className='flex justify-content-between'>
+        {/* <span className='search__button'>
+            <Button label={<i className="pi pi-plus"></i>} className='button__elements' onClick={()=>setShowDialog(true)}></Button>
+            <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
+        </span> */}
+        <span className="p-input-icon-left search__class">
+              <i className="pi pi-search" />
+              <InputText placeholder="Search for element repository" value={searchText} onChange={(event) =>
+                        event &&
+                        event.target &&
+                        handleSearchChange(event.target.value)} />
+        </span>
+        {screenData.length && <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>}
+          <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
+        {/* </span>
+        <Button label='Design Studio'>
+           <img src="static/imgs/design_studio_icon 1.svg" style={{ color: "white", fill: "white", width: "100%" }} />
+        </Button>
+        <span> */}
+        {/* <span>
+        <Button type="designStudio" size="small" style={buttonStyle_design} onClick={(e) => handleNext("Design Studio")} >
+              <div className='flex justify-content-center align-items-center'>
+                <img src="static/imgs/design_studio_icon 1.svg" style={{ color: "white", fill: "white", width: "100%" }} />
+              </div>
+              <div>Design Studio</div>
+        </Button><Dropdown className='overviewDropdown' value={selectOverview} onChange={(e) => setSelectOverview(e.value)} options={optionOverview} optionLabel="name"/>
+        </span> */}
+          {/* <div>Design Studio</div>
+           */}
+        {/* </span> */}
+        </div>
+      {/* </Card> */}
+      {screenData?.length === 0 && 
       (<div className='empty_msg flex flex-column align-items-center justify-content-center'>
         <img className="not_captured_ele" src="static/imgs/ic-capture-notfound.png" alt="No data available" />
-        <p className="not_captured_message">No Element Repository yet</p>
-        <Button label='Create Repository' onClick={handleAddAccordion} />
-        </div>)
-      :<><Button label='Add Repository' className='button__elements' onClick={handleAddAccordion}></Button>
-      <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip></>}
+        <p className="not_captured_message">{noRepository ?"No Element Repository found for entered text":"No element repository created yet."}</p>
+        {!noRepository && <Button className='create__btn' label='Create Repository' onClick={()=>setShowDialog(true)} />}
+        </div>)}
        <Accordion className='accordion-class p-2' activeIndex={activeAccordionIndex} onTabChange={(e) => setActiveAccordionIndex(e.index)}>
         {screenData?.map((screenDetails,index) => (
           <AccordionTab key={index} header={
@@ -915,9 +1028,6 @@ const deleteScreen = (index, screenDetails)=>{
                   {editingIndex === index ? (
                     <InputText
                       className='input__field'
-                      // value={value?.length>0 ? value :screenDetails.name}
-                      // // onChange={(e) => handleAccordionNameEdit(index, e.target.value)}
-                      // onChange={(e) => setValue(e.target.value === null || e.target.value === undefined ? '' : e.target.value)}
                       value={screenDetails.name}
                       onChange={(e) =>handleChangeScreenName(index,e) }
                       onKeyDown={(e)=>handleAccordionNameEdit(index,e)}
@@ -950,10 +1060,12 @@ const deleteScreen = (index, screenDetails)=>{
               onContextMenu={(e) => handleContextMenu(e, index)}
               size='small'
               emptyMessage="No data found"
-              selectionMode={"single"}
               selection={selectedCapturedElement}
-              onSelectionChange={onRowClick}
+              selectionMode='multiple' 
+              className='repo__datatable'
+              onSelectionChange={(e)=>onRowClick(e)} 
             >
+              <Column selectionMode={screenDetails.related_dataobjects.length === 0?'none':"multiple" } headerStyle={{ width: '1rem' }}></Column>
               <Column field="custname" header="Element Name" body={(rowData) => renderElementName(rowData)}
               editor={(options) => {
                 if (!options.rowData || Object.keys(options.rowData).length === 0) {
@@ -989,12 +1101,11 @@ const deleteScreen = (index, screenDetails)=>{
               {reusedDeleteElement && <Dialog className='delete_reuse_dailog' visible={reusedDeleteElement} onHide={()=>setResusedDeleteElement(false)} icon="pi pi-exclamation-triangle" footer={<>
                         <Button label='Delete current' onClick={()=>{setResusedDeleteElement(false);deleteCurrentElement(selectedCapturedElement,screenDetails)}} text/>
                         <Button label='Delete everywhere' onClick={()=>{setResusedDeleteElement(false);deleteElement(selectedCapturedElement,screenDetails)}}/>
-                        {/* <Button onClick={()=>setResusedDeleteElement(false)} label='Cancel'/>         */}
                     </>}
                     >
                       <DelReuseMsgContainer message={reuseDelMessage}/>
                     </Dialog>
-        }
+              }
             {/* ))} */}
             
         </AccordionTab>
@@ -1018,6 +1129,9 @@ const deleteScreen = (index, screenDetails)=>{
             </DataTable>
           </div>
         </Dialog>: null }
+        <Dialog className='RepositoryDailog' header="Add repository" visible={showDialog} onHide={()=>{setRepositoryName("");setShowDialog(false)}} footer={footer}>
+            <InputText value={repositoryName} className='repository__input' onChange={handleRepositoryName} placeholder='Enter repository name'/>
+          </Dialog>
     </div>
     </>
   );

@@ -173,7 +173,10 @@ const InputBox = (props) => {
                     node.children.forEach(child => {
                         if (child.id === dNodes[pi].id) {
                             child.name = dNodes[pi].name;
-                            child.parent.name = dNodes[pi].name;
+                            if(child.parent.type === "teststepsgroups"){
+                               child.parent.parent.name = dNodes[pi].name;
+                            }else if(child.parent.type === "scenarios"){child.parent.parent.name = dNodes[pi].name;}
+                            else{ child.parent.name = dNodes[pi].name;}
                             // Use map on child.parent.children to update specific child
                             if(child.parent.children[0].id === dNodes[pi].id){
                                 child.parent.children = child.parent.children.map(subChild => {

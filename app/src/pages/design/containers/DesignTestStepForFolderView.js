@@ -337,17 +337,30 @@ const DesignModal = (props) => {
                                 for(let object in keywordData) {
                                     let firstList = [];
                                     let secondList = [];
-                                    for(let keyword in keywordData[object]){
-                                        if(keywordData[object][keyword]['ranking']){
-                                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
-                                                [keyword] : keywordData[object][keyword]
-                                            });
+                                    for (let keyword in keywordData[object]) {
+                                        if (keywordData[object][keyword]['ranking']) {
+                                            const index = keywordData[object][keyword]['ranking'] - 1;
+                                            let key = keyword;
+                                    
+                                            // Check if the index already exists in firstList
+                                            let newIndex = index;
+                                            while (firstList[newIndex]) {
+                                                newIndex++;
+                                            }
+                                    
+                                            // Create a new object at the new index if necessary
+                                            if (!firstList[newIndex]) {
+                                                firstList[newIndex] = {};
+                                            }
+                                    
+                                            // Assign the keyword to the new index
+                                            firstList[newIndex][key] = keywordData[object][keyword];
                                         } else {
-                                            secondList.push(({
-                                                [keyword] :keywordData[object][keyword]
-                                            }));
+                                            secondList.push({
+                                                [keyword]: keywordData[object][keyword]
+                                            });
                                         }
-                                    };
+                                    }
                                     secondList = [...firstList, ...secondList];
                                     let keyWordObject = {};
                                     for(let keyword of secondList){
@@ -1368,9 +1381,9 @@ const DesignModal = (props) => {
         function handleArrow(){
             setArrow(!arrow)
             if(!arrow){
-                toast.current.show({severity:'success', summary: 'Success', detail:'New keywords has been changed to Old keywords', life: 5000}) 
+                toast.current.show({severity:'success', summary: 'Success', detail:'Descriptive Keyword has been changed to Technical Keyword', life: 5000}) 
             }else{
-                toast.current.show({severity:'success', summary: 'Success', detail:'Old keywords has been changed to New keywords', life: 5000})
+                toast.current.show({severity:'success', summary: 'Success', detail:'Technical Keyword has been changed to Descriptive Keyword', life: 5000})
             }
         }
      
@@ -1387,7 +1400,7 @@ const DesignModal = (props) => {
                     <span className="step_col d__step_head" ></span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >{!arrow?"New Keywords":"Old Keywords"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to old keywords ":"Switch to new keywords "} onClick={handleArrow} style={{ fontSize: '1rem',left: '2rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={!arrow?"Switch to old keywords ":"Switch to new keywords "}/></span>
+                    <span className="keyword_col d__key_head" >{!arrow?"Descriptive Keyword":"Technical Keyword"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to Technical Keyword ":"Switch to Descriptive Keyword "} onClick={handleArrow} style={{ fontSize: '1rem',left: '0.6rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={arrow?"Switch to Descriptive Keyword ":"Switch to Technical Keyword "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1446,13 +1459,15 @@ const DesignModal = (props) => {
     }
     
     const approvalOnClick = async () => {
-
+let keywordAction=customEdit?'edited':'created'
         if (inputKeywordName === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000,style: { zIndex:999999999 } })
         }
-
+        else if (customTooltip === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+        }
         else if (inputEditor === '') {
-            toast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000 })
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000,style: { zIndex:999999999 } })
         }
         else {
             try {
@@ -1467,7 +1482,8 @@ const DesignModal = (props) => {
                     'code': inputEditor,
                     'elementtype': selectedType,
                     'language': langSelect,
-                    'tooltip': customTooltip
+                    'tooltip': customTooltip,
+                    'action':keywordAction
 
                 })
                 setOverlay('Updating the list ')
@@ -1536,17 +1552,22 @@ const DesignModal = (props) => {
         setCustomEdit(false);
     }
 
-    const createCustomeKeywordFooter = () => <>
-        <Button
-            data-test="createButton"
-            label={"save keyword"}
-            onClick={approvalOnClick}
-            style={{padding: '0.5rem 1rem' }}
-            disabled={isNameValid && !customEdit}
-        >
-
-        </Button>
-    </>
+    const createCustomeKeywordFooter = () => (
+        <>
+          <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>
+            <p>*Mandatory Fields</p>
+          </div>
+          <div style={{ paddingTop: '10px', float: 'right' }}>
+            <Button
+              data-test="createButton"
+              label={customEdit ? "Save Keyword" : "Create Keyword"}
+              onClick={()=>{approvalOnClick();saveTestCases()}}
+              style={{ padding: '0.5rem 1rem' }}
+              disabled={isNameValid && !customEdit}
+            />
+          </div>
+        </>
+      );
 
     return (
         <>
@@ -1607,6 +1628,8 @@ const DesignModal = (props) => {
             
             {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
             <Dialog draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false); setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                 <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/>
+            <Tooltip target=".p-dialog-header-maximize" position="bottom" content="Maximize/Minimize" />
                 <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
                     <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
                         {/* <div className="flex flex-row gap-2 align-items-center">
@@ -1615,13 +1638,13 @@ const DesignModal = (props) => {
                         </div> */}
                         <div className="flex" style={{flexDirection:'column'}}>
                         <div className="flex flex-row align-items-center gap-2">
-                            <label htmlFor='firstName' className="pb-2 font-medium ">Name:</label>
+                            <label htmlFor='firstName' className="pb-2 font-semibold ">Name<span style={{color:'red'}}>*</span>:</label>
                             <div className="flex" style={{flexDirection:"column"}}>
                             <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"
                                 style={{ width: '150%' }}
-                                placeholder="Enter custom key"
+                                placeholder="Enter Name"
                                 inputTxt={inputKeywordName} 
                                 setInputTxt={setInputKeywordName} 
                                 isNameValid={isNameValid}
@@ -1644,7 +1667,7 @@ const DesignModal = (props) => {
                         
                         </div>
                         <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
-                            <label htmlFor='TooltipNamme' className="pb-2 font-medium ">Tooltip: </label>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-semibold">Tooltip<span style={{color:'red'}}>*</span>: </label>
                             <AvoInput htmlFor="keywordtooltip" maxLength="100"
                                 className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
                                 type="text"

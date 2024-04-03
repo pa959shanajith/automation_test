@@ -265,6 +265,8 @@ class TestSuiteExecutor {
             inputs['projectId'] = batchExecutionData.batchInfo[0].projectId;
             inputs['releaseName'] =  batchExecutionData.batchInfo[0].releaseId;
             inputs['cycleId'] =  batchExecutionData.batchInfo[0].cycleId;
+            if('actualRun' in batchExecutionData) inputs["actualRun"] = batchExecutionData["actualRun"]
+            else inputs["actualRun"] = true
         }
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";
