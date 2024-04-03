@@ -40,6 +40,7 @@ const GenAi = () => {
     const [currentId,setCurrentId] = useState('');
     const [deleteRow, setDeleteRow] = useState(false);
     const [tableData, setTableData] = useState([]);
+    const [fileFilter, setFileFilter] = useState([]);
 
 
 
@@ -88,7 +89,7 @@ const GenAi = () => {
                 // Handle the error, e.g., show an error message
                 console.error(result.error);
             } else {
-                toastSuccess('Model deleted successfully');
+                toastSuccess('File deleted successfully');
                 const result = await getall_uploadfiles({email});
                 if (result.data) {
                 setFileDetails(result.data);
@@ -119,8 +120,9 @@ const GenAi = () => {
                 //       email: email,
                 //    },
                 // })
-                if (uploadFilesData) {
-                    // const filteredData = uploadFilesData?.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
+                if (uploadFilesData && uploadFilesData.data && uploadFilesData.data.length > 0) {
+                    const sorted = uploadFilesData.data.slice().sort((a, b) => new Date(b.uploadedTime) - new Date(a.uploadedTime));
+                    setFileFilter(sorted);
                     setFileDetails(uploadFilesData?.data);
                     setBadgeValue(Object.keys(uploadFilesData?.data).length);
                 }
@@ -250,6 +252,13 @@ const GenAi = () => {
             fileUploadRef.current.clear(); // Clear the input element
         }
     };
+    let defaultselectedProject = reduxDefaultselectedProject;
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+        defaultselectedProject = JSON.parse(localStorageDefaultProject);
+    }
+    const filteredData = fileFilter.filter((rowData) => rowData.project === defaultselectedProject.projectName);
+  
 
     return (
   
@@ -299,7 +308,7 @@ const GenAi = () => {
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleDelete(currentId)}
                     />
-                <DataTable value={fileDetails} header={header} tableStyle={{}}>
+                <DataTable value={filteredData} header={header} tableStyle={{}}>
                     <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} bodyClassName={"file_name"}/>
                     <Column field="actions" header="Actions" body={actionTemplate} style={{width:"1.5rem"}}/>
                 </DataTable>
