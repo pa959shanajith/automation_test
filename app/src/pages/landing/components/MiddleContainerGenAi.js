@@ -463,7 +463,7 @@ const MiddleContainerGenAi = () =>{
       const functionalMindMapCreation = async ()=>{
         try{
           setOverlay("Mind Map generation in progress...")
-        const data = userTestcase;
+        const data = apiResponse;
         const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
             method: 'POST',
             headers: {
