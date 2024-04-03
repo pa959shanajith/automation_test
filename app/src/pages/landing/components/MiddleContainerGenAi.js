@@ -463,7 +463,7 @@ const MiddleContainerGenAi = () =>{
       const functionalMindMapCreation = async ()=>{
         try{
           setOverlay("Mind Map generation in progress...")
-        const data = userTestcase;
+        const data = apiResponse;
         const testData = await axios('https://avogenerativeai.avoautomation.com/predictionFromSteps', {
             method: 'POST',
             headers: {
@@ -635,8 +635,8 @@ const MiddleContainerGenAi = () =>{
         <>
         {overlay ? <ScreenOverlay content={overlay} /> : null}
         <Toast ref={toast} ></Toast>
-        <div className='flex flex-column pl-2 pb-2' style={{ gap: "0.5rem" }} >
-          <div className="flex flex-row align-items-center">
+        <div className='flex flex-column pl-2 pb-2 pr-2' style={{ gap: "0.5rem", marginTop : '0.7rem' }} >
+          <div className="flex flex-row align-items-center" style={{borderBottom : '1px solid #DEE2E6' , paddingBottom : '0.35rem'}}>
             <div className="w-1rem mr-1 flex flex-row align-items-center justify-content-center">
               <img src="static/imgs/generate_tetscase.svg" alt="SVG Image" style={{ width: "100%" }} />
             </div>
@@ -645,7 +645,7 @@ const MiddleContainerGenAi = () =>{
           <div className="flex flex-row" style={{ gap: "3rem" }}>
             <div className="flex flex-row justify-content-center align-items-center">
               <RadioButton
-                className="mr-2"
+                className="mr-2 e-small"
                 inputId="systemLevelTc"
                 name="systemLevelTc"
                 value="a"
@@ -713,7 +713,7 @@ const MiddleContainerGenAi = () =>{
           <>
             <div className="flex flex-column" >
               {!apiResponse ? (
-                <div className="card-group p-3 " style={{ border: '1px solid #ccc', margin: '5px', display: 'flex', flexDirection: 'row' }}>
+                <div className="card-group p-3 " style={{ display: 'flex', flexDirection: 'row' }}>
                   <div className="card card-data bg-light" >
                     <div className="card-body ">
                       <div className='summary-container'>
@@ -725,7 +725,7 @@ const MiddleContainerGenAi = () =>{
                                 checked={selectedTestCases.includes(testCase.id)}
                                 onChange={() => handleCheckboxChange(testCase.id, testCase.summary)}
                               />
-                              <span className="content">
+                              <span className="content" style={{fontSize:"14px"}}>
                                 <span> {testCase.id} - {testCase.summary}</span>
                                 <span className="summary"> {testCase.summary}</span>
                               </span>
@@ -735,7 +735,7 @@ const MiddleContainerGenAi = () =>{
                       </div>
                     </div>
                   </div>
-                </div>
+                 </div>
 
 
               ) : (<>

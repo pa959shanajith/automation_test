@@ -46,7 +46,7 @@ const GenerateTestCaseList = ({ apiResponse, setSelectedGenAiTc, setTextAreaData
         </div>
        
     }
-    return <div className="w-5">
+    return <div className="w-full">
         <div className='generateTests_header'>Generated Tests</div>
         <DataTable
             className={selectedOption == 'b' ? "generateTests_dataTable" : "generateTests_systemlevel"}
