@@ -77,12 +77,12 @@ const ConfigureSetup = ({
     execution.scenarios.map(scenario => scenario.tag)
   );
   const flattenedTags = tags?.flat();
-
   let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
   const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject);
   if (!projectInfo) projectInfo = projectInfoFromRedux;
   else projectInfo = projectInfo
   let currentprojectdetails=getProjectData?.projects?.filter(project=>project._id===projectInfo?.projectId)[0]
+  
   const searchOptions = [
     { label: 'Search by name', value: 'option1' },
     { label: 'Search by tag', value: 'option2', className:"tagSearch" }
@@ -128,29 +128,6 @@ const ConfigureSetup = ({
     setSelectedTags([]);
   };
 
- 
-  const profileNameTooltip = (name) => {
-    return <>
-      <Tooltip target={`.profilenametooltip_${name}`} content={name}></Tooltip>
-      <span
-        className={`profilenametooltip_${name} profilenametooltip`}
-      >
-        {name}
-      </span></>   
-};
-
-const profileChildNameTooltip = (name) => {
-  return <>
-    <Tooltip target={`.profileChildNametooltip${name}`} content={name}  ></Tooltip>
-    <span
-      className={`profileChildNametooltip${name} profileChildNametooltip`}  
-    >
-      {name}
-    </span></>   
-};
-  
-
-
   useEffect(() => {
     const mainTree = [];
     configData?.configureData && configData?.configureData[modules]?.map((el, index) => {
@@ -167,7 +144,7 @@ const profileChildNameTooltip = (name) => {
           childTree.push({
             key: `${index}-${ind}`,
             data: {
-              name: profileChildNameTooltip(e?.name),
+              name: e?.name,
               dataParameterization: (
                 <InputText
                   value={dataparam[dataParamName]?.value}
@@ -211,7 +188,7 @@ const profileChildNameTooltip = (name) => {
         key: `${index}`,
         id: el?.moduleid,
         data: {
-          name:profileNameTooltip(el?.name),
+          name:el?.name,
         },
         children: childTree,
       });
@@ -368,6 +345,15 @@ const profileChildNameTooltip = (name) => {
     };
     dispatch(readTestSuite(dataObj));
   };
+  const renderWithToolTip=(rowData,field)=>{
+ 
+    return (
+      <>
+      <Tooltip target={`.profilenametooltip_${rowData?.data.name}`} content={rowData?.data.name} position="right"></Tooltip>
+      <span classname={`.profilenametooltip_${rowData?.data.name}`} title={rowData?.data.name}>{rowData?.data.name.length>20?rowData?.data.name.substring(0,20)+'...':rowData?.data.name}</span>
+      </>
+      )
+  }
 
   const tableTreeHeader = (
     <div className="flex flex-column">
@@ -521,6 +507,7 @@ const profileChildNameTooltip = (name) => {
                   header={el.code}
                   className={`column_${el.field}`}
                   {...(el.field === "name" ? { expander: true } : {})}
+                  body={el.field==="name"?(rowData)=>renderWithToolTip(rowData,el.field):null}
                 ></Column>
               ))}
             </TreeTable>
