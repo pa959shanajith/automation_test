@@ -32,7 +32,6 @@ const GenAi = () => {
     const [readTempData, setReadTempData] = useState([]);
     const [selectedTemp,setSelectedTemp] = useState(null);
     const template_info = useSelector((state) => state.setting.template_info);
-    console.log(template_info)
     const [tempExtras, setTempExtras] = useState({});
     const [isUploadSuccess, setUploadSuccess] = useState(false);
     const [fileUploading, setFileUploading] = useState(false);
@@ -40,10 +39,8 @@ const GenAi = () => {
     const [currentId,setCurrentId] = useState('');
     const [deleteRow, setDeleteRow] = useState(false);
     const [tableData, setTableData] = useState([]);
-    const [fileFilter, setFileFilter] = useState([]);
-
-
-
+    const [refreshProjects, setRefreshProjects] = useState(false);
+    const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
 
 
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -90,13 +87,7 @@ const GenAi = () => {
                 console.error(result.error);
             } else {
                 toastSuccess('File deleted successfully');
-                const result = await getall_uploadfiles({email});
-                if (result.data) {
-                setFileDetails(result.data);
-                console.log(result);
-                } else {
-                console.error(result.error);
-                }
+                setRefreshProjects(true)
             }
         } catch (error) {
             // Handle any unexpected errors
@@ -114,17 +105,12 @@ const GenAi = () => {
     useEffect(() => {
         const fetchData = async (email) => {
             try {
-                const uploadFilesData = await getall_uploadfiles({ email: email });
-                // axios.get('/getall_uploadfiles', {
-                //    params: {
-                //       email: email,
-                //    },
-                // })
-                if (uploadFilesData && uploadFilesData.data && uploadFilesData.data.length > 0) {
-                    const sorted = uploadFilesData.data.slice().sort((a, b) => new Date(b.uploadedTime) - new Date(a.uploadedTime));
-                    setFileFilter(sorted);
-                    setFileDetails(uploadFilesData?.data);
-                    setBadgeValue(Object.keys(uploadFilesData?.data).length);
+                const allProjectsData = await getall_uploadfiles({ email: email });
+                setRefreshProjects(false)
+                if (allProjectsData && allProjectsData.data && allProjectsData.data.length > 0) {
+                    const specificProjects = allProjectsData?.data?.filter(proj=>proj?.project === localStorageDefaultProject?.projectName)
+                    setFileDetails(specificProjects);
+                    setBadgeValue(Object.keys(allProjectsData?.data).length);
                 }
             } catch (error) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'Message Content', life: 3000 });
@@ -132,7 +118,7 @@ const GenAi = () => {
         };
         fetchData(email);
 
-    }, []);
+    }, [refreshProjects]);
 
     const templateDataforTable = async () => {
         try {
@@ -194,7 +180,6 @@ const GenAi = () => {
 
         };
         const organization = "Avo Assure";
-        const localStorageDefaultProject = JSON.parse(localStorage.getItem('DefaultProject'));
         const projectName = localStorageDefaultProject.projectName;
         const formData = new FormData();
         formData.append('name', name);
@@ -214,16 +199,8 @@ const GenAi = () => {
             } else {
                 try {
                     refreshFileUpload()
-                    const uploadFilesData = await getall_uploadfiles(querystrg);
-                    // const filteredData = uploadFilesData?.data?.filter((data) => data.project == reduxDefaultselectedProject?.projectName)
-                    setFileDetails(uploadFilesData?.data);
-                    // axios.get('/getall_uploadfiles', {
-                    //    params: {
-                    //       email: email,
-                    //    },
-                    // })
-                    // toast.current.show({ severity: 'success', summary: 'Success', detail: 'get uploaded file', life: 3000 });
-                    setBadgeValue(Object.keys(uploadFilesData.data).length);
+                    setRefreshProjects(true)
+                    // setBadgeValue(Object.keys(uploadFilesData.data).length);
                 } catch (uploadFilesError) {
                     toast.current.show({ severity: 'error', summary: 'Error', detail: 'errorMessage', life: 3000 });
                 }
@@ -252,16 +229,12 @@ const GenAi = () => {
             fileUploadRef.current.clear(); // Clear the input element
         }
     };
-    let defaultselectedProject = reduxDefaultselectedProject;
-    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
-    if (localStorageDefaultProject) {
-        defaultselectedProject = JSON.parse(localStorageDefaultProject);
-    }
-    useEffect(() => {
-        // Filter the files whenever fileDetails change or defaultselectedProject changes
-        const filteredData = fileDetails.filter((rowData) => rowData.project === defaultselectedProject.projectName);
-        setFileFilter(filteredData);
-    }, [fileDetails, defaultselectedProject]);
+    // useEffect(() => {
+    //     // Filter the files whenever fileDetails change or defaultselectedProject changes
+    //     const filteredData = fileDetails.filter((rowData) => rowData.project === defaultselectedProject.projectName);
+    //     setFileDetails(filteredData)
+    //     // setFileFilter(filteredData);
+    // }, [fileDetails, defaultselectedProject]);
   
 
     return (
@@ -312,7 +285,7 @@ const GenAi = () => {
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleDelete(currentId)}
                     />
-                <DataTable value={fileFilter} header={header} tableStyle={{}}>
+                <DataTable value={fileDetails} header={header} tableStyle={{}}>
                     <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} bodyClassName={"file_name"}/>
                     <Column field="actions" header="Actions" body={actionTemplate} style={{width:"1.5rem"}}/>
                 </DataTable>

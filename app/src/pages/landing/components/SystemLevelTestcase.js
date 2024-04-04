@@ -218,7 +218,7 @@ const SystemLevelTestcase = (props) => {
                     {apiResponse &&
                         <div className='flex flex-column'>
                             <InputTextarea
-                                style={{ width: "42vw", height: "70vh",fontSize:"13px" }}
+                                style={{ width: "45vw", height: "65vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={textAreaData}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -227,8 +227,8 @@ const SystemLevelTestcase = (props) => {
                     }
                 </div>}
                 {
-                    readOnly && readOnlyData && <div className='flex flex-column overflow-y-scroll' style={{ height: "70vh" }}>{readOnlyData.map(item => {
-                        return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-y-scroll' style={{ height: "65vh" }}>{readOnlyData.map(item => {
+                        return <div className='input_text_disabled flex flex-column mb-2' onClick={()=>{
                             toast.current.show({
                                 severity: 'info',
                                 summary: 'Info',
@@ -237,7 +237,7 @@ const SystemLevelTestcase = (props) => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "40vw", height: "70vh",fontSize:"13px" }}
+                                style={{ width: "45vw", height: "65vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}

@@ -683,8 +683,8 @@ const ModuleLevelTestcase = (props) => {
                     }
                 </div>}
                 {
-                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "61vh" }}>{readOnlyData.map(item => {
-                        return <div className='input_text_disabled flex flex-column mt-2 mb-2' onClick={()=>{
+                    readOnly && readOnlyData && <div className='flex flex-column overflow-scroll' style={{ height: "60vh" }}>{readOnlyData.map(item => {
+                        return <div className='input_text_disabled flex flex-column mb-2' onClick={()=>{
                             toast.current.show({
                                 severity: 'info',
                                 summary: 'Info',
