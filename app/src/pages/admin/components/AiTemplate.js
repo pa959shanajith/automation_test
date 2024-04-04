@@ -323,7 +323,7 @@ console.log("tempData", tempData);
               <Dropdown value={testType} options={LLMModel} onChange={onTestTypeChange} optionLabel="name" placeholder="Select a Test Type" style={{ width: '28rem' }} />
 
               <div className='accuracy_div'>
-                <label className="pb-4 font-medium">Accuracy </label>
+                <label className="pb-4 font-medium">Accuracy<span style={{ color: "#d50000" }}>*</span> </label>
                 <div className="flex flex-row  temp-div">
                   <label className="pb-2 font-medium">Low</label>
                   <div className="accuracy_sub_div">
