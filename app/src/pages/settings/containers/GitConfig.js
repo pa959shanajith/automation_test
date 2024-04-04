@@ -261,14 +261,14 @@ const GitConfig = (props) => {
 
             <div className='flex flex-row w-full align-items-center justify-content-between ' >
                 <span className="label_git" >User</span>
-                <Dropdown data-test="user_git" value={userRef?.current?.value} className='w-full md:w-25rem' inputId={'userGit'} inputRef={userRef}
+                <Dropdown data-test="user_git" value={userRef?.current?.value} className='w-full md:w-25rem p-inputtext-sm' inputId={'userGit'} inputRef={userRef}
                     onChange={() => fetchProjectList(resetSelectList, userData, userRef, setProjectList, setProjectData, displayError, setLoading, ProjectRef)}
                     placeholder={"Select User"} options={userList} />
             </div>
           
             <div className='flex flex-row w-full align-items-center justify-content-between'>
                 <span className="label_git" >Project</span>
-                <Dropdown data-test="project_git" value={selectProject} className='w-full md:w-25rem' inputId={'projectGit'} inputRef={ProjectRef} onChange={() => { onChangeProject(resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, userData, userRef, projectData, ProjectRef, setLoading) }} placeholder={"Select Project"} options={projectList} />
+                <Dropdown data-test="project_git" value={selectProject} className='w-full md:w-25rem p-inputtext-sm'  inputId={'projectGit'} inputRef={ProjectRef} onChange={() => { onChangeProject(resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, userData, userRef, projectData, ProjectRef, setLoading) }} placeholder={"Select Project"} options={projectList} />
             </div>
      
             <FormInputGit label={"Configuration"} data-test="name_git" inpRef={gitconfigRef} placeholder={`Enter ${props.screenName} Name`} />
