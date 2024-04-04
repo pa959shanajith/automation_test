@@ -585,13 +585,15 @@ const ModuleLevelTestcase = (props) => {
             } */}
             {!apiResponse &&
                     <>
-                        <img className='imgDiv' src={'static/imgs/moduleLevelTestcaseEmpty.svg'} width='200px' />
+                        <img className='imgDiv'  width='200px' />
                         <p>Generate test cases for a module of your system</p>
                     </>}
-                <p><strong>Module</strong></p>
                 <div className={`${!apiResponse ? "flexColumn" : "flexRow loginBox"}`}>
                     {/* <div className="flexColumn"> */}
-                    <InputText placeholder="Enter module name: Eg.login, Fund transfer" style={{ width: `${apiResponse ? '45vw' : "20vw"} `,marginTop:`${apiResponse ? "1rem": "" }` }} value={query} onChange={handleInputChange} />
+                    <div className={apiResponse ? "flex flex-row m-2 justify-content-center align-items-center" : "flex flex-column justify-content-center align-items-center"}>
+                        <p className='mr-2'><strong>Module</strong></p>
+                        <InputText placeholder="Enter module name: Eg.login, Fund transfer" style={{ width: `${apiResponse ? '45vw' : "20vw"} ` }} value={query} onChange={handleInputChange} />
+                    </div>
                     {!apiResponse && <Button loading={isLoading} disabled={query?.length == 0} label={`${isLoading ? "Generating" : "Generate"}`} style={{ marginTop: '20px' }} onClick={() => {
                         if (template_id.length > 0) {
                             generateTestcase();
@@ -605,7 +607,7 @@ const ModuleLevelTestcase = (props) => {
                         }
                     }}></Button>}
                 </div>
-                <label className='labelText'>{apiResponse?"":"Eg. of module name: login, sign up"}</label>
+                <label className='labelText'>{apiResponse?"":"Eg. of module name: login, Fund transfer"}</label>
             {/* {!apiResponse &&
                 <>
                     <img className='imgDiv' src={'static/imgs/systemLevelTestcasesEmpty.svg'} width='200px' />
@@ -657,7 +659,7 @@ const ModuleLevelTestcase = (props) => {
                 )
             }
             <Toast ref={toast} position="bottom-center" style={{ zIndex: 999999 }} />
-            <div className='flex flex-row w-full'>
+            <div className='flex flex-row w-full pl-2 pr-2'>
                 {apiResponse && <GenerateTestCaseList 
                 selectedOption={props.selectedOption}
                 apiResponse={apiResponse} 
@@ -672,7 +674,7 @@ const ModuleLevelTestcase = (props) => {
                     {apiResponse &&
                         <div className='flex flex-column'>
                             <InputTextarea
-                                style={{ width: "42vw", height: "61vh",fontSize:"13px" }}
+                                style={{ width: "45vw", height: "60vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={textAreaData}
                                 onChange={(e) => updateTextAreaData(e)}
@@ -691,7 +693,7 @@ const ModuleLevelTestcase = (props) => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "42vw", height: "61vh",fontSize:"13px" }}
+                                style={{ width: "45vw", height: "60vh",fontSize:"13px" }}
                                 autoResize={false}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}

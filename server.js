@@ -359,7 +359,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(webocular|neuronGraphs\/|integration|admin)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration|admin|GenAI)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});

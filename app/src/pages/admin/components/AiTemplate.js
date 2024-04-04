@@ -12,6 +12,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import AvoConfirmDialog from '../../../globalComponents/AvoConfirmDialog';
+import useDebounce from '../../../customHooks/useDebounce';
 
 
 
@@ -40,7 +41,8 @@ const AiTemplate = () => {
 
     const [filters, setFilters] = useState({});
   const [globalFilterValue, setGlobalFilterValue] = useState('');
-
+  const debouncedSearchValue = useDebounce(globalFilterValue, 500);
+  
 
 
 
@@ -112,9 +114,9 @@ const AiTemplate = () => {
 
 
       const onCreateTemplate = async () => {
-        const scaledAccuracy = accuracy / 100;
+        // const scaledAccuracy = accuracy / 100;
         try {
-          const templateData = await createTemp(generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
+          const templateData = await createTemp(generateTemplatePayload(domain, llmModel.code, testType.name, accuracy, activeCheck, defaultChcek, name, description));
             setRefreshTable(true);
 
             console.log(templateData);
@@ -132,9 +134,9 @@ const AiTemplate = () => {
       };
 
       const onEditTemplate = async () => {
-        const scaledAccuracy = accuracy / 100;
+        // const scaledAccuracy = accuracy / 100;
         try {
-          const result = await editTemp(currentId, generateTemplatePayload(domain, llmModel.code, testType.name, scaledAccuracy, activeCheck, defaultChcek, name, description));
+          const result = await editTemp(currentId, generateTemplatePayload(domain, llmModel.code, testType.name, accuracy, activeCheck, defaultChcek, name, description));
     
           if (result.error) {
             toast.current.show({ severity: 'error', summary: 'Error', detail: result.error || 'Unknown error', life: 3000 });
@@ -225,14 +227,14 @@ const AiTemplate = () => {
     templateDataforTable();
   }, [refreshTable == true]);
 
-  const renderInputSwitch = (rowData, property) => {
-    return (
-      <InputSwitch
-        checked={rowData[property]}
-        onChange={(e) => handleSwitchChange(e, rowData, property)}
-      />
-    );
-  };
+  // const renderInputSwitch = (rowData, property) => {
+  //   return (
+  //     <InputSwitch
+  //       checked={rowData[property]}
+  //       onChange={(e) => handleSwitchChange(e, rowData, property)}
+  //     />
+  //   );
+  // };
   
   const handleSwitchChange = (e, rowData, property) => {
     // Handle switch change
@@ -319,8 +321,10 @@ console.log("tempData", tempData);
                 <div className="flex flex-row  temp-div">
                   <label className="pb-2 font-medium">Low</label>
                   <div className="accuracy_sub_div">
-                    <InputText value={accuracy} onChange={(e) => setAccuracy(e.target.value)} style={{ width: '24rem' }} />
-                    <Slider value={accuracy} onChange={(e) => setAccuracy(e.value)} style={{ width: '24rem' }} />
+                    <InputText value={accuracy > 1 ? `0.${accuracy}` : accuracy} onChange={(e) => setAccuracy(e.target.value)} style={{ width: '24rem' }} />
+                    <Slider  value={accuracy*100} onChange={(e) => {
+                      console.log("eeee",e);
+                      setAccuracy(e.value/100)}} style={{ width: '24rem' }} />
                   </div>
                   <label className="pb-2 font-medium">High</label>
                 </div>
@@ -355,7 +359,7 @@ console.log("tempData", tempData);
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleTemplateDelete(currentId)}
                     />
-         <DataTable value={tempData} paginator rows={5} globalFilter={globalFilterValue} showGridlines
+         <DataTable value={tempData} paginator rows={5} globalFilter={debouncedSearchValue} showGridlines
          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown" rowsPerPageOptions={[5, 10, 20]}>
          {/* <Column
     header="Sl No"
@@ -364,8 +368,8 @@ console.log("tempData", tempData);
         <Column field="name" header="Name" />
         <Column field="description" header="Description" />
         <Column field="createdAt" header="Created On" />
-        <Column header="Default" body={(rowData) => renderInputSwitch(rowData, 'default')} />
-        <Column header="Status" body={(rowData) => renderInputSwitch(rowData, 'active')} />
+        <Column  field="default"header="Default" />
+        <Column  field="active"header="Status"  />
         <Column header="Actions" body={renderActions} />
       </DataTable>
                     </div>
