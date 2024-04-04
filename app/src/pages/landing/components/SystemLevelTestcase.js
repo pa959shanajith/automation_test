@@ -237,8 +237,8 @@ const SystemLevelTestcase = (props) => {
                             });
                         }}>
                             <InputTextarea
-                                style={{ width: "45vw", height: "65vh",fontSize:"13px" }}
-                                autoResize={false}
+                                style={{ width: "45vw", height: "auto",fontSize:"13px", minHeight:"40px" }}
+                                autoResize={true}
                                 value={item?.TestCase}
                                 onChange={(e) => updateTextAreaData(e)}
                                 disabled={true}
