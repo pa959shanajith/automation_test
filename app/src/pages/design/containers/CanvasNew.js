@@ -3030,20 +3030,10 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </g>
                 ):null}
-                    {(node[1].type === "scenarios" && node[1]?.assignedUser != userInfo.username&& node[1]?.assignedUser!='') ? (
+                {(node[1].type === "scenarios" && node[1]?.assignedUser != userInfo.username && node[1]?.assignedUser != '') ? (
                   <g transform={node[1].transformImpact} className='node_'>
                     <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon ct-nodeIcon_02 pi pi-eye"
                     ></image>
-                  </g>
-            ) : null}
-                 {(node[1].type === "screens" && node[1]?.assignedUser!=userInfo.username && node[1]?.assignedUser!='') ? (
-                  <g transform={node[1].transformImpact} className='node_'>
-                    <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon pi pi-eye" ></image>
-                  </g>
-                ) : null}
-                 {(node[1].type === "testcases" && node[1]?.assignedUser!=userInfo.username && node[1]?.assignedUser!='') ? (
-                  <g transform={node[1].transformImpact} className='node_'>
-                    <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon pi pi-eye" ></image>
                   </g>
                 ) : null}
                     <title val={node[0]} className="ct-node-title">{node[1].title} 

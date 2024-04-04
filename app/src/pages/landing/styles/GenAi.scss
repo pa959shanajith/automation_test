@@ -11,7 +11,7 @@
     border: 1px solid #DEE2E6 ;
 }
 .genai_right_container{
-    width: 65%;
+    width: 60%;
 }
 .context_container{
     border-color: #DEE2E6;
@@ -47,7 +47,7 @@
 }
 .leftandor{
     color: #9E9E9E;
-    font: $f7_regular;
+    font: $f8_regular;
 }
 .left_btm_container{
     // border-bottom: 1px solid #DEE2E6;
@@ -65,8 +65,10 @@
   .genai_right_content{
     .p-card{
         height: 45rem;
-        margin-top: 0.5rem;
+        // margin-top: 0.5rem;
     }
+    width: 20%;
+    border-left: 1px solid #DEE2E6;
  }
   
   
@@ -194,7 +196,7 @@
 }
 }
 .generateTests_header{
-    font: $f5_semibold;
+    font: $f5_regular;
     color: #616161;
 }
 
@@ -210,7 +212,7 @@
 .generateTests_dataTable{
     height: 60vh;
     overflow: auto;
-    width: 19rem;
+    max-width: 100%;
 }
 .generateTests_systemlevel{
     height: 70vh;
@@ -240,4 +242,7 @@
 .with-response-div{
     display: flex;
     flex-direction: column;
+}
+.parameter_container{
+    border-bottom: 1px solid #DEE2E6;
 }
