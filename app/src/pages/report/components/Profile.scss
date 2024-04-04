@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .profile_container {
     .table_profile {
         margin-top: 0;
@@ -42,10 +43,7 @@
             .p-datatable-wrapper {
                 .p-datatable-tbody>tr>td:nth-child(1) {
                     text-align: center;
-                    width: 35.5vw;
-                }
-                .p-datatable-tbody>tr>td:nth-child(2) {
-                    width: 36.2vw;   
+                    width: 30vw;
                 }
             }
         }
@@ -86,11 +84,12 @@
                     padding-right: 1rem;
                     margin-top: 1rem;
                     .p-datatable-wrapper { 
-                        .p-datatable-tbody>tr>td:nth-child(4) {
-                            border-left: none;  
+                        .p-datatable-tbody>tr>td{
+                            border:none;
                         }
                         .p-datatable-tbody>tr>td:nth-child(1) {
                             text-align: left;   
+                            width: auto;
                         }
                         .p-datatable-tbody>tr>td:nth-child(2) {
                             width: auto;   
@@ -181,13 +180,11 @@
     }
     .suite_text {
         display: inline-block;
-        width: 35vw;
-        text-align: center;
+        width: 30vw;
     }
     .case_text {
         display: inline-block;
-        width: 33vw;
-        // text-align: center;
+        width: 30vw;
     }
 }
 
@@ -238,7 +235,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 10px;
 }
 
 .pi-download {
@@ -253,4 +249,66 @@
 
 .download_popup_container {
     font-family: 'Open Sans';
+}
+.p-column-title{
+    display: block;
+    font: inherit;
+    margin-left: 0rem;
+}
+.exelist_title{
+    font: $f5_semibold;
+}
+.exestatus_container{
+    font: $f6_regular;
+}
+.exestatus_icon{
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+.exefailbg{
+    background-color: #FF6259;
+}
+.exepassbg{
+    background-color: #4CD07D;
+}
+.exeterminatebg{
+    background-color: #B32B23;
+}
+.exeexebg{
+    background-color: #605BFF;
+}
+
+.exefailcolor{
+    color: #FF6259;
+}
+.exepasscolor{
+    color: #4CD07D;
+}
+.exeterminatecolor{
+    color: #B32B23;
+}
+.exeexecolor{
+    color: #605BFF;
+}
+.exestrips{
+    width:auto;
+    height:auto;
+    text-align: center;
+    min-width: 40px;
+    min-height: 40px;
+}
+.testSuite_col1{
+    width: 28vw;
+}
+.exestatusbar_container{
+    font: $f6_regular;
+    color: white;
+    border-right: 1px solid #e9ecef;
+}
+.exeHeader{
+    font: $f7_semibold;
+}
+.exeSubHeader{
+    font: $f7_regular;
 }
