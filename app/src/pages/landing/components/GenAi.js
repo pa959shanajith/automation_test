@@ -257,7 +257,11 @@ const GenAi = () => {
     if (localStorageDefaultProject) {
         defaultselectedProject = JSON.parse(localStorageDefaultProject);
     }
-    const filteredData = fileFilter.filter((rowData) => rowData.project === defaultselectedProject.projectName);
+    useEffect(() => {
+        // Filter the files whenever fileDetails change or defaultselectedProject changes
+        const filteredData = fileDetails.filter((rowData) => rowData.project === defaultselectedProject.projectName);
+        setFileFilter(filteredData);
+    }, [fileDetails, defaultselectedProject]);
   
 
     return (
@@ -297,7 +301,7 @@ const GenAi = () => {
                         </div>
                     }
                 />
-                {fileUploading && <ProgressSpinner style={{width: '50px', height: '50px'}} strokeWidth="8" fill="var(--surface-ground)"/>}
+                {fileUploading && <ProgressSpinner style={{width: '30px', height: '30px'}} strokeWidth="8" fill="var(--surface-ground)"/>}
             </div>
             <div className="datatable_files">
             <AvoConfirmDialog
@@ -308,7 +312,7 @@ const GenAi = () => {
                         icon="pi pi-exclamation-triangle"
                         accept={() => handleDelete(currentId)}
                     />
-                <DataTable value={filteredData} header={header} tableStyle={{}}>
+                <DataTable value={fileFilter} header={header} tableStyle={{}}>
                     <Column field="path" header="File Name" body={(rowData) => extractFilename(rowData.path)} bodyClassName={"file_name"}/>
                     <Column field="actions" header="Actions" body={actionTemplate} style={{width:"1.5rem"}}/>
                 </DataTable>
