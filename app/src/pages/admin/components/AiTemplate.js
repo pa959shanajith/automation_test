@@ -133,6 +133,7 @@ const AiTemplate = () => {
          }
       };
 
+
       const onEditTemplate = async () => {
         // const scaledAccuracy = accuracy / 100;
         try {
@@ -235,6 +236,11 @@ const AiTemplate = () => {
   //     />
   //   );
   // };
+
+  const statusBodyTemplate = (rowData) => {
+    const status = rowData.active ? 'Active' : 'Inactive';
+    return <span>{status}</span>;
+  };
   
   const handleSwitchChange = (e, rowData, property) => {
     // Handle switch change
@@ -321,8 +327,8 @@ console.log("tempData", tempData);
                 <div className="flex flex-row  temp-div">
                   <label className="pb-2 font-medium">Low</label>
                   <div className="accuracy_sub_div">
-                    <InputText value={accuracy > 1 ? `0.${accuracy}` : accuracy} onChange={(e) => setAccuracy(e.target.value)} style={{ width: '24rem' }} />
-                    <Slider  value={accuracy*100} onChange={(e) => {
+                    <InputText value={accuracy} onChange={(e) => setAccuracy(e.target.value > 1 ? `0.${e.target.value}` : e.target.value)} style={{ width: '24rem' }} />
+                    <Slider  value={Number(accuracy)*100} onChange={(e) => {
                       console.log("eeee",e);
                       setAccuracy(e.value/100)}} style={{ width: '24rem' }} />
                   </div>
@@ -333,10 +339,10 @@ console.log("tempData", tempData);
                 <label className="pb-2 font-medium"> Active</label>
                 <InputSwitch checked={activeCheck} onChange={(e) => setActiveCheck(e.value)} />
               </div>
-              <div className="flex flex-row default-class">
+              {/* <div className="flex flex-row default-class">
                 <label className="pb-2 font-medium"> Default</label>
                 <InputSwitch checked={defaultChcek} onChange={(e) => setDefaultCheck(e.value)} />
-              </div>
+              </div> */}
 
 
             </div>
@@ -368,8 +374,8 @@ console.log("tempData", tempData);
         <Column field="name" header="Name" />
         <Column field="description" header="Description" />
         <Column field="createdAt" header="Created On" />
-        <Column  field="default"header="Default" />
-        <Column  field="active"header="Status"  />
+        {/* <Column  field="default"header="Default" /> */}
+        <Column field="active" header="Status" body={statusBodyTemplate} />
         <Column header="Actions" body={renderActions} />
       </DataTable>
                     </div>
