@@ -93,7 +93,7 @@ const BrowserstackLogin = React.memo(({ setLoading, displayBasic6, onHidedia, ha
   )
 });
 const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProjects, mobileDetailsBrowserStack, displayBasic7, onHidedia, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-  smartMode, selectedICE, setSelectedICE, availableICE, dataExecution, browserlist, CheckStatusAndExecute, iceNameIdMap, browserstackUser, showBrowserstack, setBrowserstackValues, browserstackValues, setSelectedTab, selectedTab }) => {
+  smartMode, selectedICE, setSelectedICE, availableICE, dataExecution, browserlist, CheckStatusAndExecute, iceNameIdMap, browserstackUser, showBrowserstack, setBrowserstackValues, browserstackValues, setSelectedTab, selectedTab, setExecutionMode }) => {
   const [newOsNames, setNewOsNames] = useState([])
   const [selectedOS, setSelectedOS] = useState('');
   const [selectedOS1, setSelectedOS1] = useState('');
@@ -123,11 +123,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
   const [index2, setIndex2] = useState(false);
   const [count, setCount] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [onEdit, setOnEdit] = useState(false);
   const [rowToDelete, setRowToDelete] = useState({});
-  const [editingRows, setEditingRows] = useState([]);
   const [config, setConfig] = useState([]);
   const [editModes, setEditModes] = useState(Array(config.length).fill(false));
-  const [clickedRow, setClickedRow] = useState({});
   const toast = useRef(null);
 
   useEffect(() => {
@@ -190,30 +189,6 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
   }, [browserstackBrowserDetails, mobileDetailsBrowserStack]);
 
   // Functions related to Normal Execution
-  // const onOsChange = async (option) => {
-  //   setselectedBrowserVerionDetails([]);
-  //   setBrowserstackOsVersion([]);
-  //   setBrowserstackBrowsers([]);
-  //   setSelectedBrowserVersions('');
-  //   setSelectedOsVersions('');
-  //   setSelectedBrowserVersionsDetails('');
-  //   setSelectedOS(option.key);
-  //   setIndex1(true);
-  //   setIndex2(true)
-  //   let arrayOS_names = [];
-  //   if (browserstackBrowserDetails.os_names[option.key]?.length) {
-  //     let getValue = browserstackBrowserDetails.os_names[option.key];
-  //     arrayOS_names = getValue.map((element, index) => ({
-  //       key: element,
-  //       text: element,
-  //       title: element,
-  //       index: index
-  //     }));
-  //   }
-
-  //   setBrowserstackOsVersion(arrayOS_names);
-  // };
-
   const onOsChange_Normal = async (option) => {
     setselectedBrowserVerionDetails([]);
     setBrowserstackOsVersion([]);
@@ -238,29 +213,6 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     setBrowserstackOsVersion(arrayOS_names);
   };
 
-  // const onOsVersionChange = (option) => {
-  //   setBrowserstackBrowsers([])
-  //   setselectedBrowserVerionDetails([])
-  //   setSelectedBrowserVersions('')
-  //   setSelectedOsVersions(option.key)
-  //   let arrayBrowser = []
-  //   let os_name = selectedOS.concat(" ", option.key);
-  //   if (Object.entries(browserstackBrowserDetails.browser).length) {
-  //     Object.entries(browserstackBrowserDetails.browser).forEach(([browser, os_version]) => {
-  //       Object.entries(os_version).forEach(([os_version_key, browser_version]) => {
-  //         if (os_version_key === os_name) {
-  //           arrayBrowser.push({
-  //             key: browser,
-  //             text: browser,
-  //             title: browser
-  //           });
-  //         }
-  //       });
-  //     });
-  //   }
-  //   setBrowserstackBrowsers(arrayBrowser)
-  // }
-
   const onOsVersionChange_Normal = (option) => {
     setBrowserstackBrowsers([])
     setselectedBrowserVerionDetails([])
@@ -283,30 +235,6 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     }
     setBrowserstackBrowsers(arrayBrowser)
   }
-
-  // const onBrowserSelect = (option) => {
-  //   setselectedBrowserVerionDetails([])
-  //   setSelectedBrowserVersionsDetails('')
-  //   setSelectedBrowserVersions('')
-  //   setSelectedBrowserVersions(option.key)
-  //   let arrayBrowserVersion = []
-  //   let os_name = selectedOS.concat(" ", selectedOsVersions);
-  //   if (Object.entries(browserstackBrowserDetails.browser[option.key]).length) {
-  //     if (Object.entries(browserstackBrowserDetails.browser[option.key][os_name]).length) {
-  //       browserstackBrowserDetails.browser[option.key][os_name].forEach((element, index) => {
-  //         arrayBrowserVersion.push({
-  //           key: element,
-  //           text: element,
-  //           title: element,
-  //           index: index
-  //         });
-  //       });
-  //     }
-  //   }
-  //   setselectedBrowserVerionDetails(arrayBrowserVersion.sort((a, b) => {
-  //     return Number(b.key) - Number(a.key);
-  //   }));
-  // }
 
   const onBrowserSelect_Normal = (option) => {
     setselectedBrowserVerionDetails([])
@@ -348,8 +276,8 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     setIndex2(true);
 
     let arrayOS_names = [];
-    if (browserstackBrowserDetails.os_names[option.name]?.length) {
-      let getValue = browserstackBrowserDetails.os_names[option.name];
+    if (browserstackBrowserDetails.os_names[option.name.trim()]?.length) {
+      let getValue = browserstackBrowserDetails.os_names[option.name.trim()];
       arrayOS_names = getValue.map((element) => ({
         name: element,
         code: element
@@ -360,7 +288,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
       return prev.map((item, index) => {
         if (index === rowIndex) {
           return {
-            id: index, osname: option.name, osversion: "", browsername: "", browserversion: "",
+            id: item.id, osname: option.name, osversion: "", browsername: "", browserversion: "",
           };
         }
         return item;
@@ -371,10 +299,8 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
   };
 
   const onOsVersionChange_Parallel = (option, { field, rowIndex }) => {
-    // setBrowserstackBrowsers2([]);
     setselectedBrowserVerionDetails2([]);
     setSelectedBrowserVersions1('');
-    // setBrowserstackOsVersion2([]);
     setSelectedOsVersions1(option.name);
 
     let arrayBrowser = []
@@ -405,12 +331,9 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
   };
 
   const onBrowserSelect_Parallel = (option, { field, rowIndex }) => {
-    // setselectedBrowserVerionDetails2([])
     setSelectedBrowserVersionsDetails1('')
     setSelectedBrowserVersions1('')
     setSelectedBrowserVersions1(option.name)
-    // setBrowserstackOsVersion2([]);
-    // setBrowserstackBrowsers2([]);
     let arrayBrowserVersion = [];
     let os_name = selectedOS1.concat(" ", selectedOsVersions1);
     if (Object.entries(browserstackBrowserDetails.browser[option.name]).length) {
@@ -442,9 +365,6 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
 
   const onBrowserVersionChange_Parallel = (option, { field, rowIndex }) => {
     setSelectedBrowserVersionsDetails1(option.name);
-    // setBrowserstackOsVersion2([]);
-    // setBrowserstackBrowsers2([]);
-    // setselectedBrowserVerionDetails2([]);
 
     setConfig(prev => {
       return prev.map((item, index) => {
@@ -506,19 +426,16 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     );
   };
 
-  const editExecutionRow = (rowData) => {
+  const editExecutionRow = (rowData, options) => {
     const newEditModes = [...editModes];
     newEditModes[rowData.rowIndex] = !newEditModes[rowData.rowIndex];
     setEditModes(newEditModes);
-  };
-
-  const onRowEditSave = (event) => {
-    setEditingRows([]);
+    setOnEdit(!onEdit);
   };
 
   const deleteExecutionRow = (id) => {
-    const updatedConfig = config.filter((rowData) => rowData.id !== id);
-    setConfig(updatedConfig);
+    const updatedConfig = config.filter((rowData, index) => index != id);
+    setConfig((prev) => updatedConfig);
     setVisible(false);
   };
 
@@ -567,54 +484,6 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     { field: "actions", header: "Actions" },
   ];
 
-  const statusEditor = (options, place) => {
-    return (
-      //2nd dropDown
-      Object.keys(options).map((key) => {
-
-        if (key != "id") {
-          return (
-            <Dropdown
-              value={`${key == "osname" ? { name: config[clickedRow.rowIndex][key], code: config[clickedRow.rowIndex][key], versions: [] } : { name: config[clickedRow.rowIndex][key], code: config[clickedRow.rowIndex][key] }}`}
-              options={getOptions(key)}
-              onChange={(e) => {
-                onChangeFunctions(e.value, { ...clickedRow, field: key });
-              }}
-              placeholder={placeHolder(key)}
-              optionLabel='name'
-            />
-          )
-        }
-      })
-    );
-  };
-
-  const placeHolder = (field) => {
-    switch (field) {
-      case "osname":
-        return "Select OS 2nd Name";
-      case "osversion":
-        return "Select OS Version";
-      case "browsername":
-        return "Select Browser Name";
-      case "browserversion":
-        return "Select Browser Version";
-    }
-  };
-
-  const getOptions = (field) => {
-    switch (field) {
-      case "osname":
-        return newOsNames;
-      case "osversion":
-        return browserstackOsVersion2;
-      case "browsername":
-        return browserstackBrowsers2;
-      case "browserversion":
-        return selectedBrowserVerionDetails2;
-    }
-  };
-
   const onChangeFunctions = (value, rowData) => {
     if (rowData.field == "osname") {
       onOsChange_Parallel(value, rowData);
@@ -636,127 +505,11 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
   //   return false;
   // };
 
-  // const emptyCheck = config.filter((conf) => hasEmptyStringValue(conf)).length;
-
-  const statusEditorForNewFields = (options, field, rowData) => {
-    const value = options[field];
-
-    const selectedValue = (field) => {
-      switch (field) {
-        case "osname":
-          return options.osname
-        case "osversion":
-          return options.osversion;
-        case "browsername":
-          return options.browsername;
-        case "browserversion":
-          return options.browserversion;
-      }
-    };
-
-    if (options[field] == "") {
-      const getOptions = (field) => {
-        switch (field) {
-          case "osname":
-            return newOsNames;
-          case "osversion":
-            return browserstackOsVersion2;
-          case "browsername":
-            return browserstackBrowsers2;
-          case "browserversion":
-            return selectedBrowserVerionDetails2;
-        }
-      };
-
-      const placeHolder = (field) => {
-        switch (field) {
-          case "osname":
-            return "Select OS 1st Name";
-          case "osversion":
-            return "Select OS Version";
-          case "browsername":
-            return "Select Browser Name";
-          case "browserversion":
-            return "Select Browser Version";
-        }
-      };
-
-      //1st dropDown
-      return (
-        <Dropdown
-          value={selectedValue(field)}
-          options={getOptions(field)}
-          onChange={(e) => {
-            onChangeFunctions(e.value, rowData);
-          }}
-          placeholder={selectedValue(field) !== "" ? null : placeHolder(field)}
-          optionLabel="name"
-        />
-      );
-    } else {
-      if (field == "actions") {
-        return (
-          <div style={{ display: "flex" }}>
-            <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(rowData)}>
-              <img src="static/imgs/ic-edit.png"
-                style={{ height: "20px", width: "20px" }}
-                className="pencil_button p-button-edit"
-              />
-            </button>
-            <button onClick={() => {
-              setVisible(true);
-              setRowToDelete(rowData);
-            }}>
-              <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }}
-                className="trash_button p-button-edit" label="Bottom"
-              />
-            </button>
-          </div>
-        )
-      } else {
-        return <p className='m-auto'>{selectedValue(field)}</p>
-      }
-    }
-    // else {
-    //   const valueTemplate = () => {
-    //     if (field == "actions") {
-    //       return (
-    //         <div style={{ display: "flex" }}>
-    //           <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(rowData)}>
-    //             <img src="static/imgs/ic-edit.png"
-    //               style={{ height: "20px", width: "20px" }}
-    //               className="pencil_button p-button-edit"
-    //             />
-    //           </button>
-    //           <button onClick={() => {
-    //             setVisible(true);
-    //             setRowToDelete(rowData);
-    //           }}>
-    //             <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }}
-    //               className="trash_button p-button-edit" label="Bottom"
-    //             />
-    //           </button>
-    //         </div>
-    //       )
-    //     } else {
-    //       return <p className='m-auto'>{selectedValue(field)}</p>
-    //     }
-    //   };
-
-    //   //2nd dropDown
-    //   return (
-    //     <div className="inline-flex gap-2 m-auto">{
-    //       (editMode && options.id == rowData.rowIndex) ? statusEditor(options, "status editor new") : valueTemplate()
-    //     }</div>
-    //   )
-    // }
-  };
 
   const onRowEditComplete = (e) => {
     let updatedConfig = [...config];
     let { newData, index } = e;
     updatedConfig[index] = newData;
-
     setConfig(updatedConfig);
   };
 
@@ -764,7 +517,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     const selectedValue = (field) => {
       switch (field) {
         case "osname":
-          return options.osname
+          return options.osname;
         case "osversion":
           return options.osversion;
         case "browsername":
@@ -775,16 +528,61 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     };
 
     if (editModes[field.rowIndex] || options[field.field] == "") {
-      const getOptions = (field) => {
-        switch (field) {
-          case "osname":
-            return newOsNames;
-          case "osversion":
-            return browserstackOsVersion2;
-          case "browsername":
-            return browserstackBrowsers2;
-          case "browserversion":
-            return selectedBrowserVerionDetails2;
+      const getOptions = (field, onEdit) => {
+        if (onEdit) {
+          switch (field) {
+            case "osname":
+              return newOsNames?.map((os) => {
+                delete os.versions;
+                return os;
+              });
+            case "osversion":
+              return browserstackBrowserDetails.os_names[options.osname]?.map((browser) => {
+                return {
+                  name: browser,
+                  code: browser
+                }
+              });
+            case "browsername":
+              function filterByValue(data, value) {
+                let result = [];
+
+                for (let browser in data) {
+                  if (data[browser].hasOwnProperty(value)) {
+                    result.push(browser);
+                  }
+                }
+
+                return result?.map((res) => {
+                  return {
+                    name: res,
+                    code: res,
+                  }
+                });
+              }
+
+              const filteredArray = filterByValue(browserstackBrowserDetails.browser, `${options?.osname} ${options?.osversion}`);
+              return filteredArray
+
+            case "browserversion":
+              return browserstackBrowserDetails.browser[options.browsername][`${options?.osname} ${options?.osversion}`]?.map((version) => {
+                return {
+                  name: version,
+                  code: version
+                }
+              });
+          }
+        } else {
+          switch (field) {
+            case "osname":
+              return newOsNames;
+            case "osversion":
+              return browserstackOsVersion2;
+            case "browsername":
+              return browserstackBrowsers2;
+            case "browserversion":
+              return selectedBrowserVerionDetails2;
+          }
         }
       };
 
@@ -812,14 +610,13 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
           values = {
             name: selectedValue(field.field),
             code: selectedValue(field.field),
-            versions: []
+            key: selectedValue(field.field)
           }
         }
       }
       else {
         values = selectedValue(field.field)
       };
-
 
       //1st dropDown
       return (
@@ -828,24 +625,23 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
             field.field != "actions" ?
               <Dropdown
                 value={values}
-                options={getOptions(field.field)}
-                onChange={(e) => onChangeFunctions(e.value, field)}
+                options={getOptions(field.field, onEdit)}
+                onChange={(e) =>
+                  onChangeFunctions(e.value, field)}
                 placeholder={selectedValue(field.field) !== "" ? null : placeHolder(field.field)}
                 optionLabel="name"
               />
-              : <div style={{ display: "flex" }}>
-                <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(field)}>
-                  <img src="static/imgs/ic-edit.png"
+              : <div style={{ display: "flex", justifyContent: "center" }}>
+                <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(field, options)}>
+                  <img src={onEdit ? "static/imgs/check_black_icon.svg" : "static/imgs/ic-edit.png"}
                     style={{ height: "20px", width: "20px" }}
-                    className="pencil_button p-button-edit"
                   />
                 </button>
                 <button onClick={() => {
                   setVisible(true);
                   setRowToDelete(field);
                 }}>
-                  <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }}
-                    className="trash_button p-button-edit" label="Bottom"
+                  <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }} label="Bottom"
                   />
                 </button>
               </div>}
@@ -854,19 +650,17 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     } else {
       if (field.field == "actions") {
         return (
-          <div style={{ display: "flex" }}>
-            <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(field)}>
-              <img src="static/imgs/ic-edit.png"
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button style={{ marginRight: "5px" }} onClick={() => editExecutionRow(field, options)}>
+              <img src={onEdit ? "static/imgs/check_black_icon.svg" : "static/imgs/ic-edit.png"}
                 style={{ height: "20px", width: "20px" }}
-                className="pencil_button p-button-edit"
               />
             </button>
             <button onClick={() => {
               setVisible(true);
               setRowToDelete(field);
             }}>
-              <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }}
-                className="trash_button p-button-edit" label="Bottom"
+              <img src="static/imgs/ic-delete-bin.png" style={{ height: "20px", width: "20px" }} label="Bottom"
               />
             </button>
           </div>
@@ -877,14 +671,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
     }
   };
 
-  // useEffect(() => {
-  //   if (editMode) {
-  //     statusEditor(clickedRow, "useEffect");
-  //   }
-  // }, [editMode]);
+  const browserstackModalWidth = activeIndex == 0 ? "browserstackModalNormalWidth" : "browserstackModalParallelWidth";
 
   return (
-    <AvoModal customClass='browserstack_modal' header={headerTemplate}
+    <AvoModal customClass={`browserstack_modal ${browserstackModalWidth}`} header={headerTemplate}
       visible={displayBasic7} onModalBtnClick={() => onHidedia('displayBasic7')}
       content={
         <>
@@ -966,7 +756,8 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
               </TabPanel>
 
               <TabPanel header="Parallel Execution" rightIcon="pi pi-info-circle ml-2" className="Parllel_cls">
-                <div>
+                <div classname="normal-exicution_cls" style={{ border: '2px solid #EEE', borderRadius: "5px" }}>
+                  <h4 className='m-2 ml-3'>Select Combinations <span style={{ fontSize: '1em', color: "red", marginLeft: "-5px" }}>*</span></h4>
                   <div className="counter_cls">
                     <div>
                       <p style={{ padding: '10px 5px', color: '#000', background: '#FFF', textAlign: 'center' }}>{count}</p>
@@ -993,17 +784,16 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                     <Toast ref={toast} />
                     <ConfirmDialog group="declarative" visible={visible} onHide={() => setVisible(false)} message="Do you want to delete this record?"
                       header="Delete Confirmation" icon="pi pi-exclamation-triangle" accept={() => deleteExecutionRow(rowToDelete.rowIndex)} reject={reject} />
-                    <DataTable value={config} editMode="row" onRowEditComplete={onRowEditComplete}>
+                    <DataTable value={config} editMode="row" onRowEditComplete={onRowEditComplete} style={{ height: "26vh", maxHeight: "27vh", overflow: 'auto' }}>
                       {headerConfigs.map((headerConfig) => {
                         const { field, header } = headerConfig;
                         return (
                           <Column
                             key={field}
                             field={field}
-                            // rowEditor={true}
                             header={header}
-                            style={{ width: "20%", textAlign: "center" }}
-                            // body={(options, field) => statusEditorForNewFields(options, field.field, field)}
+                            style={{ textAlign: "center", height: "20px", border: "1px solid #CCC" }}
+                            className='w-2'
                             body={(options, field) => statusEditorForNewFieldsNew(options, field)}
                           />
                         );
@@ -1016,7 +806,10 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                       <span style={{ position: "relative", left: "-14px", fontSize: "15px", top: "-4px" }}>1</span></i>)
                   }
                   <div className='progress-bar2'></div>
-                  {selectedICE ? (<div className='pi-check2-bg'> <i class="pi pi-check" style={{ position: 'relative', top: '-1px', color: '#FFF', padding: "1px" }}  > </i></div>)
+                  {selectedICE ? (
+                    <div className='pi-check2-bg' style={{ position: 'relative', top: '90px', left: "-26px", color: '#FFF', padding: "1px" }}>
+                      <i class="pi pi-check"></i>
+                    </div>)
                     : (<i class="pi pi-circle" style={{ fontSize: "1.25rem", color: "#6366F1", position: "relative", top: "90px", left: "-25px" }}>
                       <span style={{ position: "relative", left: "-14px", fontSize: "15px", top: "-4px" }}>2</span></i>)
                   }
@@ -1057,7 +850,25 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
           </>}
 
           <div style={{ padding: "0px 20px ", marginTop: "16px" }}>
-            <div className="ice_container">
+            <div className="ice_container" id="ice_container_box">
+              <div>
+                <h4 style={{ marginBottom: "10px" }}>Select Avo Assure Client to start the execution <span style={{ fontSize: '1em', color: "red", marginLeft: "-5px" }}>*</span></h4>
+                <div>
+                  <h5>Avo Assure Client</h5>
+                  <DropDownList
+                    poolType={poolType}
+                    ExeScreen={ExeScreen}
+                    inputErrorBorder={inputErrorBorder}
+                    setInputErrorBorder={setInputErrorBorder}
+                    placeholder={"Search"}
+                    data={availableICE}
+                    smartMode={ExeScreen === true ? smartMode : ""}
+                    selectedICE={selectedICE}
+                    setSelectedICE={setSelectedICE}
+                    className="saucelabs_ICE "
+                  />
+                </div>
+              </div>
               <div className="ice_status">
                 <span className="status">Status:</span>
                 <span className="available"></span>
@@ -1067,47 +878,36 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
                 <span className="dnd"></span>
                 <span>Do Not Disturb</span>
               </div>
-              <h4 >Select Avo Assure Client  to start the exicution <span style={{ fontSize: '1em', color: "red", marginLeft: "-5px" }}>*</span></h4>
-              <div>
-                <h5>Avo Assure Client</h5>
-                <DropDownList
-                  poolType={poolType}
-                  ExeScreen={ExeScreen}
-                  inputErrorBorder={inputErrorBorder}
-                  setInputErrorBorder={setInputErrorBorder}
-                  placeholder={"Search"}
-                  data={availableICE}
-                  smartMode={ExeScreen === true ? smartMode : ""}
-                  selectedICE={selectedICE}
-                  setSelectedICE={setSelectedICE}
-                  className="saucelabs_ICE "
-                />
-              </div>
             </div>
           </div>
 
           <div style={{ backgroundColor: 'FAFAFA' }}>
             <Button label="Execute" title="Execute" className="Sacuelab_execute_button" disabled={selectedICE == ''} onClick={async () => {
-              let payload = {};
               let result = config.map((data) => {
                 let obj = {};
                 Object.keys(data).filter((key) => {
                   if (key != "id") {
-                    if (obj[key] == undefined) {
-                      obj[key] = data[key];
+                    if (key == "osversion") {
+                      if (obj["osversion"] == undefined) {
+                        obj["osVersion"] = data[key];
+                      }
+                    } else if (key == "osname") {
+                      if (obj["osname"] == undefined) {
+                        obj["os"] = data[key];
+                      }
+                    } else if (key == "browsername") {
+                      if (obj["browsername"] == undefined) {
+                        obj["browserName"] = data[key];
+                      }
+                    } else if (key == "browserversion") {
+                      if (obj["browserversion"] == undefined) {
+                        obj["browserVersion"] = data[key];
+                      }
                     }
                   }
                 });
                 return obj;
               });
-
-
-              if (activeIndex == 1) {
-                payload = {
-                  executionMode: "browserstack_parallel",
-                  platforms_web: result || []
-                }
-              };
 
               dataExecution.type = (ExeScreen === true ? ((smartMode === "normal") ? "" : smartMode) : "")
               dataExecution.poolid = ""
@@ -1116,11 +916,24 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
               dataExecution['executionEnv'] = 'browserstack'
               dataExecution['browserstackDetails'] = browserstackUser && browserstackValues;
               if (!showBrowserstack) {
-                dataExecution['os'] = selectedOS;
-                dataExecution['osVersion'] = selectedOsVersions;
-                dataExecution['browserVersion'] = selectedBrowserVersionsDetails
-                dataExecution['browserName'] = selectedBrowserVersions;
-                dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedBrowserVersions)[0].key]
+                if (activeIndex == 1) {     // for parallel execution
+                  setExecutionMode("browserstack_parallel");
+                  dataExecution.exectionMode = "browserstack_parallel";
+                  dataExecution.platforms_web = result || [];
+                  dataExecution['os'] = "";
+                  dataExecution['osVersion'] = "";
+                  dataExecution['browserVersion'] = ""
+                  dataExecution["browserType"] = ['1']
+                  dataExecution['browserName'] = "";
+                } else if (activeIndex == 0) {    // for normal execution
+                  setExecutionMode("serial");
+                  dataExecution.exectionMode = "serial";
+                  dataExecution["browserType"] = [browserlist.filter((element, index) => element.text == selectedBrowserVersions)[0].key]
+                  dataExecution['os'] = selectedOS;
+                  dataExecution['osVersion'] = selectedOsVersions;
+                  dataExecution['browserVersion'] = selectedBrowserVersionsDetails
+                  dataExecution['browserName'] = selectedBrowserVersions;
+                }
               } else {
                 dataExecution["browserType"] = ['1']
                 dataExecution['mobile'] = {
@@ -1144,7 +957,7 @@ const BrowserstackExecute = React.memo(({ browserstackBrowserDetails, selectProj
 
           </div>
         </>}
-      headerTxt='BrowserStack Integration' modalSytle={{ height: "auto", background: "#FFFFFF" }}
+      headerTxt='BrowserStack Integration' modalSytle={{ background: "#FFFFFF" }}
     />
   )
 })

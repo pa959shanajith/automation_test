@@ -216,6 +216,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
 ]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [executionMode, setExecutionMode] = useState("serial");
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -1157,7 +1158,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
-    executionData["exectionMode"] = execAction;
+    executionData["exectionMode"] = executionData?.exectionMode;
   //   if(executionData["exectionMode"] == selectedTab){
   //    executionData["exectionMode"]="browserstack_parallel";
   //  }
@@ -1233,7 +1234,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
       setBrowserTypeExe([]);
       setModuleInfo([]);
-      setExecAction("serial");
+      setExecAction(executionMode);
       setExecEnv("default");
     } catch (error) {
       setLoading(false);
@@ -1247,7 +1248,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       });
       setBrowserTypeExe([]);
       setModuleInfo([]);
-      setExecAction("serial");
+      setExecAction(executionMode);
       setExecEnv("default");
       
     }
@@ -1318,7 +1319,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       searchKey: getSearch
     });
 
-    const configDataLength = configurationList["data"].length;
+    const configDataLength = configurationList["data"]?.length;
     if(configDataLength > 0){
       dispatch(testrailPlanRunIds(configurationList["data"][configDataLength - 1]?.executionRequest?.integration?.testrail?.runAndPlanDetails) || {});
     }
@@ -2743,6 +2744,7 @@ Learn More '/>
             displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
             changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
             availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
+            setExecutionMode={setExecutionMode}
         />
       {browserstackLogin}
         <Breadcrumbs />
