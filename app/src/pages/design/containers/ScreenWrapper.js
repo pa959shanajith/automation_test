@@ -7,7 +7,7 @@ import "../styles/ScreenWrapper.scss";
 const ScreenWrapper = props => {
     return (
         <div className="ss__content">
-            <div className="ss__content_wrap" style={ props.fullHeight ? {height: "100%"} : {}}>
+            <div className="ss__content_wrap" style={ props.fullHeight ? {height: "75vh"} : {}}>
                 { /* Task Name */ }
                 <div className="ss__task_title">
                     {/* <div className="ss__task_name">{taskName}</div> */}

@@ -1,97 +1,116 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect,useState,useRef} from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { useDispatch, useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
-import { pushToHistory } from './DtUtils';
-import { ScrollBar, Messages as MSG, setMsg } from '../../global';
-import { ReactSortable } from 'react-sortablejs';
-import TextareaAutosize from 'react-textarea-autosize';
+import { Messages as MSG, setMsg ,VARIANT} from '../../global';
+import { pasteCells, prepareCopyData, validateData, prepareSaveData, deleteData, parseTableData, getNextData, getPreviousData, pushToHistory } from './DtUtils';
+import { setCopyCells } from '../UtilitySlice';
+import { InputText } from 'primereact/inputtext';
+import ImportPopUp from './ImportPopUp';
+import ExportDataTable from './ExportDataTable';
 import "../styles/Table.scss";
+import DtPasteStepDialog from './DtPasteStepDialog';
+import { Toast } from 'primereact/toast';
+import { Dropdown } from 'primereact/dropdown';
+import { Tooltip } from 'primereact/tooltip';
+import * as utilApi from '../api';
 
-/* 
-    data
-    setData
-    checkList
-    setCheckList
-    dnd
-*/
 
-const Table = props => {
+const Table = (props) => {
+    
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [currScreen, setCurrScreen] = useState(props.currScreen);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [refreshTable, setRefreshTable] = useState(false);
+    const [columnVisibilities, setColumnVisibilities] = useState({});
+    const dispatch = useDispatch();
+    const copiedCells = useSelector(state=>state.utility.copiedCells)
+    const [showPS, setShowPS] = useState(false);
+    const toast = useRef();
+    const [importPopup, setImportPopup] = useState(false);
+    const [showExportPopup, setShowExportPopup] = useState(false);
+    const [editingHeader, setEditingHeader] = useState('');
 
-    const headerRef = useRef();
-    const rowRef = useRef();
-
-    const onAdd = type => {
-        if (type === "col") {
-            if (props.headers.length >= 50)
-                setMsg(MSG.UTILITY.ERR_COLUMN_50);
-            else {
-                pushToHistory({ headers: props.headers, data: props.data });
-                let newHeaders = [...props.headers];
-                let newHeaderId = uuid();
-                newHeaders.push({
-                    __CELL_ID__: newHeaderId,
-                    name: `C${props.headerCounter}`
-                })
-                props.setFocus({ type: 'tableCol', id: newHeaderId });
-                props.setHeaders(newHeaders);
-                props.setHeaderCounter(count => count + 1);
-            }
+    useEffect(() => {
+        if (props.headers) {
+            const initialColumnVisibilities = {};
+            props.headers.forEach(header => {
+                initialColumnVisibilities[header.__CELL_ID__] = true; // Initially, all columns are visible
+            });
+            setColumnVisibilities(initialColumnVisibilities);
         }
-        else if (type === "row") {
-            if (props.data.length >= 199)
-                setMsg(MSG.UTILITY.ERR_ROWS_200);
-            else {
-                pushToHistory({ headers: props.headers, data: props.data });
-                let newData = [...props.data];
-                let newRowId = uuid();
-                newData.push({ __CELL_ID__: newRowId })
-                props.setFocus({ type: 'tableRow', id: newRowId });
-                props.setData(newData);
-            }
-        }
-    }
+    }, [props.headers]);
 
-    const updateHeaders = (newHeader, headerId, invalidFlag) => {
-
-        if (invalidFlag) {
-            setMsg(MSG.UTILITY.ERR_HEADER)
-            return;
-        }
-        pushToHistory({ headers: props.headers, data: props.data });
-        let newHeaders = [...props.headers];
-        let oldHeaderName;
-        newHeaders.forEach(header => {
-            if (header.__CELL_ID__ === headerId) {
-                oldHeaderName = header.name
-                header.name = newHeader;
-            }
-        })
-        let newData = [...props.data];
-        newData.forEach(row => {
-            let columnValue = row[oldHeaderName];
-            delete row[oldHeaderName]
-            row[newHeader] = columnValue;
-        })
+    const handleDropdownChange = (columnId) => {
+        const newHeaders = props.headers.filter(header => header.__CELL_ID__ !== columnId);
+        const newData = props.data.map(row => {
+            const newRow = { ...row };
+            delete newRow[columnId];
+            return newRow;
+        });
+        props.setData(newData);
         props.setHeaders(newHeaders);
-        props.setData(newData);
-    }
+        return {newData, newHeaders}
+    };
 
-    const updateTableData = (value, rowId, headerId) => {
-        let newData = [...props.data];
-        pushToHistory({ headers: props.headers, data: props.data });
-        for (let row of newData) {
-            if (row.__CELL_ID__ === rowId) {
-                row[headerId] = value;
-                break;
+        const data = Array.isArray(props.data) ? props.data : [];
+
+        const handleRowSelect = (e) => {
+            updateCheckList(e, "row", e.value.__CELL_ID__)
+        };
+
+        const handleColumnSelect = (e) => {
+            return props.setData(e.value)
+        };
+    
+        const onAdd = (type) => {
+            if (type === "col") {
+                if (props.headers.length >= 50) {
+                    setMsg(MSG.UTILITY.ERR_COLUMN_50);
+                } else {
+                    pushToHistory({ headers: props.headers, data: props.data });
+                    const newHeaders = [...props.headers];
+                    const newHeaderId = uuid();
+                    newHeaders.push({
+                        __CELL_ID__: newHeaderId,
+                        name: `C${props.headerCounter}`
+                    });
+                    props.setHeaders(newHeaders);
+                    props.setFocus({ type: 'tableCol', id: newHeaderId });
+                    props.setHeaderCounter(count => count + 1);
+                }
+            } else if (type === "row") {
+                if (props.data.length >= 199) {
+                    setMsg(MSG.UTILITY.ERR_ROWS_200);
+                } else {
+                    pushToHistory({ headers: props.headers, data: props.data });
+                    const newRowId = uuid();
+                    const newRow = { __CELL_ID__: newRowId };
+                    const newData = [...props.data, newRow];
+                    props.setFocus({ type: 'tableRow', id: newRowId });
+                    props.setData(newData);
+                    setRefreshTable(!refreshTable);
+                }
             }
-        }
-        props.setData(newData);
-    }
+        };
 
-    // loc => id for header, index for row
+        const updateHeaderName = (newName, headerId) => {
+            pushToHistory({ headers: props.headers, data: props.data });
+            const newHeaders = props.headers.map(header => {
+                if (header.__CELL_ID__ === headerId) {
+                    return { ...header, name: newName };
+                }
+                return header;
+            });
+            props.setHeaders(newHeaders);
+        };
+    
+         // loc => id for header, index for row
     const updateCheckList = (e, type, loc) => {
         let newCheckList = props.checkList.type === type ? { ...props.checkList } : { type: type, list: [] }
 
-        if (e.ctrlKey) {
+        if (e.originalEvent.ctrlKey) {
             let itemIndex = newCheckList.list.indexOf(`sel||${type}||${loc}`);
             if (itemIndex < 0)
                 newCheckList.list.push(`sel||${type}||${loc}`);
@@ -105,403 +124,361 @@ const Table = props => {
 
         props.setCheckList(newCheckList);
     }
+    
+        const rowEditor = (rowData, columnMeta, headerId) => {
+            const handleInputChange = (e) => {
+                const { value } = e.target;
+                updateTableData(value, rowData.__CELL_ID__, headerId);
+                columnMeta.editorCallback(value)
+            };
+        
+            return (
+                <InputText
+                    value={rowData[columnMeta.field]}
+                    onChange={handleInputChange}
+                />
+            );
+        };
+        const handleHeaderClick = (field) => {
+            setEditingHeader(field);
+          };
 
-    const onScrollY = e => {
-        rowRef.current.style.top = `-${e.scrollTop}px`
-    }
+        const dynamicColumns = props.headers.map((header) => (
+            <Column
+                key={`header-${header.__CELL_ID__}`}
+                header={(editingHeader === header.name || editingHeader === '') ? <InputText value={header.name} onChange={(e) => updateHeaderName(e.target.value, header.__CELL_ID__)} /> : <span onClick={() => handleHeaderClick(header.name)}>{header.name}</span>}
+                field={header.__CELL_ID__}
+                columnKey={header.__CELL_ID__}
+                // initialValue={header.__CELL_ID__ || ''}
+                headerStyle={{ textAlign: 'center',width: '21rem' }}
+                bodyStyle={{ textAlign: 'center',width: '21rem' }}
+                editor={(props) => rowEditor(props.rowData, props,header.__CELL_ID__)}
+                bodyClassName={"ellipsis_column"}
+                style={{ display: columnVisibilities[header.__CELL_ID__] ? 'table-cell' : 'none' }}
+            />
+        ));
+    
+        const updateTableData = (value, rowId, headerId) => {
+            pushToHistory({ headers: props.headers, data: props.data });
+            const newData = props.data.map(row => {
+                if (row.__CELL_ID__ === rowId) {
+                    return { ...row, [headerId]: value };
+                }
+                return row;
+            });
+            props.setData(newData);
+        };
+    
+        const toastError = (errorMessage) => {
+            if (toast.current && errorMessage) {
+                if (errorMessage.CONTENT) {
+                    toast.current.show({ severity: errorMessage.VARIANT, summary: 'Error', detail: errorMessage.CONTENT, life: 5000 });
+                } else {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(errorMessage), life: 5000 });
+                }
+            }
+        };
+        
+        const toastSuccess = (successMessage) => {
+            if (toast.current && successMessage) {
+                if (successMessage.CONTENT) {
+                    toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+                } else {
+                    toast.current.show({ severity: 'success', summary: 'Success', detail: JSON.stringify(successMessage), life: 5000 });
+                }
+            }
+        };
+        
+    
+        const onAddRowcol = () => {
+            if (props.checkList.list.length===1){
+                if (props.checkList.type==="row"){
+                    if (props.data.length >= 199) 
+                        toastError(MSG.UTILITY.ERR_ROWS_200);
+                    else {
+                        pushToHistory({headers: props.headers, data: props.data});
+                        let newData = [...props.data];
+                        let locToAdd = 0;
+                        let rowId = props.checkList.list[0].split('||').pop();
+        
+                        // For SubHeader Selection, Location To Add (LocToAdd) will always be 0 i.e. start of data
+                        if (rowId !== 'subheader') {
+                            newData.forEach((row, rowIndex) => {
+                                if (rowId === row.__CELL_ID__) locToAdd = rowIndex+1;
+                            })
+                        }
+                        
+                        let newRowId = uuid();
+                        newData.splice(locToAdd, 0, {__CELL_ID__: newRowId});
+                        props.setFocus({type: 'action', id: newRowId});
+                        props.setData(newData);
+                    }
+                }
+                else{
+                    if (props.headers.length >= 50) 
+                        toastError(MSG.UTILITY.ERR_COLUMN_50);
+                    else {
+                        pushToHistory({headers: props.headers, data: props.data});
+                        let newHeaders = [...props.headers];
+                        let locToAdd = 0;
+                        let headerId = props.checkList.list[0].split('||').pop();
+                        
+                        props.headers.forEach((header, headerIndex)=>{
+                            if (header.__CELL_ID__ === headerId) locToAdd = headerIndex;
+                        })
+                        
+                        let newHeaderId = uuid();
+                        newHeaders.splice(locToAdd+1, 0, {
+                            __CELL_ID__: newHeaderId,
+                            name: `C${props.headerCounter}`
+                        })
+        
+                        props.setFocus({type: "action", id: newHeaderId});
+                        props.setHeaders(newHeaders);
+                        props.setHeaderCounter(count => count + 1);
+                    }
+                }
+            }
+            else {
+                toastError(MSG.CUSTOM(props.checkList.list.length 
+                    ? `Too many selected ${props.checkList.type === "row" ? "rows" : "columns"}`
+                    : `Please select a row or column to perform add operation.`,VARIANT.ERROR));
+            }
+        }
+    
+        
+        const onDelete = () => {
+            // HANDLE CHECKLIST
+            if (props.checkList.list.length){
+                if (props.checkList.type==="row"){
+                    if (props.checkList.list.includes("sel||row||subheader") || props.data.length === props.checkList.list.length)
+                    toastError(MSG.CUSTOM(props.checkList.list.includes("sel||row||subheader") 
+                        ? 'Cannot delete SubHeader row.'
+                        : 'Table cannot have 0 rows',VARIANT.WARNING));
+                    else {
+                        pushToHistory({headers: props.headers, data: props.data});
+                        let [newData,] = deleteData(props.data, [], props.checkList.list);
+                        props.setData(newData);
+                    }
+                }
+                else{
+                    if (props.headers.length === props.checkList.list.length)
+                    toastError(MSG.UTILITY.ERR_COLUMN_0);
+                    else {
+                        pushToHistory({headers: props.headers, data: props.data});
+                        let [newHeaders, newData] = deleteData(props.headers, props.data, props.checkList.list);
+                        props.setHeaders(newHeaders);
+                        props.setData(newData);
+                    }
+                }
+                props.setCheckList({type: 'row', list: []});
+            }
+            else {
+                toastError(MSG.UTILITY.ERR_DELETE);
+            }
+        }
+    
+        
+        const onUndo = () => {
+            const resp = getPreviousData({headers: props.headers, data: props.data});
+            if (resp==="EMPTY_STACK") {
+                toastError(MSG.UTILITY.ERR_UNDO);
+            }
+            else {
+                if (resp.data) props.setData(resp.data);
+                if (resp.headers) props.setHeaders(resp.headers);
+            }
+        }
+    
+        const onRedo = () => {                          
+            const resp = getNextData({headers: props.headers, data: props.data});
+            if (resp==="EMPTY_STACK") {
+                toastError(MSG.UTILITY.ERR_REDO);
+            }
+            else {
+                if (resp.data) props.setData(resp.data);
+                if (resp.headers) props.setHeaders(resp.headers);
+            }
+        }
+    
+        const onCopy = () => {
+            if (props.checkList.list.length) {
+                let resp = prepareCopyData(props.headers, props.data, props.checkList);
+                if (resp.isEmpty)
+                toastError(MSG.UTILITY.ERR_EMPTY_COPY);
+                else{
+                    dispatch(setCopyCells(resp.copiedData));
+                    props.setCheckList({type: 'row', list: []})
+                }
+            }
+            else 
+            toastError(MSG.UTILITY.ERR_SELECT_COPY);
+        }
+    
+        const onPaste = () => {
+            if (copiedCells.cells.length){
+                if (copiedCells.type === 'rows' && props.data.length+copiedCells.cells.length > 199) 
+                toastError(MSG.UTILITY.ERR_PASTE_200);
+                else if (copiedCells.type === 'cols' && props.headers.length+copiedCells.cells.length > 50) 
+                toastError(MSG.UTILITY.ERR_PASTE_50);
+                else 
+                    setShowPS(true);
+            }
+            else {
+                toastError(MSG.UTILITY.ERR_NO_DATA_PASTE);
+            }
+        }
+    
+        const pasteData = (pasteIndex) => {
+            try{
+                pushToHistory({headers: props.headers, data: props.data});
+                const [newHeaders, newData] = pasteCells(copiedCells, props.headers, props.data, Number(pasteIndex))
+                props.setHeaders([...newHeaders]);
+                props.setData([...newData]);
+                props.setCheckList({type: 'row', list: []})
+                setShowPS(false);
+            }
+            catch (error) {
+                setShowPS(false);
+                console.error(error)
+            }
+        }
+        const goToEditScreen = () => {
+            let arg = prepareSaveData(props.tableName, props.headers, props.data);
+    
+            if (arg.data === "emptyData")
+                props.setScreenType('datatable-Edit');
+            else
+                props.setModal({
+                    title: "Unsaved Data Found", 
+                    content: "Unsaved data will be lost. Are you sure you want to go to Edit Screen?", 
+                    onClick: ()=>{ props.setScreenType('datatable-Edit'); props.setModal(false); }
+                });    
+        }
 
-    const onScrollX = e => {
-        headerRef.current.style.left = `-${e.scrollLeft}px`;
-    }
+        const dropdownOptions = props.headers.map(header => ({
+            label: header.name,
+            value: header.__CELL_ID__
+        }));
+
+        const updateTable = async(newData="", newHeaders="") => {
+            try{
+                let arg = prepareSaveData(props.tableName, newHeaders,newData);
+    
+                let validation = validateData(arg.tableName, arg.data);
+    
+                switch (validation) {
+                    case "tableName": props.setErrors({tableName: true}); break;
+                    case "emptyData": toastError(MSG.UTILITY.ERR_EMPTY_SAVE); break;
+                    case "duplicateHeaders": toastError(MSG.UTILITY.ERR_DUPLICATE_HEADER); break;
+                    case "saveData": 
+                        props.setOverlay("Updating Data Table");
+                        const resp = await utilApi.editDataTable(arg);
+                        props.setOverlay("");
+                        if (resp === "success") 
+                        toastSuccess(MSG.UTILITY.SUCC_UPDATE_DATATABLE)
+                        else 
+                        toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+                        break;
+                    default: toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE); break;
+                }
+            }
+            catch(error) {
+                toastError(MSG.UTILITY.ERR_UPDATE_DATATABLE)
+                console.error(error);
+            }
+        }
+    
+
+        const deleteColumn = (selectedOption) => {
+            props.setModal({
+                title: "Confirm Deletion", 
+                content: "Are you sure you want to delete the selected column?", 
+                onClick: () => handleConfirmation(selectedOption)
+            });
+        }
+        
+        const handleConfirmation = (selectedOption) => {
+                const {newData, newHeaders} = handleDropdownChange(selectedOption.value);
+                if(currScreen === "Edit"){
+                    updateTable(newData, newHeaders);
+                }
+                // {(currScreen === 'Create') ? '' : updateTable(newData, newHeaders)}
+                props.setModal(false);
+        }
+
+    const header = (
+        <div className="flex align-items-center justify-content-between">
+            <div className='flex gap-5'>
+                <Tooltip target=".plus-img" position="bottom" content="Add Selected Row" />
+                <span className='plus-img' data-pr-tooltip="Add Selected Row" onClick={onAddRowcol}>
+                    <img src="static/imgs/plus.svg" alt="add selected Row/Column" />
+                </span>
+                <Tooltip target=".import-img" position="bottom" content="Import" />
+                <span className="import-img" data-pr-tooltip='Import' onClick={() => setImportPopup(true)}>
+                    <img src="static/imgs/Import.svg" alt="import" />
+                </span>
+                <Tooltip target=".export-img" position="bottom" content="Export" />
+                <span className={props.tableName ? "export-img dt_separation" : "disabled_export dt_separation"} data-pr-tooltip="Export" onClick={props.tableName ? () => setShowExportPopup(true) : null}>
+                    <img src="static/imgs/export_icon 1.svg" alt="export" />
+                </span>
+                <Tooltip target=".copy-img" position="bottom" content="Copy Row" />
+                <span className="copy-img" data-pr-tooltip="Copy Row" onClick={onCopy}>
+                    <img src="static/imgs/copy.svg" alt="Copy" />
+                </span>
+                <Tooltip target=".paste-img" position="bottom" content="Paste Row" />
+                <span title="Paste Row" className="paste-img dt_separation" data-pr-tooltip="Paste Row" onClick={onPaste}>
+                    <img src="static/imgs/paste.svg" alt="Paste" />
+                </span>
+                <Tooltip target=".redo_img" position="bottom" content="Redo" />
+                <span title="Redo" className='redo_img' data-pr-tooltip="Redo" onClick={onRedo}>
+                    <img src="static/imgs/redo.svg" alt="Redo" />
+                </span>
+                <Tooltip target=".undo_img" position="bottom" content="Undo" />
+                <span title="Undo" className="undo_img dt_separation" data-pr-tooltip="Undo" onClick={onUndo}>
+                    <img src="static/imgs/undo.svg" alt="Undo" />
+                </span>
+                <Tooltip target=".edit_img" position="bottom" content="Edit" />
+                <span className="edit_img" data-pr-tooltip="Edit" onClick={goToEditScreen}>
+                    <img src="static/imgs/pencil.svg" alt="Edit" />
+                </span>
+                <Tooltip target=".delete_img" position="bottom" content="Remove Selected Row" />
+                <span title="Remove Selected Row" className='delete_img' data-pr-tooltip="Remove Selected Row" onClick={onDelete}>
+                    <img src="static/imgs/trash.svg" alt="Delete" />
+                </span>
+            </div>
+            <div className='ml-2 columnDelete'>
+                <Dropdown
+                    // className='columnDelete'
+                    options={dropdownOptions}
+                    value={null} // Set the default value or leave it as null
+                    onChange={(selectedOption) => deleteColumn(selectedOption)}
+                    placeholder="Select a column to delete"
+                />
+            </div>
+            <div>
+                <button className="btn_add" onClick={() => onAdd('col')} >+ Add column</button>
+            </div>
+        </div>
+    );
+
+    
 
     return (
         <>
-            {<div className="dt__table full__dt">
-                <RowNumColumn
-                    {...props}
-                    rowRef={rowRef}
-                    updateCheckList={updateCheckList}
-                    onAdd={onAdd}
-                />
-                <div className="dt__headersMainContainer full__dt">
-                    <div className="dt__headersScrollContainer">
-                        <div ref={headerRef} className="dt__Scroller">
-                            <Headers
-                                checkList={props.checkList}
-                                headers={props.headers}
-                                setHeaders={props.setHeaders}
-                                updateCheckList={updateCheckList}
-                                onAdd={onAdd}
-                            />
-                        </div>
-                        <div style={{ display: 'flex' }}>
-                            <Rows
-                                {...props}
-                                onScrollY={onScrollY}
-                                onScrollX={onScrollX}
-                                updateHeaders={updateHeaders}
-                                updateCheckList={updateCheckList}
-                                updateTableData={updateTableData}
-                                setUpdateData={props.setDataValue}
-                            />
-                        </div>
-                    </div>
-
-
-                </div>
-            </div>}
+        <Toast ref={toast} position="bottom-center" baseZIndex={1000} style={{ maxWidth: "35rem" }}/>
+        { importPopup && <ImportPopUp setImportPopup={setImportPopup} importPopup={importPopup} setData={props.setData} setHeaders={props.setHeaders} setOverlay={props.setOverlay} { ...props } />}
+        { showExportPopup && <ExportDataTable setShowExportPopup={setShowExportPopup} showExportPopup={showExportPopup} tableName={props.tableName} setOverlay={props.setOverlay} /> }
+        { showPS && <DtPasteStepDialog setShow={setShowPS} show={showPS} upperLimit={copiedCells.type === "cols" ? props.headers.length : props.data.length+1 } pasteData={pasteData} pasteType={copiedCells.type} /> }
+            <div className="card flex table_cell">
+                <DataTable value={props.data} reorderableColumns selectionMode="single" reorderableRows onRowReorder={handleColumnSelect} showGridlines header={header} footer={<div className='table__footer'><button className='btn_add' onClick={()=>onAdd('row')}> + Add row</button></div>} onSelectionChange={handleRowSelect} scrollable scrollHeight='243px' style={{overflowY : "auto"}}>
+                <Column rowReorder style={{ width: '3rem' }} />
+                    {dynamicColumns}
+                </DataTable>
+            </div>
         </>
     );
-}
+};
 
 export default Table;
 
-const Headers = ({ headers, setHeaders, updateCheckList, onAdd, checkList }) => {
-    const onStart = () => {
-        pushToHistory({ headers: headers });
-    }
-    return (
-        <div className="dt__table_header" >
-            <ReactSortable
-                list={headers}
-                setList={setHeaders}
-                className="dt__table_header_cells"
-                ghostClass="dt__ghost_header"
-                onStart={onStart}
-            >
-                {headers.map((header, headerIndex) => {
-                    return (
-                        <HeaderCell
-                            key={`header-${header.__CELL_ID__}`}
-                            headerIndex={headerIndex}
-                            headerName={header.name}
-                            selected={checkList.list.includes(`sel||col||${header.__CELL_ID__}`)}
-                            headerId={header.__CELL_ID__}
-                            headers={headers}
-                            updateCheckList={updateCheckList}
-                        />
-                    )
-                })}
-            </ReactSortable>
-            <div className="dt__table_new_column_header" data-test="dt__table_add_col" onClick={() => onAdd('col')}>
-                +
-            </div>
-        </div>
-    );
-}
-
-/*
-    headerName => header's name
-    headerIndex => for header's index in header array
-    headers => header list to check when renaming header
-    updateHeaders => updates Header State and all headers in data
-*/
-const HeaderCell = props => {
-    const [value, setValue] = useState(props.headerIndex || '')
-
-    useEffect(() => {
-        setValue(props.headerIndex)
-    }, [props.headerIndex]);
-
-    return (
-        <div className={"dt__cell dt__table_header_cell" + (props.selected ? " dt__hdrCell_Sel dt__colHeadSel" : "")}>
-            <div onClick={(e) => props.updateCheckList(e, "col", props.headerId)} data-test="dt__header_cell" >{`C${value + 1}`}</div>
-        </div>
-    );
-}
-
-
-
-
-const Rows = props => {
-    return (
-        <div className='table__utility'>
-            <SubHeaderRow
-                focus={props.focus}
-                setFocus={props.setFocus}
-                headers={props.headers}
-                updateHeaders={props.updateHeaders}
-                checkList={props.checkList}
-            />
-            {props.data.map((row, rowIndex) => {
-                return (
-                    <Row
-                        key={`row-${row.__CELL_ID__}`}
-                        focus={props.focus}
-                        setFocus={props.setFocus}
-                        checkList={props.checkList}
-                        setCheckList={props.setCheckList}
-                        updateTableData={props.updateTableData}
-                        headers={props.headers}
-                        row={row}
-                        rowIndex={rowIndex}
-                        updateCheckList={props.updateCheckList}
-                        setUpdateData={props.setUpdateData}
-                    />
-                )
-            })}
-            <AddRow focus={props.focus} setFocus={props.setFocus} />
-        </div>
-    );
-}
-
-const RowNumColumn = props => {
-
-    const onStart = () => {
-        pushToHistory({ headers: props.headers, data: props.data });
-    }
-
-    return (
-        <div className="dt__numberColumnContainer">
-            <div className="dt__table_numbered_column_header" />
-            <div className="dt__numberColScrollContainer">
-                <div ref={props.rowRef} className="dt__Scroller">
-                    <div
-                        key={"rownum-header"}
-                        className={"dt__table_numbered_column " + (props.checkList.list.includes(`sel||row||subheader`) ? " dt__hdrCell_Sel" : "")}
-                        data-test="dt__number_cell"
-                        onClick={(e) => props.updateCheckList(e, "row", "subheader")}
-                        id={`rowNum-1`}
-                    >
-                        1
-                    </div>
-                    <ReactSortable list={props.data} setList={props.setData} disabled={!props.dnd} key={props.dnd.toString()} ghostClass="dt__ghost_header" onStart={onStart}>
-                        {props.data.map((row, rowIndex) => {
-                            return (
-                                <div
-                                    key={`rownum-${row.__CELL_ID__}`}
-                                    className={"dt__table_numbered_column " + (props.checkList.list.includes(`sel||row||${row.__CELL_ID__}`) ? " dt__hdrCell_Sel" : "") + (props.dnd ? " grabbable" : "")}
-                                    onClick={(e) => props.updateCheckList(e, "row", row.__CELL_ID__)}
-                                    data-test="dt__number_cell"
-                                    id={`rowNum-${rowIndex + 2}`}
-                                >
-                                    {rowIndex + 2}
-                                </div>
-                            )
-                        })}
-                    </ReactSortable>
-                    <div
-                        key={`rownum-addRow`}
-                        className="dt__table_numbered_column dt__addRow"
-                        data-test="dt__table_add_row"
-                        onClick={() => props.onAdd('row')}
-                    >
-                        +
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-const SubHeaderRow = props => {
-
-    const addColRef = useRef();
-
-    useEffect(() => {
-        if (props.focus.type === "tableCol" && addColRef.current) {
-            addColRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            props.setFocus({ type: '', id: '' })
-        }
-    }, [props.focus])
-
-    return (
-        <div className="dt__table_row" data-test="dt__row">
-            <div className="dt__table_header_cells">
-                {props.headers.map(header => {
-                    return (
-                        <SubHeaderCell
-                            key={`cell-header-${header.__CELL_ID__}`}
-                            focus={props.focus}
-                            setFocus={props.setFocus}
-                            columnName={header.name}
-                            initialValue={header.name}
-                            updateHeaders={props.updateHeaders}
-                            headers={props.headers}
-                            headerId={header.__CELL_ID__}
-                            selected={
-                                props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`) ||
-                                props.checkList.list.includes(`sel||row||subheader`)
-                            }
-                        />
-                    )
-                })}
-            </div>
-            <div className={"dt__table_add_column " + (props.checkList.list.includes(`sel||row||subheader`) ? "dt__selected_cell" : '')} ref={addColRef} />
-        </div>
-    )
-}
-
-const AddRow = props => {
-
-    const addRowRef = useRef();
-
-    useEffect(() => {
-        if (props.focus.type === "tableRow" && addRowRef.current) {
-            addRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            props.setFocus({ type: '', id: '' })
-        }
-    }, [props.focus])
-
-    return (
-        <div className="dt__table_AddRow dt__table_row" data-test="dt__row" ref={addRowRef} />
-    );
-}
-
-const SubHeaderCell = props => {
-    const [value, setValue] = useState(props.initialValue || '');
-    const [edit, setEdit] = useState(false);
-    const colRef = useRef();
-    const areaRef = useRef();
-
-    useEffect(() => {
-        if (props.focus.type === "action" && props.focus.id === props.headerId && colRef.current) {
-            colRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            props.setFocus({ type: '', id: '' })
-        }
-    }, [props.focus])
-
-    useEffect(() => {
-        setValue(props.initialValue || '')
-    }, [props.initialValue]);
-
-    useEffect(() => {
-        if (edit && areaRef.current) areaRef.current.focus();
-    }, [edit])
-
-    const onBlur = e => {
-        let invalidHeader = false;
-        props.headers.forEach(header => {
-            if (!value.trim() || (header.name === value && header.__CELL_ID__ !== props.headerId) || value === "__CELL_ID__") invalidHeader = true;
-        })
-
-        if (invalidHeader)
-            setValue(props.initialValue || '')
-        props.updateHeaders(value, props.headerId, invalidHeader)
-        setEdit(false);
-        return true;
-    };
-
-    const onChange = e => setValue(e.target.value);
-
-    const checkKeyPress = event => {
-        if (event.keyCode === 13) onBlur();
-    }
-
-    const onClick = () => {
-        setEdit(true);
-    }
-
-    (() => {
-        let rowNum = document.getElementById(`rowNum-1`)
-        if (rowNum && colRef.current) {
-            document.getElementById(`rowNum-1`).style.height = `${colRef.current.clientHeight}px`;
-        }
-    })()
-
-    return (
-        <div
-            ref={colRef}
-            className={
-                "dt__cell dt__subHeader"
-                + (props.selected ? " dt__selected_cell" : '')}
-            data-test="dt__subHeader_cell"
-        >
-            {edit ? <TextareaAutosize ref={(tag) => areaRef.current = tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} />
-                : <div className="dt__subHeaderCell" onClick={onClick}>{value}</div>
-            }
-        </div>
-    );
-}
-
-
-const Row = props => {
-
-    const rowRef = useRef();
-
-    useEffect(() => {
-        if (props.focus.type === "action" && props.focus.id === props.row.__CELL_ID__ && rowRef.current) {
-            rowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            props.setFocus({ type: '', id: '' })
-        }
-    }, [props.focus])
-
-
-    const updateHeight = () => {
-        let rowNum = document.getElementById(`rowNum-${props.rowIndex + 2}`)
-        if (rowNum && rowRef.current) {
-            document.getElementById(`rowNum-${props.rowIndex + 2}`).style.height = `${rowRef.current.clientHeight}px`;
-        }
-    }
-
-    return (
-        <div className="dt__table_row" data-test="dt__row" ref={rowRef}>
-            <div className="dt__table_header_cells">
-                {props.headers.map(header => {
-                    return (
-                        <DataCell
-                            key={`cell-${props.row.__CELL_ID__}-${header.__CELL_ID__}`}
-                            rowId={props.row.__CELL_ID__}
-                            headerId={header.__CELL_ID__}
-                            initialValue={props.row[header.__CELL_ID__] || ''}
-                            updateTableData={props.updateTableData}
-                            updateHeight={updateHeight}
-                            selected={
-                                props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ||
-                                props.checkList.list.includes(`sel||col||${header.__CELL_ID__}`)
-                            }
-                            setUpdateData={props.setUpdateData}
-                        />
-                    )
-                })}
-            </div>
-            <div className={"dt__table_add_column " + (props.checkList.list.includes(`sel||row||${props.row.__CELL_ID__}`) ? "dt__selected_cell" : "")} />
-        </div>
-    )
-}
-
-/* 
-    value => cell's name
-    updateTableData => To Update Table Data
-*/
-
-const DataCell = props => {
-    const [value, setValue] = useState(props.initialValue);
-    const [edit, setEdit] = useState(false);
-    const areaRef = useRef();
-
-    useEffect(() => {
-        setValue(props.initialValue)
-    }, [props.initialValue]);
-
-    useEffect(() => {
-        if (edit && areaRef.current) areaRef.current.focus();
-    }, [edit])
-
-    const onChange = e => setValue(e.target.value);
-
-    const onClick = () => {
-        setEdit(true);
-    }
-
-    const checkKeyPress = event => {
-        if (event.keyCode === 13) onBlur();
-    }
-
-    const onBlur = e => {
-        if (props.initialValue !== value)
-            props.updateTableData(value, props.rowId, props.headerId)
-            props.setUpdateData(false);
-        setEdit(false);
-    }
-
-    props.updateHeight();
-
-    return (
-        <div className={"dt__cell " + (props.selected ? "dt__selected_cell" : '')} data-test="dt__data_cell">
-            {edit
-                ? <TextareaAutosize ref={(tag) => areaRef.current = tag} value={value || ''} onChange={onChange} onBlur={onBlur} onKeyDown={checkKeyPress} onHeightChange={props.updateHeight} />
-                : <div className="dt__cell_value" onClick={onClick}>{value}</div>}
-        </div>
-    );
-}

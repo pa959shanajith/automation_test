@@ -17,7 +17,9 @@ const initialState = {
   scheduledList: [],
   scheduledStatusList: [],
   scheduledStatus: false,
-  setupExists: ""
+  setupExists: "",
+  testrailPlanRunIds: { plan: "", run: "" },
+  setEditConfig: false
 };
 
 const getProjects = createAsyncThunk("config/fetchProjects", async () => {
@@ -208,6 +210,12 @@ const configureSetupSlice = createSlice({
     clearErrorMSg: (state) => {
       state.error = "";
       state.setupExists = "";
+    },
+    testrailPlanRunIds: (state, action) =>{
+      state.testrailPlanRunIds = action.payload
+    },
+    setEditConfig: (state, action) =>{
+      state.setEditConfig = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -363,6 +371,4 @@ const configureSetupSlice = createSlice({
 });
 
 export default configureSetupSlice.reducer;
-export const { checkRequired } = configureSetupSlice.actions;
-export const { setScheduleStatus } = configureSetupSlice.actions;
-export const { clearErrorMSg } = configureSetupSlice.actions;
+export const { checkRequired, setScheduleStatus, clearErrorMSg, testrailPlanRunIds, setEditConfig } = configureSetupSlice.actions;

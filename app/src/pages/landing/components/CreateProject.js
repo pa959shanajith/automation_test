@@ -11,6 +11,7 @@ import { Avatar } from 'primereact/avatar';
 import { getUserDetails, userCreateProject_ICE ,getUsers_ICE , userUpdateProject_ICE} from '../api';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadUserInfoActions } from '../LandingSlice';
+import { migrateProject } from "../../global/globalSlice";
 
 const CreateProject = (props) => {
   const [value, setValue] = useState('');
@@ -196,7 +197,7 @@ const CreateProject = (props) => {
     { name: 'SAP', code: 'SAP', image: 'static/imgs/SAP.svg', disabled: applicationLicenseCheck.sapLicense.value ,title:applicationLicenseCheck.sapLicense.msg},
     { name: 'Oracle Applications', code: 'OEBS', image: 'static/imgs/OEBS.svg', disabled: applicationLicenseCheck.oebsLicense.value ,title:applicationLicenseCheck.oebsLicense.msg},
     { name: 'Desktop', code: 'Desktop', image: 'static/imgs/desktop.png', disabled: applicationLicenseCheck.desktopLicense.value,title:applicationLicenseCheck.desktopLicense.msg},
-    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/WebService.png', disabled: applicationLicenseCheck.webserviceLicense.value, title:applicationLicenseCheck.webserviceLicense.msg},
+    { name: 'Web Services', code: 'Webservice', image: 'static/imgs/WebService.svg', disabled: applicationLicenseCheck.webserviceLicense.value, title:applicationLicenseCheck.webserviceLicense.msg},
     { name: 'Mainframe', code: 'Mainframe',image: '/static/imgs/mainframe.png', disabled: applicationLicenseCheck.mainframeLicense.value,title:applicationLicenseCheck.mainframeLicense.msg},
     { name: 'Mobile Web', code: 'MobileWeb', image: 'static/imgs/mobileWeb.png', disabled: applicationLicenseCheck.mobilewebLicense.value , title:applicationLicenseCheck.mobilewebLicense.msg},
     { name: 'Mobile Application', code: 'MobileApp', image: '/static/imgs/mobileApps.png', disabled: applicationLicenseCheck.mobileAppLicense.value, title:applicationLicenseCheck.mobileAppLicense.msg},
@@ -207,7 +208,7 @@ const CreateProject = (props) => {
     { name: 'SAP', code: 'SAP', value:'5db0022cf87fdec084ae49b4', image: 'static/imgs/SAP.svg' },
     { name: 'Oracle Applications', code: 'OEBS', value:'5db0022cf87fdec084ae49b3', image: 'static/imgs/OEBS.svg' },
     { name: 'Desktop', code: 'Desktop', value:'5db0022cf87fdec084ae49af', image: 'static/imgs/desktop.png' },
-    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/WebService.png' },
+    { name: 'Web Services', code: 'Webservice',value:'5db0022cf87fdec084ae49b7', image: 'static/imgs/WebService.svg' },
     { name: 'Mainframe', code: 'Mainframe', value:'5db0022cf87fdec084ae49b0',image: '/static/imgs/mainframe.png' },
     { name: 'Mobile Web', code: 'MobileWeb',value:"5db0022cf87fdec084ae49b2", image: 'static/imgs/mobileWeb.png' },
     { name: 'Mobile Application', code: 'MobileApp',value:'5db0022cf87fdec084ae49b1', image: '/static/imgs/mobileApps.png' },
@@ -255,7 +256,7 @@ const CreateProject = (props) => {
     const inputValue= event.target.value.toLowerCase();
     setQuery(inputValue);
     if (inputValue !== "") {
-      const filterData = items.filter((item) =>
+      const filterData = unFilteredData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setItems(filterData);
@@ -270,7 +271,7 @@ const CreateProject = (props) => {
     setQueryDisplayUser(inputValue);
   
     if (inputValue !== "") {
-      const filterDataDisplayUser = displayUser.filter((item) =>
+      const filterDataDisplayUser = unFilteredAssaignedData.filter((item) =>
         item.name.toLowerCase().includes(inputValue)
       );
       setDisplayUser(filterDataDisplayUser);
@@ -279,24 +280,12 @@ const CreateProject = (props) => {
     }
   }
 
-  // function handleSearchDisplayUser(event) {
-  //   setQueryDisplayUser(event.target.value);
-  //   if(event.target.value !== ""){
-  //   const filterDataDisplayUser = displayUser.filter(item => item.name.toLowerCase().includes(queryDisplayUser.toLowerCase()))
-  //   setDisplayUser(filterDataDisplayUser)
-  //   }
-  //   else{
-  //     setDisplayUser(unFilteredAssaignedData)
-  //   }
-  // }
-
-
   const handleClose = () => {
     setQuery("");
     setQueryDisplayUser(""); 
     props.onHide();
     setRefreshData(!refreshData);
-    props.setHandleManageProject(false);
+    props?.setHandleManageProject(false);
    
   };
 
@@ -450,14 +439,18 @@ const CreateProject = (props) => {
         setIsInvalidProject(true);
         return;
       }
-      setIsInvalidProject(false)
-      props.toastSuccess("Project Created Successfully");
-      dispatch(loadUserInfoActions.savedNewProject(true));
-      props.onHide();
-      setRefreshData(!refreshData);
+      if(projectRes === "success"){
+        setIsInvalidProject(false)
+        props.toastSuccess("Project Created Successfully");
+        dispatch(loadUserInfoActions.savedNewProject(true));
+        dispatch(migrateProject(value.trim()));
+        setRefreshData(!refreshData);
+        if(props?.setProjectName) (props.setProjectName(projData.projectName));
+        props.onHide();
+      }
+      
     } catch (error){
       console.error("API request failed:", error);
-
       props.toastError("Failed to create Project");
       }
     }

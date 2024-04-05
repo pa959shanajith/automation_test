@@ -1,7 +1,18 @@
+import AceEditor from "react-ace";
+import "ace-builds";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/worker-javascript";
+
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/ext-language_tools";
+import 'ace-builds/src-noconflict/ext-error_marker';
+import 'ace-builds/webpack-resolver';
+
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserDetails, getNotificationGroups } from '../api';
+import { getUserDetails, getNotificationGroups, createKeyword } from '../api';
 import { Messages as MSG,ScreenOverlay,RedirectPage,ResetSession } from "../../global";
 import { getObjNameList, getKeywordList } from "../components/UtilFunctions";
 import * as DesignApi from "../api";
@@ -12,7 +23,7 @@ import '../styles/DesignTestStep.scss';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
-import { TestCases, copiedTestCases, SaveEnable, Modified } from '../designSlice';
+import { TestCases, copiedTestCases, SaveEnable, Modified, SetAdvanceDebug, SetDebuggerPoints, SetEnablePlayButton, setCurrentDebugPlayButton } from '../designSlice';
 import { ConfirmDialog } from 'primereact/confirmdialog';
 import { Tooltip } from 'primereact/tooltip';
 import TableRow from "../components/TableRow";
@@ -22,9 +33,19 @@ import DetailsDialog from "../components/DetailsDialog";
 import PasteStepDialog from "../components/PasteStepDialog";
 import SelectMultipleDialog from "../components/SelectMultipleDialog";
 import { Checkbox } from 'primereact/checkbox';
+import { RadioButton } from "primereact/radiobutton";
+import { Sidebar } from 'primereact/sidebar';
+//import AceEditor from 'react-ace';
 
+
+import { mode, style } from 'd3';
+import AvoInput from '../../../globalComponents/AvoInput';
+import ReactAce from "react-ace/lib/ace";
+import { Icon } from "@mui/material";
 
 const DesignModal = (props) => {
+    const {assignUser} = props
+    const pgmLang = useRef();
     const toast = useRef();
     const headerCheckRef = useRef();
     const navigate = useNavigate();
@@ -34,6 +55,9 @@ const DesignModal = (props) => {
     const modified = useSelector(state => state.design.Modified);
     const saveEnable = useSelector(state => state.design.SaveEnable);
     const mainTestCases = useSelector(state => state.design.TestCases);
+    const debuggerPoints=useSelector(state=>state.design.debuggerPoints)
+    const advanceDebug=useSelector(state=>state.design.advanceDebug)
+    const enablePlayButton=useSelector(state=>state.design.enablePlayButton)
     const [selectedSpan, setSelectedSpan] = useState(null);
     const [visibleDependentTestCaseDialog, setVisibleDependentTestCaseDialog] = useState(false);
     const [addedTestCase, setAddedTestCase] = useState([]);
@@ -70,8 +94,33 @@ const DesignModal = (props) => {
     const [rowChange, setRowChange] = useState(false);
     const [commentFlag, setCommentFlag] = useState(false);
     const [disableActionBar, setDisableActionBar ] = useState(false);
+    const [arrow, setArrow] = useState(false);
+    const[actionForAdvanceDebug,setActionForAdvanceDebug]=useState("");
+    const[watchlist,setWatchList] = useState([]);
+    const [customkeyword, setCustomKeyWord] = useState(false);
+    const [stepOfCustomKeyword, setStepOfCustomKeyword] = useState(0);
+    const [langSelect, setLangSelect] = useState('javascript');
+    const [inputKeywordName, setInputKeywordName] = useState('');
+    const [inputEditor, setInputEditor] = useState("");
+    const [customTooltip, setCustomTooltip] = useState("");
+    const customKeyToast = useRef();
     let runClickAway = true;
-    
+    const [selectedType, setSelectedType] = useState("Specific");
+    const [AllOptions , setAlloptions] = useState('');
+    const [isNameValid, setIsNameValid] = useState(false);
+    const [isSpaceError, setIsSpaceError] = useState(false);
+    const [customEdit , setCustomEdit] =useState(false);
+    const[advDebugDisable,setAdvDebugDisable]=useState(false)
+    // const [keywordtypes,setKeywordtypes] = useState("Specific")
+ 
+
+    const handleAceEditor = (e) => {
+        setInputEditor(e)
+    }
+    const onSelectLanguage = (e) => {
+        setLangSelect(e.target.value);
+
+    }
 
     // Function to remove duplicates based on a specified property (e.g., 'name')
     const removeDuplicates = (arr, property) => {
@@ -296,17 +345,30 @@ const DesignModal = (props) => {
                                 for(let object in keywordData) {
                                     let firstList = [];
                                     let secondList = [];
-                                    for(let keyword in keywordData[object]){
-                                        if(keywordData[object][keyword]['ranking']){
-                                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
-                                                [keyword] : keywordData[object][keyword]
-                                            });
+                                    for (let keyword in keywordData[object]) {
+                                        if (keywordData[object][keyword]['ranking']) {
+                                            const index = keywordData[object][keyword]['ranking'] - 1;
+                                            let key = keyword;
+                                    
+                                            // Check if the index already exists in firstList
+                                            let newIndex = index;
+                                            while (firstList[newIndex]) {
+                                                newIndex++;
+                                            }
+                                    
+                                            // Create a new object at the new index if necessary
+                                            if (!firstList[newIndex]) {
+                                                firstList[newIndex] = {};
+                                            }
+                                    
+                                            // Assign the keyword to the new index
+                                            firstList[newIndex][key] = keywordData[object][keyword];
                                         } else {
-                                            secondList.push(({
-                                                [keyword] :keywordData[object][keyword]
-                                            }));
+                                            secondList.push({
+                                                [keyword]: keywordData[object][keyword]
+                                            });
                                         }
-                                    };
+                                    }
                                     secondList = [...firstList, ...secondList];
                                     let keyWordObject = {};
                                     for(let keyword of secondList){
@@ -584,6 +646,7 @@ const DesignModal = (props) => {
 
     const getKeywords = useCallback(objectName => getKeywordList(objectName, keywordList, props.appType, testScriptData), [keywordList, props.appType, testScriptData]);
 
+    // console.log(getKeywords('@Browser'),'getKeywords');
     const getRowPlaceholders = useCallback((obType, keywordName) => keywordList[obType][keywordName], [keywordList])
 
     //Debug function
@@ -621,8 +684,41 @@ const DesignModal = (props) => {
         else testcaseID.push(findTestCaseId.id);
         setOverlay('Debug in Progress. Please Wait...');
         ResetSession.start();
-        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType)
+        DesignApi.debugTestCase_ICE(browserType, testcaseID, userInfo, props.appType,false,debuggerPoints,advanceDebug,"")
             .then(data => {
+                if(advanceDebug && debuggerPoints){
+                    setAdvDebugDisable(true)
+                    if(watchlist.length){
+                        setWatchList([])
+                    }
+                    setOverlay("");
+                //    dispatch( SetEnablePauseDebugger({status:true,point:debuggerPoints[0]}))
+                if (data === "Invalid Session") return ;
+                else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+                else if (data === "success") showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT)
+                else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+                else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+                else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+                else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+                else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+                else{
+               dispatch(setCurrentDebugPlayButton(data.length+1))
+                dispatch(SetEnablePlayButton(true))
+                console.log(data)
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
+            }
+                return
+                }
                 setOverlay("");
                 ResetSession.end();
                 if (data === "Invalid Session") return ;
@@ -648,6 +744,7 @@ const DesignModal = (props) => {
                     toast.current.show({severity: 'success',summary: 'Success', detail:data, life:2000})
                 }										
             })
+
             .catch(error => {
                 setOverlay("");
                 ResetSession.end();
@@ -850,40 +947,40 @@ const DesignModal = (props) => {
                 { ((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
                 <ConfirmDialog visible={visible} onHide={() => setVisible(false)} message='Import will erase your old data. Do you want to continue?' 
                     header="Table Consists of Data" accept={()=>importTestCase(true)} reject={()=>setVisible(false)} />
-            {(rowData && !props.testSuiteInUse)?<div>
-                {(rowData.name === rowExpandedName.name)?<div className='btn__grp'>
-                    <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px'}}  onClick={()=>addRow()} />
+            {(rowData &&!advanceDebug)?<div>
+                {(rowData.name === rowExpandedName.name)?<div className='btn__grp' style={{ cursor: assignUser ? 'pointer' : 'not-allowed' }}>
+                    <img className='add' src='static/imgs/ic-jq-addsteps.png' alt='addrow' style={{marginTop:'0.5rem',width:'26px', height:'26px',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => addRow() : null} disabled={!assignUser}/>
                     <Tooltip target=".add " position="bottom" content="  Add Test Step"/>
-                    <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>editRow()}/>
+                    <img src='static/imgs/ic-jq-editsteps.png' alt='edit' className='edit'style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => editRow() : null} disabled={!assignUser}/>
                     <Tooltip target=".edit " position="bottom" content="  Edit Test Step"/>
-                    <img className='trash' src='static/imgs/ic-jq-deletesteps.png' alt='delete' style={{marginTop:'0.5rem', width:'26px', height:'26px'}} title='Delete' onClick={deleteTestcase} />
+                    <img className='trash' src='static/imgs/ic-jq-deletesteps.png' alt='delete'  style={{marginTop:'0.5rem', width:'26px', height:'26px',opacity:assignUser?'1':'0.5'}} title='Delete' onClick={assignUser ? () => deleteTestcase() : null} disabled={!assignUser}/>
                     <Tooltip target=".trash " position="bottom" content="  Delete"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <i className='pi pi-check-square' style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black'}} onClick={()=>selectMultiple()}/>
+                    <i className='pi pi-check-square'  style={{width:'20px', height:'20px', marginTop:'0.8rem',color: 'black',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => selectMultiple() : null} disabled={!assignUser}/>
                     <Tooltip target='.pi-check-square' position='bottom' content='  Select Test Step(s)'/>
-                    <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>toggleDrag()}/>
+                    <img src='static/imgs/ic-jq-dragsteps.png' alt='Drag Steps' className='drag' style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => toggleDrag() : null} disabled={!assignUser}/>
                     <Tooltip target='.drag' position='bottom' content='  Drag & Drop Test Step'/>
-                    <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>copySteps()}/>
+                    <img src='static/imgs/ic-jq-copysteps.png' alt='Copy Steps' className='copy' style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => copySteps() : null} disabled={!assignUser}/>
                     <Tooltip target='.copy' position='bottom'content='  Copy Test Step'/>
-                    <img src='static/imgs/ic-jq-pastesteps.png' alt='Paste steps' className='paste' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>onPasteSteps()}/>
+                    <img src='static/imgs/ic-jq-pastesteps.png' alt='Paste steps' className='paste'  style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => onPasteSteps() : null} disabled={!assignUser}/>
                     <Tooltip target=".paste" position='bottom' content='  Paste Test Step'/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <img src='static/imgs/skip-test-steps.png' alt='comment steps'className='comment' style={{width:'20px', height:'20px', marginTop:'0.7rem'}} onClick={()=>commentRows()}/>
+                    <img src='static/imgs/skip-test-steps.png' alt='comment steps'className='comment'  style={{width:'20px', height:'20px', marginTop:'0.7rem',opacity:assignUser?'1':'0.5'}} onClick={assignUser ? () => commentRows() : null} disabled={!assignUser}/>
                     <Tooltip target=".comment " position="bottom" content="  Skip Test Step"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
 
-                    <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} onClick={()=>importTestCase()} />
+                    <img src='static/imgs/import_new_18x18_icons.png' className='ImportSSSS' alt='import' style={{marginTop:'0.6rem', width:'20px', height:'20px',opacity:assignUser?'1':'0.5'}}  onClick={assignUser ? () => importTestCase() : null} disabled={!assignUser} />
                     <Tooltip target=".ImportSSSS" position="bottom" content="Import Test Steps"/>
                     <input id="importTestCaseField" type="file" style={{display: "none"}} ref={hiddenInput} onChange={onInputChange} accept=".json"/>
-                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
+                    <img src='static/imgs/Export_new_icon_greys.png' alt='export' className='ExportSSSS' style={{marginTop:'0.6rem', width:'20px', height:'20px',cursor:'pointer'}} disabled={disableActionBar}  onClick={()=>disableActionBar !== true?exportTestCase():rowData.testCases[0].custname !== ""?exportTestCase():""} />
                     <Tooltip target=".ExportSSSS" position="bottom" content="Export Test Steps"/>
                     <Divider type="solid" layout="vertical" style={{padding: '0rem', margin:'0rem'}}/>
                     
-                    <Button label="Debug" size='small'  disabled={rowData.testCases.length === 0 || debugEnable || changed} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
+                    <Button label="Debug" size='small'  disabled={rowData.testCases.length === 0 || debugEnable || changed|| !assignUser} className="debuggggg" onClick={()=>{DependentTestCaseDialogHideHandler(); setVisibleDependentTestCaseDialog(true)}} outlined></Button>
                     <Tooltip target=".debuggggg" position="left" content=" Click to debug and optionally add dependent test steps repository." />
-                    <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed} label='Save'/>
+                    <Button className="SaveEEEE" data-test="d__saveBtn" title="Save Test Case" onClick={saveTestCases} size='small' disabled={!changed|| !assignUser} label='Save'/>
                     <Tooltip target=".SaveEEEE" position="left" content="  save" />
             </div>:null}
             </div>:null}
@@ -916,10 +1013,27 @@ const DesignModal = (props) => {
             debugTestCases()
         }
     }
+    const [ingredients, setIngredients] = useState([]);
+    const [visibleRight, setVisibleRight] = useState(false);
+    const onIngredientsChange = (e) => {
+        let _ingredients = [...ingredients];
+
+        if (e.checked)
+            _ingredients.push(e.value);
+        else
+            _ingredients.splice(_ingredients.indexOf(e.value), 1);
+
+        setIngredients(_ingredients);
+    }
+    console.log(ingredients)
     const footerContent = (
         <div>
+            <div className="flex align-items-right">
+                <Checkbox inputId="ingredient1" name="Debug" value="Advance Debug" onChange={onIngredientsChange} checked={ingredients.includes('Advance Debug')} />
+                <label htmlFor="ingredient1" className="ml-2">Advance Debug</label>
+            </div>
             <Button label="Cancel" size='small' onClick={() => DependentTestCaseDialogHideHandler()} className="p-button-text" />
-            <Button label="Debug" size='small' onClick={() => handleDebug(selectedSpan)} autoFocus />
+            <Button label={!ingredients.includes('Advance Debug')?"Debug":"Advance Debug"} size='small' onClick={!ingredients.includes('Advance Debug')?() =>{ handleDebug(selectedSpan)}:()=>{dispatch(SetAdvanceDebug(true));DependentTestCaseDialogHideHandler();setVisibleRight(true);setEdit(false)} } autoFocus />
         </div>
     );
     
@@ -1161,7 +1275,7 @@ const DesignModal = (props) => {
     
             // Create a new array with updated test cases
             let updatedTestCases = testCaseUpdate.testCases.map((testCase, i) => {
-                if (i === rowIdx) {
+                if (i == rowIdx) {
                     let updatedTestCase = {...testCases[rowIdx]};
                     return updatedTestCase;
                 }
@@ -1314,8 +1428,27 @@ const DesignModal = (props) => {
         setHeaderCheck(event.target.checked);
         headerCheckRef.current.indeterminate = false;
     }
+
+    useEffect(() => {
+        if (inputKeywordName && AllOptions?.length > 0) {
+          const isExist = AllOptions.some(option => option.value.toLowerCase() === inputKeywordName.toLowerCase());
+          setIsNameValid(isExist);
+        } else {
+          setIsNameValid(false);
+        }
+    }, [inputKeywordName, AllOptions]);
     const rowExpansionTemplate = (data) => {
-        return (
+        function handleArrow(){
+            setArrow(!arrow)
+            if(!arrow){
+                toast.current.show({severity:'success', summary: 'Success', detail:'Descriptive Keyword has been changed to Technical Keyword', life: 5000}) 
+            }else{
+                toast.current.show({severity:'success', summary: 'Success', detail:'Technical Keyword has been changed to Descriptive Keyword', life: 5000})
+            }
+        }
+     
+        return (<>
+            <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
             <div className="p-1 dataTableChild">
                     { showSM && <SelectMultipleDialog data-test="d__selectMultiple" setShow={setShowSM} show={showSM} selectSteps={selectSteps} upperLimit={data.testCases.length} /> }
                     { showPS && <PasteStepDialog setShow={setShowPS} show={showPS} pasteSteps={pasteSteps} upperLimit={data.testCases.length}/> }
@@ -1324,10 +1457,10 @@ const DesignModal = (props) => {
                     { showDetailDlg && <DetailsDialog TCDetails={data.testCases[showDetailDlg].addTestCaseDetailsInfo} setShow={setShowDetailDlg} show={idx} setIdx={setIdx} onSetRowData={setRowData} idx={showDetailDlg} /> }
                 <div className="d__table">
                 <div className="d__table_header">
-                    <span className="step_col d__step_head" ></span>
+                    <span className="step_col d__step_head" >{advanceDebug?'Break Point':''}</span>
                     <span className="sel_col d__sel_head"><input className="sel_obj" type="checkbox" checked={headerCheck} onChange={onCheckAll} ref={headerCheckRef} /></span>
                     <span className="objname_col d__obj_head" >Element Name</span>
-                    <span className="keyword_col d__key_head" >Keywords</span>
+                    <span className="keyword_col d__key_head" >{!arrow?"Descriptive Keyword":"Technical Keyword"}<i className="pi pi-arrow-right-arrow-left" tooltip={!arrow?"Switch to Technical Keyword ":"Switch to Descriptive Keyword "} onClick={handleArrow} style={{ fontSize: '1rem',left: '0.6rem',position: 'relative',top: '0.2rem'}}></i>         <Tooltip target=".pi-arrow-right-arrow-left " position="bottom" content={arrow?"Switch to Descriptive Keyword ":"Switch to Technical Keyword "}/></span>
                     <span className="input_col d__inp_head" >Input</span>
                     <span className="output_col d__out_head" >Output</span>
                     <span className="details_col d__det_head" >Details</span>
@@ -1339,7 +1472,7 @@ const DesignModal = (props) => {
                         <div className="con" id="d__tcListId">
                         <div style={{overflowY:'auto'}}>
                             <ClickAwayListener  mouseEvent="false" touchEvent="false" onClickAway={()=>{ runClickAway ? setStepSelect(oldState => ({ ...oldState, highlight: []})) : runClickAway=true}} style={{height: "100%"}}>
-                            <ReactSortable filter=".sel_obj" disabled={!draggable} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setnewtestcase} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
+                            <ReactSortable filter=".sel_obj" disabled={!draggable|| !assignUser} key={draggable.toString()} list={(data && data.testCases) ? data.testCases.map(x => ({ ...x, chosen: true })) : []} setList={setnewtestcase} style={{overflow:"hidden"}} animation={200} ghostClass="d__ghost_row" onEnd={onDrop}>
                                 {
                                 data.testCases.map((item, i) => <TableRow data-test="d__tc_row" draggable={draggable}
                                     key={i} idx={i} objList={objNameList} testCase={item} edit={edit} 
@@ -1348,7 +1481,18 @@ const DesignModal = (props) => {
                                     setRowData={setRowData} showRemarkDialog={showRemarkDialog} showDetailDialog={showDetailDialog}
                                     rowChange={rowChange} keywordData={keywordList} 
                                     testcaseDetailsAfterImpact={props.testcaseDetailsAfterImpact}
-                                    impactAnalysisDone={props.impactAnalysisDone}
+                                    impactAnalysisDone={props.impactAnalysisDone} arrow={arrow}
+                                    setCustomKeyWord={setCustomKeyWord}
+                                    setStepOfCustomKeyword={setStepOfCustomKeyword}
+                                    setInputKeywordName={setInputKeywordName}
+                                    setCustomTooltip={setCustomTooltip}
+                                    setLangSelect={setLangSelect}
+                                    setInputEditor={setInputEditor}
+                                    setAlloptions={setAlloptions}
+                                    setCustomEdit={setCustomEdit}
+                                    fetchData={props.fetchingDetails}
+                                    typesOfAppType={props.appType}
+                                    assignUser={assignUser}
                                     />)
                                 } 
                             </ReactSortable>
@@ -1361,6 +1505,7 @@ const DesignModal = (props) => {
                 </div>
                 </div>
             </div>
+            </>
         );
     }
     
@@ -1373,11 +1518,230 @@ const DesignModal = (props) => {
         }
     setExpandedRows(_expandedRow)
     }
+    const handlePlay=()=>{
+        // SetEnablePauseDebugger({status:false})
+        let debuggerPointShift=[...debuggerPoints]
+        dispatch(SetEnablePlayButton(false))
+        debuggerPointShift.shift()
+        let newDebuggerPoints=debuggerPointShift
+        // dispatch(SetDebuggerPoints({push:'play',points:newDebuggerPoints}))
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"play")
+        .then(data => {
+            
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+        else{
+                dispatch(SetEnablePlayButton(true))
+                // let watchlistinindexformat=watchlist.map(step=>{
+                //     return {...step,index:step.teststep}
+                // })
+                // let applplaybuttononstep=[...watchlistinindexformat,...data]
+                // let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                //     var existObj = acc.find(item => item.index === obj.index);
+                //     if(existObj){
+                //           return acc;
+                //         }
+                //         acc.push(obj);
+                //         return acc;
+                //       },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index +1))
+                let dataforstep=data.map(steps=>{
+                    return {teststep:steps.index,
+                    name:steps.custname,
+                    status:steps.result[0],
+                    value:steps.result[2].includes("901a")?"":steps.result[2]
+                    }
+                }
+                )
+                setWatchList((watchlist)=>{
+                return [...watchlist,...dataforstep]
+                })
+            }
+        }
+        
+        )
+    }
+    const handleMoveToNext=()=>{
+        
+        let nextVal=debuggerPoints[0]+1
+        let debuggerPointShift=[...debuggerPoints]
+        debuggerPointShift.shift()
+        let newDebuggerPoints=[nextVal,...debuggerPointShift]
+        // dispatch(SetDebuggerPoints({push:'nextStep',points:newDebuggerPoints}))
+
+        DesignApi.debugTestCase_ICE(null, null, null, null,false,debuggerPoints,advanceDebug,"nextStep")
+        .then(data => {
+            if (data === "Invalid Session") return ;
+            else if (data === "unavailableLocalServer")  showInfo(MSG.GENERIC.UNAVAILABLE_LOCAL_SERVER.CONTENT)
+            else if (data === "success") {showSuccess(MSG.DESIGN.SUCC_DEBUG.CONTENT);dispatch(SetEnablePlayButton(false))
+                setAdvDebugDisable(false)}
+            else if (data === "fail") showError(MSG.DESIGN.ERR_DEBUG.CONTENT)
+            else if (data === "Terminate") showWarn(MSG.DESIGN.WARN_DEBUG_TERMINATE.CONTENT) 
+            else if (data === "browserUnavailable") showWarn(MSG.DESIGN.WARN_UNAVAILABLE_BROWSER.CONTENT)
+            else if (data === "scheduleModeOn") showWarn(MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT)
+            else if (data === "ExecutionOnlyAllowed")  showWarn(MSG.GENERIC.WARN_EXECUTION_ONLY.CONTENT)
+            
+            else{
+                let watchlistinindexformat=watchlist.map(step=>{
+                    return {...step,index:step.teststep}
+                })
+                let applplaybuttononstep=[...watchlistinindexformat,...data]
+                let uniquewatchlist=applplaybuttononstep.reduce((acc, obj)=>{
+                    var existObj = acc.find(item => item.index === obj.index);
+                    if(existObj){
+                          return acc;
+                        }
+                        acc.push(obj);
+                        return acc;
+                      },[]);
+                    dispatch(setCurrentDebugPlayButton(data[data.length-1].index + 1))
+            let dataforstep=data.map(steps=>{
+                return {teststep:steps.index,
+                name:steps.custname,
+                status:steps.result[0],
+                value:steps.result[2].includes("901a")?"":steps.result[2]
+                }
+            }
+            )
+            setWatchList((watchlist)=>{
+            return [...watchlist,...dataforstep]
+            })
+           
+        }
+    }
+        )
+        }
+    const handleRemoveDebuggerPoints=()=>{
+        dispatch(SetDebuggerPoints({push:'reset',points:[]}))
+        toast.current.show({severity:'success', summary:'Success', detail:"Debugger points removed successfully", life:2000})
+    }
+    
+    const approvalOnClick = async () => {
+        let keywordAction=customEdit?'edited':'created'
+        if (inputKeywordName === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 ,style: { zIndex:999999999 }  })
+            return;
+        }
+        else if (customTooltip === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 } })
+            return;
+        }
+        else if (inputEditor === '') {
+            customKeyToast.current.show({ severity: 'warn', summary: 'Warning', detail: MSG.DESIGN.WARN_ACE_EDITOR_NOT_ENTERED.CONTENT, life: 2000, style: { zIndex: 99999999 }  })
+            return;
+        }
+        else {
+            try {
+                setCustomKeyWord(false)
+
+                setOverlay('Creating the Kewyord')
+
+                await createKeyword({
+                    'name': inputKeywordName,
+                    'objecttype': customkeyword,
+                    'apptype': props.appType,
+                    'code': inputEditor,
+                    'elementtype': selectedType,
+                    'language': langSelect,
+                    'tooltip': customTooltip,
+                    'action':keywordAction
+
+                })
+                setOverlay('Updating the list ')
+                let keywordData = await DesignApi.getKeywordDetails_ICE(props.appType)
+
+                let sortedKeywordList = {};
+                for (let object in keywordData) {
+                    let firstList = [];
+                    let secondList = [];
+                    for (let keyword in keywordData[object]) {
+                        if (keywordData[object][keyword]['ranking']) {
+                            firstList[keywordData[object][keyword]['ranking'] - 1] = ({
+                                [keyword]: keywordData[object][keyword]
+                            });
+                        } else {
+                            secondList.push(({
+                                [keyword]: keywordData[object][keyword]
+                            }));
+                        }
+                    };
+                    // console.log('firstList', firstList);
+                    // console.log('secondList', secondList);
+                    secondList = [...firstList, ...secondList];
+                    // console.log('secondList2', secondList);
+
+                    let keyWordObject = {};
+                    // secondList = secondList.forEach((keyword) => {
+                    //     keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0]
+                    // });
+
+                    for (let keyword of secondList) {
+                        if (keyword && Object.keys(keyword)[0] && Object.values(keyword)[0])
+                            keyWordObject[[Object.keys(keyword)[0]]] = Object.values(keyword)[0];
+                        // console.log('Object.keys(keyword)[0]', Object.keys(keyword)[0]);
+                        // console.log('Object.values(keyword)[0]', Object.values(keyword)[0]);
+                    }
+                    // console.log('keyWordObject', keyWordObject);
+                    // sortedKeywordList[object] = secondList.reduce((kerwordobjects, currentKeyword) => {
+                    //     return ({...kerwordobjects, [Object.keys(currentKeyword)[0]]: Object.values(currentKeyword)[0]})
+                    // }, {});
+                    // console.log('sortedKeywordList[object]', sortedKeywordList[object]);
+                    // sortedKeywordList[object] = { ...secondList };
+                    sortedKeywordList[object] = keyWordObject;
+                }
+                toast.current.show({ severity: 'success', summary: 'Success', detail: MSG.DESIGN.SUCC_CUSTOMKEY_ENTERED.CONTENT, life: 3000 })
+                setKeywordList(sortedKeywordList);
+                setStepSelect({ edit: false, check: [stepOfCustomKeyword], highlight: [] })
+                setOverlay('')
+                setCustomTooltip("")
+                setInputEditor('');
+                setInputKeywordName('');
+                setLangSelect('javascript');
+                setSelectedType("Specific");
+                setCustomEdit(false);
+            } catch (error) {
+
+                toast.current.show({ severity: "error", summary: 'Error', detail: MSG.DESIGN.ERR_CUSTOMKEY_NOT_ENTERED.CONTENT, life: 2000 })
+                console.error("Error: Failed to communicate with the server ::::", error)
+
+            }
+        }
+        setInputKeywordName('');
+        setCustomTooltip("");
+        setLangSelect('javascript');
+        setInputEditor('');
+        setCustomEdit(false);
+    }
+const createCustomeKeywordFooter = () => (
+    <>
+      <div style={{ paddingRight: '1rem', paddingTop: '10px', float: 'left',color:'red',display:'flex',justifyContent:'center',alignItems:'center' }}>
+        <p>*Mandatory Fields</p>
+      </div>
+      <div style={{ paddingTop: '10px', float: 'right' }}>
+        <Button
+          data-test="createButton"
+          label={customEdit ? "Save Keyword" : "Create Keyword"}
+          onClick={()=>{approvalOnClick();saveTestCases()}}
+          style={{ padding: '0.5rem 1rem' }}
+          disabled={isNameValid && !customEdit}
+        />
+      </div>
+    </>
+  );
+  
+
     return (
         <>
         {((screenLavelTestSteps.length === 0) || overlay ) && <ScreenOverlay content={overlay} />}
-        <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
-            <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}>
+        <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
+            {/* <Dialog className='design_dialog_box' header={headerTemplate} position='right' visible={props.visibleDesignStep} style={{ width: '73vw', color: 'grey', height: '95vh', margin: '0px' }} onHide={() => {props.setVisibleDesignStep(false);props.setImpactAnalysisDone({addedElement:false,addedTestStep:false})}}> */}
                 <div className='toggle__tab'>
                     <DataTable value={screenLavelTestSteps.length>0?uniqueArray(screenLavelTestSteps,'name'):[]} expandedRows={expandedRows} onRowToggle={(e) => rowTog(e)}
                             onRowExpand={onRowExpand} onRowCollapse={onRowCollapse} selectionMode="single" selection={selectedTestCase}
@@ -1388,7 +1752,7 @@ const DesignModal = (props) => {
                         <Column body={bodyHeader} style={{ background: 'white',paddingLeft:'0.5rem' }}/>
                     </DataTable>
                 </div>
-            </Dialog>
+            {/* </Dialog> */}
 
             <Dialog className={props.appType !== "Web"?  "debug__object__modal_ForOtherAppTypes" :"debug__object__modal" } header={props.fetchingDetails["parent"]["name"]}  visible={visibleDependentTestCaseDialog} onHide={DependentTestCaseDialogHideHandler} footer={footerContent}>
                 <div className={props.appType !== "Web"? "debug__btn_ForOtherAppTypes" : 'debug__btn'}>
@@ -1429,6 +1793,138 @@ const DesignModal = (props) => {
                     </div>
                 </div>
             </Dialog>
+            
+            {/* <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/> */}
+            <Dialog  draggable={false} maximizable visible={customkeyword} onHide={() => { setCustomKeyWord(false); setInputEditor(''); setCustomEdit(false);setInputKeywordName(''); setCustomTooltip("");setLangSelect('javascript'); }} footer={<div style={{paddingTop:'10px'}}>{createCustomeKeywordFooter()}</div>} header={"Custom Keyword"} style={{ width: "75%", height: "90%", overflow: 'hidden' }} position='center'>
+                <Toast ref={customKeyToast} position="bottom-center" baseZIndex={1000}/>
+                <Tooltip target=".p-dialog-header-maximize" position="bottom" content="Maximize/Minimize" />
+                <div className="flex flex-column gap-3" style={{marginTop:'1rem'}}>
+                    <div className="flex flex-row gap-1 md:gap-4 xl:gap-8" style={{alignItems:'flex-start'}}>
+                        {/* <div className="flex flex-row gap-2 align-items-center">
+                            <label htmlFor='isGeneric' className="pb-2 font-medium" style={{ marginTop: "0.3rem" }}>Type: </label><div>I want it to be Generic</div>
+                            <Checkbox required checked={checked} value={"Generic"} onChange={(e) => { setChecked(e.checked); setSelectedType(e.value) }} />
+                        </div> */}
+                        <div className="flex" style={{flexDirection:'column'}}>
+                        <div className="flex flex-row align-items-center gap-2">
+                            <label htmlFor='firstName' className="pb-2 font-semibold ">Name<span style={{color:'red'}}>*</span>:</label>
+                            <div className="flex" style={{flexDirection:"column"}}>
+                            <AvoInput htmlFor="keywordname" data-test="firstName-input__create" maxLength="100"
+                                className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
+                                type="text"
+                                style={{ width: '150%' }}
+                                placeholder="Enter Name"
+                                inputTxt={inputKeywordName} 
+                                setInputTxt={setInputKeywordName} 
+                                isNameValid={isNameValid}
+                                setIsSpaceError={setIsSpaceError}
+                                nameInput='name'
+                                isSpaceError={isSpaceError}
+                                customEdit={customEdit}
+                                />
+                                </div>
+                                </div>
+                                <div className="flex" style={{flexDirection:'column',paddingLeft:'3.5rem'}}>
+
+                                {isNameValid &&!customEdit &&  <small id="username-help" style={{color:'red'}}>
+                                  *keyword already exists
+                                </small>}
+                                {isSpaceError && <small id="username-help" style={{color:'red'}}>
+                                  *space not allowed
+                                </small>}
+                                </div>
+                        
+                        </div>
+                        <div className="flex flex-row align-items-center gap-2" style={{ width: "30%" }}>
+                            <label htmlFor='TooltipNamme' className="pb-2 font-semibold ">Tooltip<span style={{color:'red'}}>*</span>: </label>
+                            <AvoInput htmlFor="keywordtooltip" maxLength="100"
+                                className={`w-full md:w-20rem p-inputtext-sm ${props.firstnameAddClass ? 'inputErrorBorder' : ''}`}
+                                type="text"
+                                style={{ width: '160%' }}
+                                placeholder="Enter short description"
+                                inputTxt={customTooltip} setInputTxt={setCustomTooltip}
+                                customEdit={customEdit}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex flex-row gap-3">
+                    <div className="buildtype_container" style={{ overflow: 'hidden' }}>
+                        <div className="flex flex-wrap gap-8" style={{ padding: "0.5rem 2.5rem 1rem 0rem" }}>
+
+                            <div className="flex align-items-center" >
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="javascript" checked={langSelect === 'javascript'} />
+                                <label htmlFor="ingredient1" className="ml-2 ss__build_type_label">JavaScript</label>
+                            </div>
+                            <div className="flex align-items-center"  >
+                                <RadioButton onChange={onSelectLanguage} disabled={customEdit} className="ss__build_type_rad" type="radio" name="program_language" value="python" checked={langSelect === 'python'} />
+                                <label htmlFor="ingredient2" className="ml-2 ss__build_type_label">Python</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div className='languageEditor'>
+
+                    <AceEditor
+                        mode={langSelect}
+
+                        name="editor"
+                        //value={this.props.data}
+                        theme="monokai"
+                        fontSize={14}
+
+
+                        onChange={handleAceEditor}
+                        editorProps={{ $blockScrolling: true }}
+                        style={{ width: "100%" }}
+                        value={inputEditor}
+                        //   onValidate={(annotations)=>{
+                        //     console.log(annotations);
+                        //   }}
+
+                        setOptions={{
+                            enableSnippets: true,
+                            showLineNumbers: true,
+                            tabSize: 3,
+                            useWorker: true,
+                            highlightActiveLine: true,
+                            behavioursEnabled: true,
+                            showPrintMargin: false,
+                            hScrollBarAlwaysVisible: false,
+                            vScrollBarAlwaysVisible: false,
+                            enableBasicAutocompletion: true,
+                            enableLiveAutocompletion: true,
+                        }}
+
+                    />
+                </div>
+
+            </Dialog>
+            <div className='AdvanceDebug'>
+                <Sidebar className='AdvanceDebugRight' style={{width:'35rem', height:'94%'}} visible={visibleRight} position="right" onHide={() => {setVisibleRight(false);dispatch(SetDebuggerPoints({push:'reset',points:[]}));dispatch(SetAdvanceDebug(false));setIngredients([]);dispatch(setCurrentDebugPlayButton(null));dispatch(SetEnablePlayButton(false));setAdvDebugDisable(false)}}>
+                    <h2 style={{marginTop:'0.1rem',marginBottom:'1.5rem',color: 'rgba(3, 2, 41, .6)', fontFamily: 'Open Sans', fontWeight: '500'}}>Advance Debug</h2>
+                    <div style={{display:'flex',justifyContent:'space-between', marginBottom:'1.5rem'}}>
+                    <div style={{display:'flex',width:'15rem',justifyContent:'space-around'}}>
+                        {(enablePlayButton)?<img src='static/imgs/Start.svg' title="Move to next debugger point" onClick={()=>{setActionForAdvanceDebug("play");handlePlay()}} alt='' style={{height:'30px',cursor:'pointer'}}/>:<img src='static/imgs/pause.png' style={{height:'30px',cursor:'pointer'}}></img>}
+                        
+                        <img src='static/imgs/StepInto.svg' title ="Move to next step" onClick={handleMoveToNext}alt='' style={{height:'30px',cursor:'pointer'}}/>
+                        
+                        <img src='static/imgs/deactivate.png' title="Deactivate breakpoints" onClick={handleRemoveDebuggerPoints} style={{height:'30px',cursor:'pointer'}}></img>
+                                            </div>
+                    <div><Button label="DEBUG" title ={advDebugDisable?"Already in progress":"Start debugging" } disabled={advDebugDisable} style={advDebugDisable?{height:'30px',cursor:'not-allowed'}:{height:'30px',cursor:'pointer'}} size="small" onClick={()=>{dispatch(SetAdvanceDebug(true));handleDebug(selectedSpan);setAdvDebugDisable(true)}}/></div>
+
+                    </div>
+                    <div className="card">
+            <DataTable value={watchlist}>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '10%', flex:"0 0", fontFamily:'LatoWebLight'}} field="teststep" header="Step"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '43%', minWidth: '30%', flex:"0 0", fontFamily:'LatoWebLight'}} field="name" header="Element Name"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="status" header="Status"></Column>
+                <Column headerStyle={{ justifyContent: "center", backgroundColor: '#5e626b', color: '#fff', width: '30%', minWidth: '20%', flex:"0 0", fontFamily:'LatoWebLight'}} field="value" header="Value"></Column>
+            </DataTable>
+        </div>
+                </Sidebar>
+            </div>
         </>
     )
 }

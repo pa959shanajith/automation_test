@@ -50,7 +50,11 @@ exports.initScraping_ICE = function (req, res) {
 				} else if (reqBody.appType == "SAP") {
 					var applicationPath = reqBody.applicationPath;
 					reqAction = "SAP";
-					dataToIce = {"emitAction": "LAUNCH_SAP", "username": icename, "applicationPath": applicationPath};
+					var emitAction = "LAUNCH_SAP";
+					if (reqBody.scrapeType && reqBody.scrapeType == "Genius") {
+						emitAction= "LAUNCH_SAP_GENIUS";
+					}
+					dataToIce = {"emitAction": emitAction, "username": icename, "applicationPath": applicationPath};
 					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
 					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath);
 				} else if (reqBody.appType == "OEBS") {
@@ -203,7 +207,7 @@ exports.updateScenarioComparisionStatus = async (req, res) => {
 
         if (result == "fail") return res.send("fail");
 
-        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+        logger.info("Scenario comparison status sent successfully from designscreen/"+fnName+" service");
 
         res.send(JSON.stringify(result))
 
@@ -245,7 +249,7 @@ exports.updateTestSuiteInUseBy = async (req, res) => {
 
         if (result == "fail") return res.send("fail");
 
-        logger.info("Scenario comparision status sent successfully from designscreen/"+fnName+" service");
+        logger.info("Scenario comparison status sent successfully from designscreen/"+fnName+" service");
 
         res.send(JSON.stringify(result))
 
@@ -265,7 +269,8 @@ exports.getScrapeDataScreenLevel_ICE = async (req, res) => {
 		const inputs = {
 			"screenid": req.body.screenId,
 			"projectid": req.body.projectId,
-			"query": "getscrapedata"
+			"query": "getscrapedata",
+			"params":req.body.param
 		};
 		if (req.body.type == "WS_screen" || req.body.type== "Webservice"){
 			inputs.query = "getWSscrapedata";
@@ -336,6 +341,37 @@ exports.updateScreen_ICE = async (req, res) =>{
 		logger.error("Error occurred in designscreen/"+fnName+":", exception);
 		res.status(500).send('fail');
 	}
+};
+
+exports.insertScreen = async (req, res) =>{
+    const fnName = "insertScreen";
+    try {
+        logger.info("Inside UI service: " + fnName);
+        // var d = req.body;
+        var inputs = req.body.data;
+        inputs.userId = req.session.userid;
+        inputs.roleId = req.session.activeRoleId;
+        var data = await utils.fetchData(inputs, "design/insertScreen", fnName);
+        res.send(data)
+    } catch (exception) {
+        logger.error("Error occurred in insertScreen/"+fnName+":", exception);
+        res.status(500).send('fail');
+    }
+};
+exports.insertRepository = async (req, res) =>{
+    const fnName = "insertRepository";
+    try {
+        logger.info("Inside UI service: " + fnName);
+        // var d = req.body;
+        var inputs = req.body.data;
+        inputs.userId = req.session.userid;
+        inputs.roleId = req.session.activeRoleId;
+        var data = await utils.fetchData(inputs, "design/insertRepository", fnName);
+        res.send(data)
+    } catch (exception) {
+        logger.error("Error occurred in insertRepository/"+fnName+":", exception);
+        res.status(500).send('fail');
+    }
 };
 
 exports.fetchReplacedKeywords_ICE = async (req, res) => {
@@ -868,6 +904,127 @@ exports.checkingMobileClient_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Exception in the checkingMobileClient_ICE: %s",exception);
+		res.send("fail");
+	}
+};
+
+exports.launchAndServerConnectSAPGenius_ICE = function (req, res) {
+	var icename,value,username;
+	var dataToIce={"username":""};
+	logger.info("Inside UI service: launchAndServerConnectSAPGenius_ICE");
+	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
+		username=req.session.username;
+		icename = undefined
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.info("ICE Socket requesting Address: %s" , icename);
+		if(mySocket != undefined && mySocket.connected) {	
+				var reqAction = "";
+				var reqBody = req.body.screenViewObject;
+				if (reqBody.appType == "SAP") {
+					var applicationPath = reqBody.applicationPath;
+					reqAction = "SAP";
+					var emitAction = "LAUNCH_SAP_GENIUS";
+					dataToIce = {"emitAction": emitAction, "username": icename, "applicationPath": applicationPath};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath);
+				}
+				res.send("pass");
+		} 
+		else {
+				logger.error("Error occurred in the service launchAndServerConnectSAPGenius_ICE: Socket not Available");
+				var flag = "unavailableLocalServer";
+				res.send(flag);
+		}
+		
+	} 
+	catch (exception) {
+		logger.error("Exception in the service launchAndServerConnectSAPGenius_ICE: %s",exception);
+		res.send("fail");
+	}
+};
+
+
+exports.startScrapingSAPGenius_ICE = function (req, res) {
+	var icename,value,username;
+	var dataToIce={"username":""};
+	logger.info("Inside UI service: startScrapingSAPGenius_ICE");
+	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
+		username=req.session.username;
+		icename = undefined
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];	
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.info("ICE Socket requesting Address: %s" , icename);
+		if(mySocket != undefined && mySocket.connected) {	
+				var reqAction = "";
+				var reqBody = req.body.screenViewObject;
+				if (reqBody.appType == "SAP") {
+					var applicationPath = reqBody.applicationPath;
+					reqAction = "SAP";
+					var emitAction = "START_SCRAPE_SAP_GENIUS";
+					dataToIce = {"emitAction": emitAction, "username": username, "applicationPath": applicationPath};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath, dataToIce.username);
+				}
+				res.send("pass");
+		} 
+		else {
+				logger.error("Error occurred in the service startScrapingSAPGenius_ICE: Socket not Available");
+				var flag = "unavailableLocalServer";
+				res.send(flag);
+		}
+		
+	} 
+	catch (exception) {
+		logger.error("Exception in the service startScrapingSAPGenius_ICE: %s",exception);
+		res.send("fail");
+	}
+};
+
+exports.stopScrapingSAPGenius_ICE = function (req, res) {
+	var icename,value,username;
+	var dataToIce={"username":""};
+	logger.info("Inside UI service: stopScrapingSAPGenius_ICE");
+	try {
+		var mySocket;
+		var clientName=utils.getClientName(req.headers.host);
+		username=req.session.username;
+		icename = undefined
+		if(myserver.allSocketsICEUser[clientName] && myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if (myserver.allSocketsMap[clientName] && myserver.allSocketsMap[clientName][icename]) mySocket = myserver.allSocketsMap[clientName][icename];	
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.info("ICE Socket requesting Address: %s" , icename);
+		if(mySocket != undefined && mySocket.connected) {	
+				var reqAction = "";
+				var reqBody = req.body.screenViewObject;
+				if (reqBody.appType == "SAP") {
+					var applicationPath = reqBody.applicationPath;
+					reqAction = "SAP";
+					var emitAction = "STOP_SCRAPE_SAP_GENIUS";
+					dataToIce = {"emitAction": emitAction, "username": username, "applicationPath": applicationPath};
+					logger.info("Sending socket request for "+dataToIce.emitAction+" to cachedb");
+					mySocket.emit(dataToIce["emitAction"], dataToIce.applicationPath, dataToIce.username);
+				}
+				res.send("pass");
+		} 
+		else {
+				logger.error("Error occurred in the service stopScrapingSAPGenius_ICE: Socket not Available");
+				var flag = "unavailableLocalServer";
+				res.send(flag);
+		}
+		
+	} 
+	catch (exception) {
+		logger.error("Exception in the service stopScrapingSAPGenius_ICE: %s",exception);
 		res.send("fail");
 	}
 };

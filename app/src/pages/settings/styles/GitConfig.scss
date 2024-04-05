@@ -1,6 +1,11 @@
 .git_container {
-    width: 38rem;
-
+    height: 100%;
+    position: relative;
+    width: 73%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
     .col-xs-9 {
         width: 83%;
     }

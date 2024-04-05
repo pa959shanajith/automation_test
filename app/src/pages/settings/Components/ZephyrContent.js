@@ -77,7 +77,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const [releaseArr, setReleaseArr] = useState([]);
     const [importReleaseArr, setImportReleaseArr] = useState([]);
     const [avoProjects , setAvoProjects]= useState(null);
-    const [selectedRel, setSelectedRel] = useState("Select Release");
+    const [selectedRel, setSelectedRel] = useState("Select Repo/Release");
     const [importSelectedRel, setImportSelectedRel] = useState("Select Release");
     const [testCases, setTestCases] = useState([]);
     const [modules, setModules] = useState([]);
@@ -151,6 +151,18 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
             ],
         },
     ]);
+
+    const [repoTypes, setRepoType] = useState([
+        {
+            id: 1,
+            name: "Project Repository"
+        },
+        {
+            id: 2,
+            name: "Release"
+        }
+    ])
+    const [selectedRepoType, setSelectedRepoType] = useState("Select Type");
 
     useEffect(() => {
         setMultipleSelected(false);
@@ -256,7 +268,8 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                     testid: selectedZphyrTCIds,
                     testname: selectedZphyrTCNames,
                     reqdetails: selectedZphyrTCReqs, 
-                    scenarioId: checkedScnIds
+                    scenarioId: checkedScnIds,
+                    selectionType: selectedRepoType.name
             }
             ];
             dispatchAction(mappedPair(mappedPairObj));
@@ -608,7 +621,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     //     );
     // };
     const confirmPopupMsg = (
-        <div> <p>Note : If you import already mapped testcases will be unmapped</p></div>
+        <div> <p>Note : If you import already mapped test cases will be unmapped</p></div>
     )
 
 
@@ -624,7 +637,43 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     // };
     const handleProject= async(e)=>{
         const projectId = e.target.value;
-        const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        setSelectZephyrProject(projectId);
+        setSelectedRepoType("Select Type");
+        setSelectedRel("Select Repo/Release");
+        setProjectDetails([]);
+        // const releaseData = await api.zephyrProjectDetails_ICE(projectId.id, '6440e7b258c24227f829f2a4');
+        // if (releaseData.error)
+        //     setToast('error','Error',releaseData.error);
+        // else if (releaseData === "unavailableLocalServer")
+        //     setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
+        // else if (releaseData === "scheduleModeOn")
+        //     setToast("info", "Info", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+        // else if (releaseData === "Invalid Session"){
+        //     setToast('error','Error','Invalid Session');
+        // }
+        // else if (releaseData === "invalidcredentials")
+        //     setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
+        // else if (releaseData) {
+        //     setProjectDetails([]);
+        //     setReleaseArr(releaseData);
+        //     setSelectZephyrProject(projectId);
+        //     getProjectScenarios();
+        //     // setSelectedRel("Select Release");
+        //     // clearSelections();
+        // }
+    }
+
+    const handleType = async (e) => {
+        setSelectedRel("Select Repo/Release");
+        setProjectDetails([]);
+        const repoType = e.value;
+        let releaseData = ""
+        if (repoType.name == "Release") {
+            releaseData = await api.zephyrProjectDetails_ICE(selectZephyrProject.id, '6440e7b258c24227f829f2a4');
+        }
+        else {
+            releaseData = await api.zephyrRepoDetails_ICE(selectZephyrProject.id, '6440e7b258c24227f829f2a4');
+        }
         if (releaseData.error)
             setToast('error','Error',releaseData.error);
         else if (releaseData === "unavailableLocalServer")
@@ -637,12 +686,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
         else if (releaseData === "invalidcredentials")
             setToast('error','Error',MSG.INTEGRATION.ERR_INVALID_CRED.CONTENT);
         else if (releaseData) {
-            setProjectDetails([]);
+            setSelectedRepoType(repoType);
             setReleaseArr(releaseData);
-            setSelectZephyrProject(projectId);
             getProjectScenarios();
-            // setSelectedRel("Select Release");
-            // clearSelections();
         }
     }
 
@@ -671,8 +717,15 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     }
 
     const onReleaseSelect = async(event) => {
+        setProjectDetails([]);
         const releaseId = event.target.value;
-        const testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        let testAndScenarioData = ""
+        if (selectedRepoType.name == "Release") {
+            testAndScenarioData = await api.zephyrCyclePhase_ICE(releaseId.id, '6440e7b258c24227f829f2a4');
+        }
+        else {
+            testAndScenarioData = await api.zephyrModuleUnderRepo_ICE({repoId: releaseId.id, projectId: selectZephyrProject.id}, '6440e7b258c24227f829f2a4');
+        }
         if (testAndScenarioData.error)
              setToast('error','Error',testAndScenarioData.error);
         else if (testAndScenarioData === "unavailableLocalServer")
@@ -831,7 +884,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     
             if(finalMappings.length === 0){
                 setImportStatus("Not_Mapped");
-                setToastNew("error", "Error", 'Please upload the valid testcase sheet !!!');return;
+                setToastNew("error", "Error", 'Please upload the valid test case sheet !!!');return;
             }
             else{
                 // saving the finalMappings 
@@ -1102,8 +1155,14 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
     const handleNodeToggle = async (nodeobj) => {
         if(Object.keys(nodeobj).length && nodeobj.node && !isNaN(parseInt(nodeobj.node.key))){
             setEnableBounce(true);
-            const data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
-        if (data.error)
+            let data = ""
+            if (selectedRepoType.name == "Release") {
+                data = await api.zephyrTestcaseDetails_ICE("testcase", nodeobj.node.key);
+            }
+            else {
+                data = await api.zephyrRepoTestcaseDetails_ICE("repotestcase", nodeobj.node.key);
+            }
+            if (data.error)
                 setToast('error','Error',data.error);
             else if (data === "unavailableLocalServer")
                 setToast('error','Error',MSG.INTEGRATION.ERR_UNAVAILABLE_ICE.CONTENT);
@@ -1284,7 +1343,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                             <TabView activeIndex={activeIndex} onTabChange={(e) => handleTabChange(e.index)}>
                                 <TabPanel header="Mapping">
                                     <div className="zephyr__mapping">
-                                        <div className="card_zephyr1">
+                                        {/* <div className="card_zephyr1"> */}
                                             <Card className="mapping_zephyr_card1">
                                                 {enableBounce && <div className="bouncing-loader">
                                                     <div></div>
@@ -1295,14 +1354,17 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                 <div className="dropdown_div1">
                                                     <div className="dropdown-zephyr1">
                                                         <span>Select Project <span style={{ color: 'red' }}>*</span></span>
-                                                        <span className="release_span"> Select Release<span style={{ color: 'red' }}>*</span></span>
+                                                        <span className="type_span"> Select Type<span style={{ color: 'red' }}>*</span></span>
+                                                        <span className="release_span"> Select Repo/Release<span style={{ color: 'red' }}>*</span></span>
                                                     </div>
                                                     <div className="dropdown-zephyr2">
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrProject} className="dropdown_project" options={zephyrProj} onChange={(e) => setSelectZephyrProject(e)} placeholder="Select Project" /> */}
                                                         <Dropdown value={selectZephyrProject} onChange={(e) => handleProject(e)} options={domainDetails} optionLabel="name"
                                                             placeholder="Select Project" className="project_dropdown" />
+                                                        <Dropdown value={selectedRepoType} onChange={(e) => handleType(e)} options={repoTypes} optionLabel="name"
+                                                            placeholder="Select Type" className="type_dropdown" />
                                                         <Dropdown value={selectedRel} onChange={(e) => onReleaseSelect(e)} options={releaseArr} optionLabel="name"
-                                                            placeholder="Select Release" className="release_dropdown" />
+                                                            placeholder="Select Repo/Release" className="release_dropdown" />
                                                         {/* <Dropdown style={{ width: '11rem', height: '2.5rem' }} value={selectZephyrRelease} className="dropdown_release" options={zephyrRelease} onChange={(e) => setSelectZephyrRelease(e)} placeholder="Select Release" /> */}
                                                     </div>
 
@@ -1317,7 +1379,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                         onExpand={handleNodeToggle}
 
                                                     />
-                                                 <div className="jira__paginator">
+                                                 <div className="jira__paginator__zephyr">
                                                 <Paginator
                                                     first={currentZepPage - 1}
                                                     rows={itemsPerPage}
@@ -1328,10 +1390,10 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                 </div>
                                                 </div>)}
                                             </Card>
-                                        </div>
+                                        {/* </div> */}
 
-                                        <div>
-                                            <div className="card_zephyr2">
+                                        {/* <div> */}
+                                            {/* <div className="card_zephyr2"> */}
                                                 <Card className="mapping_zephyr_card2">
                                                     <div className="dropdown_div1">
                                                         <div className="dropdown-zephyr">
@@ -1346,7 +1408,7 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                         <div className="avotest__zephyr">
                                                             <Tree value={treeData} selectionMode="single" selectionKeys={selectedAvoKeys} onSelectionChange={(e) => setSelectedAvoKeys(e.value)} nodeTemplate={TreeNodeCheckbox} className="avoProject_tree" />
                                                         </div>
-                                                        <div className="testcase__AVO__jira__paginator">
+                                                        <div className="testcase__AVO__jira__paginator__zephyr">
 
                                                         <Paginator
                                                             first={indexOfFirstScenario}
@@ -1357,11 +1419,11 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                                     </div>
                                                     </div>
                                                 </Card>
-                                            </div>
-                                        </div>
-                                        <span>
+                                            {/* </div> */}
+                                        {/* </div> */}
+                                        <span className="map__btn__zephyr">
                                             {/* <img className="map__btn__zephyr" src="static/imgs/map_button_icon.svg" /> */}
-                                            <Button className="map__btn__zephyr" label='Map' severity='primary' size='small' onClick={()=>handleSync()}></Button>
+                                            <Button  label='Map' size='small' onClick={()=>handleSync()}></Button>
                                         </span>
                                     </div>
 
@@ -1371,9 +1433,9 @@ const ZephyrContent = ({ domainDetails , setToast,activeIndex,setActiveIndex  },
                                 <TabPanel header="View Mapping">
                                     <Card className="view_map_zephyr">
                                         <div className="flex justify-content-flex-start toggle_btn">
-                                            <span>Zephyr Testcase to Avo Assure Testcase</span>
+                                            <span>Zephyr Test case to Avo Assure Test case</span>
                                             <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                            <span>Avo Assure Testcase to Zephyr Testcase</span>
+                                            <span>Avo Assure Test case to Zephyr Test case</span>
                                         </div>
 
                                         {checked ? (<div className="accordion_testcase">

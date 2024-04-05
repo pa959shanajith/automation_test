@@ -7,9 +7,10 @@
 }
 
 .dt__btngroup{
-    display: flex;
-    max-width: 100%;
-    margin-bottom: 15px;
+    // display: flex;
+    max-width: 89%;
+    // margin-bottom: 15px;
+    padding-left: 1.2rem;
 }
 
 .dt__table_ac_btn_grp{
@@ -41,10 +42,23 @@
 .dt__taskBtns{
     align-items: center;
     display: flex;
-    flex-grow: 1;
+    // flex-grow: 1;
+    // position: relative;
+    // left: 49rem;
+    // gap: 1rem;
+    position: fixed;
+    bottom: 30px;
+    right: 128px;
+}
+
+.dt__taskBtns_create{
+    align-items: center;
+    display: flex;
+    // flex-grow: 1;
     position: relative;
-    left: 10rem;
-    gap: 1rem;
+    position: fixed;
+    bottom: 30px;
+    right: 102px;
 }
 
 .dt__taskBtn{
@@ -76,7 +90,7 @@
     z-index: 1;
     height: 60%;
     width: 50%;
-    bottom: 1rem;
+    bottom: 0rem;
     right: 1rem;
 
     input{
@@ -93,7 +107,7 @@
         font-size: 14px;
         box-shadow: rgba(0, 0, 0, 0.176) 0px 6px 12px;
         display: block;
-        max-height:10rem;
+        max-height:6.3rem;
         width: 80%;
         overflow: auto;
         background: white;
@@ -117,9 +131,6 @@
 .dt__tableName, .dt__selectTable{
     font-size: 14px;
     height: 50px;
-    display: flex;
-    align-items: center;
-    padding-left: 1rem;
     padding-top: 1rem;
 }
 
@@ -145,5 +156,14 @@
   border-radius: 5px !important;
 }
 .dt__table_container{
-    overflow: auto;
+    // overflow: auto;
+    width: 93%;
+    padding: 1.3rem;
+    margin-top: 1rem;
+}
+.DataTableCreate{
+    font: $f5_semibold;
+}
+.dt_name{
+    font: $f7_semibold;
 }

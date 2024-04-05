@@ -1,0 +1,86 @@
+@import "../../global/styles/ColorVariables.scss";
+.captureDesign_dialog_box {
+    .p-dialog-header {
+        background: #ffffff !important;
+        border-top-right-radius: 4px;
+        padding: 0.3rem 0 !important;
+        height: 3rem !important;
+
+        .p-dialog-header-icons {
+            position: absolute;
+            width: 2vw;
+            height: 2vh;
+            left: 1rem;
+            top: 1rem;
+        }
+        .p-dialog .p-dialog-header .p-dialog-title {
+            margin-left: 2.79rem;
+            margin-bottom: .7rem;
+        }
+        .p-dialog-title {
+            .header_Groups {
+                color: rgba(3, 2, 41, .6);
+                font-family: Open Sans;
+                font: $f6_semibold;
+                left: 4rem !important;
+                position: absolute;
+            }
+
+            .dailog_headerGroups1 {
+                color: #030229;
+                font-family: Open Sans;
+                font-size: 20px;
+                font-weight: 500;
+                left: 5.5rem !important;
+                position: absolute;
+                top: 2.5rem;
+            }
+        }
+    }
+    .p-dialog-content {
+        overflow: auto;
+        padding-bottom: 0 !important;
+    }
+}
+.groupsTabPosition{
+    position: fixed;
+    left: calc(100% - 676px);
+}
+.captureDesignGroups{
+    padding: 0rem 0rem;
+}
+.tabView_captureDesign{
+    left: 50%;
+    position: absolute;
+    top: 0rem;
+    transform: translateX(-50%);
+    background: transparent !important;
+    .p-tabview-nav {
+        height: 3rem;
+
+        .p-tabview-nav-link {
+            padding: 8px;
+        }
+    }
+    .p-tabview-panels{
+        background: transparent !important;
+        padding: 0rem !important;
+    }
+}
+.captureDesign_dialog_div{
+    .p-dialog-content {
+        overflow: auto;
+    }
+}
+.p-tabview .p-tabview-panels{
+    background: transparent;
+}
+
+.elem_repo_tab_heading{
+    font: $f7_semibold;
+}
+.repo_group_header{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}   

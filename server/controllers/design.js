@@ -180,6 +180,9 @@ exports.debugTestCase_ICE = function (req, res) {
 							var browsertypeobject = {
 								browsertype: requestedbrowsertypes
 							};
+							var debuggerPointsObject = {
+                                debuggerPoints:req.body.debuggerPoints
+                            };
 							var flag = "";
 							var inputs = {
 								"query": "testcaseids",
@@ -235,7 +238,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											};
 										}
 										var responsedata = requestedtestcaseids.map(i=> tcDict[i])
-										responsedata.push(browsertypeobject);
+										responsedata.push(browsertypeobject,debuggerPointsObject);
 										logger.info("Sending socket request for debugTestCase to cachedb");
 										dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
 										startDebugging(dataToIce);
@@ -247,6 +250,7 @@ exports.debugTestCase_ICE = function (req, res) {
             }else {
               let responsedata = [{apptype, template:"",datatables:[], testcase:requestedtestcaseids, testcasename:"geniusExecution"}];
               responsedata.push(browsertypeobject);
+			  responsedata.push(debuggerPointsObject)
               dataToIce = {"emitAction" : "debugTestCase","username" : icename, "responsedata":responsedata};
               startDebugging(dataToIce);
             }
@@ -416,8 +420,8 @@ exports.debugTestCase_ICE = function (req, res) {
 												};
 												responsedata.endPointURL.push(wsdlurl.split('?')[0]);
 												responsedata.operations.push(operations);
-												if (data.value != "fail" && data.value != undefined && data.value != "") {
-													response = data.value.split('rEsPONseBOdY:');
+												if (data != "fail" && data != undefined && data != "") {
+													response = data.split('rEsPONseBOdY:');
 													if (response.length == 2) {
 														responsedata.header.push(response[0]);
 														responsedata.body.push(response[1]);
@@ -449,6 +453,45 @@ exports.debugTestCase_ICE = function (req, res) {
 							logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 						}
 					}
+					else if(action=='playDebug'){
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
+						mySocket.emit("playDebug",dataToIce );
+										function result_playDebug_listener(message) {
+											data = message;
+											mySocket.removeListener('result_playDebug_listener', result_playDebug_listener);
+
+											//LB: make sure to send recieved data to corresponding user
+											
+
+											try {
+												res.send(data);
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											}
+												
+										}
+										mySocket.on("result_playDebug_listener", result_playDebug_listener);
+					}
+					else if(action=='moveToNextStep'){
+						let dataToIce={responseData:{ debuggerPoints:req.body.debuggerPoints, action:action}}
+						mySocket.emit("moveToNextStep",dataToIce );
+										function result_moveToNextStep_listener(message) {
+											data = message;
+											//LB: make sure to send recieved data to corresponding user
+											mySocket.removeListener('result_moveToNextStep_listener', result_moveToNextStep_listener);
+
+											
+											
+											try {
+												res.send(data);
+											} catch (exception) {
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
+											}
+												
+										}
+										mySocket.on("result_moveToNextStep_listener", result_moveToNextStep_listener);
+					}
+					
 				} catch (exception) {
 					logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 				}
@@ -509,8 +552,23 @@ exports.getTestcasesByScenarioId_ICE = async (req, res) => {
 			testcasesObj.testcaseName = testcasenames[index];
 			testcasesArr.push(testcasesObj);
 		}
-		logger.info("Sending testcase details from design/"+fnName+" service");
+		logger.info("Sending test case details from design/"+fnName+" service");
 		res.send(testcasesArr);
+	} catch (exception) {
+		logger.error("Error occurred in design/"+fnName+":", exception);
+        res.status(500).send("fail");
+	}
+};
+exports.createKeyword = async (req, res) => {
+	const fnName = "createKeyword";
+	logger.info("Inside UI service: " + fnName);
+    try {
+		const inputs = req.body.data;
+		// Query 1 fetching the objecttype,keywords basked on projecttypename
+		const result = await utils.fetchData(inputs, "design/createKeyword", fnName);
+		if (result == "fail") return res.send("Server data rendering failed: Fail");
+
+		res.send("Pass");
 	} catch (exception) {
 		logger.error("Error occurred in design/"+fnName+":", exception);
         res.status(500).send("fail");

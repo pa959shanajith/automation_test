@@ -16,6 +16,7 @@ import {
   openScreenshot,
   getAccessibilityData,
   getDetails_AZURE,
+  getExecutionVideo
 } from "../api";
 import { InputText } from "primereact/inputtext";
 import { OverlayPanel } from "primereact/overlaypanel";
@@ -34,8 +35,11 @@ import { DataTable } from "primereact/datatable";
 import AvoInputText from "../../../globalComponents/AvoInputText";
 import NetworkOperation from "./NetworkOperation";
 import { Tooltip } from 'primereact/tooltip';
+import {Messages as MSG} from '../../global';
+
 
 export default function BasicDemo() {
+  const toast = useRef();
   const [reportData, setReportData] = useState([]);
   const [reportViewData, setReportViewData] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState(null);
@@ -72,6 +76,10 @@ export default function BasicDemo() {
   const [networkDialog, setNewtorkDialog] = useState(false);
   const [networkData, setNetworkData] = useState([]);
   const [description, setDescription] = useState(null);
+  const [downloadLevel, setDownloadLevel] = useState(null);
+  const [reportVideo, setReportVideo] = useState({ hasVideo: false });
+  const [reportInfo, setReportInfo] = useState({ reportId: "", executionId: "" });
+
   const filterValues = [
     { name: 'Pass', key: 'P' },
     { name: 'Fail', key: 'F' },
@@ -86,9 +94,11 @@ export default function BasicDemo() {
     const getQueryParam = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get("reportID");
-      return id;
+      const downloadLevel = urlParams.get("downloadLevel");
+      return { id, downloadLevel, viewReport };
     };
-    const id = getQueryParam();
+    const { id, downloadLevel } = getQueryParam();
+    setDownloadLevel(downloadLevel);
     const getUrl = new URLSearchParams(window.location.search);
     const execution = getUrl.get("execution");    
     const accessibilityID = getUrl.get("accessibilityID");
@@ -105,8 +115,14 @@ export default function BasicDemo() {
 
   const getReportsTable = async () => {
     if (reportid) {
-      const view = await viewReport(reportid);
-      setReportData(JSON.parse(view));
+      const view = await viewReport(reportid, "json", false, downloadLevel, true);
+      const parsedView = JSON.parse(view);
+      setReportData(parsedView);
+      setReportInfo({ reportid, executionId: parsedView.overallstatus.executionId, scenarioName: parsedView.overallstatus.scenarioName });
+      if (parsedView.overallstatus.video !== "-") {
+        setReportVideo({ hasVideo: true, videoPath: parsedView.overallstatus.video });
+    }
+    else setReportVideo({ hasVideo: false });
     }
   };
 
@@ -581,6 +597,19 @@ export default function BasicDemo() {
       />
     );
   };
+  function getActualResult (status, tcDetails) {
+    let result = "";
+    if ( status === "Pass" ){
+        result = tcDetails.actualResult_pass || "As Expected";
+    }
+    else if ( status === "Fail" ) {
+        result = tcDetails.actualResult_fail || "Fail";
+    }
+    else if ( status === "Terminated" ) {
+        result = "Terminated";
+    }
+    return result;
+}
   const convertDataToTree = (data) => {
     const treeDataArray = [];
     for (let i = 0; i < data.length; i++) {
@@ -623,6 +652,7 @@ export default function BasicDemo() {
           }
         }
         modifiedChild.flag = modifiedChild.status;
+        modifiedChild.testcase_details = getActualResult(modifiedChild.status, modifiedChild.testcase_details)
         const statusIcon =
           modifiedChild.status === "Pass"
             ? "static/imgs/pass.png"
@@ -783,6 +813,7 @@ export default function BasicDemo() {
   const screenShotLink = (getLink) =>{
     return (
     <div className="action_items">
+      <div className={`screenshot-container ${getLink?.data?.screenshot_path ? '' : 'empty-container'}`}>
       {getLink?.data?.screenshot_path && (
         <div
           className="screenshot_view"
@@ -797,6 +828,8 @@ export default function BasicDemo() {
          <img className="screenshot" src="static/imgs/ViewScreenshot.svg" data-pr-tooltip="View Screenshot" />
         </div>
       )}
+      </div>
+      <div className="network-icon-container">
       {getLink?.data?.Network_Data && (
       <div>
         <Tooltip target=".Network_icon" position="bottom" />
@@ -810,6 +843,7 @@ export default function BasicDemo() {
         />
       </div>
       )}
+       </div>
     </div>
   )}
 
@@ -870,8 +904,50 @@ export default function BasicDemo() {
     return <span className="pi pi-arrow-right" onClick={() => onMoreDetails(getDetails)}></span>
   }
 
+  const toastError = (erroMessage) => {
+    if (erroMessage.CONTENT) {
+        toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'error', summary: 'Error', detail: erroMessage, life: 5000 });
+}
+
+const toastSuccess = (successMessage) => {
+    if (successMessage.CONTENT) {
+        toast.current.show({ severity: successMessage.VARIANT, summary: 'Success', detail: successMessage.CONTENT, life: 5000 });
+    }
+    else toast.current.show({ severity: 'success', summary: 'Success', detail: successMessage, life: 5000 });
+}
+  
+  const onVideoExportClick = async() => {
+    let scName = reportInfo.scenarioName;
+    
+    let data = await getExecutionVideo (reportVideo.videoPath);
+
+    if (data.error || !data.byteLength) {
+        console.error(data.error);
+        toastError(MSG.REPORT.ERR_FETCH_VIDEO);
+    }
+    else {
+        let filedata = new Blob([data], { type: "video/mp4" });
+
+        if (window.navigator.msSaveOrOpenBlob) window.navigator.msSaveOrOpenBlob(filedata, scName);
+        else {
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(filedata);
+            a.download = scName;
+            document.body.appendChild(a);
+            a.click();
+            URL.revokeObjectURL(a.href);
+            document.body.removeChild(a);
+        }
+
+        toastSuccess(MSG.REPORT.SUCC_EXPORT_REPORT);
+    }
+}
+
   return (
     <>
+    <Toast ref={toast} position="bottom-center" baseZIndex={9999} />
     <div className="reportsTable_container">
       <div className="reportSummary">
         <Accordion
@@ -880,7 +956,14 @@ export default function BasicDemo() {
           onTabOpen={() => setReportSummaryCollaps(false)}
           onTabClose={() => setReportSummaryCollaps(true)}
         >
-          <AccordionTab className="content" header="Result Summary">
+          <AccordionTab header={
+                        <div className="flex align-items-center">
+                            <span className="content" >Result Summary</span>
+                            {reportVideo.hasVideo && 
+                            <span style={{marginLeft : '81rem'}}>
+                            <img src='static/imgs/video-download.svg' alt='video-export' height="24" width="24" onClick={(e)=> {e.stopPropagation();e.preventDefault();onVideoExportClick()}}/></span>}
+                        </div>
+                    }>
             <CollapsibleCard
               collapsible={false}
               width="100%"
@@ -932,21 +1015,26 @@ export default function BasicDemo() {
         >
           <Column
             field="slno"
-            header="S No."
+            header="#"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
             align="center"
             expander
           />
           <Column
             field="Step"
-            header="Steps"
+            header="Step"
             style={{ width: "8rem", padding: "0rem", textAlign: "center" }}
           />
           <Column
             field="StepDescription"
-            header="Description"
+            header="Step Details"
             style={{ width: "18rem", padding: "0rem", textAlign: "center" }}
             body={reoptDescriptionTooltip}
+          />
+          <Column
+          field="testcase_details"
+          header="Remarks"
+          style={{ width: "10rem", padding: "0rem", textAlign: "center", wordWrap:'break-word' }}
           />
           <Column
             field="EllapsedTime"
@@ -1003,7 +1091,7 @@ export default function BasicDemo() {
           header={getTableHeader}
           className="ruleMap_table"
         >
-          <Column field="slno" header="Sl. No."></Column>
+          <Column field="slno" header="#"></Column>
           <Column field="description" header="Description"></Column>
           <Column field="status" header="Status"></Column>
           <Column field="impact" header="Impact"></Column>

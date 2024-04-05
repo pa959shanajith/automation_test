@@ -19,28 +19,19 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: 0;
 }
-.adminSelect-ldap-edit {
-	padding: 0px;
-	height: 25px;
-	margin-bottom: 0;
-	width: 50%;
-	margin-left: 4%;
-	margin-top: 1%;
-	line-height: 2;
-    border: 1px solid $borderOne !important;
-    -webkit-text-stroke: thin;
-}
-.adminSelect-ldap-edit:focus {
-	box-shadow: none !important;
-}
+
 .ldap-content_wrapper-edit{
-    height: 100%;
-    float: left;
-    padding-bottom: 55px;
+    height: 93vh;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
+
 .ldap_container-edit{
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 68%;
     padding: 20px;
-    height: 100%;
+    width: 71%;
 }
 

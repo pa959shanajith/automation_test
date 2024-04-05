@@ -2,6 +2,7 @@
 .Topbar_Menu{
     .p-menubar {
         padding: 0;
+        border: none !important;
     }
     .p-menubar-start {
         width: 37%;
@@ -15,7 +16,6 @@
         .Header_size {
         position: relative;
         height: 100%;
-        background: #ffffff !important;
 }
 
 .Headers {
@@ -59,12 +59,22 @@
 {
     position: absolute;
     z-index: 4;
-    bottom: 4rem;
-    right: 2rem;
+    top: 0.5rem;
+    right: 2.5rem;
     border-radius: 3rem;
-    padding: 1rem;
+    padding: 0.5rem;
     .p-menu {
         width: 13.5rem !important;
+    }
+}
+@media (max-width: 576px) {
+    .needHelp {
+        bottom: 31.5rem; /* Adjust the bottom position for smaller screens */
+        right: 1.5rem; /* Adjust the right position for smaller screens */
+    }
+
+    .needHelp .p-menu {
+        width: calc(100vw - 4rem) !important; /* Adjust menu width for smaller screens */
     }
 }
 .needHelp_Menu{
@@ -113,5 +123,14 @@
     white-space: nowrap;
   }
   
+  .notification-menu-class{
+    border:solid #605BFF;
 
+}
+.keyword_menu{
+    .p-menu{
+        max-height: 100px; 
+        overflow-y: auto;
+    }
+}
   

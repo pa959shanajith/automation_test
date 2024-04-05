@@ -8,6 +8,7 @@ import * as utilApi from '../api';
 import "../styles/DataTable.scss";
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Tooltip } from 'primereact/tooltip';
 
 const DataTable = props => {
 
@@ -29,11 +30,11 @@ const DataTable = props => {
             close={()=>setModal(false)}
             footer={
                 <>
+                <Button outlined onClick={()=>setModal(false)}>
+                    {showModal.rejectText ? showModal.rejectText : "No"}
+                </Button>
                 <Button onClick={showModal.onClick}>
                     {showModal.continueText ? showModal.continueText : "Yes"}
-                </Button>
-                <Button onClick={()=>setModal(false)}>
-                    {showModal.rejectText ? showModal.rejectText : "No"}
                 </Button>
                 </>
             }
@@ -42,16 +43,19 @@ const DataTable = props => {
     return <>
         { showModal && <Modal/>}
         { overlay && <ScreenOverlay content={overlay} /> }
-        <div className="page-taskName" >
+        <div className="page-taskName-utility card shadow-2">
             <span className="page-taskName-encryption" data-test="dt__pageTitle">
-                {currScreen} Data Table
+            <img src="static/imgs/Datatable_icon.svg" className='current_img_icon' alt="SVG Image" />
+            Data Table
+            <Tooltip target=".utilitydatatable" position="bottom" content="Create a data table and utilize them for test data management and parameterization."/>
+            <img src="static/imgs/info-circle.svg" className='utilitydatatable relative left-1' alt="Your Image" />
             </span>
         </div>
         
         { 
             currScreen === "Create" 
-            ? <CreateScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} />
-            : <EditScreen setModal={setModal} setDataValue={setDataValue} dataValue={dataValue} setOverlay={setOverlay} setScreenType={props.setScreenType} />
+            ? <CreateScreen setModal={setModal} setOverlay={setOverlay} setScreenType={props.setScreenType} currScreen={props.currScreen}/>
+            : <EditScreen setModal={setModal} setDataValue={setDataValue} dataValue={dataValue} setOverlay={setOverlay} setScreenType={props.setScreenType} currScreen={props.currScreen}/>
         }
     </>;
 }
@@ -68,28 +72,29 @@ const CreateScreen = props => {
 
     return (
         <>
-            <TableName tableName={tableName} setTableName={setTableName} error={errors.tableName} />
-            <div className="dt__btngroup">
-            <TableActionButtons 
+            <TableName tableName={tableName} setTableName={setTableName} error={errors.tableName} currScreen={props.currScreen}/>
+            <div>
+            {/* <TableActionButtons 
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
                 checkList={checkList} headerCounter={headerCounter} dnd={dnd} setDnd={setDnd}
                 setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
-            />
-            <CreateScreenActionButtons 
-                { ...props } tableName={tableName} data={data} setData={setData} 
-                 setHeaders={setHeaders} setErrors={setErrors} headers={headers}
-            />
+            /> */}
+           
             </div>
             <div className="dt__table_container full__dt">
                 { 
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} setHeaderCounter={setHeaderCounter}
-                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}
-                        focus={focus} setFocus={setFocus}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList} setDnd={setDnd}
+                        focus={focus} setFocus={setFocus} tableName={tableName} currScreen={props.currScreen}
                     /> 
                 }
             </div>
+            <CreateScreenActionButtons 
+                { ...props } tableName={tableName} data={data} setData={setData} 
+                 setHeaders={setHeaders} setErrors={setErrors} headers={headers}
+            />
         </>
     );
 }
@@ -131,42 +136,52 @@ const EditScreen = props => {
     return(
         <>
             <div className="dt__btngroup">
-            <TableActionButtons
+            {/* <TableActionButtons
                 { ...props } data={data} setData={setData} headers={headers} setHeaders={setHeaders}
                 checkList={checkList} headerCounter={headerCounter} dnd={dnd} setDnd={setDnd}
                 setHeaderCounter={setHeaderCounter} setCheckList={setCheckList} setFocus={setFocus}
-            />
-            <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} dataValue={props.dataValue} setDataValue={props.setDataValue}/>
+            /> */}
             </div>
             <SearchDataTable dataTables={dataTables} setData={setData} setHeaders={setHeaders} setTableName={setTableName} { ...props } setDataValue={props.setDataValue}/>
-            <div>
+            <div className='dt__btngroup'>
                 { 
                     data.length > 0 && 
                     <Table 
                         { ...props } data={data} setData={setData} dataValue={props.dataValue} setDataValue={props.setDataValue} headers={headers} setHeaders={setHeaders} headerCounter={headerCounter} 
-                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter}
-                        focus={focus} setFocus={setFocus}
+                        setCheckList={setCheckList} dnd={dnd} checkList={checkList}  setHeaderCounter={setHeaderCounter} setDnd={setDnd} tableName={tableName}
+                        focus={focus} setFocus={setFocus} dataTables={dataTables} setTableName={setTableName} currScreen={props.currScreen}
                     /> 
                 }
             </div>
+            {!tableName ? '' : <EditScreenActionButtons { ...props } tableName={tableName} headers={headers} data={data} dataValue={props.dataValue} setDataValue={props.setDataValue}/>}
         </>
     );
 }
 
-const TableName = ({tableName, setTableName, error}) => {
+const TableName = ({tableName, setTableName, error , currScreen}) => {
+    
+    const [currScreenData, setCurrScreenData] = useState(currScreen);
+
+    useEffect(()=>{
+        setCurrScreenData(currScreen)
+        resetHistory();
+    }, [currScreen])
 
     const onChange = e => setTableName(validate(e.target.value, "dataTableName"));
 
     return (
-        <div className="dt__tableName">
-            Data Table Name:
+        <>
+        <label data-test="Data Table" className='DataTableCreate' style={{ paddingLeft: '1.3rem' }}>{currScreenData} Data Table</label>
+        <div className="dt__tableName flex flex-column gap-2">
+            <label data-test="Data Table Name" className='dt_name' style={{ paddingLeft: '1.3rem' }}>Data Table Name</label>
             <InputText
                 className={error ? 'dt__tableNameError' : ''}
                 onChange={onChange}
                 value={tableName}
                 placeholder="Enter Data Table Name"
-      />
+            />
         </div>
+        </>
     );
 }
 

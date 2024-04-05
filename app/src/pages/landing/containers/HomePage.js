@@ -65,7 +65,7 @@ const HomePage = () => {
             <LandingContainer
                 sideNavBar={<SideNavBar />}
                 sidePanel={<SidePanel validateProjectLicense={validateProjectLicense} toastError={toastError} toastSuccess={toastSuccess}/>}
-                contentPage={<ProjectOverview validateProjectLicense={validateProjectLicense} toastError={toastError} toastSuccess={toastSuccess} />}
+                contentPage={<ProjectOverview validateProjectLicense={validateProjectLicense} toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/>}
             ></LandingContainer>
         </>
     )

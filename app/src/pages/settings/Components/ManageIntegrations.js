@@ -15,11 +15,12 @@ import * as api from '../api.js';
 import { RedirectPage, Messages as MSG, setMsg } from '../../global';
 import { Toast } from "primereact/toast";
 import { ConfirmDialog } from 'primereact/confirmdialog';
+import TestArtifacts from "./TestArtifacts.js";
 import {
     screenType,resetIntergrationLogin, resetScreen, selectedProject,
     selectedIssue, selectedTCReqDetails, selectedTestCase,
     syncedTestCases, mappedPair, selectedScenarioIds,
-    selectedAvoproject, mappedTree,enableSaveButton, almavomapped
+    selectedAvoproject, mappedTree,enableSaveButton,almavomapped, updateTestrailMapping
 } from '../settingSlice';
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -28,6 +29,7 @@ import { Tree } from 'primereact/tree';
 // import { checkboxTemplate } from './path/to/checkboxTemplate';
 import ZephyrContent from "./ZephyrContent";
 import AzureContent from "./AzureContent";
+import TestRailContent from "./TestRailContent";
 import { Paginator } from 'primereact/paginator';
 import { getDetails_SAUCELABS } from "../../execute/api";
 import { fetchALMTestCases } from "../api.js"
@@ -35,7 +37,7 @@ import { useNavigate } from 'react-router-dom';
 import CloudALMContent from "./CloudALMContent";
 export var navigate;
 
-const ManageIntegrations = ({ visible, onHide }) => {
+const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastError }) => {
     // selectors
     const navigate = useNavigate();
     const currentProject = useSelector(state => state.setting.selectedProject);
@@ -47,6 +49,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const selectedAvo = useSelector(state => state.setting.selectedAvoproject);
     const AzureLoginDetails = useSelector(state => state.setting.AzureLogin);
     const zephyrLoginDetails = useSelector(state => state.setting.zephyrLogin);
+    const testrailLoginDetails = useSelector(state => state.setting.testRailLogin);
     const enabledSaveButton = useSelector(state => state.setting.enableSaveButton);
     // state
     const [activeIndex, setActiveIndex] = useState(0);
@@ -91,6 +94,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const [user, setUser] = useState([]);
     const azureRef = useRef(null);
     const zephyrRef = useRef(null);
+    const testrailRef = useRef(null);
     const [domainDetails , setDomainDetails] = useState(null);
     const [currentAvoPage, setCurrentAvoPage] = useState(1);
     const [indexOfFirstScenario, setIndexOfFirstScenario] = useState(0);
@@ -191,6 +195,9 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 break;
             case 'qTest':
                 break;
+            case 'TestRail':
+                callLoginTestRail();
+                break;
             default:
                 break;
         }
@@ -253,12 +260,43 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else if (domainDetails === "notreachable") setToast('error','Error',"Host not reachable.");
         //else if (domainDetails === "Error:Failed in running Zephyr") setLoginError("Host not reachable");
         // else if (domainDetails === "Error:Zephyr Operations") setLoginError("Failed during execution");
-        else if (domainDetails) {
-            setToast("success", "Success", `${selectedscreen.name} login successful`);
+        else if (domainDetails?.length) {
+            setToast("success", "Success", `${selectedscreen?.name} login successful`);
             setShowLoginCard(false);
             setDomainDetails(domainDetails);
             zephyrRef.current.callViewMappedFiles();
             // setLoginSuccess(true);
+        }
+        setIsSpin(false);
+    }
+    
+    const callLoginTestRail = async()=>{
+        const testrailPayload = {
+            TestRailUrl : testrailLoginDetails.url,
+            TestRailUsername : testrailLoginDetails.username,
+            TestRailToken : testrailLoginDetails.apiKey,
+            TestRailAction : "getProjects"
+        };
+
+        const testrailProjects = await api.getProjectsTestrail_ICE(testrailPayload);
+        setIsSpin(false);
+
+        if (testrailProjects.error) setToast('error','Error', testrailProjects.error.CONTENT);
+        else if (testrailProjects === "unavailableLocalServer") setToast('error','Error',"ICE Engine is not available, Please run the batch file and connect to the Server.");
+        else if (testrailProjects === "scheduleModeOn") setToast('error','Error',"Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+        else if (testrailProjects === "Invalid Session"){
+            setToast('error','Error','Invalid session');
+            setIsSpin(false);
+        }
+        else if (testrailProjects === "Invalid Credentials") setToast('error','Error',"Invalid Credentials");
+        else if (testrailProjects === "fail") setToast('error','Error',"Fail to Login");
+        else if (testrailProjects === "notreachable") setToast('error','Error',"Host not reachable.");
+        else if (testrailProjects === "Error:testrail Operations") setToast('error','Error', "Wrong Credentials");
+        else if (testrailProjects) {
+            setToast("success", "Success", `${selectedscreen.name} login successful`);
+            setShowLoginCard(false);
+            setDomainDetails(testrailProjects);
+            // testrailRef.current.callViewMappedFiles();
         }
         setIsSpin(false);
     }
@@ -341,6 +379,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const integrationItems = [
         { label: 'Tool Based Integration' },
         { label: 'Cloud Based Integration' },
+        { label: 'Versioning'}
     ];
 
     ////pagination for  jira testcases/////////////////////////////////////////////////////////////////////////////
@@ -380,7 +419,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setSelectedNodes([]);
         dispatchAction(enableSaveButton(false))
         onHide();
-
+        setDomainDetails([]);
     }
 
     const handleTabChange = (index) => {
@@ -562,7 +601,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         else {
             setToast("info", "Info", 'Please sync atleast one map');
         }
-
+ 
         // Fetching mapped API's again
         const fetchMappedDetails = async () => {
             try {
@@ -570,7 +609,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     user_id: localStorage.userInfo.user_id,
                     action: "viewALM_MappedList_ICE"
                 });
-        
+       
                 if (getModulesData && getModulesData.length > 0) {
                     dispatchAction(almavomapped(getModulesData));
                 }
@@ -578,8 +617,25 @@ const ManageIntegrations = ({ visible, onHide }) => {
                 console.error("Error fetching mapped details:", error);
             }
         };
-
+ 
         fetchMappedDetails();
+    }
+
+    const callTestrailSaveButton = async () => {
+        if (mappedData && Object.keys(mappedData).length) {
+            const response = await api.saveTestrailMapping(mappedData);
+            if (response.error) {
+                setToast("error", "Error", response.error);
+            } else if (response === "scheduleModeOn")
+                setToast("warn", "Warning", MSG.GENERIC.WARN_UNCHECK_SCHEDULE.CONTENT);
+            else if (response.status == 201 || response.status == 200 || response == "success") {
+                setToast("success", "Success", 'Tests mapped successfully!');
+                dispatchAction(updateTestrailMapping(true));
+            }
+        }
+        else {
+            setToast("info", "Info", 'Please sync atleast one map');
+        }
     }
 
     const callViewMappedFiles = async (saveFlag) => {
@@ -655,6 +711,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
     const acceptFunc = () => {
         setIsShowConfirm(false);
+        setDomainDetails([]);
         dispatchAction(resetIntergrationLogin());
         dispatchAction(resetScreen());
         setShowLoginCard(true);
@@ -674,6 +731,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
         setTreeData([]);
         setCompleteTreeData([]);
         setSelectedNodes([]);
+        dispatchAction(updateTestrailMapping(false));
     };
 
     const rejectFunc = () => {
@@ -684,8 +742,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
         e.preventDefault();
         dispatchAction(selectedProject(e.target.value));
         setDisableIssue(false);
-        console.log(e.target.value, ' project e');
-        // const releaseId = e.target.value;
         const projectScenario = await api.getAvoDetails("6440e7b258c24227f829f2a4");
         if (projectScenario.error)
             setToast("error", "Error", projectScenario.error);
@@ -879,8 +935,8 @@ const ManageIntegrations = ({ visible, onHide }) => {
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Back" onClick={() => { dispatchAction(enableSaveButton(false)); showLogin() }} size="small" outlined />
-                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' size="small" onClick={selectedscreen.name === 'Jira' ? callSaveButton : selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name == "CloudALM" ? callCalmSaveButton : callZephyrSaveButton} />
+                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name=="TestRail" ? callTestrailSaveButton : selectedscreen.name == "CloudALM" ? callCalmSaveButton : callZephyrSaveButton} />
+                    <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" outlined/>
                 </div>)}
 
             {activeIndex === 1 &&(
@@ -906,7 +962,6 @@ const ManageIntegrations = ({ visible, onHide }) => {
     const CloudBasedIntegrationContent = useMemo(() => <CloudSettings  />, [])
 
 
-
     return (
         <>
             <div className="card flex justify-content-center">
@@ -914,6 +969,7 @@ const ManageIntegrations = ({ visible, onHide }) => {
                     <div>
                         {showLoginCard  ? <TabMenu model={integrationItems} activeIndex={Index}  onTabChange={handleTabIndexChange} /> : ""}
                         {Index === 1 && <CloudSettings createSaucelabs={createSaucelabs} setCreateSaucelabs={setCreateSaucelabs} SaucelabsURL={SaucelabsURL} setSaucelabsURL={setSaucelabsURL} SaucelabsUsername={SaucelabsUsername} setSaucelabsUsername={setSaucelabsUsername} SaucelabsAPI={SaucelabsAPI} setSaucelabsAPI={setSaucelabsAPI} />}
+                        {Index === 2 && <TestArtifacts toastError={toastError} toastSuccess={toastSuccess} toastWarn={toastWarn}/>}
                     </div>
                     <ConfirmDialog visible={isShowConfirm} onHide={() => setIsShowConfirm(false)} message="Are you sure you want to go Back ?"
                         header="Confirmation" icon="pi pi-exclamation-triangle" accept={acceptFunc} reject={rejectFunc} />
@@ -1018,24 +1074,13 @@ const ManageIntegrations = ({ visible, onHide }) => {
 
                                         </TabPanel>
 
-                                        <TabPanel header="View Mapping">
-                                            <Card className="view_map_card">
-                                                <div className="flex justify-content-flex-start toggle_btn">
-                                                    <span>Jira Testcase to Avo Assure Testcase</span>
-                                                    <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                                    <span>Avo Assure Testcase to Jira Testcase</span>
-                                                </div>
-
-                                                {checked ? (<div className="accordion_testcase">
-                                                    <Accordion multiple activeIndex={0} >
-                                                        {rows.map((item) => (
-                                                            <AccordionTab header={<span>{item.scenarioNames[0]} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)}/></span>}>
-                                                                <span>{item.itemSummary}</span>
-                                                            </AccordionTab>))}
-                                                    </Accordion>
-                                                </div>
-
-                                                ) : (
+                                            <TabPanel header="View Mapping">
+                                                <Card className="view_map_card">
+                                                    <div className="flex justify-content-flex-start toggle_btn">
+                                                        <span>Jira Test case to Avo Assure Test case</span>
+                                                        <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+                                                        <span>Avo Assure Test case to Jira Test case</span>
+                                                    </div>
 
                                                     <div className="accordion_testcase">
                                                         <Accordion multiple activeIndex={0}>
@@ -1045,27 +1090,26 @@ const ManageIntegrations = ({ visible, onHide }) => {
                                                                 </AccordionTab>))}
                                                         </Accordion>
                                                     </div>
-                                                )}
                                             </Card>
-
-                                        </TabPanel>
-
+                                            </TabPanel>               
                                     </TabView>
 
-                                </div>
-                            </div>
-                        )
-
-                        : selectedscreen.name === "Zephyr" && Index === 0 ? <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
-                            : selectedscreen.name === "Azure DevOps" && Index === 0 ? <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
-                                : selectedscreen.name === "CloudALM" && Index === 0 ? (calmTestCaseData && <CloudALMContent activeIndex={activeIndex} handleTabChange={handleTabChange} testCaseData={calmTestCaseData} />)
-                                    : null
+                                
+                                </div> 
+                           </div>
+                            )
+                        : selectedscreen.name === "Zephyr" && Index === 0 ? 
+                            <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name === "Azure DevOps" && Index === 0 ?
+                            <AzureContent setFooterIntegrations={footerIntegrations} ref={azureRef} callAzureSaveButton={callAzureSaveButton} setToast={setToast} issueTypes={issueTypes} projectDetails={projectDetails} selectedNodes={selectedNodes} setSelectedNodes={setSelectedNodes} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+                        : selectedscreen.name == "TestRail" && Index === 0 ? 
+                            <TestRailContent ref={testrailRef} domainDetails={domainDetails} issueTypes={issueTypes} setToast={setToast} />
+                        : selectedscreen.name === "CloudALM" && Index === 0 ? (calmTestCaseData && <CloudALMContent activeIndex={activeIndex} handleTabChange={handleTabChange} testCaseData={calmTestCaseData} />)    
+                        : null
                     }
-
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>
-
         </>
     )
 }

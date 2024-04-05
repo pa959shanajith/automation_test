@@ -209,22 +209,22 @@ export const reportsBar = {
 
 export const testTypesOptions = [
   {
-    icon: 'pi pi-align-left',
+    icon: 'functional_test_icon',
     value: 'Functional Test'
   },
   {
-    icon: 'pi pi-align-left',
+    icon: 'accessibility_test',
     value: 'Accessibility Test'
   }
 ];
 
 export const viewByOptions = [
   {
-    icon: 'pi pi-align-left',
+    icon: 'execution_profile_icon',
     value: 'Execution Profile'
   },
   {
-    icon: 'pi pi-align-left',
+    icon: 'Test_suites',
     value: 'Test Suites'
   }
 ];

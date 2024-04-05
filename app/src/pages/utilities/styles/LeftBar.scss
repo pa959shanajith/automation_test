@@ -19,6 +19,10 @@
     font: $f5_regular;
     color: #212121;
 }
+.util_header_migration{
+    font: $f5_regular;
+    color: #212121;
+}
 
 .letfnav h4{
     text-align: center;
@@ -41,6 +45,10 @@
 }
 .encrypt_drodown{
     height: 2.5rem !important;
+    font: $f6_regular;
+    .p-dropdown-label{
+        padding: 0.3rem !important;
+    }
 }
 
 #selected{
@@ -48,6 +56,9 @@
 }
 
 .util__execution_ic{
+    padding: 10px;
+}
+.util__execution_migration{
     padding: 10px;
 }
 .util__devOps {
@@ -58,8 +69,9 @@
     display: flex;
     align-items: center;
     width: 95%;
-    background: #e3cff0 !important;
-    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    background: #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
     top: 2rem;
 }
@@ -70,6 +82,8 @@
     display: flex;
     align-items: center;
     position: relative;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    width: 95%;
     top: 2rem;
 }
 
@@ -77,10 +91,11 @@
     display: flex;
     align-items: center;
     width: 95%;
-    background: #e3cff0 !important;
-    border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    background: #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
     position: relative;
-    top: 3rem;
+    top: 2rem;
 }
 
 .not_active_tab_data {
@@ -89,7 +104,9 @@
     display: flex;
     align-items: center;
     position: relative;
-    top: 3rem;
+    top: 2rem;
+    width: 95%;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
 }
 .left_side_panel{
     position: relative;
@@ -97,11 +114,38 @@
     height: 100%;
 }
 .notelabel{
-    margin-left: 1rem;
+    margin-left: 1.3rem;
     font: $f6_semibold;
 }
 .notecontent{
     margin-left: 4rem;
     margin-top: -1.5rem;
    font:$f6_regular
+}
+.active_tab_migrate{
+    display: flex;
+    align-items: center;
+    width: 95%;
+    background:  #EBEBFF !important;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    // border-radius: 0.5rem 0.5rem 0.5rem 0.5rem !important;
+    position: relative;
+    top: 2rem;
+}
+.not_active_tab_migrate {
+    background-color: none !important;
+    font: $f7_regular;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-bottom: 2px solid rgba(0, 0, 0, .1);
+    top: 2rem;
+    width: 95%;
+}
+.page-taskName-utility{
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+.Encryption_Method{
+    font: $f7_semibold;
 }

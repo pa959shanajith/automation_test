@@ -23,7 +23,12 @@ export const loadUserInfo = createSlice({
         },
         updatedProject: false,
         webSocketRes : {},
-        isShowSocket:false
+        isShowSocket:false,
+        openCaptureScreen: false,
+        updateElementRepository: false,
+        sapGeniusScrapeData: {},
+        collapseSideBar:false,
+        setElementRepositoryIndex:0
     },
     reducers: {
         setUserInfo: (state, action) => {
@@ -70,7 +75,9 @@ export const loadUserInfo = createSlice({
         setSocket: (state, action) => {
             state.socket = action.payload
         },
-
+        setSAPGeniusScrapeData: (state, action) => {
+            state.sapGeniusScrapeData = action.payload;
+        },
         updateNotify: (state, action) => {
             var value = action.payload
             value.dateTime = new Date().toLocaleString();
@@ -98,6 +105,18 @@ export const loadUserInfo = createSlice({
         setIsShowSocket: (state, action) => {
             state.isShowSocket = action.payload
         },
+        openCaptureScreen: (state, action) => {
+            state.openCaptureScreen = action.payload;
+        },
+        updateElementRepository: (state, action) => {
+            state.updateElementRepository = action.payload;
+        },
+        collapseSideBar:(state,action)=>{
+            state.collapseSideBar = action.payload;
+        },
+        setElementRepositoryIndex:(state,action)=>{
+            state.setElementRepositoryIndex = action.payload;
+        }
         // need it in future
         // ----------------------------------
         // CLEAR_NOTIFY: (state, action) => {

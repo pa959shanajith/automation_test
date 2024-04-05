@@ -48,7 +48,7 @@ const DevOpsReport = props => {
 
     
     const onWebClick = ({reportid, testscenarioid}) => async() => {
-        const win = window.open(`/viewReports?reportID=${reportid}&execution=${testscenarioid}`, "_blank"); 
+        const win = window.open(`/viewReports?reportID=${reportid}&execution=${testscenarioid}&downloadLevel=testCase&viewReport=true`, "_blank"); 
         win.focus();
         localStorage['executionReportId'] = reportid;
         localStorage['logData'] = JSON.stringify(logData[testscenarioid]);
@@ -66,7 +66,7 @@ const DevOpsReport = props => {
         let reportID = reportid;
         let scName = testscenarioname;
         
-        let data =  await publicViewReport(reportID, reportType, screenshotFlag);
+        let data =  await publicViewReport(reportID, reportType, screenshotFlag, "testCase");
 
         if (data.error) {
             console.error(data.error);

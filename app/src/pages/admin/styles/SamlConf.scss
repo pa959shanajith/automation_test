@@ -1,6 +1,39 @@
+@import '../../global/styles/ColorVariables.scss';
 
 .saml_container {
     margin: 1rem;
     height: 65vh;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+
+    .saml_header span{
+        background: #331d4c;
+        border-radius: 5px;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        color: #fff;
+        display: inline-block;
+        font-size: 18px;
+        font: 400 1rem/1.5rem Open Sans;
+        height: 66%;
+        margin-bottom: 3%;
+        padding: 2px 14px 1px;
+        width: 23%;
+    }
+
+    .saml_header {
+        float: left;
+        width: 100%;
+        margin-bottom: 10px;
+        height: 10%;
+    }
+
+    .label_text {
+        font: 600 0.8125rem/1rem Open Sans;
+    }
+
+    .serverNamelabel {
+        font: $f7_semibold ;
+    }
 }

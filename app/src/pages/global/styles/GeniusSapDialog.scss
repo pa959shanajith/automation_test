@@ -1,0 +1,45 @@
+.p-dialog {
+    max-height: 95%;
+}
+
+.geniusMindmapDialog {
+    .p-dialog-header {
+        background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+        border-bottom: 1px solid black
+    }
+}
+
+.validation_container {
+    height: 1rem;
+
+    .txt_valid {
+        visibility: hidden;
+    }
+
+    .txt_invalid {
+        visibility: visible;
+        color: #D1272C;
+    }
+}
+
+.genius_sap {
+    .p-dialog-header {
+        background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+        border-bottom: 1px solid black
+    }
+
+}
+
+.create_testcase {
+    .p-dialog-header {
+        background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+        border-bottom: 1px solid black
+    }
+}
+
+.create_testsuite {
+    .p-dialog-header {
+        background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+        border-bottom: 1px solid black
+    }
+}

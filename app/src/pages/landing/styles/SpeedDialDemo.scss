@@ -1,0 +1,30 @@
+
+.p-speeddial-action{
+    width: 1.8rem;
+    height: 1.8rem;
+}
+.p-button.p-button-icon-only.p-button-rounded{
+    border-radius: 50%;
+    height: 1.8rem;
+}
+.p-fluid .p-button-icon-only{
+    width: 1.8rem;
+}
+.p-speeddial-button.p-button.p-button-icon-only{
+    width: 1.8rem;
+}
+.p-speeddial{
+    position: absolute;
+    right: -0.8rem;
+   bottom: -12px;
+}
+.p-button.p-button-outlined:enabled:hover, .p-button.p-button-outlined:not(button):not(a):not(.p-disabled):hover{
+    background: rgba(99, 102, 241, 0.04);
+    color: #62348e;
+    border: 1px solid;
+}
+.p-button.p-button-outlined{
+    background-color: transparent;
+    color:  rgb(116, 115, 127);
+    border: 1px solid;
+}

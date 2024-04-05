@@ -1,0 +1,102 @@
+
+.testcase-cls .p-dialog .p-dialog-content .tab__cls {
+    margin: 25px auto;
+}
+
+.testcase-cls .p-dialog .p-dialog-content .select-users {
+    margin-left: 40px;
+}
+.testcase-cls .p-dialog .p-dialog-content .data__mapping {
+    display: flex;
+    justify-content: center;
+    height: auto;
+}
+
+.testcase-cls .card_data1 {
+    margin-left: -1rem;
+    position: relative;
+    right:0px !important;
+}
+.testcase-cls .mapping_data_card1, .testcase-cls .mapping_data_card2 {
+    width: 27rem !important;
+	height: 10rem !important;
+	margin-left:4px;
+}
+ .testcase-cls .p-card-content .check1 .label1 {
+    font-size: 1rem;
+    display: inline-block;
+    width: auto;
+}
+.testcase-cls .p-card-content .check1 .topping{
+    width: 20px;
+    height:20px
+}
+
+.testcase-cls .p-card-content .check1 {
+    border-bottom: 1px solid #ccc;
+   bottom: auto;
+}
+
+.testcase-cls .p-avatar {
+
+    margin-left: -79px;
+    margin-top: 16px;
+}
+
+
+.testcase-cls .move-icon {
+    margin: 20px;
+    padding: 10px;
+
+}
+
+.testcase-cls .gtbtn {
+    position: absolute;
+    top: 200px;
+    color: #777 !important;;
+    border: 1px solid #777 !important;
+    margin-left: -162px;
+
+}
+.testcase-cls .dropdown_project, .testcase-cls .dropdown_release {
+    height: 2.7rem!important;
+    width: 11rem!important;
+}
+.testcase-cls .mapping_data_card1 .p-card-body{
+    height: 20.5rem !important;
+    width: 23rem !important;
+}
+
+.testcase-cls .login_container_integrations {
+    display: none;
+}
+.testcase-cls .card__login__jira {
+    top: 5rem;
+    bottom: 0rem;
+    box-shadow: none!important;
+    height: 20rem;
+    left: 5rem;
+    position: relative;
+    width: 31rem;
+}
+.testcase-cls .logout__btn {
+
+    background-color: #6366f1 !important;
+    color: #fff !important;
+    left: 0px !important;
+    position: relative !important;
+}
+.testcase-cls:has(.card__login__jira){
+    width: 50vw !important;
+    height:60vw !important;
+    position: relative !important;
+    // top: 20px !important;
+  
+}
+.testcase-cls .btn1 {
+    background-color: #fff !important;
+    border: 1px solid #6366f1 !important;
+    color: #6366f1 !important;
+    position: relative !important;
+   
+}

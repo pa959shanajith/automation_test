@@ -10,8 +10,12 @@
     }
     .action_items{
      display: flex;
+     justify-content: space-around;
      flex-direction: row;
      gap: 1rem;
+    }
+    .empty-container {
+        width: 1.5rem; 
     }
     .plug_icon{
         cursor: pointer;
