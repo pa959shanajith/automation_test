@@ -9,7 +9,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Tooltip } from 'primereact/tooltip';
 import { geniusMigrate, showGenuis, showSmallPopup, migrateProject } from '../../global/globalSlice';
 import "primeicons/primeicons.css";
-import {loadUserInfoActions} from "../LandingSlice"
+import {loadUserInfoActions} from "../LandingSlice";
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
 
 
 const ProjectCreation = (props) => {
@@ -125,7 +127,7 @@ const ProjectCreation = (props) => {
         </div>
         {/* {userInfo && userInfo.rolename === "Quality Manager" ? ( */}
           <>
-            <div className="flex flex-row ">
+            {/* <div className="flex flex-row ">
               <Card className="CreateProj-card " id="Createproj-title">
                 <div className="CreateProj-header flex flex-row justify-between items-center">
                 <h2 className="CreateProj-title">Create new element repository</h2>
@@ -135,7 +137,7 @@ const ProjectCreation = (props) => {
                  
                 </div>
               </Card>
-            </div>
+            </div> */}
           </>
         {/* ) : null} */}
 
@@ -212,11 +214,18 @@ const ProjectCreation = (props) => {
           <div><Button size='small' className="CreateProj_btn" onClick={CreateGenAi}>Create</Button></div>
         </Card> */}
          <div className="flex flex-row ">
+        
               <Card className="CreateProj-card " id="Createproj-title">
                 <div className="CreateProj-header flex flex-row justify-between items-center">
-                <h2 className="CreateProj-title">Create TestCase using AI</h2>
-                  <Button className="CreateProj_btn" size="small" onClick={CreateGenAi}>
-                    Create
+              <Step active={true}>
+                <div className='stepplabel'>
+                <StepLabel className='flex justify-center labelstep'>1</StepLabel>
+                </div>
+              </Step>
+                <h2 className="CreateProj-title">Create Test case using AI</h2>
+                  <Button className="CreateProj_btn" size="small" onClick={CreateGenAi} >
+                    <img src="static/imgs/plus_white_icon.svg" style={{marginRight: "11px", marginLeft: "-3rem"}} />
+                      <div style={{marginRight:"2px"}}>Create</div>
                   </Button>
                  
                 </div>

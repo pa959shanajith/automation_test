@@ -14,7 +14,8 @@
             position: relative;
             .MuiStepConnector-lineVertical {
                 position: absolute;
-                bottom: -12px;
+                // bottom: -12px;
+                // bottom: -54px;
             }
         }
     }
@@ -59,9 +60,10 @@
                   .CreateProj_btn {
                     flex-shrink: 0; 
                     width: 10.2rem; 
-                    font: $f7_semibold;
+                    font: $f7_regular;
                     margin-right: 0.6rem;
                     justify-content: center;
+                    width: 11.4rem;
                   }
             }
         }
@@ -146,4 +148,26 @@
         }
         
     } 
-    
+    .stepplabel{
+         
+        display: flex;
+        align-items:center ;
+        justify-content: center;
+        background-color: rgb(96, 91, 255);
+        border-radius: 50%;
+       color: white;
+        margin: 9px;
+        
+        font-size: 0.8rem;
+        height: 1.5rem;
+        min-width: 1.5rem;
+        font-weight: bold;
+          
+        line-height: 1.8rem;
+    }
+    .labelstep{
+        .css-1hv8oq8-MuiStepLabel-label.Mui-active {
+            color: white;
+            font-weight: 500;
+        }
+    }

@@ -506,14 +506,21 @@
 .reportPagination{
     .p-paginator {
         background: #fff;
-        border: 2px outset #e9ecef !important;
-        border-radius: 10px;
-        color: #605BFF;
-        width: fit-content;
-        padding: 0.5rem 1rem !important;
-        position: relative;
-        left: 38rem;
+    border: 2px outset #e9ecef !important;
+    border-radius: 10px;
+    color: #605bff;
+    /* left: 38rem; */
+    padding: .5rem 1rem !important;
+    position: fixed;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    bottom: 10vh;
+    /* margin: 0 50%; */
+    width: fit-content;
+    margin-left: 50%;
+    transform: translateX(-50%);
     }
+
     .p-paginator .p-paginator-pages .p-paginator-page.p-highlight{
         background: #605BFF;
         border-color: #605BFF;
