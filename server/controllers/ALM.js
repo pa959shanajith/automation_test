@@ -492,10 +492,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     logger.info("ALM Job Status service called");
     try {
-      logger.info("request payload : "+ req.query.project+', '
-      + req.query.scope + ', '
-      +req.query.jobIds
-      );
+      logger.info("request payload : "+ JSON.stringify(req.query));
       var send_res = {
         "project": req.query.project,
         "scope": req.query.scope,
@@ -551,7 +548,8 @@ exports.fetchALM_Testcases = async function (req,res) {
                   }
                 })
               }
-            percentage = jobStatus === "finished"  ? 100 : percentage;
+            logger.info("jobstatus from running status : ",jobStatus);
+            percentage = jobStatus === "finished" || jobStatus === "aborted" ? 100 : percentage;
             percentage = fetch_jobStatus['Completed'] ? calculatePercentage(fetch_jobStatus['Completed']) : percentage;
             send_res["jobstatuses"].push({"id":each_exec.executionListId,
             "status":fetch_jobStatus['status'] === "Inprogress" ? "running": jobStatus,
@@ -561,7 +559,7 @@ exports.fetchALM_Testcases = async function (req,res) {
           }
 
         console.log(send_res,' its send_res ');
-        logger.info("send response : "+send_res)
+        logger.info("send response : "+JSON.stringify(send_res))
         return res.status(200).send(send_res);
  
     } catch (error) {
