@@ -146,6 +146,7 @@ class TestSuiteExecutor {
                 execReq['osVersion'] = batchData.osVersion
                 execReq['browserName'] = batchData.browserName
                 execReq['os'] = batchData.os
+                execReq['platforms_web'] = batchData.platforms_web
             } else {
                 execReq["mobile"] = batchData.mobile
             } 
