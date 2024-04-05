@@ -216,6 +216,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
     }
 ]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [executionMode, setExecutionMode] = useState("serial");
 
   let userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
@@ -246,7 +247,7 @@ const ConfigurePage = ({ setShowConfirmPop, cardData }) => {
   const [batchInfo, setBatchInfo] = useState([]);
   const [profileName, setProfileName] = useState(null);
   const [configbtnsave,setConfigbtnsave]=useState(null);
-  
+  const [selectedTab, setSelectedTab] = useState("Normal Execution");
   const NameOfAppType = useSelector((state) => state.landing.defaultSelectProject);
   const typesOfAppType = NameOfAppType.appType;
   const [selectedLanguage, setSelectedLanguage] = useState("curl");
@@ -1083,6 +1084,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
+    console.log("executionData",executionData);
     if (Array.isArray(executionData.targetUser)) {
       for (let icename in executionData.targetUser) {
         let ice_id = iceNameIdMap[executionData.targetUser[icename]];
@@ -1136,18 +1138,17 @@ const handleSubmit1 = async (SauceLabPayload) => {
     />,
     [setLoading, displayBasic6, onHidedia, handleBrowserstackSubmit,setBrowserstackUser,setBrowserstackValues,browserstackValues]);
 
-    const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
-            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
-            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
-            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap}
-        />,
-            [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
-            availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
-
+    // const browserstackExecute = useMemo(() => <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+    //         displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+    //         changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+    //         availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
+    //     />,
+    //         [browserstackBrowserDetails, displayBasic7, onHidedia, mobileDetailsBrowserStack,  showBrowserstack, changeLable, poolType, ExeScreen, inputErrorBorder, setInputErrorBorder,
+    //         availableICE, smartMode, selectedICE, setSelectedICE,  dataExecution, browserstackUser,  browserlist,setBrowserstackValues,browserstackValues, CheckStatusAndExecute, iceNameIdMap]);
 
 
   const ExecuteTestSuite = async (executionData, btnType) => {
-    if (executionData === undefined) executionData = dataExecution;
+       if (executionData === undefined) executionData = dataExecution;
     if(executionData["executionEnv"] != 'saucelabs' && executionData["executionEnv"] != 'browserstack') {
       executionData["executionEnv"]=execEnv;
       executionData["browserType"]=browserTypeExe;
@@ -1157,8 +1158,12 @@ const handleSubmit1 = async (SauceLabPayload) => {
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
-    executionData["exectionMode"] = execAction;
-    // executionData["executionEnv"] = execEnv;
+    executionData["exectionMode"] = executionData?.exectionMode;
+  //   if(executionData["exectionMode"] == selectedTab){
+  //    executionData["exectionMode"]="browserstack_parallel";
+  //  }
+
+    // executionData["executionEnv"] == execEnv;
     // executionData["browserType"] = browserTypeExe;
     executionData["integration"] = integration;
     executionData["configurekey"] = currentKey;
@@ -1229,7 +1234,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
 
       setBrowserTypeExe([]);
       setModuleInfo([]);
-      setExecAction("serial");
+      setExecAction(executionMode);
       setExecEnv("default");
     } catch (error) {
       setLoading(false);
@@ -1243,8 +1248,9 @@ const handleSubmit1 = async (SauceLabPayload) => {
       });
       setBrowserTypeExe([]);
       setModuleInfo([]);
-      setExecAction("serial");
+      setExecAction(executionMode);
       setExecEnv("default");
+      
     }
   };
 
@@ -1313,7 +1319,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
       searchKey: getSearch
     });
 
-    const configDataLength = configurationList["data"].length;
+    const configDataLength = configurationList["data"]?.length;
     if(configDataLength > 0){
       dispatch(testrailPlanRunIds(configurationList["data"][configDataLength - 1]?.executionRequest?.integration?.testrail?.runAndPlanDetails) || {});
     }
@@ -2733,7 +2739,13 @@ Learn More '/>
       <div>
       {sauceLabLogin}
       {sauceLabExecute}
-      {browserstackExecute}
+      {/* {browserstackExecute} */}
+      <BrowserstackExecute  selectProjects={projectInfo?.appType} browserstackBrowserDetails={browserstackBrowserDetails} mobileDetailsBrowserStack={mobileDetailsBrowserStack}
+            displayBasic7={displayBasic7} onHidedia={onHidedia} showBrowserstack={showBrowserstack}  onModalBtnClick={onHidedia}
+            changeLable={changeLable} poolType={poolType} ExeScreen={ExeScreen} inputErrorBorder={inputErrorBorder} setInputErrorBorder={setInputErrorBorder}
+            availableICE={availableICE} smartMode={smartMode} selectedICE={selectedICE} setSelectedICE={setSelectedICE}  dataExecution={dataExecution} browserstackUser={browserstackUser} browserstackValues={browserstackValues} setSelectedTab={setSelectedTab} selectedTab={selectedTab} setBrowserstackValues={setBrowserstackValues}browserlist={browserlist} CheckStatusAndExecute={CheckStatusAndExecute} iceNameIdMap={iceNameIdMap} 
+            setExecutionMode={setExecutionMode}
+        />
       {browserstackLogin}
         <Breadcrumbs />
         <div className="grid" style={{ borderBottom: 'solid #dee2e6' }}>

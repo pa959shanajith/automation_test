@@ -48,8 +48,9 @@ const RightPanelGenAi = () => {
                             </div>
                             <div className="w-full">
                                 <label className="pb-2 font-medium">Accuracy <span style={{ color: "#d50000" }}>*</span></label>
-                                <InputText value={range > 1 ? `0.${range}` : range} onChange={(e) => { setRange(e.target.value); dispatchAction(setEditParameters({ "temperature": e.target.value })); }} className="w-full" />
-                                <Slider value={range * 100} onChange={(e) => {
+                                <InputText  value={range} onChange={(e) => {setRange(e.target.value > 1 ? `0.${e.target.value}` : e.target.value); dispatchAction(setEditParameters({ "temperature": e.target.value > 1 ? `0.${e.target.value}` : e.target.value }));}}
+                                className="w-full" />
+                                <Slider value={Number(range)*100} onChange={(e) => {
                                     setRange(e.value/100)
                                 }} className="w-full" />
                             </div>
