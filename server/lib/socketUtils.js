@@ -1,5 +1,6 @@
 var logger = require('../../logger');
 let queue = require("./execution/executionQueue");
+const reports = require("../controllers/report");
 let execInfo = undefined;
 
 const result_executeTestSuite = async(resultData,execReq,execType,userInfo,invokinguser,insertReport,notifySocMap,resSent,mySocket)=>
