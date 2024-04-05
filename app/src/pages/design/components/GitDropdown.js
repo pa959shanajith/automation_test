@@ -145,7 +145,10 @@ const GitDropdown = (props) => {
       gitemailRef.current.value = data[4];
       gitbranchRef.current.value = data[5];
       gitconfigRef.current.disabled = true;
-      if(apiPayload.param === 'bit') bitProjectKey.current.value = data[6];
+      if(apiPayload.param === 'bit') {
+        bitProjectKey.current.value = data[6];
+        bitProjectKey.current.disabled = true;
+      }
     }
   }
 
@@ -187,7 +190,8 @@ const GitDropdown = (props) => {
     gitbranchRef.current.value = "";
     gitconfigRef.current.readOnly = false;
     gitconfigRef.current.disabled = false;
-    bitProjectKey.current.value = ""
+    bitProjectKey.current.value = "";
+    bitProjectKey.current.disabled = false;
   }
 
   const gitConfigAction = async (action) => {
@@ -378,7 +382,7 @@ const GitDropdown = (props) => {
 
       <Toast ref={toast} position="bottom-center" />
       <Dialog
-        header={selectedImage === 'commit' ? `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "BitBucket"} Commit Configuration` : selectedImage === 'version_history' ? 'Version History' : `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "BitBucket"} Configuration`}
+        header={selectedImage === 'commit' ? `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "Bitbucket"} Commit Configuration` : selectedImage === 'version_history' ? 'Version History' : `${(props.configurationName !== "noconfig" && props.configurationName === "git") ? "Git" : "Bitbucket"} Configuration`}
         visible={dialogVisible}
         style={selectedImage === 'commit' ? { width: "50vw", height: '85vh' } : { width: "58vw", height: '85vh' }}
         onHide={DialogCloseHandle}
@@ -431,6 +435,7 @@ const GitDropdown = (props) => {
             gituserRef={gituserRef}
             gitemailRef={gitemailRef}
             gitbranchRef={gitbranchRef}
+            configName={props.configurationName }
           />
         </div>
       </Dialog>

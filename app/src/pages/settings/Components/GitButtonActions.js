@@ -40,7 +40,7 @@ const GitButtonActions = (props) => {
         
         let apiPayloadData = {}
         if (['update', 'create'].includes(action)) {
-            if (!gitValidate(action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, gitBranch)) return;
+            if (!gitValidate(props.screenName, action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, gitBranch, bitProjectKey)) return;
             setLoading("Loading...");
             if (props.screenName === "Git") {
                 apiPayloadData.param = "git";
@@ -108,7 +108,7 @@ const GitButtonActions = (props) => {
         }
         setLoading(false);
         if (!['create'].includes(action)) {resetFields();}
-        if (action === "update") {
+        if (action === "update" || action === "delete") {
             Project.current.value = '';
             user.current.value = '';
             props.setSelectProject('');
@@ -148,7 +148,7 @@ const GitButtonActions = (props) => {
     );
 }
 
-const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, gitBranch) => {
+const gitValidate = (screenName, action, user, domain, Project, gitConfigName, gitAccToken, gitUrl, gitUsername, gitEmail, gitBranch, bitProjectKey) => {
     var flag = true;
     const errBorder = '2px solid red';
     var regExUrl = /^https:\/\//g;
@@ -201,6 +201,10 @@ const gitValidate = (action, user, domain, Project, gitConfigName, gitAccToken, 
     if (!regExUrl.test(gitUrl.current.value.trim())) {
         gitUrl.current.style.outline = errBorder;
         // toastWarn(Messages.ADMIN.WARN_GIT_URL);
+        flag = false;
+    }
+    if(screenName === "Bitbucket" && action !== "delete" && bitProjectKey.current.value.trim() === '') {
+        bitProjectKey.current.style.outline = errBorder                       ////
         flag = false;
     }
     return flag;

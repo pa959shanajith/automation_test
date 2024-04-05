@@ -204,7 +204,7 @@ const bodyTemplate = (rowData) => {
         <Dropdown
           filter
           data-test="projectSelect"
-          className='projectSelect'
+          className='projectSelect p-intputtext-sm'
           value={rowData.selectedProject}
           options={props.projectListDropdown}
           onChange={(e) => handleProjectSelect(e.value, rowData)}
@@ -214,6 +214,7 @@ const bodyTemplate = (rowData) => {
           optionLabel="name"
         />
         <Button
+          size="small"
           data-test="git-restore"
           label="Restore"
           title="restore"

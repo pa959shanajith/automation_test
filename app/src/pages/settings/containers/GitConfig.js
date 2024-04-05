@@ -87,12 +87,17 @@ const GitConfig = (props) => {
                 } else {
                     gitconfigRef.current.value = data[0];
                     gitconfigRef.current.readOnly = true;
+                    gitconfigRef.current.disabled = true;
                     tokenRef.current.value = data[1];
                     urlRef.current.value = data[2];
                     gituserRef.current.value = data[3];
                     gitemailRef.current.value = data[4];
                     gitbranchRef.current.value = data[5];
-                    if(apiPayload.param === "bit" ) bitProjectKey.current.value = data[6];
+                    if(apiPayload.param === "bit" ) { 
+                        bitProjectKey.current.value = data[6];
+                        bitProjectKey.current.readOnly = true;
+                        bitProjectKey.current.disabled = true;
+                    }
                 }
                 setLoading(false);
             }
@@ -110,6 +115,7 @@ const GitConfig = (props) => {
         // setProjectData({})
         gitconfigRef.current.value = "";
         gitconfigRef.current.readOnly = false;
+        gitconfigRef.current.disabled = false;
         tokenRef.current.value = "";
         urlRef.current.value = "";
         gituserRef.current.value = "";
@@ -130,6 +136,8 @@ const GitConfig = (props) => {
         gitbranchRef.current.style.outline = "";
         if (bitProjectKey.current) {
             bitProjectKey.current.value ="";
+            bitProjectKey.current.readOnly = false;
+            bitProjectKey.current.disabled = false;
         }
         
     }
@@ -253,14 +261,14 @@ const GitConfig = (props) => {
 
             <div className='flex flex-row w-full align-items-center justify-content-between ' >
                 <span className="label_git" >User</span>
-                <Dropdown data-test="user_git" value={userRef?.current?.value} className='w-full md:w-25rem' inputId={'userGit'} inputRef={userRef}
+                <Dropdown data-test="user_git" value={userRef?.current?.value} className='w-full md:w-25rem p-inputtext-sm' inputId={'userGit'} inputRef={userRef}
                     onChange={() => fetchProjectList(resetSelectList, userData, userRef, setProjectList, setProjectData, displayError, setLoading, ProjectRef)}
                     placeholder={"Select User"} options={userList} />
             </div>
           
             <div className='flex flex-row w-full align-items-center justify-content-between'>
                 <span className="label_git" >Project</span>
-                <Dropdown data-test="project_git" value={selectProject} className='w-full md:w-25rem' inputId={'projectGit'} inputRef={ProjectRef} onChange={() => { onChangeProject(resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, userData, userRef, projectData, ProjectRef, setLoading) }} placeholder={"Select Project"} options={projectList} />
+                <Dropdown data-test="project_git" value={selectProject} className='w-full md:w-25rem p-inputtext-sm'  inputId={'projectGit'} inputRef={ProjectRef} onChange={() => { onChangeProject(resetFields, displayError, showEdit, urlRef, gitconfigRef, tokenRef, gituserRef, gitemailRef, gitbranchRef, userData, userRef, projectData, ProjectRef, setLoading) }} placeholder={"Select Project"} options={projectList} />
             </div>
      
             <FormInputGit label={"Configuration"} data-test="name_git" inpRef={gitconfigRef} placeholder={`Enter ${props.screenName} Name`} />
