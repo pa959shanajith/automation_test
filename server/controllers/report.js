@@ -292,8 +292,8 @@ const prepareExecutionReportData = async(exportLevel = "", downloadLevel = "", e
         const descriptionData = await utils.fetchData({ executionListId }, "download/downloadReport", "prepareReportData");
 
         commonFields["projectName"] = descriptionData.length ? descriptionData[0]["projectname"][0] : "";
-        commonFields["browser"] = descriptionData.length ? descriptionData[0]["overallstatusReport"][0]["browserType"] : "";
-        commonFields["browserVersion"] = descriptionData.length ? descriptionData[0]["overallstatusReport"][0]["browserVersion"] : "";
+        commonFields["browser"] = descriptionData.length ? descriptionData[0]["overallstatusReport"].length ? descriptionData[0]["overallstatusReport"][0]["browserType"] : "" : "";
+        commonFields["browserVersion"] = descriptionData.length ? descriptionData[0]["overallstatusReport"].length ? descriptionData[0]["overallstatusReport"][0]["browserVersion"] : "" : "";
         commonFields["overallStatus"] = descriptionData.length ? (descriptionData[0]["status"]).toUpperCase() : "";
         if (descriptionData.length) {
             const result = generateReportDateTime(descriptionData[0]["starttime"], descriptionData[descriptionData.length - 1]["endtime"])

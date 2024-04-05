@@ -21,6 +21,7 @@ import { Tooltip } from 'primereact/tooltip';
 import moment from "moment";
 import { Toast } from "primereact/toast";
 import { InputNumber } from "primereact/inputnumber";
+import { reportsDateFormat, addReportEllapsedTimes } from "../../design/components/UtilFunctions";
 
 
 const Profile = () => {
@@ -43,6 +44,8 @@ const Profile = () => {
   const [downloadLevel, setDownloadLevel] = useState("row");
   const [executionListId, setExecutionListId] = useState("");
   const toast = useRef(null);
+  const [testSuiteName, setTestSuiteName] = useState("");
+  const [exeProfileLength, setExeprofileLength] = useState(0);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -91,7 +94,7 @@ const Profile = () => {
       } else if(location?.state?.viewBy === "Accessibility"){
         executionProfiles = await getScreenData(location?.state?.screen);
       };
-
+      setExeprofileLength(executionProfiles?.length)
       // let sortExecutions= [...executionProfiles].reverse();
       if (location?.state?.viewBy === "Execution Profile") {
         setReportsTable(
@@ -99,8 +102,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Run No: ${executionProfiles.length - (ind)}`,
-            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm A"),
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -117,8 +120,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Run No: ${executionProfiles.length - (ind)}`,
-            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm A"),
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -136,8 +139,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Run No: ${executionProfiles.length - (ind)}`,
-            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm A"),
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -154,8 +157,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: `Run No: ${executionProfiles.length - (ind)}`,
-            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm A"),
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -174,7 +177,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: moment(el?.executedtime).format("DD MMM YYYY hh:mm A"),
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
         setReportsDataTable(
@@ -183,7 +186,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: moment(el?.executedtime).format("DD MMM YYYY hh:mm A"),
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
       }
@@ -335,7 +338,7 @@ const Profile = () => {
                     <div className="flex flex-column pl-2">
                       <div className="flex align-items-start mb-1">
                         <span className="exeHeader">Elapsed Time : </span>
-                        <span className="exeSubHeader">~30s</span>
+                        <span className="exeSubHeader">{el?.ellapsedTime?.length ? addReportEllapsedTimes(el?.ellapsedTime) : "NA"}</span>
                       </div>
                       <div className="flex align-items-start">
                         <span className="exeHeader">Total Test Cases : </span>
@@ -612,7 +615,7 @@ const Profile = () => {
               <div className="flex flex-column pl-2">
                 <div className="flex align-items-start mb-1">
                   <span className="exeHeader">Elapsed Time : </span>
-                  <span className="exeSubHeader">~30s</span>
+                  <span className="exeSubHeader">{el?.ellapsedTime?.length ? addReportEllapsedTimes(el?.ellapsedTime) : "NA"}</span>
                 </div>
                 <div className="flex align-items-start">
                   <span className="exeHeader">Total Test Cases : </span>
@@ -836,7 +839,7 @@ const Profile = () => {
                 <div className="flex flex-column pl-2">
                   <div className="flex align-items-start mb-1">
                     <span className="exeHeader">Elapsed Time : </span>
-                    <span className="exeSubHeader">~30s</span>
+                    <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
                   </div>
                   <div className="flex align-items-start">
                     <span className="exeHeader">Total Test Suites : </span>
@@ -902,7 +905,7 @@ const Profile = () => {
               <div className="flex flex-column pl-2">
                 <div className="flex align-items-start mb-1">
                   <span className="exeHeader">Elapsed Time : </span>
-                  <span className="exeSubHeader">~30s</span>
+                  <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
                 </div>
                 <div className="flex align-items-start">
                   <span className="exeHeader">Total Test Cases : </span>
@@ -961,6 +964,7 @@ const Profile = () => {
         setFileType("pdf");
         setDownloadLevel("row");
         setExecutionListId(e?._id);
+        setTestSuiteName(`run_number_${exeProfileLength - Number((e?.key))}`)
       }}>
         <img className="w-full" src="static/imgs/report_download.svg"/>
       </div>
@@ -1034,7 +1038,12 @@ const Profile = () => {
     else {
       let a = document.createElement("a");
       a.href = URL.createObjectURL(filedata);
-      a.download = SS ? `${scenarioName}_screenshots` : scenarioName;
+      // setting download fileName
+      if(downloadLevel == "testCase"){
+        a.download = SS ? `${scenarioName}_screenshots` : scenarioName;
+      }else{
+        a.download = `${testSuiteName}_${exportLevel}`;
+      }
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(a.href);

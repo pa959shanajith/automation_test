@@ -90,6 +90,7 @@
                         .p-datatable-tbody>tr>td:nth-child(1) {
                             text-align: left;   
                             width: auto;
+                            max-width: 15vw;
                         }
                         .p-datatable-tbody>tr>td:nth-child(2) {
                             width: auto;   
@@ -287,7 +288,7 @@
 }
 .exeterminatecolor{
     color: #B32B23;
-}
+}x
 .exeexecolor{
     color: #605BFF;
 }
@@ -295,8 +296,9 @@
     width:auto;
     height:auto;
     text-align: center;
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 5px;
 }
 .testSuite_col1{
     width: 28vw;
@@ -307,8 +309,14 @@
     border-right: 1px solid #e9ecef;
 }
 .exeHeader{
-    font: $f7_semibold;
+    font: $f7_regular;
 }
 .exeSubHeader{
+    font: $f7_semibold;
+}
+.runtitle{
+    font: $f7_semibold;
+}
+.rundatetime{
     font: $f7_regular;
 }

@@ -714,3 +714,42 @@ export const DateTimeFormat = (inputDate, createDate) => {
     }
     return output;
 }
+// Report Date Time Show Format Ex: ~00:00:00 
+export const reportsDateFormat = (startDateFormat, endDateFormat) => {
+    // Check if endDateFormat is null
+    if (!startDateFormat || !endDateFormat) {
+        return "NA";
+    }
+    // Convert date strings to Date objects
+    const startDate = new Date(startDateFormat);
+    const endDate = new Date(endDateFormat);
+    // Calculate the difference in milliseconds
+    const differenceMs = endDate - startDate;
+    // Convert milliseconds to seconds
+    const differenceSec = Math.round(differenceMs / 1000);
+    // Calculate hours, minutes, and seconds
+    const hours = Math.floor(differenceSec / 3600);
+    const minutes = Math.floor((differenceSec % 3600) / 60);
+    const seconds = differenceSec % 60;
+    // Format the result
+    const formattedResult = "~" + (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    return formattedResult;
+}
+// Add 2 Report Date Format Ex: (~00:00:04 + ~00:00:03) = ~00:00:07
+export const addReportEllapsedTimes = (ellapsedTimeArr) => {
+    const timeToSeconds = (timeStr) => {
+        const [, hours, minutes, seconds] = timeStr.match(/(\d+):(\d+):(\d+)/);
+        return parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+    }
+    const secondsToTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `~${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    // Convert to seconds and sum
+    const totalSeconds = ellapsedTimeArr.reduce((acc, timeStr) => acc + timeToSeconds(timeStr), 0);
+    // Convert total seconds back to time format
+    const totalTime = secondsToTime(totalSeconds);
+    return totalTime
+}
