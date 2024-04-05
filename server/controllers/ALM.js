@@ -159,53 +159,53 @@ exports.fetchALM_Testcases = async function (req,res) {
     
     logger.info("ALM get datavariants service called");
     try {
-      logger.info("request payload : "+ req.query.calmTenantId+', '
-      + req.query.calmTenantLabel + ', '
-      +req.query.sutTenant + ', '
-      + req.query.sutSystemType + ', '
-      + req.query.sutSystemId +  ', '
-      + req.query.sutBaseUrl + ', '
-      + req.query.sutSoftwareVersion + ', '
-      + req.query.project + ', '
-      + req.query.scope + ', '
-      + req.query.countryVersion + ', '
-      + req.query.testCases + ', '
-      + req.query.Language
-      );
+      logger.info("request payload : "+ JSON.stringify(req.query));
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString();
       var send_res = {
-        "project": "11111111-1111-1111-1111-111111111111",
-        "scope": "f787dc00-0e96-4457-82b5-911e2861f6bf",
+        "project":  req.query.project,
+        "scope": req.query.scope,
         "testcasesvariants": [
           {
-            "testCaseId": "GUIDTC1",
+            // "testCaseId": "GUIDTC1",
             "variants": [
               {
-                "id": "DEFAULT_VARIANT",
+                "id": "VAR01",
                 "name": "Data Variant 1",
                 "description": "Simple data variant for simple scenario",
-                "language": "string",
-                "lastModifiedBy": "John Doe",
-                "lastModifiedAt": "2023-12-06T09:46:29.782Z",
-                "url": "https://<test_automation_tool_URL/datavariant/<Variant_ID>",
-                "error": {
-                  "errorType": "string",
-                  "errorCode": 0,
-                  "errorShortMessage": "string",
-                  "errorLongMessage": "string",
-                  "errorUrl": "string"
-                }
+                "language": "en",
+                "lastModifiedBy": "Avo Automation",
+                "lastModifiedAt": formattedDate,
+                "url": `${req.protocol}://${req.get('host')}/datavariant/VAR01`,
+                "error":null
               }
             ],
-            "error": {
-              "errorType": "string",
-              "errorCode": 0,
-              "errorShortMessage": "string",
-              "errorLongMessage": "string",
-              "errorUrl": "string"
-            }
+            // "error": {
+            //   "errorType": "string",
+            //   "errorCode": 0,
+            //   "errorShortMessage": "string",
+            //   "errorLongMessage": "string",
+            //   "errorUrl": "string"
+            // }
           }
         ]
       }
+
+      var testCases = req.query.testCases;
+      if(testCases){
+        testCases = testCases.split(',');
+      }
+
+      logger.info(JSON.stringify(testCases));
+      // if(send_res.testcasesvariants.length){
+        testCases.forEach((testcaseId) => {
+          send_res.testcasesvariants = send_res.testcasesvariants.map((each_variant) => ({
+            ...each_variant,
+            testCaseId: testcaseId
+        }));
+        })
+        
+      // }
         // var inputs = {
         //     "query": "alm_get_testcases"
         // }
@@ -220,8 +220,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         // }
         // emit_data['testcaseId'] = result[0].rows || ''
         // socket_io.emit('messageFromServer',req.body);
-        logger.info("info : getALM_Datavariants api called");
-        logger.info("send response : "+send_res);
+        logger.info("send response : "+ JSON.stringify(send_res));
         res.status(200).send(send_res);
  
     } catch (error) {
@@ -240,10 +239,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     logger.info("ALM Execute testcase service called");
     try {
-      logger.info("request payload : "+ req.body.project+', '
-      + req.body.scope + ', '
-      + JSON.stringify(req.body.testcases,null,2)
-      );
+      logger.info("request payload : "+ JSON.stringify(req.body));
       var send_res = {'data':[
         {
           "testCaseId": req.body.testcases[0].testCaseId,
@@ -287,7 +283,8 @@ exports.fetchALM_Testcases = async function (req,res) {
 
           send_res['data'][0]['jobId'] = fetchJOB[0].rows.executionListId;
           send_res['data'][0]['jobName'] = fetchJOB[0].rows.executionData.configurename;
-          send_res['data'][0]['jobUrl'] =`${req.protocol}://${req.get('host')}/jobmonitor/${fetchJOB[0].rows.executionListId}`
+          // send_res['data'][0]['jobUrl'] =`${req.protocol}://${req.get('host')}/jobmonitor/${fetchJOB[0].rows.executionListId}`
+          send_res['data'][0]['jobUrl'] =`${req.protocol}://${req.get('host')}/runningStatus?configurekey=${getProfile[0].rows.executionData.configurekey}&executionListId=${fetchJOB[0].rows.executionListId}`
           const keyToRemove = 'error';
           var modifies_res = send_res.data.map(obj => {
             let { [keyToRemove]: _, ...rest } = obj;
@@ -605,19 +602,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     logger.info("ALM Execution History service called");
     try {
-      logger.info("request payload : "+ req.query.calmTenantId+', '
-      + req.query.calmTenantLabel + ', '
-      +req.query.sutTenant + ', '
-      + req.query.sutSystemType + ', '
-      + req.query.sutSystemId +  ', '
-      + req.query.sutBaseUrl + ', '
-      + req.query.sutSoftwareVersion + ', '
-      + req.query.project + ', '
-      + req.query.scope + ', '
-      + req.query.language + ', '
-      + req.query.testCases + ', '
-      + req.query.lastExecutionCount
-      );
+      logger.info("request payload : "+ JSON.stringify(req.query));
         var send_res = {
           "project": req.query.project,
           "scope": req.query.scope,
@@ -682,7 +667,8 @@ exports.fetchALM_Testcases = async function (req,res) {
               console.log("API Response for job:", job, "Response:", getReport,' getting from DAS'); 
               if( getReport[0].rows && Object.keys(getReport[0].rows).length){
                 let execHistory = getReport[0].rows;
-                let jobURL = `${req.protocol}://${req.get('host')}/jobmonitor/${job.exec.executionListId}`
+                // let jobURL = `${req.protocol}://${req.get('host')}/jobmonitor/${job.exec.executionListId}`
+                let jobURL = `${req.protocol}://${req.get('host')}/runningStatus?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
                 let logURL = `${req.protocol}://${req.get('host')}/devOpsReport?configurekey=${job.exec.executionData.configurekey}&executionListId=${job.exec.executionListId}`
                 testcaseshistory.push({
                     "testCaseId": job.exec.executionData.testcaseRefId || "",
@@ -690,7 +676,7 @@ exports.fetchALM_Testcases = async function (req,res) {
                     "jobId": job.exec.executionListId || "",
                     "jobName": job.exec.executionData.configurename || "",
                     "jobUrl": jobURL || "",
-                    "logUrl": logURL || "",
+                    "logUrl": jobURL || "",
                     "startedAt": convertDateUTC(execHistory.report.overallstatus.StartTime) || "" ,
                     "startedBy": "Automation",
                     "endedAt": convertDateUTC(execHistory.report.overallstatus.EndTime) || "",
@@ -719,8 +705,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         if(testcaseshistory && testcaseshistory.length){
           send_res.testcaseshistory = testcaseshistory;
         }
-        console.log(send_res,' its res');
-        logger.info("send response : "+send_res)
+        logger.info("send response : "+JSON.stringify(send_res))
         return res.status(200).send(send_res);
  
     } catch (error) {
@@ -754,7 +739,7 @@ exports.fetchALM_Testcases = async function (req,res) {
  
     logger.info("ALM Scope Change service called");
     try {
-      logger.info("request payload : "+ req.body);
+      logger.info("request payload : "+ JSON.stringify(req.body));
       var send_res = { 'data':
       [
           {
@@ -779,7 +764,7 @@ exports.fetchALM_Testcases = async function (req,res) {
         // emit_data['testcaseId'] = result[0].rows || ''
         // socket_io.emit('messageFromServer',req.body);
         logger.info("info : Scope_Changed api called ");
-        logger.info("send response : "+send_res)
+        logger.info("send response : "+JSON.stringify(req.body))
         res.status(201).send(send_res.data);
  
     } catch (error) {

@@ -60,7 +60,7 @@ if (cluster.isMaster) {
 		var path = require('path');
 		var Client = require("node-rest-client").Client;
 		var apiclient = new Client();
-										var redisStore = require('connect-redis')(sessions);
+												var redisStore = require('connect-redis')(sessions);
 		var redisConfig = {
 			"host": process.env.CACHEDB_IP,
 			"port": parseInt(process.env.CACHEDB_PORT),
@@ -286,7 +286,7 @@ if (cluster.isMaster) {
 		app.get('/sap-calm-testautomation/api/v1/job/status/:jobID',ALM.JobMonitor);
 		app.get('/sap-calm-testautomation/api/v1/job/status',ALM.Job_Status);
 		app.get('/sap-calm-testautomation/api/v1/testcases/executionhistory',ALM.Execution_History);
-		app.post('/saveSAP_ALMDetails_ICE',auth.protect, ALM.saveSAP_ALMDetails_ICE);
+		app.post('/saveSAP_ALMDetails_ICE', ALM.saveSAP_ALMDetails_ICE);
 		app.get('/fetchALM_Testcases',auth.protect,ALM.fetchALM_Testcases);
 		app.post('/viewALM_MappedList_ICE', auth.protect, ALM.viewALM_MappedList_ICE);
 		app.post('/sap-calm-testautomation/api/v1/testcases/execute1',ALM.Execute_Testcase_Run);
@@ -540,7 +540,7 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/unlockAccountEmail', authlib.unlockAccountEmail);
 		app.post('/unlock', authlib.unlock);
 		app.post('/verifyUser',authlib.verifyUser);
-    app.post('/checkForgotExpiry',authlib.checkForgotExpiry);
+    	app.post('/checkForgotExpiry',authlib.checkForgotExpiry);
 		app.post('/loadUserInfo', auth.protect, login.loadUserInfo);
 		app.post('/getRoleNameByRoleId', auth.protect, login.getRoleNameByRoleId);
 		app.post('/logoutUser', login.logoutUser);
