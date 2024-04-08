@@ -28,15 +28,10 @@ const VerticalSteps = (props) => {
     const dispatch= useDispatch ();
     const toast = useRef();
     const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
-    console.log("reduxDefaultselectedProject",reduxDefaultselectedProject);
     let project = reduxDefaultselectedProject;
-    console.log("project",project);
     const activeStep = reduxDefaultselectedProject.progressStep;
-    console.log("activeStep",activeStep);
     let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    console.log("userInfo",userInfo);
     const userInfoFromRedux = useSelector((state) => state.landing.userinfo)
-    console.log("userInfoFromRedux",userInfoFromRedux);
     if(!userInfo) userInfo = userInfoFromRedux; 
     else userInfo = userInfo ;
 

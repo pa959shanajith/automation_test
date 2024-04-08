@@ -1011,7 +1011,6 @@ const handleSubmit1 = async (SauceLabPayload) => {
         setLoading(false);
       } else {
         // Data is empty or doesn't have expected properties
-        console.log(data)
         if (data === "unavailableLocalServer") {
           toast.current.show({
             severity: 'error',
@@ -1084,7 +1083,6 @@ const handleSubmit1 = async (SauceLabPayload) => {
   };
 
   const CheckStatusAndExecute = (executionData, iceNameIdMap) => {
-    console.log("executionData",executionData);
     if (Array.isArray(executionData.targetUser)) {
       for (let icename in executionData.targetUser) {
         let ice_id = iceNameIdMap[executionData.targetUser[icename]];
@@ -1158,7 +1156,7 @@ const handleSubmit1 = async (SauceLabPayload) => {
     if (modul_Info === false) return;
     setLoading("Sending Execution Request");
     executionData["source"] = "task";
-    executionData["exectionMode"] = executionData?.exectionMode;
+    executionData["exectionMode"] = execAction;
   //   if(executionData["exectionMode"] == selectedTab){
   //    executionData["exectionMode"]="browserstack_parallel";
   //  }
