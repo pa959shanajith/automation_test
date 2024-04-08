@@ -213,24 +213,28 @@ const ProjectCreation = (props) => {
         {/* <Card title="Create TestCase using AI" className="CreateProj-card" id="Createproj-title">
           <div><Button size='small' className="CreateProj_btn" onClick={CreateGenAi}>Create</Button></div>
         </Card> */}
-         <div className="flex flex-row ">
-        
-              <Card className="CreateProj-card " id="Createproj-title">
-                <div className="CreateProj-header flex flex-row justify-between items-center">
-              <Step active={true}>
-                <div className='stepplabel'>
-                <StepLabel className='flex justify-center labelstep'>1</StepLabel>
+        <div className="flex flex-row ">
+
+          <Card className="CreateProj-card " id="Createproj-title">
+            <div className="CreateProj-header flex flex-row justify-content-between align-items-center ">
+              <div className='flex flex-row'>
+                <Step active={true}>
+                  <div className='stepplabel'>
+                    <StepLabel className='flex justify-center labelstep'>1</StepLabel>
+                  </div>
+                </Step>
+                <div className='flex flex-column'>
+                  <h2 className="CreateProj-title">Create Test case using AI</h2>
+                  <div className='testcaseLabel'> Create Test cases by Analysing and extracting requirments</div>
                 </div>
-              </Step>
-                <h2 className="CreateProj-title">Create Test case using AI</h2>
-                  <Button className="CreateProj_btn" size="small" onClick={CreateGenAi} >
-                    <img src="static/imgs/plus_white_icon.svg" style={{marginRight: "11px", marginLeft: "-3rem"}} />
-                      <div style={{marginRight:"2px"}}>Create</div>
-                  </Button>
-                 
-                </div>
-              </Card>
+              </div>
+              <Button className="CreateProj_btn2" size="small" onClick={CreateGenAi} >
+                <img src="static/imgs/plus_white_icon.svg" style={{ marginRight: "11px", marginLeft: "-3rem" }} />
+                <div style={{ marginRight: "2px" }}>Create</div>
+              </Button>
             </div>
+          </Card>
+        </div>
       </div>
     </>
 

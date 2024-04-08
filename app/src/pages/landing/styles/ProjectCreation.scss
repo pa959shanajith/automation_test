@@ -14,6 +14,8 @@
             position: relative;
             .MuiStepConnector-lineVertical {
                 position: absolute;
+                top: -1.7rem;
+                bottom: -2rem;
                 // bottom: -12px;
                 // bottom: -54px;
             }
@@ -64,6 +66,22 @@
                     margin-right: 0.6rem;
                     justify-content: center;
                     width: 11.4rem;
+                  }
+                  .CreateProj_btn2{
+                    background: #605bff;
+      color: 'white';
+    //   padding:"0.3rem 0.8rem 0.3rem 0.8rem";
+      // marginRight: '2rem',
+      min-width:11.2rem;
+      text-transform: 'capitalize';
+      display: flex;
+    justify-content: center;
+    height: 2rem;
+    margin-right: 10px;
+    // margin-left: 25.4rem;
+                  }
+                  .testcaseLabel{
+                    margin-left: 0.5rem;
                   }
             }
         }
@@ -153,7 +171,7 @@
         display: flex;
         align-items:center ;
         justify-content: center;
-        background-color: rgb(96, 91, 255);
+        background-color: #605bff;
         border-radius: 50%;
        color: white;
         margin: 9px;
@@ -167,6 +185,10 @@
     }
     .labelstep{
         .css-1hv8oq8-MuiStepLabel-label.Mui-active {
+            color: white;
+            font-weight: 500;
+        }
+        .css-2fdkz6.Mui-active {
             color: white;
             font-weight: 500;
         }

@@ -87,7 +87,7 @@ const VerticalSteps = (props) => {
     const steps = [
       {
         label: ' Utilize the Element Repository',
-        description:'Visualize testcases through mindmaps, capture elements and design test steps.',
+        description:'Central location to capture, access and manage elements.',
         title:<Button  size="small" style={buttonStyle_elementRepository} onClick={(e)=>{handleRepository()}}><img src="static/imgs/element_repository_white.svg"   style={{ marginRight: '10px' }} /> <div>Element Repository</div></Button>
     },
     {
