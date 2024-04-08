@@ -21,6 +21,7 @@ import { Toast } from 'primereact/toast';
 import { loadUserInfoActions } from '../LandingSlice';
 import { RedirectPage } from "../../global";
 import { Tag } from 'primereact/tag';
+import { Tooltip } from 'primereact/tooltip';
 // this component renders the "get started Box" in the landing page with the help of MUI framework
 
 const VerticalSteps = (props) => {
@@ -45,46 +46,70 @@ const VerticalSteps = (props) => {
       project = JSON.parse(localStorageDefaultProject);
     }
     const buttonStyle_design = {
-      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"10rem",
-    };
+      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"11.2rem",  textTransform: 'capitalize',marginLeft:" 1.6rem" };
     const buttonStyle_genius = {
-      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"10rem",marginTop:"2rem"
+      background:" #605bff",color:"white" , fontFamily:"Open Sans",justifyContent:"space-evenly",alignItems:"center",minWidth:"11.2rem",marginTop:"2rem",textTransform: 'capitalize' ,marginLeft:" 1.6rem"
     };
     const buttonStyle_genius_disabled = {
-      background:"rgb(160, 200, 255)" ,color:"white" , marginTop: "2rem", fontFamily:"Open Sans",padding:"0.3rem 0.8rem 0.3rem 0.8rem"
+      background:"#BDBDBD" ,color:"white" , marginTop: "2rem", fontFamily:"Open Sans",padding:"0.3rem 1.8rem 0.3rem 1.8rem",textTransform: 'capitalize' ,marginLeft:"1.6rem"
     };
 
     const buttonStyle_execute = {
-      background: (Button!="Execute"&& activeStep <1)? '#a0c8ff' : '#605bff',
+      background: (Button!="Execute"&& activeStep <2)? '#BDBDBD' : '#605bff',
       color: 'white',
       padding: '0.3rem 0.7rem',
       // marginRight: '2rem',
-      minWidth:"10rem"
+      minWidth:"11.2rem",
+      textTransform: 'capitalize',
+      marginLeft:" 1.6rem"
     };
     const buttonStyle_report = {
-      background:(Button!="Report"&& activeStep <2)? '#a0c8ff' : '#605bff',
-      color:"white" ,padding:"0.3rem 0.8rem",minWidth:"10rem"
+      background:(Button!="Report"&& activeStep <3)? '#BDBDBD' : '#605bff',
+      color:"white" ,padding:"0.3rem 0.8rem",minWidth:"11.2rem",
       // marginRight: "13.7rem"
+      textTransform: 'capitalize' ,
+      marginLeft:" 1.6rem"
+    };
+    const buttonStyle_elementRepository = {
+      background:" #605bff",
+      color: 'white',
+      padding:"0.3rem 0.8rem 0.3rem 0.8rem",
+      // marginRight: '2rem',
+      minWidth:"10rem",
+      textTransform: 'capitalize' 
     };
     
     const agsLicense = {
       value: userInfo?.licensedetails?.AGS === false,
       msg: "You do not have access for Avo Genius."
     }
+    const handleRepository=()=>{
+      // navigate("/elementRepository");
+      dispatch(loadUserInfoActions.setElementRepositoryIndex(3))
+    }
 
     const navigate = useNavigate();
     const steps = [
+      {
+        label: ' Utilize the Element Repository',
+        description:'Visualize testcases through mindmaps, capture elements and design test steps.',
+        title:<Button  size="small" style={buttonStyle_elementRepository} onClick={(e)=>{handleRepository()}}><img src="static/imgs/element_repository_white.svg"   style={{ marginRight: '10px' }} /> <div>Element Repository</div></Button>
+    },
     {
         label: <>
-          <span>{activeStep > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}</span>
-          <Tag value="Recommended for complex applications" className="tag_label" ></Tag>
+          <span>{activeStep > 1 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}</span>
+          {/* <Tag value="Recommended for complex applications" className="tag_label" ></Tag> */}
+          <img className='info_btn_design'src="static/imgs/info.png" ></img>
+          <Tooltip target=".info_btn_design" position="right" content='Recommended for complex applications.'/>
         </>,
         description: (<>
         <span>Visualize testcases through mindmaps, capture elements and design test steps.</span><div style={{margin:"0.5rem 0rem"}}><strong>OR</strong></div>
         <div className='label'>
-          <span >{activeStep > 0 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}
+          <span >{activeStep > 1 ? 'Create/modify test automation workflows' : ' Create test automation workflows'}
           </span>
-          <Tag value="Recommended for simple applications" className="tag_label" ></Tag>
+          {/* <Tag value="Recommended for simple applications" className="tag_label" ></Tag> */}
+          <img className='info__btn'src="static/imgs/info.png" ></img>
+          <Tooltip target=".info__btn" position="right" content='Recommended for simple applications.'/>
         </div>
         <div>Create rapid automation using Smart recorder.</div>
         </>),
@@ -100,7 +125,7 @@ const VerticalSteps = (props) => {
               <div className='flex justify-content-center align-items-center'>
                 <img style={{ color: "white", fill: "white", width: "100%" }} src="static/imgs/avo_genius_icon1.svg" />
               </div>
-              <div style={{marginRight:"1.5rem"}}>AVO Genius</div>
+              <div style={{marginRight:"1.5rem"}}>Avo Genius</div>
             </Button>
            
           </div>
@@ -109,21 +134,22 @@ const VerticalSteps = (props) => {
     {
         label: ' Configure and test execution profiles',
         description:'  Trigger test execution locally, via DevOps pipeline/cloud test provider or schedule it',
-        title:<Button disabled = {(Button!="Execute"&& activeStep <1)}  size="small" style={buttonStyle_execute} onClick={(e)=>handleNext("Execute")}><img src="static/imgs/execution_icon.svg"   style={{ marginRight: '10px' }} /> <div style={{marginRight:"2.6rem"}}>Execute</div></Button>
+        title:<Button disabled = {(Button!="Execute"&& activeStep <2)}  size="small" style={buttonStyle_execute} onClick={(e)=>handleNext("Execute")}><img src="static/imgs/execution_icon.svg"   style={{ marginRight: '10px' }} /> <div style={{marginRight:"2.6rem"}}>Execute</div></Button>
     },
     {
         label: 'View Test Reports ',
         description: `View and analyze executed test automations.`,
-        title:<Button  disabled = {(Button!="Report"&& activeStep <2)} size="small" style={buttonStyle_report}onClick={(e)=>handleNext("Report")} ><img src="static/imgs/reports_icon1.svg" style={{ marginRight: '10px' }} /> <div style={{marginRight:"3rem"}}>Report</div> </Button>
+        title:<Button  disabled = {(Button!="Report"&& activeStep <3)} size="small" style={buttonStyle_report}onClick={(e)=>handleNext("Report")} ><img src="static/imgs/reports_icon1.svg" style={{ marginRight: '10px' }} /> <div style={{marginRight:"3rem"}}>Reports</div> </Button>
     },
+   
     ];
 
   const handleNext = async(value) => {
     const projectList = await getProjectIDs()
     if(projectList.projectId.some((item)=>item === project.projectId)){
       dispatch(loadUserInfoActions.updatedProject(true))
-      if(value=== "Design Studio"){
-        dispatch(updateSteps(1))
+       if(value=== "Design Studio"){
+        dispatch(updateSteps(2))
         navigate("/design");
         var reqForOldModule={
           tab:"createTab",
@@ -151,12 +177,12 @@ const VerticalSteps = (props) => {
         dispatch(selectedProj(project.projectId))
       }}
       else if(value==="Execute"){
-            dispatch(updateSteps(2))
+            dispatch(updateSteps(3))
             navigate("/execute");
             dispatch(selectedProj(project.projectId))
       }
       else if(value==="Report"){
-        dispatch(updateSteps(3))
+        dispatch(updateSteps(4))
         navigate("/reports");
       }
       else if(value==="AVO Genius"){
