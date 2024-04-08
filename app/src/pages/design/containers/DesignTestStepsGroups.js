@@ -23,7 +23,7 @@ function DesignTestStepsGroups(params) {
     const TabTemplate = (name, iconpath) => {
         return <div className="flex flex-row">
             <div className="mr-2">
-                <img className="w-full" src={iconpath[activeIndex]} />
+                <img className="w-full" src={iconpath[activeIndex]} alt="" />
             </div>
             <div>{name}</div>
         </div>
