@@ -4,7 +4,7 @@
         background: #ffffff !important;
         border-top-right-radius: 4px;
         padding: 0.3rem 0 !important;
-        height: 3rem !important;
+        height: 5rem !important;
 
         .p-dialog-header-icons {
             position: relative;
@@ -67,3 +67,8 @@
 .tabPanelforHeader{
     background: transparent !important;
 }
+.repo_group_header{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}  

@@ -399,6 +399,7 @@ const ModuleListDrop = (props) =>{
 
     // normal module selection
             const selectModule = async (id,name,type,checked, firstRender) => {
+              dispatch(setTestCaseAssign({}));
                 var modID = id
                 var type = name
                 var name = type
@@ -880,7 +881,6 @@ setPreventDefaultModule(true);
       localStorage.removeItem('OldModuleForReset')
       
       }
-console.log(moduleLists,'moduleListsmoduleLists');
     return(
         <Fragment>
           {showE2EPopup &&
