@@ -21,6 +21,7 @@ import { Tooltip } from 'primereact/tooltip';
 import moment from "moment";
 import { Toast } from "primereact/toast";
 import { InputNumber } from "primereact/inputnumber";
+import { reportsDateFormat, addReportEllapsedTimes } from "../../design/components/UtilFunctions";
 
 
 const Profile = () => {
@@ -43,6 +44,8 @@ const Profile = () => {
   const [downloadLevel, setDownloadLevel] = useState("row");
   const [executionListId, setExecutionListId] = useState("");
   const toast = useRef(null);
+  const [testSuiteName, setTestSuiteName] = useState("");
+  const [exeProfileLength, setExeprofileLength] = useState(0);
 
   const checkStatus = (statusArr) => {
     let statusVal;
@@ -54,10 +57,11 @@ const Profile = () => {
   };
 
   const tableColumns = [
-    { field: "name", header: "Execution" },
-    { field: "status", header: "" },
+    { field: "name", header: "Run Details" },
     { field: "dateTime", header: "Date and Time" },
-    { field: "module", header: <div><span className="suite_text">Test Suite(s)</span><span className="case_text">Test Case(s)</span></div> }
+    { field: "status", header: "Status" },
+    { field: "module", header: <div><span className="suite_text">Test Suite(s)</span><span className="case_text">Test Case(s)</span></div> },
+    { field: "action", header: "Action" }
   ];
 
   const tableColumnsAccess = [
@@ -90,7 +94,7 @@ const Profile = () => {
       } else if(location?.state?.viewBy === "Accessibility"){
         executionProfiles = await getScreenData(location?.state?.screen);
       };
-
+      setExeprofileLength(executionProfiles?.length)
       // let sortExecutions= [...executionProfiles].reverse();
       if (location?.state?.viewBy === "Execution Profile") {
         setReportsTable(
@@ -98,8 +102,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
-            dateTime: moment(el?.startDate).format("DD MMM YYYY hh:mm:ss A"),
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -116,8 +120,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
-            dateTime: el.startDate,
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -135,8 +139,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
-            dateTime: el?.starttime,
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -153,8 +157,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="executionNo">Execution No: E {executionProfiles.length - (ind)}</span>,
-            dateTime: el?.starttime,
+            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -173,7 +177,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: el?.executedtime,
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
         setReportsDataTable(
@@ -182,7 +186,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: el?.executedtime,
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
       }
@@ -207,222 +211,146 @@ const Profile = () => {
               key: i.toString(),
               label: (
                 <div>
-                  <Badge
-                    className="badge_icon"
-                    value={`${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
+                  <div className="flex flex-row align-items-center">
+                    <div className="flex flex-row exestatusbar_container pr-2">
+                      <div className="exestrips flex flex-row justify-content-center align-items-center exeexebg">{
+                        Object.values(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
+                        ).reduce((ac, cv) => ac + cv, 0) -
+                        Object.keys(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
                         )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
+                          .filter(
+                            (item) =>
+                              item === "Terminate" ||
+                              item === "Skipped" ||
+                              item === "Incomplete"
+                          )
+                          .map(
+                            (e) =>
+                              el.scenarioStatus.reduce(
+                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                {}
+                              )[e]
+                          )
+                          .reduce((ac, cv) => ac + cv, 0)
+                      }</div>
+                      <div className="exestrips flex flex-row justify-content-center align-items-center exepassbg">{
+                        Object.values(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
+                        ).reduce((ac, cv) => ac + cv, 0) -
+                        Object.keys(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
                         )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete"
+                          .filter(
+                            (item) =>
+                              item === "Terminate" ||
+                              item === "Skipped" ||
+                              item === "Incomplete" ||
+                              item === "fail" ||
+                              item === "Fail"
+                          )
+                          .map(
+                            (e) =>
+                              el.scenarioStatus.reduce(
+                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                {}
+                              )[e]
+                          )
+                          .reduce((ac, cv) => ac + cv, 0)
+                      }</div>
+                      <div className="exestrips flex flex-row justify-content-center align-items-center exefailbg">{
+                        Object.values(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
+                        ).reduce((ac, cv) => ac + cv, 0) -
+                        Object.keys(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
                         )
-                        .map(
-                          (e) =>
+                          .filter(
+                            (item) =>
+                              item === "Terminate" ||
+                              item === "Skipped" ||
+                              item === "Incomplete" ||
+                              item === "pass" ||
+                              item === "Pass"
+                          )
+                          .map(
+                            (e) =>
+                              el.scenarioStatus.reduce(
+                                (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                {}
+                              )[e]
+                          )
+                          .reduce((ac, cv) => ac + cv, 0)
+                      }</div>
+                      <div className="exestrips flex flex-row justify-content-center align-items-center exeterminatebg">
+                        {
+                          Object.values(
                             el.scenarioStatus.reduce(
                               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                               {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${Object.values(
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )
-                    ).reduce((ac, cv) => ac + cv, 0)}`}
-                    severity="info"
-                  ></Badge>
-                  <span className="badge_txt">Executed</span>
-                  <Badge
-                    className="badge_icon"
-                    value={`${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete" ||
-                            item === "fail" ||
-                            item === "Fail"
-                        )
-                        .map(
-                          (e) =>
+                            )
+                          ).reduce((ac, cv) => ac + cv, 0) -
+                          Object.keys(
                             el.scenarioStatus.reduce(
                               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                               {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) => item === "Skipped" || item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    }`}
-                    severity="success"
-                  ></Badge>
-                  <span className="badge_txt">Passed</span>
-                  <Badge
-                    className="badge_icon"
-                    value={`${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Terminate" ||
-                            item === "Skipped" ||
-                            item === "Incomplete" ||
-                            item === "pass" ||
-                            item === "Pass"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) => item === "Skipped" || item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    }`}
-                    severity="danger"
-                  ></Badge>
-                  <span className="badge_txt">Failed</span>
-                  <Badge
-                    className="badge_icon"
-                    value={`${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) =>
-                            item === "Skipped" ||
-                            item === "Incomplete" ||
-                            item === "fail" ||
-                            item === "Fail" ||
-                            item === "pass" ||
-                            item === "Pass"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    } / ${
-                      Object.values(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      ).reduce((ac, cv) => ac + cv, 0) -
-                      Object.keys(
-                        el.scenarioStatus.reduce(
-                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                          {}
-                        )
-                      )
-                        .filter(
-                          (item) => item === "Skipped" || item === "Incomplete"
-                        )
-                        .map(
-                          (e) =>
-                            el.scenarioStatus.reduce(
-                              (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                              {}
-                            )[e]
-                        )
-                        .reduce((ac, cv) => ac + cv, 0)
-                    }`}
-                    severity="warning"
-                  ></Badge>
-                  <span className="badge_txt">Terminated</span>
+                            )
+                          )
+                            .filter(
+                              (item) =>
+                                item === "Skipped" ||
+                                item === "Incomplete" ||
+                                item === "fail" ||
+                                item === "Fail" ||
+                                item === "pass" ||
+                                item === "Pass"
+                            )
+                            .map(
+                              (e) =>
+                                el.scenarioStatus.reduce(
+                                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                                  {}
+                                )[e]
+                            )
+                            .reduce((ac, cv) => ac + cv, 0)
+                        }
+                      </div>
+                    </div>
+                    <div className="flex flex-column pl-2">
+                      <div className="flex align-items-start mb-1">
+                        <span className="exeHeader">Elapsed Time : </span>
+                        <span className="exeSubHeader">{el?.ellapsedTime?.length ? addReportEllapsedTimes(el?.ellapsedTime) : "NA"}</span>
+                      </div>
+                      <div className="flex align-items-start">
+                        <span className="exeHeader">Total Test Cases : </span>
+                        <span className="exeSubHeader">{Object.values(
+                          el.scenarioStatus.reduce(
+                            (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                            {}
+                          )
+                        ).reduce((ac, cv) => ac + cv, 0)}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ),
               data: el.id,
@@ -534,254 +462,184 @@ const Profile = () => {
       executionId: row?.data?.id,
     });
 
+    const singleTestCaseTemplate = (item) => {
+        const filterData =exeStatusList?.filter(exe=>exe.name==item?.status);
+        const tcData = filterData.length ? filterData[0] : {};
+      return <div className="flex flex-row justify-content-between align-items-center">
+        <Tooltip target=".report_view" content="View Reports" position="bottom" />
+        <div className="flex ml-3 justify-content-center align-items-center">
+          <div className={`mr-1 exestatus_icon ${tcData?.bgColor}`}></div>
+          <div className={`${tcData?.color}`}>{item?.status}</div>
+        </div>
+        <div className="report_view" style={{ width: "auto", minWidth: "40px", cursor:"pointer" }} onClick={() => handleViweReports(item._id)}>
+          <img src="static/imgs/report_view.svg" alt="reports_view_image" className="w-full" />
+        </div>
+        <div style={{ width: "auto", minWidth: "20px", cursor:"pointer" }} onClick={(e) => {
+          setDownloadId(item?._id);
+          setScenarioName(item?.scenarioname)
+          setDownloadLevel("testCase")
+          downloadRef.current.toggle(e);
+        }}>
+          <img src="static/imgs/report_download.svg"/>
+        </div>
+      </div>
+    }
+
     const nestedTable = testCaseList.map((el, i) => {
       let nestedtreeArr = {
         key: i.toString(),
         label: (
           <div>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
+            <div className="flex flex-row align-items-center">
+              <div className="flex flex-row exestatusbar_container pr-2">
+                <div className="exestrips flex flex-row justify-content-center align-items-center exeexebg">{
+                  Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
                   )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete"
+                    )
+                    .map(
+                      (e) =>
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )[e]
+                    )
+                    .reduce((ac, cv) => ac + cv, 0)
+                }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exepassbg">{
+                  Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
                   )
-                )
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete"
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "fail" ||
+                        item === "Fail"
+                    )
+                    .map(
+                      (e) =>
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )[e]
+                    )
+                    .reduce((ac, cv) => ac + cv, 0)
+                }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exefailbg">{
+                  Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
                   )
-                  .map(
-                    (e) =>
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "pass" ||
+                        item === "Pass"
+                    )
+                    .map(
+                      (e) =>
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )[e]
+                    )
+                    .reduce((ac, cv) => ac + cv, 0)
+                }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exeterminatebg">{
+                  Object.values(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  ).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(
+                    el.scenarioStatus.reduce(
+                      (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                      {}
+                    )
+                  )
+                    .filter(
+                      (item) =>
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "fail" ||
+                        item === "Fail" ||
+                        item === "pass" ||
+                        item === "Pass"
+                    )
+                    .map(
+                      (e) =>
+                        el.scenarioStatus.reduce(
+                          (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
+                          {}
+                        )[e]
+                    )
+                    .reduce((ac, cv) => ac + cv, 0)
+                }</div>
+              </div>
+              <div className="flex flex-column pl-2">
+                <div className="flex align-items-start mb-1">
+                  <span className="exeHeader">Elapsed Time : </span>
+                  <span className="exeSubHeader">{el?.ellapsedTime?.length ? addReportEllapsedTimes(el?.ellapsedTime) : "NA"}</span>
+                </div>
+                <div className="flex align-items-start">
+                  <span className="exeHeader">Total Test Cases : </span>
+                  <span className="exeSubHeader">{
+                    Object.values(
                       el.scenarioStatus.reduce(
                         (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
                         {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${Object.values(
-                el.scenarioStatus.reduce(
-                  (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                  {}
-                )
-              ).reduce((ac, cv) => ac + cv, 0)}`}
-              severity="info"
-            ></Badge>
-            <span className="badge_txt">Executed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "fail" ||
-                      item === "Fail"
-                  )
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter((item) => item === "Skipped" || item === "Incomplete")
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              }`}
-              severity="success"
-            ></Badge>
-            <span className="badge_txt">Passed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "pass" ||
-                      item === "Pass"
-                  )
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter((item) => item === "Skipped" || item === "Incomplete")
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              }`}
-              severity="danger"
-            ></Badge>
-            <span className="badge_txt">Failed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter(
-                    (item) =>
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "fail" ||
-                      item === "Fail" ||
-                      item === "pass" ||
-                      item === "Pass"
-                  )
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                ).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(
-                  el.scenarioStatus.reduce(
-                    (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                    {}
-                  )
-                )
-                  .filter((item) => item === "Skipped" || item === "Incomplete")
-                  .map(
-                    (e) =>
-                      el.scenarioStatus.reduce(
-                        (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
-                        {}
-                      )[e]
-                  )
-                  .reduce((ac, cv) => ac + cv, 0)
-              }`}
-              severity="warning"
-            ></Badge>
-            <span className="badge_txt">Terminated</span>
+                      )
+                    ).reduce((ac, cv) => ac + cv, 0)}</span>
+                </div>
+              </div>
+            </div>
             {row?.index === i ? (
               <DataTable
                 showHeaders={false}
                 className="statusTable"
                 value={testsList.map((item) => ({
                   ...item,
-                  downLoad: (
-                    <i
-                      className="pi pi-download"
-                      onClick={(e) => {
-                        setDownloadId(item?._id);
-                        setScenarioName(item?.scenarioname)
-                        setDownloadLevel("testCase")
-                        downloadRef.current.toggle(e);
-                      }}
-                    ></i>
-                  ),
-                  statusView: (
-                    <Button
-                      label="View"
-                      severity="secondary"
-                      size="small"
-                      outlined
-                      className="view_button"
-                      onClick={() => handleViweReports(item._id)}
-                    />
-                  ),
+                  extras: singleTestCaseTemplate(item)
                 }))}
               >
                 <Column field="scenarioname"></Column>
-                <Column field="status"></Column>
-                <Column field="statusView"></Column>
-                <Column field="downLoad"></Column>
+                <Column field="extras"></Column>
               </DataTable>
             ) : null}
           </div>
@@ -826,15 +684,52 @@ const Profile = () => {
     });
   };
 
+  const exeStatusList = [
+    {
+      name: "Execute",
+      status: "Executed",
+      bgColor: "exeexebg",
+      color: "exeexecolor"
+    },
+    {
+      name: "Pass",
+      status: "Passed",
+      bgColor: "exepassbg",
+      color: "exepasscolor"
+    },
+    {
+      name: "Fail",
+      status: "Failed",
+      bgColor: "exefailbg",
+      color: "exefailcolor"
+    },
+    {
+      name: "Terminate",
+      status: "Terminated",
+      bgColor: "exeterminatebg",
+      color: "exeterminatecolor"
+    }
+  ]
   const tableHeader = () => {
     return (
-      <div className="flex flex-column">
-        <div className="flex justify-content-between align-items-center">
-          <div>
-            <NavLink to="/reports" className="pi pi-angle-left"></NavLink>
-            Execution List : {location?.state?.execution}
-          </div>
-          <div className="search_container">
+      // <div className="flex flex-column">
+      <div className="flex justify-content-between align-items-center">
+        <div>
+          <NavLink to="/reports" className="pi pi-angle-left"></NavLink>
+          <span className="exelist_title">Execution List : {location?.state?.execution}</span>
+        </div>
+        <div className="flex flex-row exestatus_container">
+          {
+            exeStatusList?.map(({status,bgColor, color})=>{
+              return <div className="flex ml-3 justify-content-center align-items-center">
+                <div className={`mr-1 exestatus_icon ${bgColor}`}></div>
+                <div className={`${color}`}>{status}</div>
+              </div>
+            })
+          }
+        </div>
+          {/* Search Bar Commented */}
+          {/* <div className="search_container">
             <InputNumber
               icon="pi pi-search"
               placeholder="Search With Execution Number"
@@ -843,9 +738,9 @@ const Profile = () => {
               useGrouping={false}
               style={{width:'16rem'}}
             />
-          </div>
-        </div>
+          </div> */}
       </div>
+      // </div>
     );
   };
 
@@ -881,186 +776,143 @@ const Profile = () => {
     let treeArr = {
       key: e.key,
       label: (
-        <div className="flex">
+        <div className="flex flex-row">
           <div className="flex">
-          <div className="flex testSuite_col1">
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testSuites)
-                  .filter(
-                    (item) =>
-                      item === "Queued" ||
-                      item === "Inprogress" ||
-                      item === "inprogress"
-                  )
-                  .map((el) => e.testSuites[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${Object.values(e.testSuites).reduce(
-                (ac, cv) => ac + cv,
-                0
-              )}`}
-              severity="info"
-            ></Badge>
-            <span className="badge_txt">Executed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testSuites)
-                  .filter(
-                    (item) =>
-                      item === "Queued" ||
-                      item === "Inprogress" ||
-                      item === "inprogress" ||
-                      item === "fail" ||
-                      item === "Fail" ||
-                      item === "Terminate"
-                  )
-                  .map((el) => e.testSuites[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) }`}
-              severity="success"
-            ></Badge>
-            <span className="badge_txt">Passed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testSuites)
-                  .filter(
-                    (item) =>
-                      item === "Queued" ||
-                      item === "Inprogress" ||
-                      item === "inprogress" ||
-                      item === "pass" ||
-                      item === "Pass" ||
-                      item === "Terminate"
-                  )
-                  .map((el) => e.testSuites[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) }`}
-              severity="danger"
-            ></Badge>
-            <span className="badge_txt">Failed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testSuites)
-                  .filter(
-                    (item) =>
-                      item === "Queued" ||
-                      item === "Inprogress" ||
-                      item === "inprogress" ||
-                      item === "fail" ||
-                      item === "Fail" ||
-                      item === "pass" ||
-                      item === "Pass"
-                  )
-                  .map((el) => e.testSuites[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0)}`}
-              severity="warning"
-            ></Badge>
-            <span className="badge_txt">Terminated</span>
-          </div>
-          <div className="flex testSuite_col2" style={{borderRight:"1px solid #dee2e6"}}>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testCases)
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete"
-                  )
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0)}`}
-              severity="info"
-            ></Badge>
-            <span className="badge_txt">Executed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testCases)
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "fail" ||
-                      item === "Fail"
-                  )
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0)}`}
-              severity="success"
-            ></Badge>
-            <span className="badge_txt">Passed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testCases)
-                  .filter(
-                    (item) =>
-                      item === "Terminate" ||
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "pass" ||
-                      item === "Pass"
-                  )
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) }`}
-              severity="danger"
-            ></Badge>
-            <span className="badge_txt">Failed</span>
-            <Badge
-              className="badge_icon"
-              value={`${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
-                Object.keys(e.testCases)
-                  .filter(
-                    (item) =>
-                      item === "Skipped" ||
-                      item === "Incomplete" ||
-                      item === "pass" ||
-                      item === "Pass" ||
-                      item === "fail" ||
-                      item === "Fail"
-                  )
-                  .map((el) => e.testCases[el])
-                  .reduce((ac, cv) => ac + cv, 0)
-              } / ${
-                Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) }`}
-              severity="warning"
-            ></Badge>
-            <span className="badge_txt">Terminated</span>
-          </div>
-          </div>
-          <div className="actions_container">
-            <i
-              className="pi pi-download"
-              onClick={(event) => {
-                setVisibleDownloadPopup(true);
-                setExportLevel("executiveSummary");
-                setFileType("pdf");
-                setDownloadLevel("row");
-                setExecutionListId(e?._id)
-              }}
-            ></i>
+            <div className="flex testSuite_col1">
+              <div className="flex flex-row justify-content-center align-items-center">
+                <div className="flex flex-row exestatusbar_container pr-2">
+                  <div className="exestrips flex flex-row justify-content-center align-items-center exeexebg">{Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                  <div className="exestrips flex flex-row justify-content-center align-items-center exepassbg">{Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "fail" ||
+                          item === "Fail" ||
+                          item === "Terminate"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                  <div className="exestrips flex flex-row justify-content-center align-items-center exefailbg">{Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "pass" ||
+                          item === "Pass" ||
+                          item === "Terminate"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                  <div className="exestrips flex flex-row justify-content-center align-items-center exeterminatebg">{Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0) -
+                    Object.keys(e.testSuites)
+                      .filter(
+                        (item) =>
+                          item === "Queued" ||
+                          item === "Inprogress" ||
+                          item === "inprogress" ||
+                          item === "fail" ||
+                          item === "Fail" ||
+                          item === "pass" ||
+                          item === "Pass"
+                      )
+                      .map((el) => e.testSuites[el])
+                      .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                </div>
+                <div className="flex flex-column pl-2">
+                  <div className="flex align-items-start mb-1">
+                    <span className="exeHeader">Elapsed Time : </span>
+                    <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
+                  </div>
+                  <div className="flex align-items-start">
+                    <span className="exeHeader">Total Test Suites : </span>
+                    <span className="exeSubHeader">{Object.values(e.testSuites).reduce((ac, cv) => ac + cv, 0)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex testSuite_col2">
+              <div className="flex flex-row exestatusbar_container pr-2">
+                <div className="exestrips flex flex-row justify-content-center align-items-center exeexebg">{Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(e.testCases)
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete"
+                    )
+                    .map((el) => e.testCases[el])
+                    .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exepassbg">{Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(e.testCases)
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "fail" ||
+                        item === "Fail"
+                    )
+                    .map((el) => e.testCases[el])
+                    .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exefailbg">{Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(e.testCases)
+                    .filter(
+                      (item) =>
+                        item === "Terminate" ||
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "pass" ||
+                        item === "Pass"
+                    )
+                    .map((el) => e.testCases[el])
+                    .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+                <div className="exestrips flex flex-row justify-content-center align-items-center exeterminatebg">{Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0) -
+                  Object.keys(e.testCases)
+                    .filter(
+                      (item) =>
+                        item === "Skipped" ||
+                        item === "Incomplete" ||
+                        item === "pass" ||
+                        item === "Pass" ||
+                        item === "fail" ||
+                        item === "Fail"
+                    )
+                    .map((el) => e.testCases[el])
+                    .reduce((ac, cv) => ac + cv, 0)
+                  }</div>
+              </div>
+              <div className="flex flex-column pl-2">
+                <div className="flex align-items-start mb-1">
+                  <span className="exeHeader">Elapsed Time : </span>
+                  <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
+                </div>
+                <div className="flex align-items-start">
+                  <span className="exeHeader">Total Test Cases : </span>
+                  <span className="exeSubHeader">{Object.values(e.testCases).reduce((ac, cv) => ac + cv, 0)}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ),
@@ -1101,6 +953,21 @@ const Profile = () => {
           }}
         ></i>
       </div> */}
+    </div>
+  }
+
+  const actionsTemplate = (e) => {
+    return <div className="actions_container">
+      <div style={{ width: "auto", minWidth: "20px", cursor:"pointer" }} onClick={(event) => {
+        setVisibleDownloadPopup(true);
+        setExportLevel("executiveSummary");
+        setFileType("pdf");
+        setDownloadLevel("row");
+        setExecutionListId(e?._id);
+        setTestSuiteName(`run_number_${exeProfileLength - Number((e?.key))}`)
+      }}>
+        <img className="w-full" src="static/imgs/report_download.svg"/>
+      </div>
     </div>
   }
 
@@ -1171,7 +1038,12 @@ const Profile = () => {
     else {
       let a = document.createElement("a");
       a.href = URL.createObjectURL(filedata);
-      a.download = SS ? `${scenarioName}_screenshots` : scenarioName;
+      // setting download fileName
+      if(downloadLevel == "testCase"){
+        a.download = SS ? `${scenarioName}_screenshots` : scenarioName;
+      }else{
+        a.download = `${testSuiteName}_${exportLevel}`;
+      }
       document.body.appendChild(a);
       a.click();
       URL.revokeObjectURL(a.href);
@@ -1258,6 +1130,7 @@ const Profile = () => {
             header={tableHeader}
             // globalFilter={searchScenario}
             className="reports_table"
+            showGridlines
           >
             {tableColumns.map((col) => (
               <Column
@@ -1275,6 +1148,9 @@ const Profile = () => {
                   : {})}
                 {...(col.field === "module"
                   ? { body: moduleBodyTemplate }
+                  : {})}
+                {...(col.field === "action"
+                  ? { body: actionsTemplate }
                   : {})}
               />
             ))}
