@@ -886,6 +886,7 @@ setPreventDefaultModule(true);
         msg: "You do not have access for EndToEnd."
       }
 
+console.log(moduleLists,'moduleListsmoduleLists');
     return(
         <Fragment>
           {showE2EPopup &&

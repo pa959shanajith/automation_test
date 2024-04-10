@@ -19,7 +19,7 @@ import { Toast } from "primereact/toast";
 import { Checkbox } from 'primereact/checkbox';
 import { Messages as MSG } from '../../global/components/Messages';
 import { RedirectPage, ScreenOverlay,ResetSession,setMsg, VARIANT} from '../../global';
-import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails, getDetails_Testrail, getDetails_CloudALM } from "../api"
+import {manageJiraDetails, manageZephyrDetails, manageAzureDetails, getDetails_Azure, getDetails_JIRA, getDetails_ZEPHYR, manageTestRailDetails,getDetails_CloudALM, getDetails_Testrail } from "../api"
 import AvoConfirmDialog from "../../../globalComponents/AvoConfirmDialog";
 import { InputSwitch } from "primereact/inputswitch";
 import { Accordion, AccordionTab } from 'primereact/accordion';
@@ -463,6 +463,10 @@ const LoginModal = ({ isSpin = false, showCard2, handleIntegration, setShowLogin
                         <img src="static/imgs/zephyr_icon.svg" className="img__zephyr"></img>
                         <span className="text__zephyr">Zephyr</span>
                     </div>
+                    <div className={`integration-card ${selectedscreen?.name === 'CloudALM' ? 'selected' : ''}`} onClick={() => {handleScreenType({ name: 'CloudALM', code: 'CALM' })}}>
+                        <img src="static/imgs/zephyr_icon.svg" className="img__testrail" />
+                        <span className="text__zephyr">CloudALM</span>
+                    </div>    
                     <div className={`integration-card ${selectedscreen?.name === 'TestRail' ? 'selected' : ''}`} onClick={() => { handleScreenType({ name: 'TestRail', code: 'TR' }); getTestRailDetails(); }}>
                         <img src="static/imgs/testrail_icon.png" className="img__testrail" />
                         <span className="text__zephyr">TestRail</span>

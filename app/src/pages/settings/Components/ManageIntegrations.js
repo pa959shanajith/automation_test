@@ -601,7 +601,7 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
         else {
             setToast("info", "Info", 'Please sync atleast one map');
         }
-
+ 
         // Fetching mapped API's again
         const fetchMappedDetails = async () => {
             try {
@@ -609,7 +609,7 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
                     user_id: localStorage.userInfo.user_id,
                     action: "viewALM_MappedList_ICE"
                 });
-        
+       
                 if (getModulesData && getModulesData.length > 0) {
                     dispatchAction(almavomapped(getModulesData));
                 }
@@ -617,7 +617,7 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
                 console.error("Error fetching mapped details:", error);
             }
         };
-
+ 
         fetchMappedDetails();
     }
 
@@ -935,8 +935,8 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
         return (<div className='btn-11'>
             {activeIndex === 0 &&(
                 <div className="btn__2">
-                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name == "TestRail" ? callTestrailSaveButton : selectedscreen.name == "CloudALM" ? callCalmSaveButton : callZephyrSaveButton} />
-                    <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" />
+                    <Button label="Save" disabled={!enabledSaveButton} severity="primary" className='btn1' onClick={selectedscreen.name === 'Jira' ? callSaveButton:selectedscreen.name === 'Azure DevOps' ? callAzureSaveButton : selectedscreen.name=="TestRail" ? callTestrailSaveButton : selectedscreen.name == "CloudALM" ? callCalmSaveButton : callZephyrSaveButton} />
+                    <Button label="Back" onClick={()=>{dispatchAction(enableSaveButton(false));showLogin()}} size="small" className="logout__btn" outlined/>
                 </div>)}
 
             {activeIndex === 1 &&(
@@ -1075,24 +1075,13 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
 
                                         </TabPanel>
 
-                                        <TabPanel header="View Mapping">
-                                            <Card className="view_map_card">
-                                                <div className="flex justify-content-flex-start toggle_btn">
-                                                    <span>Jira Testcase to Avo Assure Testcase</span>
-                                                    <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
-                                                    <span>Avo Assure Testcase to Jira Testcase</span>
-                                                </div>
-
-                                                {checked ? (<div className="accordion_testcase">
-                                                    <Accordion multiple activeIndex={0} >
-                                                        {rows.map((item) => (
-                                                            <AccordionTab header={<span>{item.scenarioNames[0]} <i className="pi pi-times cross_icon" onClick={() => handleUnSyncmappedData(item)}/></span>}>
-                                                                <span>{item.itemSummary}</span>
-                                                            </AccordionTab>))}
-                                                    </Accordion>
-                                                </div>
-
-                                                ) : (
+                                            <TabPanel header="View Mapping">
+                                                <Card className="view_map_card">
+                                                    <div className="flex justify-content-flex-start toggle_btn">
+                                                        <span>Jira Test case to Avo Assure Test case</span>
+                                                        <InputSwitch checked={checked} onChange={(e) => setChecked(e.value)} />
+                                                        <span>Avo Assure Test case to Jira Test case</span>
+                                                    </div>
 
                                                     <div className="accordion_testcase">
                                                         <Accordion multiple activeIndex={0}>
@@ -1102,17 +1091,13 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
                                                                 </AccordionTab>))}
                                                         </Accordion>
                                                     </div>
-                                                )}
                                             </Card>
-
-                                        </TabPanel>
-
+                                            </TabPanel>               
                                     </TabView>
 
-                                </div>
-                                </div>
                                 
-                                
+                                </div> 
+                           </div>
                             )
                         : selectedscreen.name === "Zephyr" && Index === 0 ? 
                             <ZephyrContent ref={zephyrRef} domainDetails={domainDetails} setToast={setToast} callZephyrSaveButton={callZephyrSaveButton} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
@@ -1126,7 +1111,6 @@ const ManageIntegrations = ({ visible, onHide, toastWarn, toastSuccess, toastErr
                     <Toast ref={toast} position="bottom-center" baseZIndex={1000} />
                 </Dialog>
             </div>
-
         </>
     )
 }
