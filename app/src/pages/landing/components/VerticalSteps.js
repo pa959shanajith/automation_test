@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch  } from 'react-redux';
 import { updateSteps } from './VerticalComponentsSlice';
 import { getProjectIDs } from "../api"
-import { selectedProj } from '../../design/designSlice';
+import { appType, selectedProj } from '../../design/designSlice';
 import { showGenuis, geniusMigrate } from '../../global/globalSlice';
 import { showSapGenius } from '../../global/globalSlice';
 import { getModules,updateTestSuiteInUseBy } from '../../design/api'
@@ -88,7 +88,7 @@ const VerticalSteps = (props) => {
       {
         label: ' Utilize the Element Repository',
         description:'Central location to capture, access and manage elements.',
-        title:<Button  size="small" style={buttonStyle_elementRepository} onClick={(e)=>{handleRepository()}}><img src="static/imgs/element_repository_white.svg"   style={{ marginRight: '10px' }} /> <div>Element Repository</div></Button>
+        title:<Button  size="small" style={buttonStyle_elementRepository} disabled={project.appType==="Mainframe"} onClick={(e)=>{handleRepository()}}><img src="static/imgs/element_repository_white.svg"   style={{ marginRight: '10px' ,opacity:project.appType==="Mainframe"?0.5:1}} /> <div style={{opacity:project.appType==="Mainframe"?0.5:1}}>Element Repository</div></Button>
     },
     {
         label: <>

@@ -163,7 +163,7 @@ const CaptureModal = (props) => {
   }, [parentData,parentId,emptyDatatable])
 
   useEffect(() => {
-    if (captureData.length === 0 || !selectedRepoName) {
+    if (!selectedRepoName) {
       setShowPanel(true);
     } else {
       setShowPanel(false);
@@ -1917,6 +1917,7 @@ const elementValuetitle=(rowdata)=>{
             let newAddedRepo = screens.screenList.filter((item)=>item.name === repositoryNewName)
             newAddedRepo[0].label=newAddedRepo[0].name
             newAddedRepo[0].title = newAddedRepo[0].name
+            setRepositoryNewName("")
             handleScreenChange(newAddedRepo[0])
             // setSelectedFolderValue({type:newAddedRepo[0],key:true})
       } catch (error) {
@@ -1965,6 +1966,7 @@ const elementValuetitle=(rowdata)=>{
         dispatch(SetSelectedRepository(value.type?value.type:value))
         setSelectedScreen(value.type?value.type:value);
         setEmptyDatatable(true);
+        setRepoNameAdded(false);
         // fetchScrapeData()
         
       }
@@ -2007,6 +2009,7 @@ const confirmScreenChange = () => {
         setCaptureData([])
         setCapturedDataToSave([])
         setEmptyDatatable(true)
+        setRepoNameAdded(false)
         // fetchScrapeData()
         }
       }
@@ -2018,7 +2021,7 @@ const confirmScreenChange = () => {
 };
 
 const screenOption = screenData?.map((folder) => ({
-  label: folder.name.length > 10 ? folder.name.slice(0, 10) + '...' : folder.name,
+  label: folder.name.length > 40 ? folder.name.slice(0, 40) + '...' : folder.name,
   id:folder["_id"],
   related_dataobjects: folder.related_dataobjects,
   orderlist:folder.orderlist,

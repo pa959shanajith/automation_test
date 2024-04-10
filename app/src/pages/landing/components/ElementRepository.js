@@ -113,6 +113,8 @@ const ElementRepository = (props) => {
               setScreenData(screens.screenList.reverse());
               setFilteredData(screens.screenList)
               setScreenId(false);
+              setSearchText("");
+              setNoRepoSitory(false);
             }
         } catch (error) {
           setOverlay("")
@@ -338,7 +340,21 @@ const handleAccordionNameEdit = (index,e) => {
     }
   })
   .catch(error => console.log(error))
-};
+}
+}
+
+const handleEmptyNameCheck = (index, e,screenDetails)=>{
+  const filteredName = filteredData.reverse();
+const updatedScreenData = [...screenData];
+const updatedName = [...filteredName]
+const previousName = updatedScreenData[index].name;
+  if (!previousName && screenRename.trim() === '')  {
+    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Input cannot be empty!', life: 5000 });
+    return;
+  }
+  else{
+    return screenDetails.name = updatedName[index].name
+  }
 }
 
 const handleChangeScreenName=(index,e)=>{
@@ -617,16 +633,18 @@ const handleChangeScreenName=(index,e)=>{
               <Tooltip target=".pencil-edit" position='bottom' content='Edit'/>
               <i className={`pi pi-pencil pencil-edit ${isSelected ? 'disabled-icon' : ''}`}
                 onClick={() => {
-                  setSelectedCapturedElement(selectedElement);
-                  openElementProperties(rowData);
+                  if(!isSelected){
+                    setSelectedCapturedElement(selectedElement);
+                    openElementProperties(rowData);
+                  }
                 }}></i>
           </div>) : null}
           <div>
           <Tooltip target=".trash-icon" position='bottom' content='Delete'/>
           <i
             className={`pi pi-trash trash-icon ${isSelected ? 'disabled-icon' : ''}`}
-            disabled={isSelected}
             onClick={() => {
+              if(!isSelected){
               if (result.length>0) {
                 setResusedDeleteElement(true);
                 setReuseDelMessage(
@@ -639,6 +657,7 @@ const handleChangeScreenName=(index,e)=>{
                 setDeleteElements(true);
                 setSelectedCapturedElement(rowData);
               }
+            }
             }}
           />
           </div>
@@ -962,6 +981,7 @@ const handleRepositoryName =(e)=>{
     e.preventDefault();
     return;
   }
+  // } else if ()
   setRepositoryName(e.target.value)
 }
 
@@ -982,14 +1002,15 @@ const handleRepositoryName =(e)=>{
             <Button label={<i className="pi pi-plus"></i>} className='button__elements' onClick={()=>setShowDialog(true)}></Button>
             <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
         </span> */}
+        {(screenData.length>0 || noRepository) &&
         <span className="p-input-icon-left search__class">
               <i className="pi pi-search" />
               <InputText placeholder="Search for element repository" value={searchText} onChange={(event) =>
                         event &&
                         event.target &&
                         handleSearchChange(event.target.value)} />
-        </span>
-        {screenData.length && <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>}
+        </span>}
+        {(screenData.length>0 || noRepository) && <Button label='Add Repository' className='button__elements' onClick={()=>setShowDialog(true)}></Button>}
           <Tooltip target=".button__elements" position='bottom'>Add centralized repository to the project.</Tooltip>
         {/* </span>
         <Button label='Design Studio'>
@@ -1031,8 +1052,10 @@ const handleRepositoryName =(e)=>{
                       value={screenDetails.name}
                       onChange={(e) =>handleChangeScreenName(index,e) }
                       onKeyDown={(e)=>handleAccordionNameEdit(index,e)}
-                      onBlur={() => {setEditingIndex(null);
-                      setValue('');}}
+                      onBlur={(e) => {setEditingIndex(null);
+                      setValue('');
+                      handleEmptyNameCheck(index,e,screenDetails)
+                    }}
                       style={{height: '2.3rem', top:'-1.1rem'}}
                     />
                   ) : (
