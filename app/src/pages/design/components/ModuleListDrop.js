@@ -881,12 +881,7 @@ setPreventDefaultModule(true);
       
       }
 
-      const endToEndLicense = {
-        value: String(userInfo?.licensedetails?.ETT) === "false",
-        msg: "You do not have access for EndToEnd."
-      }
-
-console.log(moduleLists,'moduleListsmoduleLists');
+      
     return(
         <Fragment>
           {showE2EPopup &&
@@ -1175,8 +1170,8 @@ console.log(moduleLists,'moduleListsmoduleLists');
                   {
                     (projectInfo && projectInfo?.projectLevelRole && checkRole(roleIdentifiers.QAEngineer, projectInfo.projectLevelRole)) ? null :
                       <>
-                        <img src="static/imgs/plusNew.png" onClick={endToEndLicense.value ? '': () => { setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }} disabled={endToEndLicense.value} alt="PlusButtonOfE2E" className= {endToEndLicense.value ? 'E2EDisable' :'E2E' }/>
-                        <Tooltip target={endToEndLicense.value ? ".E2EDisable" : ".E2E"} content={endToEndLicense.value ? endToEndLicense.msg : " Create End To End Flow"} position="bottom" />
+                         <img src="static/imgs/plusNew.png" onClick={() => {if(!isQualityEngineer){ setE2EName('');  setIsEdit(false);setFilterSceForRightBox([]); setScenarioDataOnRightBox([]); setTransferBut([]); setShowE2EPopup(true); setInitialText(true); setPreventDefaultModule(true) }}} alt="PlusButtonOfE2E" className={!isQualityEngineer?'E2E':"disable_E2Ecreate_btn"}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : null } />
+                        <Tooltip target=".E2E" content=" Create End To End Flow" position="bottom" />
                       </>
                   }
                   {/* {showE2EPopup && <LongContentDemo setShowE2EOpen={setShowE2EPopup}  module={moduleSelect} />} */}

@@ -163,7 +163,7 @@ const filteredGrids = avogrids.map(option => ({ ...option, disabled: disableOpti
               placeholder="Select Avo Grid"
               labelTxt="Avo Agent / Avo Grid"
               required={false}
-              // disabled={typesOfAppType !== 'Web'}
+              disabled={typesOfAppType !== 'Web'}
             />
           </div>
           <div className="avogrid_fields">
