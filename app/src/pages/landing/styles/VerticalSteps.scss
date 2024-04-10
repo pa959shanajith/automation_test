@@ -62,6 +62,7 @@
     color: rgb(96, 91, 255);
     // margin-top: -3rem;
     background: white;
+    z-index: 10;
 }
 .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root{
     // color: rgb(25, 118, 210);
@@ -80,6 +81,7 @@
   .customStepper > div:nth-child(2) > span {
     // min-height: 100px;
     height: 14rem;
+    top: -1rem;
   }
 .buttonNav{
     align-items: center;
@@ -144,5 +146,31 @@
         border-left-width: 1px;
         /* min-height: 24px; */
         margin-top: -1rem;
+    }
+      .css-1u4zpwo-MuiSvgIcon-root-MuiStepIcon-root {
+        color: #bdbdbd;
+        border-radius: 1rem;
+        z-index: 10;
+    }
+    .css-4ff9q7.Mui-completed {
+        color:  #605bff;
+        z-index: 10;
+        background: white;
+    }
+    .css-4ff9q7.Mui-active {
+        color: #605bff;
+        z-index: 10;
+    }
+    .css-4ff9q7 {
+        user-select: none;
+        width: 1em;
+        height: 1em;
+        fill: currentcolor;
+        flex-shrink: 0;
+        font-size: 1.5rem;
+        display: block;
+        transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+        color: #BDBDBD;
+        z-index: 10;
     }
 }
