@@ -17,7 +17,7 @@ const archiver = require('archiver');
 const zlib = require('zlib');
 const unzipper = require('unzipper');
 const { Readable } = require('stream');
-
+const SwaggerParser = require("@apidevtools/swagger-parser");
 
 let headers
 module.exports.setReq = async (req) =>
@@ -112,7 +112,8 @@ const getModule = async (d) => {
 		"projectid":d.projectid || null,
 		"moduleid":d.moduleid,
 		"cycleid":d.cycId || null,
-		"name":"getModules"
+		"name":"getModules",
+		"query":d.query || null
 	}
 	return utils.fetchData(inputs, "mindmap/getModules", "getModules");
 };
@@ -123,6 +124,26 @@ exports.getModules = async (req, res) => {
 	try {
 		const data = await getModule(req.body);
 		res.send(data);
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+
+exports.deleteElementRepo = async (req, res) => {
+	const fnName = "deleteElementRepo";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		const inputs= {
+			"repoId":req.body.repoId,
+			"param" : "Elementdelete"			
+		}
+		const result = await utils.fetchData(inputs, "mindmap/deleteElementRepo", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
 	} catch(exception) {
 		logger.error("Error occurred in mindmap/"+fnName+":", exception);
 		return res.status(500).send("fail");
@@ -233,7 +254,7 @@ exports.saveData = async (req, res) => {
 		if (flag == 10) 
 		{
 			qpush=[]
-			var uidx = 0, rIndex;
+			var uidx = 0, rIndex, tag,currentlyInUse,assigneduser ;
 			// var idn_v_idc = {};
 			var cycId=inputs.cycId;
 
@@ -242,9 +263,17 @@ exports.saveData = async (req, res) => {
 			var nObj = [], tsList = [];
 			data.forEach(function (e, i) {
 				if (e.type == "modules") rIndex = uidx;
+				if (e.type == "modules") currentlyInUse = e.currentlyInUse;
+				if (e.type == "scenairos" ) tag = e.tag;
+				if (e.type == "scenairos" ) assigneduser = e.assigneduser;
 				if (e.task != null) delete e.task.oid;
 				// idn_v_idc[e.id_n] = e.id_c;
+				if(e.type == "scenarios" ) {
+					nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex ,tag:e.tag||[],assigneduser:e.assigneduser || ""});
+				}
+				else{
 				nObj.push({ _id:e._id||null, name: e.name,state: e.state, task: e.task, children: [],childIndex:e.childIndex });
+				}
 				if(e.scrapedurl) {
 					nObj[nObj.length - 1]['scrapedurl'] = e.scrapedurl
 				}
@@ -279,7 +308,7 @@ exports.saveData = async (req, res) => {
 					
 				});
 				sList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
-				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
+				tsList.push({ "testscenarioid": ts._id||null, "testscenarioName": ts.name, "tasks": ts.task,"tag":ts.tag,"assigneduser": ts.assigneduser, "screenDetails": sList,"state":ts.state, "childIndex":parseInt(ts.childIndex) });
 				
 			});
 			tsList.sort((a, b) => (a.childIndex > b.childIndex) ? 1 : -1);
@@ -854,7 +883,8 @@ exports.getScreens = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const projectid = req.body.projectId;
-		const inputs= { projectid }
+		const param = req.body.param;
+		const inputs= { projectid,param }
 		const result = await utils.fetchData(inputs, "mindmap/getScreens", fnName);
 		if (result == "fail") {
 			return res.send("fail");
@@ -1009,16 +1039,15 @@ exports.exportToGit = async (req, res) => {
 	const actionName = "exportToGit";
 	logger.info("Inside UI service: " + actionName);
 	try {
-		const data = req.body;
-		// const gitname = data.gitconfig;
-		const gitVersion = data.gitVersion;
-		// var gitFolderPath = data.gitFolderPath;
-		// const gitBranch = data.gitBranch;
+		const data = req.body;		
 		const moduleId = data.mindmapId;
 		const exportProjAppType=data.exportProjAppType;
 		const projectId =data.projectId;
-		const gitComMsgRef = data.gitComMsgRef;
 		const projectName =data.projectName;
+		const param=data.param;
+		// const gitname = data.gitconfig;		
+		// var gitFolderPath = data.gitFolderPath;
+		// const gitBranch = data.gitBranch;		
 		// if(!gitFolderPath.startsWith("avoassuretest_artifacts")){
 		// 	gitFolderPath="avoassuretest_artifacts/"+gitFolderPath
 		// }
@@ -1026,15 +1055,26 @@ exports.exportToGit = async (req, res) => {
 			"moduleId":moduleId,
 			"userid":req.session.userid,
 			"action":actionName,
+			"param":param,
 			// "gitname":gitname,
-			// "gitBranch":gitBranch,
-			"gitVersion": gitVersion,
+			// "gitBranch":gitBranch,			
 			// "gitFolderPath": gitFolderPath,
 			"exportProjAppType":exportProjAppType,
-			"projectId":projectId,
-			"gitComMsgRef":gitComMsgRef,
+			"projectId":projectId,			
 			"projectName":projectName
 		};
+		if (param=="git"){
+			const gitVersion = data.gitVersion;
+			const gitComMsgRef = data.gitComMsgRef;
+			inputs["gitVersion"]= gitVersion,
+			inputs["gitComMsgRef"]=gitComMsgRef
+		}
+		else if (param=="bit"){
+			const bitVersion = data.bitVersion;
+			const bitComMsgRef = data.bitComMsgRef;
+			inputs["bitVersion"]= bitVersion,
+			inputs["bitComMsgRef"]=bitComMsgRef
+		}
 		const module_data = await utils.fetchData(inputs, "git/exportToGit", actionName);
 		return res.send(module_data);
 	} catch (ex) {
@@ -1327,27 +1367,35 @@ exports.importGitMindmap = async (req, res) => {
 	logger.info("Inside UI service: " + fnName);
 	try {
 		const expProj = req.body.expProj;
-		const projectid = req.body.projectid;
+		const projectid = req.body.projectId;
 		// const gitname = req.body.gitname;
-		// const gitbranch = req.body.gitbranch;
-		const gitversion = req.body.gitversion;
+		// const gitbranch = req.body.gitbranch;		
 		// var gitfolderpath = req.body.gitfolderpath;
 		var appType= req.body.appType;		
 		var projectName = req.body.projectName;
+		var param = req.body.param;
 		// if(!gitfolderpath.startsWith("avoassuretest_artifacts")){
 		// 	gitfolderpath="avoassuretest_artifacts/"+gitfolderpath
 		// }
 		const inputs= {
+			"param":param,
 			"userid": req.session.userid,
 			"roleid": req.session.activeRoleId,
-			"projectid": projectid,
+			"projectId": projectid,
 			// "gitname": gitname,
-			// "gitbranch": gitbranch,
-			 "gitversion": gitversion,
+			// "gitbranch": gitbranch,			
 			// "gitfolderpath": gitfolderpath,
 			"appType":appType,			
 			"projectName":projectName,
 			"expProj":expProj
+		}
+		if (param=="git"){
+			const gitVersion = req.body.gitVersion;			
+			inputs["gitVersion"]= gitVersion			
+		}
+		else if (param=="bit"){
+			const bitVersion = req.body.bitVersion;			
+			inputs["bitVersion"]= bitVersion			
 		}
 		const result = await utils.fetchData(inputs, "git/importGitMindmap", fnName);
 		return res.send(result)
@@ -1638,7 +1686,8 @@ exports.checkExportVer = async (req, res) => {
         const exportname= req.body.exportname;
         const query = req.body.query;
         const projectId = req.body.projectId || "default"
-        const inputs= { "exportname":exportname,"query": query,"projectId":projectId}
+		const param=req.body.param;
+        const inputs= { "exportname":exportname,"query": query,"projectId":projectId,"param":param}
         const result = await utils.fetchData(inputs, "/git/checkExportVer", fnName);
         if (result == "fail") {
             return res.send('fail');}
@@ -1673,47 +1722,112 @@ exports.updateE2E = async (req, res) => {
 	}
 };
 
+const recurrNestedSwagger = (data)=> {
+	let value = {}
+	for(let [prop,propValue] of Object.entries(data['properties'])) {
+		if('properties' in propValue) {
+			value[prop] = recurrNestedSwagger(propValue)	
+		}else {
+			value[prop] = propValue['type']
+		}
+	}
+	return value
+}
+const swaggerToMindmapJson = async (data)=> {
+	return SwaggerParser.dereference(data)
+	.then((data) => {
+		let moduleName = {'CollectionName':data['info']['title']}
+		scenarios = {}
+		for(let [path,pathValue] of Object.entries(data['paths'])) {
+			for(let [screen,screenValue] of Object.entries(pathValue)) {
+				scenarioName = screenValue['tags'][0]
+				if(!(scenarioName in scenarios)){
+					scenarios[scenarioName] = {'screens': []}
+				}
+				let endPointURL = 'https://' + (data['host'] || "") + (data['basePath'] || "") + path
+				let screenData = {'name':screenValue['summary'].replace(/[&\/\\#, +()$~%.'":*?<>{}]/g, '_'), 'method': screen, 'endPointURL':endPointURL}
 
+				for (let params of screenValue['parameters']){
+					let value = {[params['in']]: ""}
+					if('schema' in params && 'properties' in params['schema']) {
+						value[params['in']] = {}
+						// for(let [prop,propValue] of Object.entries(params['schema']['properties'])) {
+						// 	value[params['in']][prop] = propValue['type']
+						// }
+						value[params['in']] = recurrNestedSwagger(params['schema'])
+						if (!(params['in'] in screenData)) {
+							screenData[params['in']] = []
+						}
+						if(params['schema']['type'] == 'object') {
+							if(!('header' in screenData)) screenData['header'] = ""
+							screenData['header']+='Content-Type:application/json\n'
+						}
+						screenData[params['in']].push(value[params['in']])
+					} else {
+						value[params['in']] += params['in'] !='query' ? `${[params['name']]}: ${params['type']}\n` :`${[params['name']]}=${params['type']}\n`
+						if (!(params['in'] in screenData)) {
+							screenData[params['in']] = ""
+						}
+						screenData[params['in']]+=value[params['in']]
+					}
+				}
+				scenarios[scenarioName]['screens'].push(screenData);
+			}
+		}
+		moduleName['APIS'] = scenarios
+		moduleName['type'] = 'Swagger'
+		return moduleName
+	})
+	.catch((err) => {
+		// Handle parsing error
+		console.error('Error parsing Swagger data:', err);
+		return 'Fail'
+	});
+}
 exports.importDefinition = async (req, res) => {
 	try {
         logger.info("Inside UI service: importDefinition");
         var username=req.session.username;
 		var clientName=utils.getClientName(req.headers.host);
         var icename = undefined
+		if(req.body.type == 'swaggerAI') {
+			let parsedData = await swaggerToMindmapJson(req.body.sourceUrl);
+			return res.send(parsedData)
+		}
         if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
         // redisServer.redisSubServer.subscribe('ICE2_' + icename);
 		var action = req.body.param;
 		if(action == 'importDefinition_ICE' && icename!=undefined){
 			var sourceUrl = req.body.sourceUrl;
 			try {
-				// var wsdlurl = req.body.wsdlurl;
 				logger.info("Sending socket request for debugTestCase to cachedb");
-				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl};
-				// redisServer.redisPubICE.publish('ICE1_normal_' + icename,JSON.stringify(dataToIce));
+				dataToIce = {"emitAction" : "WS_ImportDefinition","username" : icename, "sourceUrl":sourceUrl,'type':req.body.type};
 				var socket = require('../lib/socket');
 				var mySocket;
 				mySocket = socket.allSocketsMap[clientName][icename];
 				if(mySocket.connected){
 
 					logger.info("Sending request to ICE for importDefinition_ICE");
-					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl);
-					function result_WS_ImportDefinition_listener(message) {
+					mySocket.emit("WS_ImportDefinition", dataToIce.sourceUrl,dataToIce.type);
+					async function  result_WS_ImportDefinition_listener(message) {
 						let data = message;
-						//LB: make sure to send recieved data to corresponding user
 						mySocket.removeListener('result_WS_ImportDefinition', result_WS_ImportDefinition_listener);
 						try {
 							if(!Object.keys(data).length){
 								logger.info('Error Occured in fetching');
-								// res.status(resultData.Error.status).send(resultData.Error.msg);
-								// return;
+								res.send('Fail')
+								return;
 							}
-							res.send(data);
+							if('APIS' in data && 'CollectionName' in data) {
+								return res.send(data);
+							}
+							let parsedData = await swaggerToMindmapJson(data);
+							res.send(parsedData)
 						} catch (exception) {
 							res.send("fail");
 							logger.error("Exception in the service importDefinition - result_WS_ImportDefinition: %s", exception);
 						}
 					}
-					// redisServer.redisSubServer.on("message",result_WS_ImportDefinition_listener);
 					mySocket.on("result_WS_ImportDefinition",result_WS_ImportDefinition_listener)
 				} else {
 					flag = "unavailableLocalServer";
@@ -1732,5 +1846,120 @@ exports.importDefinition = async (req, res) => {
 	} catch (exception) {
         logger.error("Exception in the service importDefinition: %s", exception);
         res.send("Fail");
+    }
+};
+exports.generateToken = async (req, res) => {
+	try {
+        logger.info("Inside UI service: generateToken");
+        var username=req.session.username;
+		var clientName=utils.getClientName(req.headers.host);
+        var icename = undefined
+        if(myserver.allSocketsICEUser[clientName][username] && myserver.allSocketsICEUser[clientName][username].length > 0 ) icename = myserver.allSocketsICEUser[clientName][username][0];
+		if(icename!=undefined){
+			let action = req.body.data.type
+			if(action == 'setOAuth2.0') {
+				try {
+					let inputs = {...req.body.data};
+					dataToIce = {"emitAction" : "generateToken","username" : icename,'details':inputs};
+					var socket = require('../lib/socket');
+					var mySocket;
+					mySocket = socket.allSocketsMap[clientName][icename];
+					if(mySocket.connected){
+	
+						logger.info("Sending request to ICE for generate Token");
+						mySocket.emit("generateToken", dataToIce.details);
+						function result_generateToken_listener(message) {
+							let data = message;
+							//LB: make sure to send recieved data to corresponding user
+							mySocket.removeListener('result_generateToken', result_generateToken_listener);
+							try {
+								if(data == ''){
+									logger.info('Error Occured in generating Token');
+								}
+								res.send(data);
+							} catch (exception) {
+								res.send("fail");
+								logger.error("Exception in the service generateToken - result_generateToken: %s", exception);
+							}
+						}
+						mySocket.on("result_generateToken",result_generateToken_listener)
+					} else {
+						flag = "unavailableLocalServer";
+						logger.error("Error occurred in the service generateToken - result_generateToken: Socket not Available");
+						res.send(flag);
+					}
+					
+				} catch (exception) {
+					logger.error("Exception in the service generateToken - generateToken: %s", exception);
+				}
+			}
+		} else {
+			flag = "unavailableLocalServer";
+			logger.error("Error occurred in the service generateToken - generateToken: Socket not Available");
+			res.send(flag);
+		}
+	} catch (exception) {
+        logger.error("Exception in the service generateToken: %s", exception);
+        res.send("Fail");
+    }
+};
+exports.fetch_git_exp_details = async (req, res) => {
+    const fnName = "fetch_git_exp_details";
+    logger.info("Inside UI service: " + fnName);
+    try {
+		
+        const projectId = req.body.projectId
+		const param=req.body.param
+        const inputs= {"projectId":projectId,"param":param}		
+        const result = await utils.fetchData(inputs, "/git/fetch_git_exp_details", fnName);
+        if (result == "fail") {
+            return res.send('fail');}
+        else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
+    }
+};
+exports.saveTag = async (req, res) => {
+	const fnName = "saveTag";
+	logger.info("Inside UI service: " + fnName);
+	try {
+		var userid = req.session.userid;
+		const inputs={ 
+			"query": "saveTag",
+			"testscenarioId": req.body.testscenarioId,
+			"tag": req.body.tag
+		 };
+		const result = await utils.fetchData(inputs, "mindmap/saveTag", fnName);
+		if (result == "fail") {
+			return res.send("fail");
+		} else {
+			return res.send(result);
+		}
+	} catch(exception) {
+		logger.error("Error occurred in mindmap/"+fnName+":", exception);
+		return res.status(500).send("fail");
+	}
+};
+exports.assignedUserMM = async (req, res) => {
+    const fnName = "assignedUserMM";
+    logger.info("Inside UI service: " + fnName);
+    try {
+        var userid = req.session.userid;
+        const inputs={
+            "query": "assignedUserMM",
+            data : req.body
+         };
+        const result = await utils.fetchData(inputs, "mindmap/assignedUserMM", fnName);
+        if (result == "fail") {
+            return res.send("fail");
+        } else {
+            return res.send(result);
+        }
+    } catch(exception) {
+        logger.error("Error occurred in mindmap/"+fnName+":", exception);
+        return res.status(500).send("fail");
     }
 };

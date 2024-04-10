@@ -43,7 +43,9 @@ const GridBrowser = ({
       avogrids[index] = { ...el, name: el.Hostname };
     }
   });
+  avodropdown = { ...avodropdown, avogrid: { ...avodropdown.avogrid, disabled: avodropdown.avogrid?.status === "inactive" ? true : false } }
   const [showIntegrationModal, setShowIntegrationModal] = useState(false);
+  const [integrationType, setIntegrationType] = useState("");
   
   const determineIntegration = (integrationData) => {
     if (integrationData?.alm?.url) {
@@ -54,6 +56,8 @@ const GridBrowser = ({
       return 'Zephyr';
     } else if (integrationData?.azure?.url) {
       return 'Azure';
+    } else if (integrationData?.testrail?.url) {
+      return 'TestRail';
     }
      else {
       return 'None';
@@ -68,7 +72,8 @@ const GridBrowser = ({
     { name: 'ALM' },
     { name: 'qTest' },
     { name: 'Zephyr' },
-    { name: 'Azure'}
+    { name: 'Azure'},
+    { name: 'TestRail'},
   ];
 
   const selectedToolTemplate = (option, props) => {
@@ -128,12 +133,16 @@ const GridBrowser = ({
       onClick={() => { handleSubmit(defaultValues) }} />
     </>
 
+const disableOption = (option) => (option.status === "inactive");
+const filteredGrids = avogrids.map(option => ({ ...option, disabled: disableOption(option) }));
+
   return (
     <>
       {showIntegrationModal ?
         <IntegrationDropDown
           setshowModal={setshowModal}
           type={showIntegrationModal}
+          integrationType={integrationType}
           showIntegrationModal={showIntegrationModal}
           appType=''
           setCredentialsExecution={setIntegration}
@@ -149,7 +158,7 @@ const GridBrowser = ({
             <AvoDropdown
               dropdownValue={avodropdown?.avogrid ? avodropdown?.avogrid : { name: 'Any Agent', _id: '1111' }}
               onDropdownChange={onAvoSelectChange}
-              dropdownOptions={avogrids}
+              dropdownOptions={filteredGrids}
               name="avogrid"
               placeholder="Select Avo Grid"
               labelTxt="Avo Agent / Avo Grid"
@@ -181,6 +190,7 @@ const GridBrowser = ({
               onChange={(selectedIntegration) => {
                 setSelectedTool(selectedIntegration.value)
                 syncScenarioChange(selectedIntegration.value.name)
+                setIntegrationType(selectedIntegration.value.name);
               }}
               options={integrationList}
               optionLabel="name"

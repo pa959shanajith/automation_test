@@ -1,8 +1,8 @@
 @import "../../global/styles/ColorVariables.scss";
 .mp__container{
-    height: 94vh;
-    width: 100%;
-    min-width: 767px;
+    // height: 100%;
+    // width: 100%;
+    // min-width: 767px;
     display: flex;
     flex-direction: column;
     -webkit-touch-callout: none; /* iOS Safari */
@@ -35,9 +35,9 @@
 .mp__body .action__wrapper__expand .action__bar{
     justify-content: center;
 }
-.mp__footer .main-footer{
-    // position: static;
-}
+// .mp__footer .main-footer{
+//     // position: static;
+// }
 .mp__middle_container{
     position: relative;
     display: flex;

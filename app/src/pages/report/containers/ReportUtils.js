@@ -409,7 +409,7 @@ function browserKeywords () {
         'closebrowser', 'navigatetourl', 'openbrowser', 'refresh', 'switchtowindow', 'closesubwindows', 
         'navigateback', 'opennewtab', 'acceptpopup', 'dismisspopup', 'clearcache', 'maximizebrowser', 
         'navigatewithauthenticate', 'getbrowsertoforeground', 'sendkeys', 'getcurrenturl', 'getpagetitle', 
-        'getpopuptext', 'getbrowsername'
+        'getpopuptext', 'getbrowsername','setbrowserzoomlevel'
     ]
 }
 

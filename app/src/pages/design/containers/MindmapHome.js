@@ -12,6 +12,7 @@ import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import ModuleListSidePanel from '../components/ModuleListSidePanel';
 import ModuleListDrop from '../components/ModuleListDrop';
+import { TypeOfViewMap } from '../designSlice.js';
 
 
 /*Component MindmapHome
@@ -81,6 +82,9 @@ const MindmapHome = () => {
         setInitBlockUi(true)
       }
     })()
+    return ()=>{
+      dispatch(TypeOfViewMap("mindMapView"))
+    }
   }, []);
 
 

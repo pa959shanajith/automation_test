@@ -13,6 +13,11 @@ const initialState = {
         password:'',
         token:''
     },
+    testRailLogin: {
+        username:'',
+        apiKey:'',
+        url:''
+    },
     AzureLogin:{
         username:'',
         password:'',
@@ -52,7 +57,17 @@ const initialState = {
     checkedProjectIds:[],
     checkedReleaseIds:[],
     reference:'',
-    enableSaveButton:false
+    enableSaveButton:false,
+    updateTestrailMapping: true,
+    template_id:'',
+    template_info:[],
+    genAiParameters:{},
+    editParameters:{
+        domain:'',
+        test_type:'',
+        temperature:''
+    }
+
 }
 
 // const saucelabsInitialState = {
@@ -158,6 +173,13 @@ export const settingSlice=createSlice({
             const { fieldName, value } = action.payload;
             state.zephyrLogin[fieldName] = value;
         },
+        testRailLogin:(state,action) => {
+            const { fieldName, value } = action.payload;
+            state.testRailLogin[fieldName] = value;
+        },
+        resetTestRailLogin:(state,action) => {
+            state.testRailLogin = initialState.testRailLogin;
+        },
         resetZephyrLogin: (state) => {
             state.zephyrLogin = initialState.zephyrLogin;
           },
@@ -194,7 +216,23 @@ export const settingSlice=createSlice({
         },
         resetAzureLogin : (state, action) =>{
             state.AzureLogin = initialState.AzureLogin;
-        }
+        },
+        updateTestrailMapping : (state, action) => {
+            state.updateTestrailMapping = action.payload
+        },
+        updateTemplateId : (state, action) => {
+            state.template_id = action.payload
+        },
+        setTemplateInfo : (state, action) => {
+            state.template_info = action.payload
+        },
+        setGenAiParameters : (state, action) => {
+            state.genAiParameters = action.payload;
+        },
+        setEditParameters : (state, action) => {
+            console.log(action,' its action');
+            state.editParameters = {...state.editParameters, ...action.payload};
+        },
     }
 })
 
@@ -229,6 +267,8 @@ export const {
     almavomapped,
     showOverlay,
     zephyrLogin,
+    testRailLogin,
+    resetTestRailLogin,
     resetZephyrLogin,
     AzureLogin,
     saucelabsInitialState,
@@ -242,7 +282,12 @@ export const {
     checkedProjectIds,
     checkedReleaseIds,
     enableSaveButton,
-    resetAzureLogin
+    resetAzureLogin,
+    updateTestrailMapping,
+    updateTemplateId,
+    setTemplateInfo,
+    setGenAiParameters,
+    setEditParameters
      } = settingSlice.actions;
 // export all the reducer 
 export default settingSlice.reducer;

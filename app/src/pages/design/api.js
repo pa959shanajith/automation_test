@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {RedirectPage, Messages as MSG} from '../global'
+import {RedirectPage, Messages as MSG, VARIANT} from '../global'
 import {navigate} from './index';
 import {url} from '../../App';
 
@@ -418,21 +418,26 @@ export const importGitMindmap = async(data) => {
             data: data,
             credentials: 'include'
         });
+        let param = data.param === 'bit' ? 'bitbucket' : data.param
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         if(res.data === "empty"){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_VERIFY_INPUT}
+            return {error:{"CONTENT":`${param} configuration does not exist. Please verify your inputs.`, "VARIANT": VARIANT.ERROR}}
         }
         if(res.data === "Invalid inputs"){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_MODULE_EXIST}
+           return {error:{"CONTENT":`Module does not exist in ${param} repository. Please verify your inputs.`, "VARIANT": VARIANT.ERROR}}
         }
 		if(res.data === "No entries"){
             console.error(res.data)
             return {error:res.data}
+        }
+        if(res.data === "Unable to find the given commit in "+ data.param +"repository."){
+            console.error(res.data)
+            return {error:{"CONTENT":`Unable to find the given commit in ${param} repository, please verify.`, "VARIANT": VARIANT.ERROR}}
         }
         // if (!('testscenarios' in res.data)){
         //     console.error(res.data)
@@ -445,10 +450,10 @@ export const importGitMindmap = async(data) => {
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_IMPORT_MODULE_GIT}
+        return {error:{"CONTENT":`There is no Projects in ${param} repository to import.`, "VARIANT": VARIANT.ERROR}}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_IMPORT_MODULE_GIT}
+        return {error:{"CONTENT":`There is no Projects in ${data.param === 'bit' ? 'bitbucket' : data.param} repository to import.`, "VARIANT": VARIANT.ERROR}}
     }
 }
 
@@ -466,13 +471,14 @@ export const exportToGit = async(data) => {
             data: data,
             credentials: 'include'
         });
+        var param= data.param === "bit" ? "bitbucket" : data.param
         if(res.status === 401 || res.data === "Invalid Session"){
             RedirectPage(navigate)
             return {error:MSG.GENERIC.INVALID_SESSION};
         }
         else if(res.data==='empty'){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_PROJECT_GIT_CONGIG}
+            return {error:{"CONTENT":"Project is not "+param+" configured. Please verify.", "VARIANT": VARIANT.ERROR}}
         }
         else if(res.data==='Invalid config name'){
             console.error(res.data)
@@ -480,28 +486,37 @@ export const exportToGit = async(data) => {
         }
         else if(res.data==='commit exists'){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_GIT_COMMIT_VERSION_EXIST}
+            return {error:{"CONTENT":param+ ' commit version already exists.', "VARIANT": VARIANT.ERROR},}
         }
         else if(res.data==='Invalid gitbranch'){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_GIT_BRANCH_EXIST}
+            return {error:{"CONTENT":"Specified branch doesn't exist in "+param+" Please verify.", "VARIANT": VARIANT.ERROR},}
         }
+       
         else if(res.data==='Invalid url'){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_INVALID_GIT_CLONE_PATH}
+            return {error:{"CONTENT":"Error in "+param+" configuration: Invalid "+param+" clone path.", "VARIANT": VARIANT.ERROR},}
+        }
+        else if(res.data==="Unable to connect GIT"){
+            console.error(res.data)
+            return {error:{"CONTENT":'Error connecting '+param+', Kindly try after some time', "VARIANT": VARIANT.ERROR},}
         }
         else if(res.data==='Invalid token'){
             console.error(res.data)
-            return {error:MSG.MINDMAP.ERR_GIT_ACCESS_TOKEN}
+            return {error:{"CONTENT":"Error in "+param+" configuration: Invalid "+param+" access token.", "VARIANT": VARIANT.ERROR},}
+        }
+        else if(res.data==="The project might not exist, or you don't have permission to create a repository in the project."){
+            console.error(res.data)
+            return {error:MSG.MINDMAP.ERR_BIT_PROJECTKEY}
         }
         else if(res.status===200 && res.data !== "fail"){          
             return res.data;
         }
         console.error(res.data)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:"Error while exporting to "+param+"."}
     }catch(err){
         console.error(err)
-        return {error:MSG.MINDMAP.ERR_EXPORT_GITT}
+        return {error:`Error while exporting to ${data.param === "bit" ? "bitbucket" : data.param}.`}
     }
 }
 
@@ -724,6 +739,27 @@ export const initScraping_ICE = screenViewObject => {
     });
 }
 
+export const launchAndServerConnectSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/launchAndServerConnectSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'launchAndServerConnectSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
 
 
 /*Component 
@@ -915,20 +951,35 @@ export const getUserDetails = async(action, args) => {
 /*Component DesignContent
   api returns {"mirror":"","name":"","reuse":bool,"scrapedurl":"","view":[{"_id":"","cord":"","custname":"","height":,"hiddentag":"","left":,"objectType":"","parent":[""],"tag":"","top":,"url":"","width":,"xpath":""}/{"_id":"","custname":"","height":,"hiddentag":"","left":,"parent":[""],"tag":"button","top":,"url":"","width":,"xpath":""}]}
 */
-export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId) =>	{
+export const getScrapeDataScreenLevel_ICE = (type, screenId, projectId, testCaseId,params="") =>	{
+    let data={}    
+            if(!params){
+data={
+    param: 'getScrapeDataScreenLevel_ICE',
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+            }
+else{
+data={
+    param:params,
+    screenId: screenId,
+    projectId: projectId,
+    type: type,
+    testCaseId: testCaseId
+}
+}
     return new Promise((resolve, reject)=>{
         axios(url+"/getScrapeDataScreenLevel_ICE", {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
             },
-            data : {
-                param: 'getScrapeDataScreenLevel_ICE',
-                screenId: screenId,
-                projectId: projectId,
-                type: type,
-                testCaseId: testCaseId
-            },
+        
+            
+            data : data,
             credentials : 'include',
         }).then(res=>{
             if (res.status === 200){
@@ -1094,6 +1145,26 @@ export const updateScreen_ICE = arg => {
     });
 }
 
+export const generateToken = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/generateToken", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
 export const excelToScreen = (data) =>	{
     return new Promise((resolve, reject)=>{
         const res = axios(url+"/importScreenfromExcel", {
@@ -1183,21 +1254,50 @@ export const updateTestCase_ICE = (testCaseId, testCaseName, testCaseData, userI
   api returns String (Invalid Session/unavailableLocalServer/success/fail/Terminate/browserUnavailable/scheduleModeOn/ExecutionOnlyAllowed)
                 or {status:"", "":xpath}
 */ 
-export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false) => {
+export const debugTestCase_ICE = (browserType, testcaseID, userInfo, appType, geniusExecution=false,debuggerPoints=[],advanceDebug=false,actionForAdvanceDebug="") => {
     return new Promise((resolve, reject)=>{
-        axios(url+"/debugTestCase_ICE", {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            data : {
+        let data={}
+        if(advanceDebug){
+        if(actionForAdvanceDebug=='play'){
+            data={
+                param:'playDebug',
+                debuggerPoints:debuggerPoints
+            }
+        }
+        else if (actionForAdvanceDebug=='nextStep'){
+            data={
+                param:'moveToNextStep',
+                debuggerPoints:debuggerPoints
+            }
+        }
+        else  {
+            
+             data={   param : 'debugTestCase_ICE',
+                userInfo: userInfo,
+                browsertypes: browserType,
+                testcaseids: testcaseID,
+                apptype: appType,
+                geniusExecution,
+                debuggerPoints:debuggerPoints
+            }
+        }
+        }
+        else{
+            data={   
                 param : 'debugTestCase_ICE',
                 userInfo: userInfo,
                 browsertypes: browserType,
                 testcaseids: testcaseID,
                 apptype: appType,
-                geniusExecution
+                geniusExecution,
+        }
+    }
+        axios(url+"/debugTestCase_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
             },
+            data : data,
             credentials : 'include',
         })
         .then(res=>{
@@ -1649,7 +1749,7 @@ export const updateIrisDataset = data => {
 }
 
 
-export const importDefinition = async(sourceUrl) => {
+export const importDefinition = async(sourceUrl,type) => {
     console.log("inside API importDefinition")
     try{
         const res = await axios(url+'/importDefinition', {
@@ -1659,7 +1759,8 @@ export const importDefinition = async(sourceUrl) => {
             },
             data : {
                 param : 'importDefinition_ICE',
-                sourceUrl: sourceUrl
+                sourceUrl: sourceUrl,
+                type: type
             },
             credentials: 'include'
         });
@@ -1678,5 +1779,204 @@ export const importDefinition = async(sourceUrl) => {
     }catch(err){
         console.error(err)
         return {error:MSG.MINDMAP.ERR_FETCH_DATA}
+    }
+}
+
+export const insertScreen = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/insertScreen", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const insertRepository = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/insertRepository", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : { 
+                data: arg
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+
+export const startScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/startScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'startScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+
+export const stopScrapingSAPGenius_ICE = screenViewObject => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/stopScrapingSAPGenius_ICE", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {'param': 'stopScrapingSAPGenius_ICE', 'screenViewObject': screenViewObject},
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 401) {
+                // RedirectPage(navigate);
+                reject("Invalid Session");
+            }
+            else if (res.status === 200 && res.data !== 'fail') resolve(res.data);
+            else reject(res.status)
+        })
+        .catch(err => reject(err))
+    });
+}
+export const createKeyword = data => {
+    return new Promise((resolve, reject) => {
+        axios(url+"/createKeyword", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            data : {
+                data : data
+            },
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const saveTag = async(tagsData) => {
+    try{
+        const res = await axios(url+'/saveTag', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:tagsData,
+            credentials: 'include',
+        });
+
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data; 
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
+    }
+}
+export const fetch_git_exp_details = async(projectId, param) => { 
+    try{
+        const res = await axios(url+'/fetch_git_exp_details', {
+            method: 'POST',
+            headers: {
+            'Content-type': 'application/json',
+            },
+            data: {
+				projectId: projectId,
+                param: param
+        },
+            credentials: 'include'
+        });
+        if(res.status === 401 || res.data === "Invalid Session" ){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }else if(res.status===200 && res.data !== "fail"){            
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
+    }catch(err){
+        console.error(err)
+        return {error:MSG.ADMIN.ERR_FETCH_GIT}
+    }
+}
+
+export const deleteElementRepo = arg => {
+    return new Promise((resolve, reject)=>{
+        axios(url+"/deleteElementRepo", {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+             data: arg,
+            
+            credentials : 'include',
+        })
+        .then(res=>{
+            if (res.status === 200) resolve(res.data)
+            else reject(res.status);
+        })
+        .catch(error=>reject(error));
+    });
+}
+export const assignedUserMM = async(testCaseData) => {
+    try{
+        const res = await axios(url+'/assignedUserMM', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data:testCaseData,
+            credentials: 'include',
+        });
+ 
+        if(res.status === 401 || res.data === "Invalid Session"){
+            RedirectPage(navigate)
+            return {error:MSG.GENERIC.INVALID_SESSION};
+        }
+        if(res.status===200 && res.data !== "fail"){    
+            console.log("res.data",res.data)        
+            return res.data;
+        }
+        console.error(res.data)
+        return {error:"failed"}
+    }catch(err){
+        console.error(err)
+        return {error:"failed"}
     }
 }

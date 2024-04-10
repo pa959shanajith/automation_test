@@ -36,16 +36,16 @@ const SearchBox = (props) => {
         } else {
             idxSearch = 0;
         }
-        nodeID = filter[idxSearch].parentElement.id
-        var nodetf = filter[idxSearch].parentElement.attributes.transform?.value
+        nodeID = filter[idxSearch].parentElement.id !== ""?filter[idxSearch].parentElement.id:filter[idxSearch+1].parentElement.id
+        var nodetf = filter[idxSearch].parentElement.id !== ""?filter[idxSearch].parentElement.attributes.transform?.value:filter[idxSearch+1].parentElement.attributes.transform?.value
         var mptf =  d3.select('.ct-container').attr('transform')
         var s = d3.select('.mp__canvas_svg');
         var center = [parseFloat(s.style("width"))/2, parseFloat(s.style("height"))/2];
         var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
         var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
         var scale_mptf = 1; 
-        var x_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[0]);
-        var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
+        var x_nodetf = parseInt(nodetf?.split(/[()]/)[1].split(',')[0]);
+        var y_nodetf = parseInt(nodetf?.split(/[()]/)[1].split(',')[1]);
         //Approx cordinates of node: mindmap translate + nodetf/mpscale
         var ccord = [x_mptf + (x_nodetf / scale_mptf), y_mptf + (y_nodetf / scale_mptf)];
         var x = x_mptf - ccord[0] + center[0] - 40
@@ -63,7 +63,7 @@ const SearchBox = (props) => {
                     if(drag){drag=false; return;}
                     setInp(!inp)}
                     } 
-                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Testcases'/>
+                className="searchimg-canvas" src="static/imgs/ic-search-icon.png"  title='Search Modules, Scenarios, Screens or Test cases'/>
                 <input data-test="searchBox" id='search-canvas' type="text" onKeyDown={(e)=>{if(e.key==='Enter')onSearch(e)}} onChange={(e)=>onSearch(e)} className={((inp?" search-visible":"")+(err?" inputErrorBorderFull":""))} style={{width:'93%',marginLeft:'6px', fontFamily:'Open Sans'}} placeholder="Search"/>
             </div>
         // </Rnd>

@@ -1,0 +1,74 @@
+@import "../../global/styles/ColorVariables.scss";
+.designGroup_dialog_box {
+    .p-dialog-header {
+        background: #ffffff !important;
+        border-top-right-radius: 4px;
+        padding: 0.3rem 0 !important;
+        height: 5rem !important;
+
+        .p-dialog-header-icons {
+            position: relative;
+            right: 96%;
+        }
+        .p-dialog .p-dialog-header .p-dialog-title {
+            margin-left: 2.79rem;
+            margin-bottom: .7rem;
+        }
+        .p-dialog-title {
+            .dailog_headerGroups {
+                color: rgba(3, 2, 41, .6);
+                font: $f6_semibold;
+                left: 4rem !important;
+                top: 1rem;
+                position: absolute;
+            }
+
+            .dailog_headerGroups1 {
+                color: #030229;
+                font-family: Open Sans;
+                font-size: 20px;
+                font-weight: 500;
+                left: 5.5rem !important;
+                position: absolute;
+                top: 2.5rem;
+            }
+        }
+    }
+    .p-dialog-content {
+        overflow: unset;
+        padding-bottom: 0 !important;
+    }
+}
+.groupsTabPosition{
+    position: fixed;
+    left: calc(100% - 676px);
+}
+.tabViewHeader{
+    left: 40%;
+    position: absolute;
+    top: 0rem;
+    background: transparent !important;
+    .p-tabview-nav {
+        height: 3rem;
+
+        .p-tabview-nav-link {
+            padding: 8px;
+        }
+    }
+    .p-tabview .p-tabview-panels{
+        background: transparent !important;
+    }
+}
+.designGroup_dialog_div{
+    .p-dialog-content {
+        overflow: unset;
+    }
+}
+.tabPanelforHeader{
+    background: transparent !important;
+}
+.repo_group_header{
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}  

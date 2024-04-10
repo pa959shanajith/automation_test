@@ -70,6 +70,9 @@ const SocketFactory = () => {
             });
             socket.on('killSession', (by, reason) => {
                 return RedirectPage(history, { by: by, reason: reason })
+            });
+            socket.on('get_sap_scrape_data', (data) => {
+                dispatch(loadUserInfoActions.setSAPGeniusScrapeData(data));
             })
             // SAP ALM Socket connection
             socket.on('messageFromServer', (data) => {

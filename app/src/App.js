@@ -35,7 +35,9 @@ import Profile from './pages/report/components/Profile';
 import ReportTestTable from './pages/report/components/ReportTestTable';
 import AdminContainer from './pages/admin/containers/AdminHome';
 import GeniusDialog from './pages/global/components/GeniusDialog';
-
+import GeniusSapDialog from './pages/global/components/GeniusSapDialog';
+import GenAi from './pages/landing/components/GenAi';
+import ElementRepository from './pages/landing/components/ElementRepository';
 
 
 
@@ -95,6 +97,7 @@ const RouteApp = () => {
   return (
     <>
     <GeniusDialog />
+    <GeniusSapDialog/>
       <Routes>
       
         <Route path="/login" element={<Login />} />
@@ -113,6 +116,8 @@ const RouteApp = () => {
         <Route path='/viewReports' element={<ReportTestTable/>}/>
         <Route path="/admin" element={<AdminContainer />} />
         <Route path="/utility" element={<Utility />} />
+        <Route path="/GenAI" element={<GenAi/>}/>
+        <Route path="/elementRepository" element={<ElementRepository/>}/>
         
       </Routes>
     </>

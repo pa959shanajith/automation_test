@@ -4,6 +4,8 @@ import {setMsg, VARIANT, Messages as MSG} from '../../global';
 import { useSelector} from 'react-redux';
 import * as d3 from 'd3';
 import '../styles/InputBox.scss'
+import { getScreens } from '../api';
+import { Toast } from 'primereact/toast';
 var initdata = []
 
 
@@ -20,6 +22,21 @@ const InputBox = (props) => {
     var pt = p.select('.ct-nodeLabel');
     var t = p.attr('data-nodetype');
     var dNodes = props.dNodes
+    const toast = useRef();
+    const reduxDefaultselectedProject = useSelector((state) => state.landing.defaultSelectProject);
+  let defaultselectedProject = reduxDefaultselectedProject;
+
+    const localStorageDefaultProject = localStorage.getItem('DefaultProject');
+    if (localStorageDefaultProject) {
+        defaultselectedProject = JSON.parse(localStorageDefaultProject);
+    }
+
+    const toastError = (erroMessage) => {
+        if (erroMessage && erroMessage.CONTENT) {
+          toast.current.show({ severity: erroMessage.VARIANT, summary: 'Error', detail: erroMessage.CONTENT, life: 5000 });
+        }
+        else toast.current.show({ severity: 'error', summary: 'Error', detail: JSON.stringify(erroMessage), life: 5000 });
+      }
 
     useEffect(()=>{
         document.addEventListener("keydown", (e)=>{if(e.keyCode === 27)props.setInpBox(false)}, false);
@@ -37,7 +54,15 @@ const InputBox = (props) => {
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
+
     useEffect(()=>{
+        (async ()=>{
+           var res = await getScreens(defaultselectedProject.projectId);
+           if(res.error){
+            toastError(res.error);
+            return;
+           }
+        
         var nodetype = props.node.attr('data-nodetype');
         if(nodetype === "modules" || nodetype === "scenarios"){
             setSuggestList([]);
@@ -46,17 +71,24 @@ const InputBox = (props) => {
             return;
         }
         if(nodetype === "testcases"){
-            setSuggestList(screenData.testCaseList);
-            initdata = screenData.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
+            setSuggestList(res.testCaseList);
+            initdata = res.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
             filterSuggest()
             return;
         }
         if(nodetype === "screens"){
-            setSuggestList(screenData.screenList)
-            initdata = screenData.screenList;
+            setSuggestList(res.screenList)
+            initdata = res.screenList;
             filterSuggest()
             return;
         }
+        if(nodetype === 'teststepsgroups'){
+            setSuggestList(res.testCaseList);
+            initdata = res.testCaseList.filter((e)=>e.screenid===dNodes[pi].parent._id);
+            filterSuggest()
+            return;
+        }
+    })();
         //eslint-disable-next-line react-hooks/exhaustive-deps
     },[screenData])
 
@@ -100,7 +132,7 @@ const InputBox = (props) => {
 
     const onEnter = (val) =>{
         var reuseDict = getReuseDetails(dNodes);
-        if (val === 'Screen_0' || val === 'Scenario_0' || val === 'Testcase_0') {
+        if (val === 'Screen_0' || val === 'Scenario_0' || val === 'Testcase_0' || val === "Teststepsgroup1") {
             d3.select('#ct-inpAct').classed('errorClass',!0);
             return;
         }
@@ -133,6 +165,87 @@ const InputBox = (props) => {
                     if(dNodes[0].children[j].id === dNodes[pi].id){
                         dNodes[0].children[j].name = dNodes[pi].name;
                     }
+                }
+            }
+            if (dNodes[pi].type === 'teststepsgroups') {
+                updateData(dNodes[0])
+                function updateData(node) {
+                    node.children.forEach(child => {
+                        if (child.id === dNodes[pi].id) {
+                            child.name = dNodes[pi].name;
+                            if(child.parent.type === "teststepsgroups"){
+                               child.parent.parent.name = dNodes[pi].name;
+                            }else if(child.parent.type === "scenarios"){child.parent.parent.name = dNodes[pi].name;}
+                            else{ child.parent.name = dNodes[pi].name;}
+                            // Use map on child.parent.children to update specific child
+                            if(child.parent.children[0].id === dNodes[pi].id){
+                                child.parent.children = child.parent.children.map(subChild => {
+                                    if (subChild.childIndex === dNodes[pi].childIndex) {
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }else if(subChild.id === dNodes[pi].id){
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }
+                                    return subChild;
+                                });
+                            }else{
+                                child.parent.children[0].children = child.parent.children[0].children.map(subChild => {
+                                    if (subChild.childIndex === dNodes[pi].childIndex) {
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }else if(subChild.id === dNodes[pi].id){
+                                        subChild.name = dNodes[pi].name;
+                                        if (subChild.parent && subChild.parent.name !== undefined) {
+                                            subChild.parent.name = dNodes[pi].name;
+                                            subChild.parent.children = subChild.parent.children.map(sub=>{
+                                                if (sub.childIndex === dNodes[pi].childIndex) {
+                                                    sub.name = dNodes[pi].name;
+                                                }else if(sub.id === dNodes[pi].id){
+                                                    sub.name = dNodes[pi].name;
+                                                }
+                                                return sub;
+                                            })
+                                        }
+                                    }
+                                    return subChild;
+                                });
+                            }
+                        } else {
+                            node.children.forEach(subChild => updateData(subChild));
+                        }
+                    });
+                    return node;
                 }
             }
             if(dNodes[pi].type === 'screens'){

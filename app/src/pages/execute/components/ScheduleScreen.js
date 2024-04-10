@@ -458,7 +458,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="scheduletype"
-                header="Recurrance Type"
+                header=" Recurrence Type"
               ></Column>
               <Column
                 align="center"
@@ -536,7 +536,7 @@ const ScheduleScreen = ({
               <Column
                 align="center"
                 field="scheduletype"
-                header="Recurrance Type"
+                header=" Recurrence Type"
               ></Column>
               <Column
                 align="center"
@@ -590,7 +590,7 @@ const ScheduleScreen = ({
             <Column
               align="center"
               field="scenariodetail"
-              header="Testcase Name"
+              header="Test case Name"
             ></Column>
             <Column align="center" field="status" header="Status"></Column>
           </DataTable>

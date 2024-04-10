@@ -91,6 +91,10 @@ height: 2.5rem !important;
 
 .scenario_label{
     font: $f6_regular !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
 }
 
 .cancel__btn{
@@ -109,6 +113,18 @@ height: 2.5rem !important;
 
 .tab__cls{
     margin-top: 0.5rem;
+    position: relative;
+    
+    .download_mapping {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 9999;
+        cursor: pointer;
+        border: 2px solid black;
+        margin: 2px;
+        padding: 2px;
+    }
     .p-tabview-nav-content {
          height: 3rem !important;
     }
@@ -347,6 +363,11 @@ height: 2.5rem !important;
         cursor: pointer;
     }
 
+    .img__testrail {
+        height: 2rem;
+        width: 40px;
+        cursor: pointer;
+    }
 
     .img__qtest {
         height: 2rem;
@@ -417,6 +438,13 @@ height: 2.5rem !important;
     padding: 1rem 4rem 2rem 2rem;
     background:linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
     cursor: pointer;
+  }
+  
+  .side-panel_login .integration-card.selected {
+      border: 1px solid #6837e6;
+      border-radius: 7px;
+      background: linear-gradient(0deg, rgba(96, 91, 255, 0.2), rgba(96, 91, 255, 0.2)), #FFFFFF;
+      cursor: pointer;
   }
 
   .side-panel_login .integration-card.selected {
@@ -498,6 +526,11 @@ height: 2.5rem !important;
         .avoProject_tree{
             .p-treenode-content{
                 padding: 0 !important;
+            }
+            
+            .p-tree-container .p-treenode .p-treenode-content.p-highlight {
+                background: #eef2ff0a !important;
+                color: #333 !important;
             }
         }
         .p-treenode{
@@ -643,4 +676,10 @@ height: 2.5rem !important;
     position: absolute;
     right: 19rem;
     bottom: 3rem;
+}
+
+.unsync-icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

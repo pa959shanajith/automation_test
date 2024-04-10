@@ -8,22 +8,22 @@
   }
 
 .page-taskName-encryption{
-    display: inline-block;
+    display: flex;
+    align-items: center;
     font:$f4_semibold;
     padding: 2px 14px 1px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    // border-radius: 5px;
+    // -moz-border-radius: 5px;
+    // -webkit-border-radius: 5px;
 }
 #dropdown{
     padding: 3px;
     padding-top: 0px;
     height: 24px;
-    width: 23%;
-    margin-top: 6px;
+    width: 19%;
     border-radius: 5px;
     outline: none !important;
-    margin: 6px 10px 9px 10px;
+    margin: 6px 10px 9px 22px;
     
 }
 .options{
@@ -61,20 +61,24 @@
     border: none;
 }
 #encryptData{
-    border: none;
+    border: 0.2px solid #e0e0e0;
     width: 77%;
     height: 100%;
     outline: none;
     resize: none;
     font-size: 16px;
+    margin-left: 0.6rem;
+    font: $f6_regular;
 }
 #encryptedData{
-    border: none;
+    border: 0.2px solid #e0e0e0;
     width: 77%;
     height: 100%;
     outline: none;
     resize: none;
     font-size: 16px;
+    margin-left: 0.6rem;
+    font: $f6_regular;
 }
 #optimization-fn{
     border-radius: 1em;
@@ -166,7 +170,7 @@
     flex-direction: column;
     height: 38rem;
     position: relative;
-    width: 92%;
+    width: 100%;
 }
 .factor__row{
     white-space: nowrap;

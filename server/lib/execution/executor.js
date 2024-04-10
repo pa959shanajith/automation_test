@@ -76,18 +76,28 @@ class TestSuiteExecutor {
                 "testscenarioid": scenarioid,
                 "userid":userid
             };
+            
             const integ = integrationType[k];
             if (integ == 'qTest') inputs.query = "qtestdetails";
             else if (integ == 'ALM') inputs.query = "qcdetails";
             else if (integ == 'Zephyr') inputs.query = "zephyrdetails";
             else if (integ == 'Azure') inputs.query = "azuredetails";
+            else if (integ == 'Testrail') inputs.query = "TestrailDetails"
+            
             if (inputs.query) {
                 const qcdetails = await utils.fetchData(inputs, "qualityCenter/viewIntegrationMappedList_ICE", fnName);
+                
                 if (integ == 'ALM' && Array.isArray(qcdetails)) {
                     for (let i = 0; i < qcdetails.length; ++i) {
                         if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
                     }
                     if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList);
+                } else if (integ == 'Testrail' && Array.isArray(qcdetails) ){
+                    for (let i = 0; i < qcdetails.length; ++i) {
+                        if (qcdetails[i] != "fail") qcDetailsList.push(JSON.parse(JSON.stringify(qcdetails[i])));
+                    }
+                    if (qcDetailsList.length > 0) scenario.qcdetails.push(qcDetailsList)
+
                 } else {
                     if (qcdetails != "fail" && qcdetails.length > 0) scenario.qcdetails.push(JSON.parse(JSON.stringify(qcdetails[0])));
                 }
@@ -136,6 +146,7 @@ class TestSuiteExecutor {
                 execReq['osVersion'] = batchData.osVersion
                 execReq['browserName'] = batchData.browserName
                 execReq['os'] = batchData.os
+                execReq['platforms_web'] = batchData.platforms_web
             } else {
                 execReq["mobile"] = batchData.mobile
             } 
@@ -188,6 +199,7 @@ class TestSuiteExecutor {
             for (const tsco of suiteDetails) {
                 var integrationType = [];
                 var dtparam = [];
+
                 if (batchData.integration && batchData.integration.alm && batchData.integration.alm.url) {
                     integrationType.push("ALM");
                 }
@@ -199,6 +211,9 @@ class TestSuiteExecutor {
                 }
                 if (batchData.integration && batchData.integration.azure && batchData.integration.azure.url) {
                    integrationType.push("Azure");
+                }
+                if (batchData.integration && batchData.integration.testrail && batchData.integration.testrail.url  && batchData.integration.testrail.apitoken)  {
+                    integrationType.push("Testrail");
                 }
                 if (tsco.dataparam != "") {
                     var dt = tsco.dataparam[0].split(';')[0].split('/');
@@ -251,6 +266,8 @@ class TestSuiteExecutor {
             inputs['projectId'] = batchExecutionData.batchInfo[0].projectId;
             inputs['releaseName'] =  batchExecutionData.batchInfo[0].releaseId;
             inputs['cycleId'] =  batchExecutionData.batchInfo[0].cycleId;
+            if('actualRun' in batchExecutionData) inputs["actualRun"] = batchExecutionData["actualRun"]
+            else inputs["actualRun"] = true
         }
         const newExecIds = await utils.fetchData(inputs, "suite/ExecuteTestSuite_ICE", "generateExecutionIds");
         if (newExecIds == "fail") return "fail";

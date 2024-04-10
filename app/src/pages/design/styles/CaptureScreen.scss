@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 
 .compare__object__note {
   .p-dialog-header-icons {
@@ -680,11 +681,9 @@
 }
 
 //Styles related to element properties 
-.p-dialog .p-dialog-footer {
-  padding:0.5rem !important;
-
-
-}
+// .p-dialog .p-dialog-footer {
+//   padding:0.5rem !important;
+// }
 .element__properties{
   .p-dialog .p-dialog-header {
     padding: 0.75rem;
@@ -770,11 +769,12 @@
 .capture_card{
   display: flex;
   flex-direction: column;
-  padding:15px;
+  padding:10px 0px;
   font-family: "Open Sans";
-  width: 20%;
+  width: 20%; 
   gap: 2vh;
   border-right: 1px solid #e2e2ed;
+  z-index: 1;
 }
 .capture_card_top_section{
   display: flex;
@@ -782,15 +782,16 @@
 }
 .capture_card_header{
   margin-right: 10px;
+  margin-left: 10px;
   text-align: center;
-  font-size: 1vw;
+  font: 1vw;
 }
 .capture_card_info_wrapper{
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 15px;
+  width: 20px;
 }
 .capture_card_info_img{
   width: 100%;
@@ -813,13 +814,15 @@
   justify-content: center;
   align-items: center;
   width: 25px;
+  margin-bottom: 5px;
 }
 .capture_bottom_btn_img{
   width: 100%;
 }
 .capture_bottom_heading{
   text-align: center;
-  font-size: 1vw;
+  font: $f7_semibold;
+  color: #605BFF;
 }
 .expandCollapseIcon{
   width: 100%;
@@ -834,3 +837,77 @@
 .import_export{
   position: relative;
 }
+.repo_dropdown{
+  font-family: "Open Sans";
+}
+.dropdown_container{
+  max-width: 100%;
+  pointer-events: all;
+//   .p-dropdown-item::after {
+//     content: attr(title);
+//     position: absolute;
+//     left: 100%;
+//     top: 0;
+//     background-color: #333;
+//     color: #fff;
+//     padding: 0.5rem;
+//     border-radius: 4px;
+//     white-space: nowrap;
+//     display: none;
+// }
+
+// .p-dropdown-item:hover::after {
+//     display: block;
+// }
+}
+.dropdown_container > div > span {
+  // color: initial;
+  font-size: 1vw;
+  right: 4rem;
+}
+
+.blue-text{
+  color: blue;
+}
+
+.p-dialog-content{
+  overflow:auto;
+  flex-grow: 1;
+}
+
+.reused__icon{
+  height: 1.5rem;
+  cursor: pointer;
+}
+
+.choose__repo__txt{
+  font: $f6_regular;
+  color: #212121;
+}
+// .zoom-in-out-box {
+//   margin: 24px;
+//   width: 24px;
+//   border-radius: 50%;
+//   height: 50px;
+//   background: #f50057;
+//   animation: zoom-in-zoom-out 1s ease infinite;
+// }
+// @keyframes zoom-in-zoom-out {
+//   0% {transform: scale(1, 1);}
+//   50% {transform: scale(1.5, 1.5);}
+//   100% {transform: scale(1, 1);}}
+
+.capture_card_icon_wrapper{
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+}
+.capture_card_icon_img{
+  width: 100%;
+}
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item{
+  padding: 0.1rem 0.5rem ;
+}
+

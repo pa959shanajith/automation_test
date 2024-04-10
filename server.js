@@ -161,8 +161,8 @@ if (cluster.isMaster) {
 		app.use('*', function(req, res, next) {
 			if (req.session === undefined) {
 				return next(new Error("cachedbnotavailable"));
-}
-																					return next();
+									}
+																								return next();
 		});
 
 		app.use(function(req, res, next) {
@@ -248,7 +248,14 @@ if (cluster.isMaster) {
 		var browserstack = require('./server/controllers/browserstack');
 		var ALM = require('./server/controllers/ALM');
 
+		var generateAI = require('./server/controllers/generateAI');
+		
 		// No CSRF token
+		app.post('/moduleLevel_ExecutionStatus',report.moduleLevel_ExecutionStatus);
+		app.post('/teststepLevel_ExecutionStatus',report.teststepLevel_ExecutionStatus);
+		app.post('/defect_analysis',report.defect_analysis);
+		app.post('/rasa_prompt_model',report.rasa_prompt_model);
+		app.post('/profileLevel_ExecutionStatus',report.reportAnalysis);
 		app.post('/ExecuteTestSuite_ICE_SVN', suite.ExecuteTestSuite_ICE_API);
 		app.post('/getReport_API', report.getReport_API);
 		app.post('/getAccessibilityReports_API', report.getAccessibilityReports_API);
@@ -261,6 +268,7 @@ if (cluster.isMaster) {
 		app.post('/setExecStatus',suite.setExecStatus);
 		app.get('/runningStatus', suite.runningStatus);
 		app.post('/getGeniusData',plugin.getGeniusData);
+		app.post('/getGeniusDataSAP', auth.protect, plugin.getGeniusDataSAP);
 		app.post('/getProjectsMMTS', devOps.getProjectsMMTS);
 		app.post('/getScrapeDataScenarioLevel_ICE', designscreen.getScrapeDataScenarioLevel_ICE);
 		app.post('/updateScenarioComparisionStatus', designscreen.updateScenarioComparisionStatus)
@@ -269,8 +277,9 @@ if (cluster.isMaster) {
 		app.post('/fetchExecProfileStatus', report.fetchExecProfileStatus);
 		app.post('/fetchModSceDetails', report.fetchModSceDetails);
 		app.get('/viewReport', report.viewReport);
+		app.post('/downloadVideo', report.downloadVideo);
 		app.post('/getUserRoles', admin.getUserRoles);
-		app.post('/fetchExecutionDetail',report.fetchExecutionDetail);
+		app.get('/fetchExecutionDetail',report.fetchExecutionDetail);
 		app.post('/reportStatusScenarios_ICE',auth.protect, report.reportStatusScenarios_ICE);
 		app.post('/devopsReports/getReportsData_ICE', report.getReportsData_ICE);
         app.post('/devopsReports/reportStatusScenarios_ICE',report.reportStatusScenarios_ICE);
@@ -290,6 +299,29 @@ if (cluster.isMaster) {
 		app.get('/fetchALM_Testcases',auth.protect,ALM.fetchALM_Testcases);
 		app.post('/viewALM_MappedList_ICE', auth.protect, ALM.viewALM_MappedList_ICE);
 		app.post('/sap-calm-testautomation/api/v1/testcases/execute1',ALM.Execute_Testcase_Run);
+		app.get('/fetchDefectExecutionDetail',report.fetchDefectExecutionDetail);
+		// Gen AI API'S List
+		app.post('/uploadgeneratefile',upload.single('file'),report.uploadGeneratefile);
+		app.get('/getall_uploadfiles',report.getall_uploadfiles);
+		app.post('/getjira_json',report.getJiraJSON_ICE)
+		app.post('/generate_testcase',generateAI.generateTestcase);
+		app.post('/getJSON_userstory',generateAI.getJSON_UserStories);
+		app.post('/save_testcase',generateAI.save_GenTestcases);
+		app.post('/fetch_git_exp_details',auth.protect, mindmap.fetch_git_exp_details);
+		app.post('/saveTag', mindmap.saveTag);
+		app.post("/validateAI_token",generateAI.validateToken);
+		app.post("/genAI/create",generateAI.createModel);
+		app.get("/genAI/read",generateAI.readModel);
+		app.put("/genAI/edit/:id",generateAI.editModel);
+		app.delete("/genAI/delete/:id",generateAI.deleteModel);
+		app.post("/genAI/createTemp",generateAI.createTemp);
+		app.get("/genAI/readTemp",generateAI.readTemp);
+		app.put("/genAI/editTemp/:id",generateAI.editTemp);
+		app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
+
+		// app.put("/genAI/editTemp/:id",generateAI.editTemp);
+		// app.delete("/genAI/deleteTemp/:id",generateAI.deleteTemp);
+		app.delete("/genAI/deletefile/:id",generateAI.deleteUploadFile);
 		app.use(csrf({
 		cookie: true
 		}));
@@ -335,7 +367,7 @@ if (cluster.isMaster) {
 		app.get(/^\/(scrape|design|designTestCase|execute|scheduling|settings)$/, function(req, res) {
 			var roles = ["Quality Lead", "Quality Engineer", "Quality Manager"]; //Allowed roles
 			sessionCheck(req, res, roles);
-		});
+		});	
 
 		//Test Engineer,Test Lead and Test Manager can access
 		app.get(/^\/(mindmap|utility|plugin|landing|reports|viewReports|profile|seleniumtoavo|settings|genius|admin|devOpsReport)$/, function(req, res) {
@@ -344,7 +376,7 @@ if (cluster.isMaster) {
 		});
 
 		//Test Lead and Test Manager can access
-		app.get(/^\/(webocular|neuronGraphs\/|integration|admin)$/, function(req, res) {
+		app.get(/^\/(webocular|neuronGraphs\/|integration|admin|GenAI)$/, function(req, res) {
 			var roles = ["Quality Manager", "Quality Lead"]; //Allowed roles
 			sessionCheck(req, res, roles);
 		});
@@ -439,7 +471,7 @@ if (cluster.isMaster) {
 		});
 
 		app.get('/getClientConfig', (req,res) => {
-			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl})
+			return res.send({"avoClientConfig":uiConfig.avoClientConfig,"trainingLinks": uiConfig.trainingLinks,"geniusTrialUrl":uiConfig.sampleAvoGeniusUrl,"customerSupportEmail":uiConfig.customerSupportEmail,"videoTrialUrl":uiConfig.videoTrialUrl,"version":uiConfig.version})
 		});
 
 		app.get('/External_Plugin_URL', async (req, res) => {
@@ -490,6 +522,7 @@ if (cluster.isMaster) {
 		var qc = require('./server/controllers/qualityCenter');
 		var qtest = require('./server/controllers/qtest');
 		var zephyr = require('./server/controllers/zephyr');
+		var testrail = require('./server/controllers/testrail');
 		var webocular = require('./server/controllers/webocular');
 		var chatbot = require('./server/controllers/chatbot');
 		var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
@@ -498,7 +531,7 @@ if (cluster.isMaster) {
 		var devOps = require('./server/controllers/devOps');
 		var azure = require('./server/controllers/azure');
 		var SauceLab = require('./server/controllers/sauceLab');
-var browserstack = require('./server/controllers/browserstack');
+        var browserstack = require('./server/controllers/browserstack');
 
 
 
@@ -532,6 +565,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/singleExcelToMindmap', auth.protect, mindmap.singleExcelToMindmap);
 		app.post('/checkExportVer', auth.protect, mindmap.checkExportVer);
 		app.post('/importDefinition', auth.protect, mindmap.importDefinition);
+		app.post('/deleteElementRepo', auth.protect, mindmap.deleteElementRepo);
+		app.post('/generateToken', auth.protect, mindmap.generateToken);
+		app.post('/assignedUserMM', auth.protect, mindmap.assignedUserMM);
 		
 		//Login Routes
 		app.post('/checkUser', authlib.checkUser);
@@ -589,12 +625,15 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getDetails_JIRA', auth.protect, admin.getDetails_JIRA);
 		app.post('/manageJiraDetails', auth.protect, admin.manageJiraDetails);
 		app.post('/getDetails_Zephyr', auth.protect, admin.getDetails_Zephyr);
+		app.post('/getDetails_Testrail',auth.protect, admin.getDetails_Testrail)
 		app.post('/getDetails_Azure',auth.protect,admin.getDetails_Azure);
 		app.post('/manageZephyrDetails', auth.protect, admin.manageZephyrDetails);
+		app.post('/manageTestrailDetails', auth.protect,admin.manageTestrailDetails);
 		app.post('/manageAzureDetails',auth.protect,admin.manageAzureDetails);
 		app.post('/avoDiscoverMap', auth.protect, admin.avoDiscoverMap);
 		app.post('/avoDiscoverReset', auth.protect, admin.avoDiscoverReset);
 		app.post('/fetchAvoDiscoverMap', auth.protect, admin.fetchAvoDiscoverMap);
+		app.post('/unLock_TestSuites', auth.protect, admin.unlockTestSuites);
 
 		//Notification Routes
 		app.post('/testNotificationChannels', auth.protect, admin.testNotificationChannels);
@@ -612,6 +651,8 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/highlightScrapElement_ICE', auth.protect, designscreen.highlightScrapElement_ICE);
 		app.post('/getScrapeDataScreenLevel_ICE', auth.protect, designscreen.getScrapeDataScreenLevel_ICE);
 		app.post('/updateScreen_ICE', auth.protect, designscreen.updateScreen_ICE);
+		app.post('/insertScreen', auth.protect, designscreen.insertScreen);
+		app.post('/insertRepository', auth.protect, designscreen.insertRepository);
 		app.post('/updateIrisDataset', auth.protect, designscreen.updateIrisDataset);
 		app.post('/userObjectElement_ICE', auth.protect, designscreen.userObjectElement_ICE);
 		app.post('/exportScreenToExcel', auth.protect, designscreen.exportScreenToExcel);
@@ -619,6 +660,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/fetchReplacedKeywords_ICE', auth.protect, designscreen.fetchReplacedKeywords_ICE);
 		app.post('/getDeviceSerialNumber_ICE', auth.protect, designscreen.getDeviceSerialNumber_ICE);
 		app.post('/checkingMobileClient_ICE', auth.protect, designscreen.checkingMobileClient_ICE);
+		app.post('/launchAndServerConnectSAPGenius_ICE', auth.protect, designscreen.launchAndServerConnectSAPGenius_ICE);
+		app.post('/startScrapingSAPGenius_ICE', auth.protect, designscreen.startScrapingSAPGenius_ICE);
+		app.post('/stopScrapingSAPGenius_ICE', auth.protect, designscreen.stopScrapingSAPGenius_ICE);
 		
 		//Design TestCase Routes
 		app.post('/readTestCase_ICE', auth.protect, design.readTestCase_ICE);
@@ -626,6 +670,8 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/debugTestCase_ICE', auth.protect, design.debugTestCase_ICE);
 		app.post('/getKeywordDetails_ICE', auth.protect, design.getKeywordDetails_ICE);
 		app.post('/getTestcasesByScenarioId_ICE', auth.protect, design.getTestcasesByScenarioId_ICE);
+		app.post('/createKeyword', auth.protect, design.createKeyword);
+		
 		//Webservices APIs
 		app.post('/execRequest', auth.protect, design.executeRequest);
 		app.post('/oauth2', auth.protect, design.oAuth2auth);
@@ -701,6 +747,9 @@ var browserstack = require('./server/controllers/browserstack');
 		//Zephyr Plugin
 		app.post('/loginToZephyr_ICE', auth.protect, zephyr.loginToZephyr_ICE);
 		app.post('/zephyrProjectDetails_ICE', auth.protect, zephyr.zephyrProjectDetails_ICE);
+		app.post('/zephyrRepoDetails_ICE', auth.protect, zephyr.zephyrRepoDetails_ICE);
+		app.post('/zephyrModuleUnderRepo_ICE', auth.protect, zephyr.zephyrModuleUnderRepo_ICE);
+		app.post('/zephyrRepoTestcaseDetails_ICE', auth.protect, zephyr.zephyrRepoTestcaseDetails_ICE);
 		app.post('/zephyrCyclePhase_ICE', auth.protect, zephyr.zephyrCyclePhase_ICE);
 		app.post('/zephyrMappedCyclePhase', auth.protect, zephyr.zephyrMappedCyclePhase);
 		app.post('/zephyrTestcaseDetails_ICE', auth.protect, zephyr.zephyrTestcaseDetails_ICE);
@@ -709,7 +758,18 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/viewZephyrMappedList_ICE', auth.protect, zephyr.viewZephyrMappedList_ICE);	
 		app.post('/zephyrUpdateMapping', auth.protect, zephyr.zephyrUpdateMapping);	
 		app.post('/excelToZephyrMappings', auth.protect, zephyr.excelToZephyrMappings);
-		//app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
+
+		// Testrail Plugin
+		app.post('/getProjectsTestrail_ICE',auth.protect, testrail.getProjects_Testrail);
+		app.post('/getSuitesTestrail_ICE',auth.protect, testrail.getSuites_Testrail);
+		app.post('/getTestcasesTestrail_ICE',auth.protect, testrail.getTestcases_Testrail);
+		app.post('/saveTestrailMapping',auth.protect,testrail.saveMapping_Testrail)
+		app.post('/viewTestrailMappedList',auth.protect,testrail.viewMappedDetails_Testrail)
+		app.post('/getProjectPlans',auth.protect,testrail.getTestPlans_Testrail)
+		app.post('/getTestPlanDetails',auth.protect,testrail.getTestPlanDetails_Testrail)
+		app.post('/getSectionsTestrail_ICE',auth.protect,testrail.getSections_Testrail)
+		app.post('/getTestPlansAndRuns',auth.protect,testrail.getTestPlansAndRuns)
+		// app.post('/manualTestcaseDetails_ICE', auth.protect, qc.manualTestcaseDetails_ICE);
 		// Automated Path Generator Routes
 		app.post('/flowGraphResults', auth.protect, flowGraph.flowGraphResults);
 		app.post('/APG_OpenFileInEditor', auth.protect, flowGraph.APG_OpenFileInEditor);
@@ -755,6 +815,9 @@ var browserstack = require('./server/controllers/browserstack');
 		app.post('/getReportsData_ICE',auth.protect, report.getReportsData_ICE);	
 		app.get('/getSuiteDetailsInExecution_ICE',auth.protect, report.getSuiteDetailsInExecution_ICE);
 		app.post('/getAccessibilityData_ICE', auth.protect, report.getAccessibilityTestingData_ICE);
+
+		// Create Multiple Ldap Users
+		app.post('/createMulitpleLdapUsers', auth.protect, admin.createMultipleLdapUsers);
 		
 		//-------------Route Mapping-------------//
 		// app.post('/fetchModules', auth.protect, devOps.fetchModules);

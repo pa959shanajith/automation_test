@@ -1,3 +1,4 @@
+const moment = require('moment');
 export const getObjNameList = (appType, data) => {
     let obnames = [];
 
@@ -667,4 +668,88 @@ export const getRoleId = (roleName) =>{
       default:
         return "";
     }
+}
+
+export const DateTimeFormat = (inputDate, createDate) => {
+    // Provided date
+    const providedDate = new Date(inputDate);
+    const createddate = new Date(createDate);
+    let createdNowProject = false;
+    { providedDate.toISOString() === createddate.toISOString() ? createdNowProject = true : createdNowProject = false }
+    // Current date
+    const currentDate = new Date();
+    // Calculate years, months, days, hours, and seconds
+    const millisecondsInASecond = 1000;
+    const millisecondsInAMinute = 60 * millisecondsInASecond;
+    const millisecondsInAnHour = 60 * millisecondsInAMinute;
+    const millisecondsInADay = 24 * millisecondsInAnHour;
+    const millisecondsInAYear = 365 * millisecondsInADay;
+    const date1 = moment(providedDate, 'ddd, DD MMM YYYY HH:mm:ss ZZ');
+    const date2 = moment(new Date(), 'ddd MMM DD YYYY HH:mm:ss ZZ');
+    //convert the difference to other units, such as seconds, minutes, hours, etc.
+    const seconds = date2.diff(date1, 'seconds');
+    const minutes = date2.diff(date1, 'minutes');
+    const hours = date2.diff(date1, 'hours');
+    const days = date2.diff(date1, 'days');
+    const months = date2.diff(date1, 'months');
+    const years = date2.diff(date1, 'years');
+    let output = "";
+    if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes <= 0) {
+        output = createdNowProject ? "Created now" : "Edited Now";
+    }
+    else if (years <= 0 && months <= 0 && days <= 0 && hours <= 0 && minutes >= 1) {
+        output = `Last Edited ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months <= 0 && days <= 0 && hours >= 1) {
+        output = `Last Edited ${hours} hr${hours > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months <= 0 && days >= 1) {
+        output = `Last Edited ${days} day${days > 1 ? 's' : ''} ago`;
+    }
+    else if (years <= 0 && months >= 1) {
+        output = `Last Edited ${months} month${months > 1 ? 's' : ''} ago`;
+    }
+    else {
+        output = `Last Edited ${years} year${years > 1 ? 's' : ''} ago`;
+    }
+    return output;
+}
+// Report Date Time Show Format Ex: ~00:00:00 
+export const reportsDateFormat = (startDateFormat, endDateFormat) => {
+    // Check if endDateFormat is null
+    if (!startDateFormat || !endDateFormat) {
+        return "NA";
+    }
+    // Convert date strings to Date objects
+    const startDate = new Date(startDateFormat);
+    const endDate = new Date(endDateFormat);
+    // Calculate the difference in milliseconds
+    const differenceMs = endDate - startDate;
+    // Convert milliseconds to seconds
+    const differenceSec = Math.round(differenceMs / 1000);
+    // Calculate hours, minutes, and seconds
+    const hours = Math.floor(differenceSec / 3600);
+    const minutes = Math.floor((differenceSec % 3600) / 60);
+    const seconds = differenceSec % 60;
+    // Format the result
+    const formattedResult = "~" + (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    return formattedResult;
+}
+// Add 2 Report Date Format Ex: (~00:00:04 + ~00:00:03) = ~00:00:07
+export const addReportEllapsedTimes = (ellapsedTimeArr) => {
+    const timeToSeconds = (timeStr) => {
+        const [, hours, minutes, seconds] = timeStr.match(/(\d+):(\d+):(\d+)/);
+        return parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds);
+    }
+    const secondsToTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+        return `~${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+    // Convert to seconds and sum
+    const totalSeconds = ellapsedTimeArr.reduce((acc, timeStr) => acc + timeToSeconds(timeStr), 0);
+    // Convert total seconds back to time format
+    const totalTime = secondsToTime(totalSeconds);
+    return totalTime
 }

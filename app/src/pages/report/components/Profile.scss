@@ -1,3 +1,4 @@
+@import "../../global/styles/ColorVariables.scss";
 .profile_container {
     .table_profile {
         margin-top: 0;
@@ -8,7 +9,9 @@
     }
     .search_container {
         padding-top: 0.5rem;
-        width: 20%;
+        width: 18%;
+        position: relative;
+        right: 40rem;
         .p-input-icon-left {
             width: 100%;
         }
@@ -18,6 +21,9 @@
             .p-treenode {
                 padding: 0;
             }
+        }
+        .p-badge.p-badge-info {
+            background-color: #605BFF;
         }
         padding: 0;
         border: none;
@@ -32,14 +38,12 @@
             .p-treenode-content {
                 padding: 0;
                 overflow: hidden;
+                box-shadow: none;
             }
             .p-datatable-wrapper {
                 .p-datatable-tbody>tr>td:nth-child(1) {
                     text-align: center;
-                    width: 35.5vw;
-                }
-                .p-datatable-tbody>tr>td:nth-child(2) {
-                    width: 36.2vw;   
+                    width: 30vw;
                 }
             }
         }
@@ -53,29 +57,40 @@
                 padding: 0;
                 border-left: 1px solid #dee2e6;
                 .testSuite_col1 {
-                    width: 35vw;
+                    // width: 35vw;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 } 
                 .testSuite_col2 {
-                    width: 33vw;
+                    // width: 33vw;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 } 
                 .badge_icon {
                     margin-right: 0.5rem;
+                    .p-badge.p-badge-info {
+                        background-color: #605BFF;
+                    }
                 }
                 .badge_txt {
                     display: inline-block;
                     margin-right: 1rem;
                 }
                 .p-datatable.statusTable {
-                    width: 90%;
-                    border: 1px solid #dee2e6;
+                    width: 100%;
+                    // border: 1px solid #dee2e6;
                     padding-right: 1rem;
                     margin-top: 1rem;
                     .p-datatable-wrapper { 
-                        .p-datatable-tbody>tr>td:nth-child(4) {
-                            border-left: none;  
+                        .p-datatable-tbody>tr>td{
+                            border:none;
                         }
                         .p-datatable-tbody>tr>td:nth-child(1) {
                             text-align: left;   
+                            width: auto;
+                            max-width: 15vw;
                         }
                         .p-datatable-tbody>tr>td:nth-child(2) {
                             width: auto;   
@@ -166,13 +181,11 @@
     }
     .suite_text {
         display: inline-block;
-        width: 35vw;
-        text-align: center;
+        width: 30vw;
     }
     .case_text {
         display: inline-block;
-        width: 33vw;
-        text-align: center;
+        width: 30vw;
     }
 }
 
@@ -193,4 +206,117 @@
             background-color: lightgray;
         }
     }
+}
+.statusBadge{
+    .p-badge.p-badge-success {
+        background: white !important;
+        color: #10e91091 !important;
+        border: 1px solid #5cff5c !important;
+    }
+    .p-badge.p-badge-danger {
+        background: white;
+        color: #ee1c0d91;
+        border: 1px solid #ff5c5c;
+    }
+    .p-badge.p-badge-warning {
+        background: white;
+        color: #f55b1491;
+        border: 1px solid #f88149;
+    }
+    .p-badge.p-badge-info {
+        background: white;
+        color: #605BFF;
+        border: 1px solid #795bff;
+    }
+}
+.executionNo{
+    font-size: small;
+}
+.actions_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pi-download {
+    cursor: pointer;
+}
+
+// .statusTable{
+//     .p-tree .p-tree-container .p-treenode .p-treenode-content:focus{
+//         box-shadow: none;
+//     }
+// }
+
+.download_popup_container {
+    font-family: 'Open Sans';
+}
+.p-column-title{
+    display: block;
+    font: inherit;
+    margin-left: 0rem;
+}
+.exelist_title{
+    font: $f5_semibold;
+}
+.exestatus_container{
+    font: $f6_regular;
+}
+.exestatus_icon{
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+.exefailbg{
+    background-color: #FF6259;
+}
+.exepassbg{
+    background-color: #4CD07D;
+}
+.exeterminatebg{
+    background-color: #B32B23;
+}
+.exeexebg{
+    background-color: #605BFF;
+}
+
+.exefailcolor{
+    color: #FF6259;
+}
+.exepasscolor{
+    color: #4CD07D;
+}
+.exeterminatecolor{
+    color: #B32B23;
+}x
+.exeexecolor{
+    color: #605BFF;
+}
+.exestrips{
+    width:auto;
+    height:auto;
+    text-align: center;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 5px;
+}
+.testSuite_col1{
+    width: 28vw;
+}
+.exestatusbar_container{
+    font: $f6_regular;
+    color: white;
+    border-right: 1px solid #e9ecef;
+}
+.exeHeader{
+    font: $f7_regular;
+}
+.exeSubHeader{
+    font: $f7_semibold;
+}
+.runtitle{
+    font: $f7_semibold;
+}
+.rundatetime{
+    font: $f7_regular;
 }

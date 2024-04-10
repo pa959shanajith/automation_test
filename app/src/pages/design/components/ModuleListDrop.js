@@ -7,7 +7,7 @@ import * as d3 from 'd3';
 import '../styles/ModuleListDrop.scss'
 import ImportMindmap from'../components/ImportMindmap.js';
 import WSImportMindmap from'../components/WSImportMindmap.js';
-import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId} from '../designSlice';
+import { isEnELoad, savedList,initEnEProj,selectedModulelist,saveMindMap,moduleList,dontShowFirstModule, selectedModuleReducer,SetCurrentModuleId, TypeOfViewMap,setUpdateScreenModuleId, setTestCaseAssign, SetModuleNewNodeAdd} from '../designSlice';
 import { Tree } from 'primereact/tree';
 import { Checkbox } from "primereact/checkbox";
 import "../styles/ModuleListSidePanel.scss";
@@ -27,6 +27,7 @@ import { Tooltip } from 'primereact/tooltip';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { checkRole, roleIdentifiers } from "../components/UtilFunctions";
+import Toolbarmenu from './ToolbarMenu.js';
 
 
 const ModuleListDrop = (props) =>{
@@ -43,6 +44,8 @@ const ModuleListDrop = (props) =>{
     const initEnEProjt = useSelector(state=>state.design.initEnEProj)
     const oldModuleForReset = useSelector(state=>state.design.oldModuleForReset)
     const currentId = useSelector(state=>state.design.currentid)
+    const updateModuleId = useSelector(state=>state.design.updateScreenModuleId)
+    const typeOfView = useSelector(state=>state.design.TypeOfViewMap)
     const [moddrop,setModdrop]=useState(true)
     const [warning,setWarning]=useState(false)
     const [loading,setLoading] = useState(false)
@@ -75,6 +78,7 @@ const ModuleListDrop = (props) =>{
     const [collapseWhole, setCollapseWhole] = useState(true);
     const [initialText, setInitialText] = useState(E2EName? false : true);
     const prjList = useSelector(state=>state.design.projectList)
+    const testAssign = useSelector(state=>state.design.testCaseAssign);
 
     ////  /////ModuleListSidePanel'S dependencies
     const [showInput, setShowInput] = useState(false);
@@ -120,6 +124,8 @@ const ModuleListDrop = (props) =>{
   if(!userInfo) userInfo = userInfoFromRedux;
   else userInfo = userInfo ;
 
+  const isQualityEngineer = userInfo && userInfo.rolename === 'Quality Engineer';
+
     let projectInfo = JSON.parse(localStorage.getItem('DefaultProject'));
     const projectInfoFromRedux = useSelector((state) => state.landing.defaultSelectProject)
     if(!projectInfo) projectInfo = projectInfoFromRedux;
@@ -143,8 +149,11 @@ const ModuleListDrop = (props) =>{
         else{dispatch(savedList(true))}
         setWarning(false); 
         if(dontShowFirstModules === true && currentId !== ""){loadModule(currentId)}else{dispatch(savedList(true))}
+        if(Object.entries(updateModuleId).length !== 0)
+        {loadModule(updateModuleId.id)}
      // eslint-disable-next-line react-hooks/exhaustive-deps
-     }, [moduleLists, initProj])
+     if(Object.entries(testAssign).length>0){loadModule(testAssign.key)}
+     }, [moduleLists, initProj, currentId,updateModuleId,testAssign])
      useEffect(()=> {
         return () => {
           handleReaOnlyTestSuite({oldModuleForReset:localStorage.getItem('OldModuleForReset'),modID:localStorage.getItem('CurrentModuleForReset'),userInfo,appType:props.appType,module:props.module,proj:proj})
@@ -152,6 +161,9 @@ const ModuleListDrop = (props) =>{
             dispatch(selectedModuleReducer({}))
             // this comment is removed when auto save of mod will effect default mod
             dispatch(dontShowFirstModule(false))
+            dispatch(setUpdateScreenModuleId(""))
+            dispatch(setTestCaseAssign({}))
+            dispatch(SetModuleNewNodeAdd(false))
         }
      // eslint-disable-next-line react-hooks/exhaustive-deps
      },[]);
@@ -379,7 +391,9 @@ const ModuleListDrop = (props) =>{
         var res = await getModules(req)
         if(res.error){displayError(res.error);return}
         dispatch(selectedModuleReducer(res))
+        dispatch(SetCurrentModuleId(modID))
         setBlockui({show:false})
+        dispatch(SetModuleNewNodeAdd(false))
     }
     const [isModuleSelectedForE2E, setIsModuleSelectedForE2E] = useState('');
 
@@ -903,14 +917,14 @@ setPreventDefaultModule(true);
                   </div>
                   <div className="centralTwinBox">
                     <div className="leftBox">
-                      <Card title="Select Testcases" className="leftCard">
+                      <Card title="Select Test Cases" className="leftCard">
                      <div className="DrpoDown_search_Tree">
                           <div className='searchAndDropDown'>
                             <div className="headlineSearchInput">
                               <span className="p-input-icon-left">
                                 <i className="pi pi-search" />
                                 <InputText type="text"
-                                  placeholder="Search Testcases"
+                                  placeholder="Search Test Cases"
                                   value={valueSearchLeftBox}
                                   style={{ width: '15rem', height: '2.2rem', marginRight:'0.2rem', marginBottom: '1%' }}
                                   className="inputContainer" onChange={(e)=>{setValueSearchLeftBox(e.target.value);handleSearchScenarioLeftBox(e.target.value)}}
@@ -940,12 +954,12 @@ setPreventDefaultModule(true);
                         <div>
                           {/* {overlayforNoModSce?<h5 className='overlay4ModSceNoMod'>There are no Test Suites and Testcases in this project ...</h5>:  */}
                           <>
-                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Testcases...</h5>:
+                          {overlayforModSce? <h5 className='overlay4ModSce'>Loading Test Suite and Test Cases...</h5>:
                             <Tree
                               value={
                                 filterModSceList[0] === "" ?[{
                                   key:0,
-                                  label: (<div className='labelOfArrayText'> No Test Suites and Testcases in this project ... </div>),
+                                  label: (<div className='labelOfArrayText'> No Test Suites and Test Cases in this project ... </div>),
                                   children:(<></>)
                                 }]:
                                 filterModSceList[0].mindmapList.map((module, modIndx) => ({
@@ -992,7 +1006,7 @@ setPreventDefaultModule(true);
                       </div>
                     </div>
                     <div className="rightBox">
-                      <Card title="Selected Testcases" className="rightCard">
+                      <Card title="Selected Test Cases" className="rightCard">
                         {!initialText?
                           <>
                           <div className="headlineSearchInputOfRightBox">
@@ -1002,7 +1016,7 @@ setPreventDefaultModule(true);
                             <span className="p-input-icon-left">
                               <i className="pi pi-search" />
                               <InputText
-                                placeholder="Search Testcases by name"
+                                placeholder="Search Test cases by name"
                                 className="inputContainer"
                                 onChange={(e)=>handleSearchScenarioRightBox(e.target.value)}
                               />
@@ -1018,12 +1032,12 @@ setPreventDefaultModule(true);
                             :
                          <div className="initialText">
                            <div className="initial1StText">
-                             <h3 className="textClass"> No Testcases Yet</h3>
+                             <h3 className="textClass"> No Test Cases Yet</h3>
                            </div>
                            <div className="initial2NdText">
                              <h3 className="textClass">Select Project</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
                              <h3 className="textClass">Select Test Suite</h3>  <img src="static/imgs/rightArrow.png" className="ArrowImg" alt="moduleLayerIcon" />
-                             <h3 >Select Testcases</h3>
+                             <h3 >Select Test Cases</h3>
                             </div>
                           </div> 
                           }
@@ -1037,6 +1051,7 @@ setPreventDefaultModule(true);
           </div>}
           <Toast  ref={toast} position="bottom-center" baseZIndex={1000}/>
              {loading?<ScreenOverlay content={'Loading Mindmap ...'}/>:null}
+             {(blockui.show)?<ScreenOverlay content={blockui.content}/>:null}
             {warning.modID?<ModalContainer
                 show = {warning.modID} 
                 style={{width:"30%"}}
@@ -1048,23 +1063,12 @@ setPreventDefaultModule(true);
             />:null}
              <>
       <div className="CollapseWholeCont">
-       <div className="collapseBut" style={{height:"9%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'17rem',zIndex:'1',}}>
+       <div className="collapseBut" style={{height:"8%",alignItems:'end',display:"flex",float:'right',position: collapseWhole? "absolute": "", left:'17rem',zIndex:'1', backgroundColor:"#e6e6fa"}}>
              <img src="static/imgs/CollapseButForLefPanel.png" alt="collapseBut" style={{ cursor:'pointer',transform: collapseWhole ? 'rotate(0deg)' : 'rotate(180deg)'}} onClick={ ()=>{collapsedForModuleWholeCont(); }}/> 
           </div>
-            <div className="Whole_container" style={{ width: collapseWhole ? "17rem" : "0.9rem", transitionDuration: '0.7s ', overflow: !collapseWhole ? "hidden" : "",backgroundColor: !collapseWhole? "#c1c1ef" : ""  }}>
-              {/* <div className="project_name_section">
-             <h5>Home/</h5>
-             <select onChange={(e)=>{setprojectId(e.target.value)}} style={{width:'10rem', height:'19px'}}>
-             {projectList.map((project, index) => (
-                      
-                               <option value={project.id} key={index}>{project.name}</option>
-                              
-                    
-                       ))}
-                 
-             </select>
-              </div> */}
-
+            <div className="Whole_container" style={{ width: collapseWhole ? "17rem" : "0.9rem", transitionDuration: '0.7s ', overflow: !collapseWhole ? "hidden" : "",backgroundColor: !collapseWhole? "#c1c1ef" : "" , height:'100%' }}>
+             { collapseWhole && <Toolbarmenu setBlockui={setBlockui} displayError={displayError}/>}
+              
               <div className="normalModule_main_container"  style={{  display: !collapseWhole ? "none" : "", overflow: !collapseWhole ? "hidden" : "" }}>
                 <div className="moduleLayer_plusIcon">
                   <div className="moduleLayer_icon">
@@ -1088,11 +1092,11 @@ setPreventDefaultModule(true);
                         <Tooltip target=".custom-target-iconws" content=" import definition" position="bottom" />
                         {WSimportPop ? <WSImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setWSImportPop} isMultiImport={true} importPop={WSimportPop} /> : null}</>
                         : null}
-                      <img className="importimg pi pi-file-import mindmapImport" src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={() => setImportPop(true)}></img>
+                      <img className={!isQualityEngineer?"importimg pi pi-file-import mindmapImport":"import_quaEng"} src="static/imgs/import_new_18x18_icon.svg" alt='' onClick={!isQualityEngineer?() => setImportPop(true):null} title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }></img>
                       <Tooltip target=".mindmapImport" position="left" content="  Click here to import a Test Suite." />
                       {importPop ? <ImportMindmap setBlockui={setBlockui} displayError={displayError} setOptions={setOptions} setImportPop={setImportPop} isMultiImport={true} importPop={importPop} toast={toast} projectName={projectInfo.projectName} projectID={projectInfo.projectId}/> : null}
                       <Tooltip target=".custom-target-icon" content=" Create Test Suite" position="bottom" />
-                      <img className={`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={() => { CreateNew() }} />
+                      <img className={isQualityEngineer?"disable_create_btn":`testsuiteimg testsuiteimg__${(props.appType === "Webservice") ? "forWS" : "forNonWS"} custom-target-icon`} src="static/imgs/plusNew.png" alt="NewModules" onClick={!isQualityEngineer ? () => { CreateNew() } : null}  title={isQualityEngineer ? "you dont't have previlage to perform this action" : null }/>
                     </>
                   }
                    
@@ -1101,7 +1105,7 @@ setPreventDefaultModule(true);
                 <div className='' style={{display:'flex',height:'1.6rem',marginTop:'2%',marginLeft:'3%'}}>
                       <input style={{width:'1rem',marginLeft:'0.57rem',marginTop:'0.28rem'}} title='Select All Modules' name='selectall' type={"checkbox"} id="selectall" checked={allModSelected} onChange={(e) => {
                                     if (!allModSelected) {
-                                        dispatch(selectedModulelist( moduleLists.filter(module=> module.type==='basic').map((modd) => modd._id) ))
+                                        dispatch(selectedModulelist( moduleLists?.filter(module=> module.type==='basic').map((modd) => modd._id) ))
                                     } else {
                                         dispatch(selectedModulelist([]) )
                                     }
@@ -1128,7 +1132,7 @@ setPreventDefaultModule(true);
                               </>
                               )
                         })} */}
-                  {moduleLists.map((e, i) => {
+                  {moduleLists?.map((e, i) => {
                     if (e.type === "basic" && ((searchInpText !== "" && e.name.toUpperCase().indexOf(searchInpText.toUpperCase()) !== -1) || searchInpText === ""))
                       return (<>
                         {/* // <div key={i}>
@@ -1146,6 +1150,7 @@ setPreventDefaultModule(true);
                             <div style={{ width: '13rem', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                               <h4 className="moduleName" onClick={(e) => selectModule(e.target.getAttribute("value"), e.target.getAttribute("name"), e.target.getAttribute("type"), e.target.checked)} value={e._id} style={{ textOverflow: 'ellipsis', textAlign: 'left', fontWeight: '300' }}>{e.name}</h4>
                             </div>
+                            {e?.currentlyinuse != '' && e?.currentlyinuse!==userInfo?.username && <img src="static/imgs/eye_new_gray_icon.svg" style={{ width: '20px', height: '20px', marginLeft: '0.5rem' }} alt="modules" title={`This test suite is in read only mode and currently in use by ${e.currentlyinuse}`}/>}
                           </div>
                         </div>
                       </>
@@ -1200,7 +1205,7 @@ setPreventDefaultModule(true);
                               </>
                               )
                         })} */}
-                  {moduleLists.map((e, i) => {
+                  {moduleLists?.map((e, i) => {
                     if (e.type === "endtoend" && ((searchInpTextEnE !== "" && e.name.toUpperCase().indexOf(searchInpTextEnE.toUpperCase()) !== -1) || searchInpTextEnE === ""))
                       return (<>
 

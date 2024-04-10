@@ -9,6 +9,7 @@
             }
         }
         width: 100%;
+        
         .validation_container {
             height: 1rem;
             .txt_valid {
@@ -78,3 +79,6 @@
         padding: 0.3rem;
     }
 }
+.p-inputtext::placeholder {
+    font: $f7_regular;
+  }
