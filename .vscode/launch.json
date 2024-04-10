@@ -10,7 +10,7 @@
             "args": [],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": null,
-            "runtimeExecutable": "${workspaceRoot}/node.exe",
+            "runtimeExecutable": null,
             "runtimeArgs": [
                 "--nolazy"
             ],

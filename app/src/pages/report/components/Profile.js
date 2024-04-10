@@ -102,8 +102,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
-            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
+            name: `Run No: ${executionProfiles.length - (ind)}`,
+            dateTime: moment(el?.startDate).utcOffset("+05:30").format("DD MMM YYYY hh:mm A"),
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -120,8 +120,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
-            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
+            name: `Run No: ${executionProfiles.length - (ind)}`,
+            dateTime: moment(el?.startDate).utcOffset("+05:30").format("DD MMM YYYY hh:mm A"),
             status: checkStatus(el.modStatus),
             testSuites: el.modStatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -139,8 +139,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
-            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
+            name: `Run No: ${executionProfiles.length - (ind)}`,
+            dateTime: moment(el?.startDate).utcOffset("+05:30").format("DD MMM YYYY hh:mm A"),
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -157,8 +157,8 @@ const Profile = () => {
             ...el,
             id: el._id,
             key: ind.toString(),
-            name: <span className="runtitle">{`Run No: ${executionProfiles.length - (ind)}`}</span>,
-            dateTime: <span className="rundatetime">{moment(el?.startDate).format("DD MMM YYYY hh:mm A")}</span>,
+            name: `Run No: ${executionProfiles.length - (ind)}`,
+            dateTime: moment(el?.startDate).utcOffset("+05:30").format("DD MMM YYYY hh:mm A"),
             status: checkStatus(el.modstatus),
             testSuites: el.modstatus.reduce(
               (ac, cv) => ((ac[cv] = ac[cv] + 1 || 1), ac),
@@ -177,7 +177,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).utcOffset("+05:30").format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
         setReportsDataTable(
@@ -186,7 +186,7 @@ const Profile = () => {
             id: el?._id,
             key: ind.toString(),
             name: el?.title,
-            dateTime: <span className="rundatetime">{moment(el?.executedtime).format("DD MMM YYYY hh:mm A")}</span>,
+            dateTime: <span className="rundatetime">{moment(el?.executedtime).utcOffset("+05:30").format("DD MMM YYYY hh:mm A")}</span>,
           }))
         );
       }
@@ -375,32 +375,11 @@ const Profile = () => {
                   className="statusTable"
                   value={testSuiteList.map((item, i) => ({
                     scenarioname: item?.testscenarioname,
-                    status: item?.status,
-                    downLoad: (
-                      <i
-                        className="pi pi-download"
-                        onClick={(e) => {
-                          setDownloadId(item?.reportid);
-                          downloadRef.current.toggle(e);
-                        }}
-                      ></i>
-                    ),
-                    statusView: (
-                      <Button
-                        label="View"
-                        severity="secondary"
-                        size="small"
-                        outlined
-                        className="view_button"
-                        onClick={() => handleViweReports(item.reportid)}
-                      />
-                    ),
+                    extras: singleTestCaseTemplate(item)
                   }))}
                 >
                   <Column field="scenarioname"></Column>
-                  <Column field="status"></Column>
-                  <Column field="statusView"></Column>
-                  <Column field="downLoad"></Column>
+                  <Column field="extras"></Column>
                 </DataTable>
               ),
             },
@@ -447,6 +426,29 @@ const Profile = () => {
   const handleAccessibilityReports = (accessibilityId, getRuleMap) => {
     window.open(`/viewReports?accessibilityID=${accessibilityId}&rulemap=${getRuleMap}`, "_blank"); 
   }
+
+  const singleTestCaseTemplate = (item) => {
+    const filterData = exeStatusList?.filter(exe => exe.name == item?.status);
+    const tcData = filterData.length ? filterData[0] : {};
+    return <div className="flex flex-row justify-content-between align-items-center">
+      <Tooltip target=".report_view" content="View Reports" position="bottom" />
+      <div className="flex ml-3 justify-content-center align-items-center">
+        <div className={`mr-1 exestatus_icon ${tcData?.bgColor}`}></div>
+        <div className={`${tcData?.color}`}>{item?.status}</div>
+      </div>
+      <div className="report_view" style={{ width: "auto", minWidth: "40px", cursor: "pointer" }} onClick={() => handleViweReports(item?._id ? item?._id : item?.reportid)}>
+        <img src="static/imgs/report_view.svg" alt="reports_view_image" className="w-full" />
+      </div>
+      <div style={{ width: "auto", minWidth: "20px", cursor: "pointer" }} onClick={(e) => {
+        setDownloadId(item?._id ? item?._id : item?.reportid);
+        setScenarioName(item?.scenarioname ? item?.scenarioname : item?.testscenarioname)
+        setDownloadLevel("testCase")
+        downloadRef.current.toggle(e);
+      }}>
+        <img src="static/imgs/report_download.svg" />
+      </div>
+    </div>
+  }
  
   const onTestCaseClick = async (row, parentRow) => {
 
@@ -461,29 +463,6 @@ const Profile = () => {
       param: "scenarioStatus",
       executionId: row?.data?.id,
     });
-
-    const singleTestCaseTemplate = (item) => {
-        const filterData =exeStatusList?.filter(exe=>exe.name==item?.status);
-        const tcData = filterData.length ? filterData[0] : {};
-      return <div className="flex flex-row justify-content-between align-items-center">
-        <Tooltip target=".report_view" content="View Reports" position="bottom" />
-        <div className="flex ml-3 justify-content-center align-items-center">
-          <div className={`mr-1 exestatus_icon ${tcData?.bgColor}`}></div>
-          <div className={`${tcData?.color}`}>{item?.status}</div>
-        </div>
-        <div className="report_view" style={{ width: "auto", minWidth: "40px", cursor:"pointer" }} onClick={() => handleViweReports(item._id)}>
-          <img src="static/imgs/report_view.svg" alt="reports_view_image" className="w-full" />
-        </div>
-        <div style={{ width: "auto", minWidth: "20px", cursor:"pointer" }} onClick={(e) => {
-          setDownloadId(item?._id);
-          setScenarioName(item?.scenarioname)
-          setDownloadLevel("testCase")
-          downloadRef.current.toggle(e);
-        }}>
-          <img src="static/imgs/report_download.svg"/>
-        </div>
-      </div>
-    }
 
     const nestedTable = testCaseList.map((el, i) => {
       let nestedtreeArr = {
@@ -743,6 +722,12 @@ const Profile = () => {
       // </div>
     );
   };
+  const nameBodyTemplate = (rowData) => {
+    return <span className="runtitle">{rowData?.name}</span>
+  }
+  const dateBodyTemplate = (rowData) => {
+    return <span className="rundatetime">{rowData?.dateTime}</span>
+  }
 
   const statusBodyTemplate = (rowData) => {
     let statusSeverity = {
@@ -839,7 +824,7 @@ const Profile = () => {
                 <div className="flex flex-column pl-2">
                   <div className="flex align-items-start mb-1">
                     <span className="exeHeader">Elapsed Time : </span>
-                    <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
+                    <span className="exeSubHeader">{addReportEllapsedTimes(e?.ellapsedTime)}</span>
                   </div>
                   <div className="flex align-items-start">
                     <span className="exeHeader">Total Test Suites : </span>
@@ -905,7 +890,7 @@ const Profile = () => {
               <div className="flex flex-column pl-2">
                 <div className="flex align-items-start mb-1">
                   <span className="exeHeader">Elapsed Time : </span>
-                  <span className="exeSubHeader">{reportsDateFormat(e?.startDate, e?.endDate)}</span>
+                  <span className="exeSubHeader">{addReportEllapsedTimes(e?.ellapsedTime)}</span>
                 </div>
                 <div className="flex align-items-start">
                   <span className="exeHeader">Total Test Cases : </span>
@@ -963,7 +948,7 @@ const Profile = () => {
         setExportLevel("executiveSummary");
         setFileType("pdf");
         setDownloadLevel("row");
-        setExecutionListId(e?._id);
+        setExecutionListId(e?.executionListId ? e?.executionListId : e?._id);
         setTestSuiteName(`run_number_${exeProfileLength - Number((e?.key))}`)
       }}>
         <img className="w-full" src="static/imgs/report_download.svg"/>
@@ -1140,8 +1125,11 @@ const Profile = () => {
                 {...(col.field === "testCases"
                   ? { filter: true, filterPlaceholder: "Search by name" }
                   : {})}
-                {...(col.field === "name" || col.field === "dateTime"
-                  ? { sortable: true }
+                {...(col.field === "name"
+                  ? { sortable: true, body: nameBodyTemplate }
+                  : {})}
+                {...(col.field === "dateTime"
+                  ? { sortable: true, body: dateBodyTemplate }
                   : {})}
                 {...(col.field === "status"
                   ? { body: statusBodyTemplate }
