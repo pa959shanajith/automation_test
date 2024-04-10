@@ -880,7 +880,6 @@ setPreventDefaultModule(true);
       localStorage.removeItem('OldModuleForReset')
       
       }
-console.log(moduleLists,'moduleListsmoduleLists');
     return(
         <Fragment>
           {showE2EPopup &&

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {saveMindmap,getModules,getScreens,updateTestSuiteInUseBy} from '../api';
 import * as d3 from 'd3';
-import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId, SetModuleNewNodeAdd } from '../designSlice';
+import { saveMindMap, toDeleteScenarios, moduleList, selectedModuleReducer,dontShowFirstModule, SetCurrentId, SetModuleNewNodeAdd, setTestCaseAssign } from '../designSlice';
 import '../styles/SaveMapButton.scss'
 import {restructureData} from '../containers/MindmapUtilsForOthersView';
 import { VARIANT, Messages as MSG, setMsg } from '../../global';
@@ -246,6 +246,7 @@ const saveNode = async(setBlockui,dNodes,projId,cycId,deletedNoded,unassignTask,
     // dispatch(moduleList(moduledata))
     if(savedList){
         dispatch(dontShowFirstModule(true))
+        dispatch(setTestCaseAssign({}))
         dispatch(moduleList(moduledata))
         dispatch(selectedModuleReducer(moduleselected))
     }

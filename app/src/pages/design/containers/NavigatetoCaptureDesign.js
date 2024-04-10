@@ -46,7 +46,12 @@ function NavigatetoCaptureDesign(params) {
     const headerTemplate = (
         <>
             <div>
-            <h5 className='header_Groups repo_group_header'>{params.fetchingDetails['name'] && params.fetchingDetails['name'].length>20?params.fetchingDetails['name'].trim().substring(0,20)+'...' : params.fetchingDetails['name']} <img style={{ height: '24px', width: '24px', opacity: 1, }} src="static/imgs/eye_view_icon.svg" className=""></img></h5>
+                <h5 className='header_Groups repo_group_header'>{params.fetchingDetails['name'] && params.fetchingDetails['name'].length > 20 ? params.fetchingDetails['name'].trim().substring(0, 20) + '...' : params.fetchingDetails['name']} {assignUser === false &&
+                    <img
+                        style={{ height: '24px', width: '24px', opacity: 1 }}
+                        src="static/imgs/eye_view_icon.svg"
+                        className=""
+                    />} </h5>
                 <TabView className="tabView_captureDesign" activeIndex={activeIndex} onTabChange={(e)=>tabChnage(e)} >
                     {
                         tabsPanelInfo?.map(({name, iconpath})=>{

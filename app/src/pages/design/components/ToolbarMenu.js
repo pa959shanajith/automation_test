@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import Legends from './Legends';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Divider } from 'primereact/divider';
-import { screenData, moduleList, selectedModuleReducer, selectedProj, selectedModulelist, selectBoxState, selectNodes, copyNodes, dontShowFirstModule, TypeOfViewMap, SetOldModuleForReset } from '../designSlice'
+import { screenData, moduleList, selectedModuleReducer, selectedProj, selectedModulelist, selectBoxState, selectNodes, copyNodes, dontShowFirstModule, TypeOfViewMap, SetOldModuleForReset, setTestCaseAssign } from '../designSlice'
 import { RadioButton } from "primereact/radiobutton";
 import { Dropdown } from 'primereact/dropdown';
 import GitDropdown from '../components/GitDropdown';
@@ -88,6 +88,7 @@ const Toolbarmenu = (props) => {
 
         localStorage.setItem("DefaultProject", JSON.stringify(defaultProjectData));
         dispatch(moduleList([]))
+        dispatch(setTestCaseAssign({}));
         var moduledata = await getModules({ "tab": "endToend", "projectid": proj, "moduleid": null })
         if (moduledata.error) { displayError(moduledata.error); return; }
         var screendata = await getScreens(proj)

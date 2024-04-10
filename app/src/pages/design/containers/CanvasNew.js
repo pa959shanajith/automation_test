@@ -362,7 +362,7 @@ const CanvasNew = (props) => {
               tree = generateTree(tree,types,{...count},props.verticalLayout,screenData,props.gen)
               count= {...count,...tree.count}
             }else{
-              let number = tree.children.length === 1 && tree.children.length === 1 && tree.children[0].children[0].children.length>5?4: tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
+              let number = tree.children.length === 1 && tree.children[0].children.length === 1 && tree.children[0].children[0].children.length>5?4: tree.children.length === 1 && tree.children[0].children.length <= 3?1:tree.children.length> 1 && tree.children.length <= 3 && tree.children[0].children.length<=6?2:3
               journey = transformDataFromTreetoJourney(tree)
               tree = generateTreeOfView(journey,typesForJourney,{...count},props.verticalLayout,screenData,number)
               count= {...count,...tree.count}
@@ -424,7 +424,6 @@ const CanvasNew = (props) => {
         }
       }
     };
-
     const agsLicense = {
       value: userInfo?.licensedetails.AGS === false,
       msg: "You do not have access for Avo Genius"
@@ -642,21 +641,18 @@ const CanvasNew = (props) => {
         { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser},
         { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)} , disabled:!assignUser },
       ];
-    const menuItemTestStepGroups = !testSuiteInUse? [
-        { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) }},
-        { label: 'Copy/Cut Test Steps Groups',icon:<img src="static/imgs/ic-jq-copysteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{handleCopyNodeData()}},
-        { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:copyNodeData.length>0?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
+    const menuItemTestStepGroups =[
+        { label: 'Add Test Steps Groups',icon:<img src="static/imgs/add-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command:()=>{clickAddNode(box.split("node_")[1]);d3.select('#'+box).classed('node-highlight',false) },disabled:!assignUser},
+        { label: 'Copy/Cut Test Steps Groups',icon:<img src="static/imgs/ic-jq-copysteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: () =>{handleCopyNodeData()},disabled:!assignUser},
+        { label: 'Paste Test Steps Groups',icon:<img src="static/imgs/ic-jq-pastesteps.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, disabled:(copyNodeData.length>0)?false:true,command: () =>{var p = d3.select('#'+box);handlePasteNodeData(d3.select('#'+box))}},
         {separator: true},
         { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
         {separator: true},
         { label: 'Debug',icon:<img src="static/imgs/Execute-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" ,display:"block"}} /> , disabled:true},
         {separator: true},
-        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)} },
-        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)}  },
-      ]:[
-        { label: 'Design Steps Groups',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestStepsGroups() },
+        { label: 'Rename',icon:<img src="static/imgs/edit-icon.png" alt='add icon'  style={{height:"25px", width:"25px",marginRight:"0.5rem" }}/>, command: ()=>{var p = d3.select('#'+box);setCreateNew(false);setInpBox(p);d3.select('#'+box).classed('node-highlight',false)},disabled:!assignUser},
+        { label: 'Delete',icon:<img src="static/imgs/delete-icon.png" alt='add icon' style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />,command: ()=>{clickDeleteNode(box);d3.select('#'+box).classed('node-highlight',false)},disabled:!assignUser },
       ]
-
       const menuItemsTestSteps =[
         { label: 'Design Test Steps',icon:<img src="static/imgs/design-icon.png" alt="execute" style={{height:"25px", width:"25px",marginRight:"0.5rem" }} />, command: ()=>handleTestSteps() },
         {separator: true},
@@ -1553,11 +1549,11 @@ const CanvasNew = (props) => {
       //   return
       // }
     }
-    if(type=="scenarios" && typeOfView === 'mindMapView' && node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){
+    if(type=="scenarios"  && node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){
       toastWarnMsg(`This Test Case is assigned to ${node[1].assignedUser}`);
       return;
     }
-    if((type=="screens"|| type=="testcases")){
+    if((type=="screens"|| type=="testcases" || type==="teststepsgroups")){
        if(node[1].assignedUser != userInfo.username && node[1]?.assignedUser!=''){setAssignUser(false)}
        else{setAssignUser(true)}
     }
@@ -2960,7 +2956,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
             {/* {(ctrlBox !== false)?<ControlBox setShowDesignTestSetup={props.setShowDesignTestSetup} ShowDesignTestSetup={props.ShowDesignTestSetup} setTaskBox={setTaskBox} nid={ctrlBox} taskname ={taskname} setMultipleNode={setMultipleNode} clickAddNode={clickAddNode} clickDeleteNode={clickDeleteNode} setCtrlBox={setCtrlBox} setInpBox={setInpBox} ctScale={ctScale}/>:null} */}
             {(inpBox !== false)?<InputBox setCtScale={setCtScale} zoom={zoom} node={inpBox} dNodes={[...dNodes]} setInpBox={setInpBox} setCtrlBox={setCtrlBox} ctScale={ctScale} />:null}
             {(multipleNode !== false)?<MultiNodeBox count={count} node={multipleNode} setMultipleNode={setMultipleNode} createMultipleNode={createMultipleNode}/>:null}
-            {visibleDesignStepGroups && <DesignTestStepsGroups visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} setFetchingDetailsForGroup={setFetchingDetailsForGroup} />}
+            {visibleDesignStepGroups && <DesignTestStepsGroups assignUser={assignUser} visibleDesignStepGroups={visibleDesignStepGroups} fetchingDetailsForGroup={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetailsForGroup} setVisibleDesignStepGroups={setVisibleDesignStepGroups} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} setFetchingDetailsForGroup={setFetchingDetailsForGroup} />}
             {visibleCaptureAndDesign && <NavigatetoCaptureDesign assignUser={assignUser} visibleCaptureAndDesign={visibleCaptureAndDesign} fetchingDetails={fetchingDetailsImpact?fetchingDetailsImpact:fetchingDetails} setVisibleCaptureAndDesign={setVisibleCaptureAndDesign} visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} testSuiteInUse={testSuiteInUse} appType={typesOfAppType}  visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={impactAnalysisDone} testcaseDetailsAfterImpact={testcaseDetailsAfterImpact} setImpactAnalysisDone={setImpactAnalysisDone} designClick={designClick} setDesignClick={setDesignClick} dNodes={dNodes} setFetchingDetails={setFetchingDetails}/>}
             <ContextMenu className='menu_items' model={menuItemsModule} ref={menuRef_module}/>
             <ContextMenu model={menuItemsScenario} ref={menuRef_scenario} />
@@ -3030,7 +3026,7 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
                 </g>
                 ):null}
-                {(node[1].type === "scenarios" && typeOfView === 'mindMapView' && node[1]?.assignedUser != userInfo.username && node[1]?.assignedUser != '') ? (
+                {(node[1].type === "scenarios"  && node[1]?.assignedUser != userInfo.username && node[1]?.assignedUser != '') ? (
                   <g transform={node[1].transformImpact} className='node_'>
                     <image style={{ height: '24px', width: '24px', opacity: 1, transform: 'translate(-4px,-4px)' }} xlinkHref="static/imgs/eye_view_icon.svg" className="ct-nodeIcon ct-nodeIcon_02 pi pi-eye"
                     ></image>

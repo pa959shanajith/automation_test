@@ -13,6 +13,7 @@ import { dontShowFirstModule, setUpdateScreenModuleId } from "../designSlice";
 
 
 function DesignTestStepsGroups(params) {
+    const {assignUser} = params;
     const dispatch = useDispatch();
     const [visibleCaptureElement, setVisibleCaptureElement] = useState(true);
     const [visibleDesignStep, setVisibleDesignStep] = useState(true);
@@ -22,7 +23,7 @@ function DesignTestStepsGroups(params) {
     const TabTemplate = (name, iconpath) => {
         return <div className="flex flex-row">
             <div className="mr-2">
-                <img className="w-full" src={iconpath[activeIndex]} />
+                <img className="w-full" src={iconpath[activeIndex]} alt="" />
             </div>
             <div>{name}</div>
         </div>
@@ -30,7 +31,13 @@ function DesignTestStepsGroups(params) {
     const headerTemplate = (
         <>
             <div>
-                <h5 className='dailog_headerGroups'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}</h5>
+                <h5 className='dailog_headerGroups repo_group_header'>{params.fetchingDetailsForGroup['parent']['name'] && params.fetchingDetailsForGroup['parent']['name'].length>20?params.fetchingDetailsForGroup['parent']['name'].trim().substring(0,20)+'...' : params.fetchingDetailsForGroup['parent']['name']}
+                {assignUser === false &&
+                    <img
+                        style={{ height: '24px', width: '24px', opacity: 1 }}
+                        src="static/imgs/eye_view_icon.svg"
+                        className=""
+                    />}</h5>
                 <TabView className="tabViewHeader" activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)} >
                     {
                         tabsPanelInfo?.map(({name, iconpath})=>{
@@ -47,11 +54,11 @@ function DesignTestStepsGroups(params) {
                 <div className='designTestGroups'>
                     
                 {activeIndex === 0 ?<div>
-                    <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse} setFetchingDetails={params.setFetchingDetailsForGroup} setModuleData={setModuleData}/>
+                    <CaptureModal visibleCaptureElement={visibleCaptureElement} setVisibleCaptureElement={setVisibleCaptureElement} fetchingDetails={params.fetchingDetailsForGroup['parent']} testSuiteInUse={params.testSuiteInUse} setFetchingDetails={params.setFetchingDetailsForGroup} setModuleData={setModuleData} assignUser={assignUser}/>
                     </div>  
                     :
                     <div>
-                        <DesignModal   fetchingDetails={params.fetchingDetailsForGroup} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse}/>
+                        <DesignModal  fetchingDetails={params.fetchingDetailsForGroup} appType={params.appType} visibleDesignStep={visibleDesignStep} setVisibleDesignStep={setVisibleDesignStep} impactAnalysisDone={params.impactAnalysisDone} testcaseDetailsAfterImpact={params.testcaseDetailsAfterImpact} setImpactAnalysisDone={params.setImpactAnalysisDone} testSuiteInUse={params.testSuiteInUse} assignUser={assignUser}/>
                     </div>  }   
                 </div>
             </Dialog>
